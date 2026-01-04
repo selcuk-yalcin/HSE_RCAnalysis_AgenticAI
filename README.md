@@ -1,51 +1,51 @@
 # HSE Root Cause Analysis - AI Agent System
 
-HSG245 tabanlı çok-ajanlı kök neden analizi sistemi.
+Multi-agent root cause investigation system based on HSG245 framework.
 
-## 📂 Proje Yapısı
+## 📂 Project Structure
 
 ```
 HSE_AgenticAI/
 ├── agents/              # AI Agents (Overview, Investigation, etc.)
 ├── api/                 # FastAPI Backend
-├── shared/              # Ortak konfigürasyon ve yardımcılar
-├── admin/              # Admin Panel (Submodule - Ayrı repo)
-├── examples/            # Test dosyaları
-└── requirements.txt     # Python bağımlılıkları
+├── shared/              # Shared configuration and utilities
+├── admin/              # Admin Panel (Submodule - Separate repo)
+├── examples/            # Test files
+└── requirements.txt     # Python dependencies
 ```
 
-## 🔗 Repository Yapısı
+## 🔗 Repository Structure
 
-Bu proje **iki ayrı repository** kullanır:
+This project uses **two separate repositories**:
 
-### 1. Backend/Agents (Bu Repo)
+### 1. Backend/Agents (This Repo)
 - **Repository**: `HSE_RCAnalysis_AgenticAI`
-- **İçerik**: AI agents, FastAPI backend, shared utilities
+- **Content**: AI agents, FastAPI backend, shared utilities
 - **Deployment**: Vercel (API)
 
 ### 2. Admin Panel (Submodule)
 - **Repository**: `admin_pan`
-- **İçerik**: Next.js/React admin interface
+- **Content**: Next.js/React admin interface
 - **Deployment**: Vercel (Frontend)
 - **URL**: https://inferaworld-admin.vercel.app
 
-## 🚀 Kurulum
+## 🚀 Installation
 
 ### Backend Setup
 
 ```bash
-# Repository'yi klonlayın (submodule ile birlikte)
+# Clone repository (with submodules)
 git clone --recurse-submodules https://github.com/selcuk-yalcin/HSE_RCAnalysis_AgenticAI.git
 cd HSE_AgenticAI
 
-# Python bağımlılıklarını yükleyin
+# Install Python dependencies
 pip install -r requirements.txt
 
-# .env dosyası oluşturun
+# Create .env file
 cp .env.example .env
-# OPENAI_API_KEY'inizi ekleyin
+# Add your OPENAI_API_KEY
 
-# API'yi başlatın
+# Start the API
 cd api
 python main.py
 ```
@@ -53,42 +53,42 @@ python main.py
 ### Admin Panel Setup
 
 ```bash
-# Admin panel klasörüne gidin
+# Navigate to admin panel folder
 cd admin
 
-# Node.js bağımlılıklarını yükleyin
+# Install Node.js dependencies
 npm install
 
-# Admin panel'i başlatın
+# Start admin panel
 npm run dev
 ```
 
 ## 🔄 Git Workflow
 
-### Backend Değişiklikleri
+### Backend Changes
 
 ```bash
-# Backend dosyalarını commit edin
+# Commit backend files
 git add agents/ api/ shared/
 git commit -m "feat: Update agents"
 git push origin main
 ```
 
-### Admin Panel Değişiklikleri
+### Admin Panel Changes
 
 ```bash
-# Admin panel klasörüne gidin
+# Navigate to admin panel folder
 cd admin
 
-# Değişiklikleri admin_pan repo'suna commit edin
+# Commit changes to admin_pan repo
 git add .
 git commit -m "feat: Update admin UI"
 git push origin main
 
-# Ana repo'ya geri dönün
+# Return to main repo
 cd ..
 
-# Submodule referansını güncelleyin
+# Update submodule reference
 git add admin
 git commit -m "chore: Update admin panel submodule"
 git push origin main
@@ -97,10 +97,10 @@ git push origin main
 ## 📡 API Endpoints
 
 - `GET /` - API status
-- `POST /api/v1/incidents` - Yeni olay oluştur
+- `POST /api/v1/incidents` - Create new incident
 - `GET /api/v1/health` - Health check
 
-## 🛠️ Teknolojiler
+## 🛠️ Technologies
 
 ### Backend
 - Python 3.11+
@@ -114,6 +114,6 @@ git push origin main
 - TypeScript
 - Tailwind CSS
 
-## 📝 Lisans
+## 📝 License
 
 MIT License
