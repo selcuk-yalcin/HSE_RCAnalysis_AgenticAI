@@ -247,8 +247,8 @@ class PDFReportAgent:
                 pdf.cell(0, 6, 'Immediate Causes:', ln=True)
                 pdf.set_font('Arial', '', 10)
                 for cause in root_causes['immediate_causes']:
-                    pdf.cell(10, 5, chr(149), ln=0)  # Bullet point
-                    pdf.multi_cell(0, 5, cause)
+                    pdf.cell(5, 5, chr(149), ln=0)  # Bullet point
+                    pdf.multi_cell(0, 5, cause, ln=True)
                 pdf.ln(2)
             
             # Underlying causes
@@ -257,8 +257,8 @@ class PDFReportAgent:
                 pdf.cell(0, 6, 'Underlying Causes:', ln=True)
                 pdf.set_font('Arial', '', 10)
                 for cause in root_causes['underlying_causes']:
-                    pdf.cell(10, 5, chr(149), ln=0)
-                    pdf.multi_cell(0, 5, cause)
+                    pdf.cell(5, 5, chr(149), ln=0)
+                    pdf.multi_cell(0, 5, cause, ln=True)
                 pdf.ln(2)
             
             # Root causes
@@ -267,8 +267,8 @@ class PDFReportAgent:
                 pdf.cell(0, 6, 'Root Causes:', ln=True)
                 pdf.set_font('Arial', '', 10)
                 for cause in root_causes['root_causes']:
-                    pdf.cell(10, 5, chr(149), ln=0)
-                    pdf.multi_cell(0, 5, cause)
+                    pdf.cell(5, 5, chr(149), ln=0)
+                    pdf.multi_cell(0, 5, cause, ln=True)
                 pdf.ln(2)
         
         pdf.ln(5)
