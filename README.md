@@ -31,6 +31,12 @@ This project uses **two separate repositories**:
 
 ## 🚀 Installation
 
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+ (for admin panel)
+- OpenAI API Key ([Get one here](https://platform.openai.com/api-keys))
+
 ### Backend Setup
 
 ```bash
@@ -41,13 +47,17 @@ cd HSE_AgenticAI
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Create .env file
+# Setup environment variables
 cp .env.example .env
-# Add your OPENAI_API_KEY
+# Edit .env and add your OPENAI_API_KEY
+nano .env
 
-# Start the API
-cd api
-python main.py
+# Test installation
+python examples/test_pdf_agent.py
+
+# Start the API server
+python -m uvicorn api.main:app --reload
+# API will be available at http://localhost:8000
 ```
 
 ### Admin Panel Setup
@@ -61,7 +71,20 @@ npm install
 
 # Start admin panel
 npm run dev
+# Admin panel will be available at http://localhost:3000
 ```
+
+### Environment Variables
+
+See [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) for detailed configuration.
+
+**Required:**
+- `OPENAI_API_KEY` - Your OpenAI API key
+
+**Optional:**
+- `OPENAI_MODEL` - Model to use (default: gpt-4o-mini)
+- `OPENAI_TEMPERATURE` - Creativity (default: 0.7)
+- `PORT` - API port (default: 8000)
 
 ## 🔄 Git Workflow
 
