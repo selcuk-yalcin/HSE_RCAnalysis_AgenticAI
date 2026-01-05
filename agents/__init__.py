@@ -5,20 +5,20 @@ from .overview_agent import OverviewAgent
 from .assessment_agent import AssessmentAgent
 from .rootcause_agent import RootCauseAgent
 from .orchestrator import RootCauseOrchestrator
+from .pdf_report_agent import PDFReportAgent
 
 # TODO: Add remaining agents
 # from .investigation_agent import InvestigationAgent
 # from .recommendation_agent import RecommendationAgent
 # from .actionplan_agent import ActionPlanAgent
-# from .report_generator import ReportGeneratorAgent
 
 __all__ = [
     'OverviewAgent',
     'AssessmentAgent',
     'RootCauseAgent',
     'RootCauseOrchestrator',
+    'PDFReportAgent',
     # 'InvestigationAgent',
     # 'RecommendationAgent',
     # 'ActionPlanAgent',
-    # 'ReportGeneratorAgent',
 ]
