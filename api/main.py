@@ -40,12 +40,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize agents
-overview_agent = OverviewAgent(OPENAI_CONFIG)
-assessment_agent = AssessmentAgent(OPENAI_CONFIG)
-rootcause_agent = RootCauseAgent(OPENAI_CONFIG)
-actionplan_agent = ActionPlanAgent(OPENAI_CONFIG)
-pdf_agent = PDFReportAgent()
+# Initialize agents with error handling
+overview_agent = None
+assessment_agent = None
+rootcause_agent = None
+actionplan_agent = None
+pdf_agent = None
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize agents on startup"""
+    global overview_agent, assessment_agent, rootcause_agent, actionplan_agent, pdf_agent
+    
+    print("🚀 Starting HSE Investigation API...")
+    print(f"📊 OpenAI API Key configured: {bool(os.getenv('OPENAI_API_KEY'))}")
+    
+    try:
+        overview_agent = OverviewAgent(OPENAI_CONFIG)
+        print("✅ Overview Agent initialized")
+        
+        assessment_agent = AssessmentAgent(OPENAI_CONFIG)
+        print("✅ Assessment Agent initialized")
+        
+        rootcause_agent = RootCauseAgent(OPENAI_CONFIG)
+        print("✅ Root Cause Agent initialized")
+        
+        actionplan_agent = ActionPlanAgent(OPENAI_CONFIG)
+        print("✅ Action Plan Agent initialized")
+        
+        pdf_agent = PDFReportAgent()
+        print("✅ PDF Report Agent initialized")
+        
+        print("🎉 All agents ready!")
+    except Exception as e:
+        print(f"❌ Error initializing agents: {e}")
+        # Don't crash - let healthcheck show the error
+        pass
 
 # In-memory storage (replace with database in production)
 incidents_db = {}
@@ -268,15 +298,20 @@ async def list_incidents():
 
 @app.get("/api/v1/health")
 async def health_check():
+    """Health check endpoint - Railway uses this"""
+    agents_status = {
+        "overview": "active" if overview_agent else "not_initialized",
+        "assessment": "active" if assessment_agent else "not_initialized",
+        "rootcause": "active" if rootcause_agent else "not_initialized",
+        "actionplan": "active" if actionplan_agent else "not_initialized",
+        "pdf_generator": "active" if pdf_agent else "not_initialized"
+    }
+    
+    all_agents_ready = all(status == "active" for status in agents_status.values())
+    
     return {
-        "status": "healthy",
-        "agents": {
-            "overview": "active",
-            "assessment": "active",
-            "rootcause": "active",
-            "actionplan": "active",
-            "pdf_generator": "active"
-        },
+        "status": "healthy" if all_agents_ready else "degraded",
+        "agents": agents_status,
         "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
         "incidents_count": len(incidents_db),
         "timestamp": datetime.now().isoformat()
