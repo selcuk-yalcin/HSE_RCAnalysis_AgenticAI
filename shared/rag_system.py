@@ -1,6 +1,7 @@
 """
 RAG (Retrieval Augmented Generation) System
 HSG245 Knowledge Base Integration with PostgreSQL + pgvector
+Uses OpenAI Embeddings (lightweight, no heavy model files)
 """
 
 import os
@@ -8,14 +9,14 @@ from typing import List, Dict, Optional
 import psycopg2
 from psycopg2.extras import execute_values
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from sentence_transformers import SentenceTransformer
+from openai import OpenAI
 from pathlib import Path
-import numpy as np
 
 class HSG245RAGSystem:
     """
     RAG system for HSG245 incident investigation
     Stores and retrieves relevant safety knowledge using PostgreSQL + pgvector
+    Uses OpenAI Embeddings API (lightweight, no model downloads)
     """
     
     def __init__(self, database_url: Optional[str] = None):
@@ -27,13 +28,14 @@ class HSG245RAGSystem:
         if not self.database_url:
             raise ValueError("DATABASE_URL not found in environment variables")
         
+        # Initialize OpenAI client for embeddings
+        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.embedding_model = "text-embedding-3-small"  # OpenAI's efficient embedding model
+        self.embedding_dim = 1536  # text-embedding-3-small dimension
+        
         # Initialize database connection
         self.conn = psycopg2.connect(self.database_url)
         self.conn.autocommit = True
-        
-        # Initialize embedding model (lightweight, runs locally)
-        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
-        self.embedding_dim = 384  # all-MiniLM-L6-v2 output dimension
         
         # Text splitter for chunking documents
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -97,8 +99,14 @@ class HSG245RAGSystem:
         
         print(f"📄 Processing {len(chunks)} chunks from {source}...")
         
-        # Generate embeddings
-        embeddings = self.embedding_model.encode(chunks)
+        # Generate embeddings using OpenAI API
+        embeddings = []
+        for chunk in chunks:
+            response = self.openai_client.embeddings.create(
+                input=chunk,
+                model=self.embedding_model
+            )
+            embeddings.append(response.data[0].embedding)
         
         # Insert into database
         with self.conn.cursor() as cur:
@@ -111,13 +119,10 @@ class HSG245RAGSystem:
                 if metadata:
                     chunk_metadata.update(metadata)
                 
-                # Convert numpy array to list for PostgreSQL
-                embedding_list = embedding.tolist()
-                
                 cur.execute("""
                     INSERT INTO hsg245_knowledge (content, embedding, source, chunk_index, metadata)
                     VALUES (%s, %s, %s, %s, %s)
-                """, (chunk, embedding_list, source, i, psycopg2.extras.Json(chunk_metadata)))
+                """, (chunk, embedding, source, i, psycopg2.extras.Json(chunk_metadata)))
         
         print(f"✅ Added {len(chunks)} chunks to knowledge base")
         return len(chunks)
@@ -153,8 +158,12 @@ class HSG245RAGSystem:
         Returns:
             List of relevant documents with metadata
         """
-        # Generate query embedding
-        query_embedding = self.embedding_model.encode([query_text])[0].tolist()
+        # Generate query embedding using OpenAI API
+        response = self.openai_client.embeddings.create(
+            input=query_text,
+            model=self.embedding_model
+        )
+        query_embedding = response.data[0].embedding
         
         # Query PostgreSQL with cosine similarity
         with self.conn.cursor() as cur:
