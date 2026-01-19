@@ -110,7 +110,7 @@ class AssessmentData(BaseModel):
     riddor_reportable: str
 
 class InvestigationData(BaseModel):
-    incident_id: str
+    incident_id: str = ""  # Optional - can be inferred from URL path
     location: str
     who_involved: str
     how_happened: str
