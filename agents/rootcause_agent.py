@@ -6,6 +6,7 @@ Performs 5 Why Analysis and identifies immediate, underlying, and root causes
 from openai import OpenAI
 from typing import Dict, List, Optional
 import json
+import os
 
 
 class RootCauseAgent:
@@ -19,13 +20,14 @@ class RootCauseAgent:
     Uses AI to build causal chains and analyze incidents
     """
     
-    def __init__(self, openai_config: Dict):
-        """Initialize Root Cause Agent with OpenAI configuration"""
-        self.client = OpenAI(api_key=openai_config["api_key"])
-        self.model = openai_config["model"]
-        self.temperature = openai_config["temperature"]
-        
-        print(f"✅ Root Cause Agent initialized (Model: {self.model})")
+    def __init__(self):
+        """Initialize Root Cause Agent with OpenRouter"""
+        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key
+        )
+        print(f"✅ Root Cause Agent initialized with OpenRouter")
     
     def analyze_root_causes(self, 
                           part1_data: Dict, 
@@ -149,7 +151,7 @@ Return a JSON with:
 Return ONLY valid JSON with 2-4 causal chains."""
 
         response = self.client.chat.completions.create(
-            model=self.model,
+            model="openai/gpt-4-turbo",
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "You are a 5 Why analysis expert. Return only valid JSON."},
@@ -216,7 +218,7 @@ Provide 3-5 causes for each category.
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model=self.model,
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "You are a cause categorization expert. Return only valid JSON."},

@@ -19,15 +19,15 @@ class RootCauseOrchestrator:
     4. Generate final report
     """
     
-    def __init__(self, openai_config: Dict):
-        """Initialize all agents"""
+    def __init__(self):
+        """Initialize all agents with OpenRouter"""
         print("\n" + "="*80)
         print("🚀 INITIALIZING ROOT CAUSE INVESTIGATION SYSTEM")
         print("="*80)
         
-        self.overview_agent = OverviewAgent(openai_config)
-        self.assessment_agent = AssessmentAgent(openai_config)
-        self.rootcause_agent = RootCauseAgent(openai_config)
+        self.overview_agent = OverviewAgent()
+        self.assessment_agent = AssessmentAgent()
+        self.rootcause_agent = RootCauseAgent()
         
         self.investigation_data = {
             "part1": None,

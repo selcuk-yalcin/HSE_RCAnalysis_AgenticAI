@@ -7,6 +7,7 @@ from openai import OpenAI
 from typing import Dict, List
 from datetime import datetime, timedelta
 import json
+import os
 
 
 class ActionPlanAgent:
@@ -22,13 +23,14 @@ class ActionPlanAgent:
     - Priority levels
     """
     
-    def __init__(self, openai_config: Dict):
-        """Initialize Action Plan Agent with OpenAI configuration"""
-        self.client = OpenAI(api_key=openai_config["api_key"])
-        self.model = openai_config["model"]
-        self.temperature = 0.3  # Low temperature for structured output
-        
-        print(f"✅ Action Plan Agent initialized (Model: {self.model})")
+    def __init__(self):
+        """Initialize Action Plan Agent with OpenRouter"""
+        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key
+        )
+        print(f"✅ Action Plan Agent initialized with OpenRouter")
     
     def generate_action_plan(self, investigation_data: Dict) -> Dict:
         """
@@ -155,7 +157,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
         
         try:
             response = self.client.chat.completions.create(
-                model=self.model,
+                model="openai/gpt-4o-mini",
                 messages=[
                     {
                         "role": "system", 
@@ -166,7 +168,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
                         "content": prompt
                     }
                 ],
-                temperature=self.temperature,
+                temperature=0.3,
                 max_tokens=2000,
                 response_format={"type": "json_object"}
             )

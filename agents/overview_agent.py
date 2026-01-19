@@ -7,6 +7,7 @@ from openai import OpenAI
 from datetime import datetime
 from typing import Dict, Optional
 import json
+import os
 
 
 class OverviewAgent:
@@ -23,13 +24,14 @@ class OverviewAgent:
     - Forwarded to / Date/Time
     """
     
-    def __init__(self, openai_config: Dict):
-        """Initialize Overview Agent with OpenAI configuration"""
-        self.client = OpenAI(api_key=openai_config["api_key"])
-        self.model = openai_config["model"]
-        self.temperature = openai_config["temperature"]
-        
-        print(f"✅ Overview Agent initialized (Model: {self.model})")
+    def __init__(self):
+        """Initialize Overview Agent with OpenRouter"""
+        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key
+        )
+        print(f"✅ Overview Agent initialized with OpenRouter")
     
     def process_initial_report(self, incident_data: Dict) -> Dict:
         """
@@ -104,8 +106,8 @@ If any information is not available, use empty string "".
 Return ONLY valid JSON, no explanations."""
 
         response = self.client.chat.completions.create(
-            model=self.model,
-            temperature=self.temperature,
+            model="openai/gpt-4-turbo",
+            temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a health and safety incident documentation expert. Return only valid JSON."},
                 {"role": "user", "content": prompt}
@@ -156,8 +158,8 @@ Classify this incident into ONE of these categories:
 Return ONLY the category name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model=self.model,
-            temperature=0.1,  # Low temperature for consistent classification
+            model="openai/gpt-4o-mini",
+            temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety incident classifier. Return only the category name."},
                 {"role": "user", "content": prompt}

@@ -7,6 +7,7 @@ from openai import OpenAI
 from datetime import datetime
 from typing import Dict, Optional
 import json
+import os
 
 
 class AssessmentAgent:
@@ -24,13 +25,14 @@ class AssessmentAgent:
     - Priority (High, Medium, Low)
     """
     
-    def __init__(self, openai_config: Dict):
-        """Initialize Assessment Agent with OpenAI configuration"""
-        self.client = OpenAI(api_key=openai_config["api_key"])
-        self.model = openai_config["model"]
-        self.temperature = openai_config["temperature"]
-        
-        print(f"✅ Assessment Agent initialized (Model: {self.model})")
+    def __init__(self):
+        """Initialize Assessment Agent with OpenRouter"""
+        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key
+        )
+        print(f"✅ Assessment Agent initialized with OpenRouter")
     
     def assess_incident(self, part1_data: Dict, incident_details: Dict = None) -> Dict:
         """
@@ -139,7 +141,7 @@ Classify this into ONE of these event types:
 Return ONLY the event type name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model=self.model,
+            model="openai/gpt-4-turbo",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety event classifier. Return only the event type."},
@@ -177,7 +179,7 @@ Classify the severity into ONE of these levels:
 Return ONLY the severity level, nothing else."""
 
         response = self.client.chat.completions.create(
-            model=self.model,
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a severity assessor. Return only the severity level."},
@@ -221,7 +223,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model=self.model,
+            model="openai/gpt-4-turbo",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a RIDDOR expert. Return only valid JSON."},
@@ -285,7 +287,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model=self.model,
+            model="openai/gpt-4o-mini",
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "You are an investigation coordinator. Return only valid JSON."},
