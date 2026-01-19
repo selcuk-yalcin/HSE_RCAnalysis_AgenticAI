@@ -34,7 +34,12 @@ class RootCauseAgent:
                           part2_data: Dict,
                           investigation_data: Dict = None) -> Dict:
         """
-        Perform comprehensive root cause analysis
+        Perform comprehensive root cause analysis following HSG245 methodology
+        
+        CORRECT FLOW:
+        1. Identify immediate causes (direct causes)
+        2. For each immediate cause, perform 5 Why analysis
+        3. Extract underlying causes (Why 2-4) and root causes (Why 5)
         
         Args:
             part1_data: Overview data
@@ -45,6 +50,7 @@ class RootCauseAgent:
             Root cause analysis results with 5 Why chains
         """
         print("\n" + "="*80)
+        print("📋 BÖLÜM 3: KÖK NEDEN ANALİZİ - Olay Analiz Ediliyor")
         print("📋 PART 3: ROOT CAUSE ANALYSIS - Analyzing Incident")
         print("="*80)
         
@@ -54,31 +60,48 @@ class RootCauseAgent:
         # Initialize root cause analysis structure
         rca_data = {
             "incident_summary": incident_summary,
-            "five_why_chains": [],
             "immediate_causes": [],
+            "five_why_chains": [],  # One chain per immediate cause
             "underlying_causes": [],
             "root_causes": [],
-            "causal_relationships": [],
-            "analysis_method": "5 Why Analysis + Causal Chain"
+            "analysis_method": "HSG245 5 Why Analysis"
         }
         
-        # Perform 5 Why Analysis
-        print("\n🔍 Performing 5 Why Analysis...")
-        five_why_results = self._perform_five_why_analysis(incident_summary)
-        rca_data["five_why_chains"] = five_why_results
+        # STEP 1: Identify immediate causes first
+        print("\n🔍 ADIM 1: Doğrudan Nedenleri Belirleme...")
+        print("🔍 STEP 1: Identifying Immediate Causes...")
+        immediate_causes = self._identify_immediate_causes(incident_summary)
+        rca_data["immediate_causes"] = immediate_causes
         
-        # Extract and categorize causes
-        print("\n📊 Categorizing causes...")
-        categorized_causes = self._categorize_causes(five_why_results, incident_summary)
-        rca_data["immediate_causes"] = categorized_causes["immediate"]
-        rca_data["underlying_causes"] = categorized_causes["underlying"]
-        rca_data["root_causes"] = categorized_causes["root"]
+        # STEP 2: For each immediate cause, perform 5 Why analysis
+        print(f"\n� ADIM 2: Her Doğrudan Neden için 5 Neden Analizi ({len(immediate_causes)} zincir)...")
+        print(f"🔗 STEP 2: Performing 5 Why for Each Immediate Cause ({len(immediate_causes)} chains)...")
         
-        # Build causal relationships
-        print("\n🔗 Building causal relationships...")
-        rca_data["causal_relationships"] = self._build_causal_relationships(
-            categorized_causes, five_why_results
-        )
+        all_chains = []
+        all_underlying = []
+        all_root = []
+        
+        for idx, immediate_cause in enumerate(immediate_causes, 1):
+            print(f"\n   Zincir {idx}/{len(immediate_causes)}: {immediate_cause.get('cause_tr', immediate_cause.get('cause', ''))}...")
+            print(f"   Chain {idx}/{len(immediate_causes)}: {immediate_cause.get('cause', '')}...")
+            
+            # Perform 5 Why for this immediate cause
+            chain = self._perform_5why_for_cause(immediate_cause, incident_summary)
+            all_chains.append(chain)
+            
+            # Extract underlying and root from this chain
+            underlying = self._extract_underlying_from_chain(chain)
+            root = self._extract_root_from_chain(chain)
+            
+            all_underlying.extend(underlying)
+            all_root.append(root)
+        
+        rca_data["five_why_chains"] = all_chains
+        rca_data["underlying_causes"] = all_underlying
+        rca_data["root_causes"] = all_root
+        
+        print("\n✅ Kök neden analizi tamamlandı!")
+        print("✅ Root cause analysis complete!")
         
         self._print_summary(rca_data)
         
@@ -111,50 +134,138 @@ class RootCauseAgent:
         
         return ". ".join(summary_parts)
     
-    def _perform_five_why_analysis(self, incident_summary: str) -> List[Dict]:
+    def _identify_immediate_causes(self, incident_summary: str) -> List[Dict]:
         """
-        Perform 5 Why Analysis using AI to identify multiple causal chains
+        STEP 1: Identify immediate (direct) causes of the incident
+        These are the unsafe acts or conditions that directly caused the incident
         """
-        prompt = f"""You are a root cause analysis expert using the 5 Why methodology.
+        prompt = f"""You are a UK Health & Safety incident investigator following HSG245 methodology.
 
-INCIDENT SUMMARY:
+OLAY ÖZETİ / INCIDENT SUMMARY:
 {incident_summary}
 
-Perform a comprehensive 5 Why Analysis. The incident may have MULTIPLE causal chains (e.g., Chain A, B, C).
+GÖREV: Olayın DOĞRUDAN NEDENLERİNİ belirleyin.
+TASK: Identify the IMMEDIATE CAUSES (direct causes) of this incident.
 
-For EACH causal chain:
-1. Start with "Why did the incident occur?" (Why 1)
-2. Ask "Why?" 4 more times, going deeper each time
-3. Each "Why" should identify a cause, and "Because" should explain it
-4. Final answer should be a root cause (organizational/systemic issue)
+IMMEDIATE CAUSES are:
+- Unsafe acts or conditions that DIRECTLY caused the incident
+- The "what went wrong" at the moment of the incident
+- Typically 2-4 immediate causes per incident
 
-Example format from HSG245:
-Chain A:
-- Why 1: Person was injured
-- Because: They were working on machine
-- Why 2: Why were they working on machine?
-- Because: They were investigating a fault
-- Why 3: Why were they investigating?
-- Because: No procedures for reporting faults
-- Why 4: Why no procedures?
-- Because: Duties/responsibilities not clearly set out
-- Why 5 (ROOT): Why weren't duties clear?
-- Because: Management system inadequate
+DOĞRUDAN NEDENLER:
+- Olayı DOĞRUDAN YARATIRAN güvensiz davranışlar veya koşullar
+- Olay anında "neyin yanlış gittiği"
+- Genellikle olay başına 2-4 doğrudan neden
 
-Return a JSON with:
-- chains: Array of chain objects, each with:
-  - chain_id: "A", "B", "C", etc.
-  - description: Brief description of this chain
-  - whys: Array of 5 objects with "question" and "answer"
-  - root_cause: The final root cause identified
+Examples from HSG245:
+- Person's hand was in danger area (Kişinin eli tehlike bölgesindeydi)
+- Machine guard was open (Makine koruyucusu açıktı)
+- Machine was still energized (Makine hala enerjiliydi)
+- No safety procedure followed (Güvenlik prosedürü uygulanmadı)
 
-Return ONLY valid JSON with 2-4 causal chains."""
+Return JSON with:
+- causes: Array of 2-4 immediate causes, each with:
+  - cause: English description
+  - cause_tr: Turkish description
+  - evidence: Supporting evidence/facts
+  - evidence_tr: Turkish evidence
+
+Return ONLY valid JSON."""
+
+        response = self.client.chat.completions.create(
+            model="openai/gpt-4-turbo",
+            temperature=0.2,
+            messages=[
+                {"role": "system", "content": "You are an HSG245 incident investigation expert. Return only valid JSON with bilingual content."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        
+        result = response.choices[0].message.content.strip()
+        
+        # Clean JSON
+        if result.startswith("```json"):
+            result = result.replace("```json", "").replace("```", "").strip()
+        elif result.startswith("```"):
+            result = result.replace("```", "").strip()
+        
+        try:
+            data = json.loads(result)
+            causes = data.get("causes", [])
+            
+            print(f"✅ {len(causes)} doğrudan neden belirlendi")
+            print(f"✅ Identified {len(causes)} immediate causes")
+            for idx, cause in enumerate(causes, 1):
+                print(f"   {idx}. {cause.get('cause_tr', cause.get('cause', 'N/A'))}")
+            
+            return causes
+        except json.JSONDecodeError as e:
+            print(f"⚠️  JSON ayrıştırma hatası / JSON parsing error: {e}")
+            return []
+    
+    def _perform_5why_for_cause(self, immediate_cause: Dict, incident_summary: str) -> Dict:
+        """
+        STEP 2: Perform 5 Why analysis for ONE immediate cause
+        Returns a single causal chain from immediate → root cause
+        """
+        cause_en = immediate_cause.get("cause", "")
+        cause_tr = immediate_cause.get("cause_tr", "")
+        
+        prompt = f"""You are performing 5 Why Analysis following HSG245 methodology.
+
+OLAY ÖZETİ / INCIDENT SUMMARY:
+{incident_summary}
+
+DOĞRUDAN NEDEN / IMMEDIATE CAUSE:
+EN: {cause_en}
+TR: {cause_tr}
+
+GÖREV: Bu doğrudan neden için 5 NEDEN analizi yapın.
+TASK: Perform 5 WHY analysis for this immediate cause.
+
+5 WHY METHODOLOGY:
+Start with the immediate cause and ask "Why?" 5 times, going deeper each time.
+
+Why 1: Why did this immediate cause occur?
+Why 2: Why did that happen? (UNDERLYING CAUSE level starts)
+Why 3: Why did that happen? (UNDERLYING CAUSE)
+Why 4: Why did that happen? (UNDERLYING CAUSE)
+Why 5: Why did that happen? (ROOT CAUSE - organizational/systemic)
+
+Example from HSG245:
+Why 1: Why was hand in danger area?
+Because: Person was investigating a fault (İşçi bir arızayı inceliyordu)
+
+Why 2: Why were they investigating themselves?
+Because: No procedure for reporting faults (Arıza bildirme prosedürü yoktu)
+
+Why 3: Why no procedure?
+Because: Duties not clearly set out (Görevler açıkça belirtilmemişti)
+
+Why 4: Why duties unclear?
+Because: Inadequate management system (Yetersiz yönetim sistemi)
+
+Why 5 (ROOT): Why inadequate management?
+Because: No systematic risk assessment (Sistematik risk değerlendirmesi yapılmamıştı)
+
+Return JSON with:
+- immediate_cause: The starting cause (EN + TR)
+- why_chain: Array of 5 why-because pairs, each with:
+  - level: 1-5
+  - why_question: The "why" question (EN)
+  - why_question_tr: Turkish translation
+  - because_answer: The "because" answer (EN)
+  - because_answer_tr: Turkish translation
+  - cause_type: "immediate" (level 1), "underlying" (levels 2-4), "root" (level 5)
+- root_cause: Final root cause summary (EN + TR)
+
+Return ONLY valid JSON with complete bilingual content."""
 
         response = self.client.chat.completions.create(
             model="openai/gpt-4-turbo",
             temperature=0.3,
             messages=[
-                {"role": "system", "content": "You are a 5 Why analysis expert. Return only valid JSON."},
+                {"role": "system", "content": "You are a 5 Why analysis expert following HSG245. Return only valid JSON with bilingual content."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -168,142 +279,140 @@ Return ONLY valid JSON with 2-4 causal chains."""
             result = result.replace("```", "").strip()
         
         try:
-            analysis = json.loads(result)
-            chains = analysis.get("chains", [])
-            
-            print(f"✅ Identified {len(chains)} causal chains")
-            for chain in chains:
-                print(f"   Chain {chain.get('chain_id', '?')}: {chain.get('description', 'N/A')}")
-            
-            return chains
+            chain = json.loads(result)
+            root = chain.get("root_cause", {})
+            print(f"      → Kök neden / Root: {root.get('root_tr', root.get('root', 'N/A'))}")
+            return chain
         except json.JSONDecodeError as e:
-            print(f"⚠️  JSON parsing error: {e}")
-            return []
+            print(f"⚠️  JSON ayrıştırma hatası / JSON parsing error: {e}")
+            return {
+                "immediate_cause": immediate_cause,
+                "why_chain": [],
+                "root_cause": {}
+            }
     
-    def _categorize_causes(self, five_why_chains: List[Dict], incident_summary: str) -> Dict:
+    def _extract_underlying_from_chain(self, chain: Dict) -> List[Dict]:
         """
-        Categorize causes into Immediate, Underlying, and Root causes using AI
+        Extract underlying causes from Why levels 2-4
         """
-        chains_text = json.dumps(five_why_chains, indent=2)
+        underlying = []
+        why_chain = chain.get("why_chain", [])
         
-        prompt = f"""You are a root cause analysis expert. Categorize causes from the 5 Why analysis.
-
-INCIDENT SUMMARY:
-{incident_summary}
-
-5 WHY CHAINS:
-{chains_text}
-
-Categorize the identified causes into three levels:
-
-1. IMMEDIATE CAUSES (Direct causes):
-   - Unsafe acts or conditions that directly caused the incident
-   - Examples: Guard was open, machine was live, hand in danger area
-
-2. UNDERLYING CAUSES (Contributing factors):
-   - Equipment issues, procedural gaps, competence issues
-   - Examples: Interlock easily defeated, no isolation procedures, inadequate training
-
-3. ROOT CAUSES (Systemic/organizational):
-   - Management system failures, organizational culture issues
-   - Examples: Inadequate safety management, poor risk assessment, unclear responsibilities
-
-Return a JSON with:
-- immediate: Array of immediate causes (each with "cause" and "description")
-- underlying: Array of underlying causes (each with "cause" and "description")
-- root: Array of root causes (each with "cause" and "description")
-
-Provide 3-5 causes for each category.
-
-Return ONLY valid JSON."""
-
-        response = self.client.chat.completions.create(
-            model="anthropic/claude-3.5-sonnet",
-            temperature=0.3,
-            messages=[
-                {"role": "system", "content": "You are a cause categorization expert. Return only valid JSON."},
-                {"role": "user", "content": prompt}
-            ]
-        )
+        for why in why_chain:
+            if why.get("cause_type") == "underlying":
+                underlying.append({
+                    "cause": why.get("because_answer", ""),
+                    "cause_tr": why.get("because_answer_tr", ""),
+                    "level": why.get("level", 0),
+                    "from_chain": chain.get("immediate_cause", {}).get("cause", "")
+                })
         
-        result = response.choices[0].message.content.strip()
-        
-        # Clean JSON
-        if result.startswith("```json"):
-            result = result.replace("```json", "").replace("```", "").strip()
-        elif result.startswith("```"):
-            result = result.replace("```", "").strip()
-        
-        try:
-            categorized = json.loads(result)
-            
-            print(f"✅ Categorized causes:")
-            print(f"   Immediate: {len(categorized.get('immediate', []))} causes")
-            print(f"   Underlying: {len(categorized.get('underlying', []))} causes")
-            print(f"   Root: {len(categorized.get('root', []))} causes")
-            
-            return categorized
-        except json.JSONDecodeError as e:
-            print(f"⚠️  JSON parsing error: {e}")
-            return {"immediate": [], "underlying": [], "root": []}
+        return underlying
     
-    def _build_causal_relationships(self, categorized_causes: Dict, 
-                                   five_why_chains: List[Dict]) -> List[Dict]:
+    def _extract_root_from_chain(self, chain: Dict) -> Dict:
         """
-        Build relationships showing how causes connect (similar to HSG245 diagram)
+        Extract root cause from Why level 5
         """
-        print("🔗 Mapping causal relationships...")
+        why_chain = chain.get("why_chain", [])
         
-        relationships = []
+        # Find Why 5 (root cause level)
+        for why in why_chain:
+            if why.get("level") == 5 or why.get("cause_type") == "root":
+                return {
+                    "cause": why.get("because_answer", ""),
+                    "cause_tr": why.get("because_answer_tr", ""),
+                    "from_immediate": chain.get("immediate_cause", {}).get("cause", ""),
+                    "from_immediate_tr": chain.get("immediate_cause", {}).get("cause_tr", "")
+                }
         
-        # For each root cause, trace back to immediate causes
-        for root in categorized_causes.get("root", []):
-            for underlying in categorized_causes.get("underlying", []):
-                for immediate in categorized_causes.get("immediate", []):
-                    relationships.append({
-                        "from": immediate.get("cause", ""),
-                        "through": underlying.get("cause", ""),
-                        "to": root.get("cause", ""),
-                        "relationship_type": "causal_chain"
-                    })
-        
-        print(f"✅ Identified {len(relationships)} causal relationships")
-        
-        return relationships[:10]  # Limit to prevent overwhelming output
+        # Fallback to root_cause summary if available
+        root_summary = chain.get("root_cause", {})
+        return {
+            "cause": root_summary.get("root", "Unknown"),
+            "cause_tr": root_summary.get("root_tr", "Bilinmiyor"),
+            "from_immediate": chain.get("immediate_cause", {}).get("cause", ""),
+            "from_immediate_tr": chain.get("immediate_cause", {}).get("cause_tr", "")
+        }
     
     def _print_summary(self, rca_data: Dict):
-        """Print formatted summary of root cause analysis"""
-        print("\n" + "-"*80)
-        print("📊 ROOT CAUSE ANALYSIS SUMMARY")
-        print("-"*80)
+        """Print formatted summary of root cause analysis - PDF friendly format"""
+        print("\n" + "="*80)
+        print("📊 KÖK NEDEN ANALİZİ ÖZETİ / ROOT CAUSE ANALYSIS SUMMARY")
+        print("="*80)
         
-        print(f"\n📋 Incident Summary:")
+        print(f"\n📋 Olay Özeti / Incident Summary:")
         print(f"{rca_data['incident_summary']}")
         
-        print(f"\n🔍 5 Why Analysis - Identified {len(rca_data['five_why_chains'])} Causal Chains:")
-        for chain in rca_data['five_why_chains']:
-            chain_id = chain.get('chain_id', '?')
-            desc = chain.get('description', 'N/A')
-            root = chain.get('root_cause', 'N/A')
-            print(f"\n   Chain {chain_id}: {desc}")
-            print(f"   → Root Cause: {root}")
-        
-        print(f"\n⚡ IMMEDIATE CAUSES ({len(rca_data['immediate_causes'])}):")
+        # IMMEDIATE CAUSES
+        print(f"\n{'='*80}")
+        print(f"⚡ DOĞRUDAN NEDENLER / IMMEDIATE CAUSES ({len(rca_data['immediate_causes'])})")
+        print(f"{'='*80}")
         for idx, cause in enumerate(rca_data['immediate_causes'], 1):
-            print(f"   {idx}. {cause.get('cause', 'N/A')}")
-            if cause.get('description'):
-                print(f"      └─ {cause['description']}")
+            print(f"\n{idx}. {cause.get('cause_tr', cause.get('cause', 'N/A'))}")
+            print(f"   {cause.get('cause', 'N/A')}")
+            if cause.get('evidence_tr'):
+                print(f"   Kanıt: {cause.get('evidence_tr', '')}")
+            if cause.get('evidence'):
+                print(f"   Evidence: {cause.get('evidence', '')}")
         
-        print(f"\n🔧 UNDERLYING CAUSES ({len(rca_data['underlying_causes'])}):")
-        for idx, cause in enumerate(rca_data['underlying_causes'], 1):
-            print(f"   {idx}. {cause.get('cause', 'N/A')}")
-            if cause.get('description'):
-                print(f"      └─ {cause['description']}")
+        # 5 WHY CHAINS - One per immediate cause
+        print(f"\n{'='*80}")
+        print(f"🔗 5 NEDEN ZİNCİRLERİ / 5 WHY CHAINS ({len(rca_data['five_why_chains'])})")
+        print(f"{'='*80}")
         
-        print(f"\n🎯 ROOT CAUSES ({len(rca_data['root_causes'])}):")
+        for chain_idx, chain in enumerate(rca_data['five_why_chains'], 1):
+            immediate = chain.get('immediate_cause', {})
+            print(f"\n{'─'*80}")
+            print(f"ZİNCİR {chain_idx} / CHAIN {chain_idx}")
+            print(f"Başlangıç: {immediate.get('cause_tr', immediate.get('cause', 'N/A'))}")
+            print(f"Starting: {immediate.get('cause', 'N/A')}")
+            print(f"{'─'*80}")
+            
+            why_chain = chain.get('why_chain', [])
+            for why in why_chain:
+                level = why.get('level', 0)
+                cause_type = why.get('cause_type', 'unknown')
+                
+                # Show hierarchy
+                indent = "   " * (level - 1)
+                
+                print(f"\n{indent}📍 NEDEN {level} / WHY {level} [{cause_type.upper()}]")
+                print(f"{indent}❓ {why.get('why_question_tr', why.get('why_question', 'N/A'))}")
+                print(f"{indent}   {why.get('why_question', 'N/A')}")
+                print(f"{indent}💡 {why.get('because_answer_tr', why.get('because_answer', 'N/A'))}")
+                print(f"{indent}   {why.get('because_answer', 'N/A')}")
+            
+            # Root cause summary
+            root = chain.get('root_cause', {})
+            print(f"\n   🎯 KÖK NEDEN / ROOT CAUSE:")
+            print(f"      {root.get('root_tr', root.get('root', 'N/A'))}")
+            print(f"      {root.get('root', 'N/A')}")
+        
+        # UNDERLYING CAUSES SUMMARY
+        print(f"\n{'='*80}")
+        print(f"🔧 ALTTA YATAN NEDENLER / UNDERLYING CAUSES ({len(rca_data['underlying_causes'])})")
+        print(f"{'='*80}")
+        unique_underlying = {}
+        for cause in rca_data['underlying_causes']:
+            key = cause.get('cause', '')
+            if key not in unique_underlying:
+                unique_underlying[key] = cause
+        
+        for idx, cause in enumerate(unique_underlying.values(), 1):
+            print(f"\n{idx}. {cause.get('cause_tr', cause.get('cause', 'N/A'))}")
+            print(f"   {cause.get('cause', 'N/A')}")
+            print(f"   (Seviye/Level {cause.get('level', '?')})")
+        
+        # ROOT CAUSES SUMMARY
+        print(f"\n{'='*80}")
+        print(f"🎯 KÖK NEDENLER / ROOT CAUSES ({len(rca_data['root_causes'])})")
+        print(f"{'='*80}")
         for idx, cause in enumerate(rca_data['root_causes'], 1):
-            print(f"   {idx}. {cause.get('cause', 'N/A')}")
-            if cause.get('description'):
-                print(f"      └─ {cause['description']}")
+            print(f"\n{idx}. {cause.get('cause_tr', cause.get('cause', 'N/A'))}")
+            print(f"   {cause.get('cause', 'N/A')}")
+            print(f"   ← Kaynağı/From: {cause.get('from_immediate_tr', cause.get('from_immediate', 'N/A'))}")
+            print(f"   ← From: {cause.get('from_immediate', 'N/A')}")
         
-        print("-"*80)
+        print(f"\n{'='*80}")
+        print(f"✅ Analiz tamamlandı / Analysis complete")
+        print(f"{'='*80}\n")
