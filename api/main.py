@@ -10,6 +10,10 @@ import sys
 import os
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Add parent directory to import agents and shared
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,7 +23,6 @@ from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent import RootCauseAgent
 from agents.actionplan_agent import ActionPlanAgent
 from agents.pdf_report_agent import PDFReportAgent
-from shared.config import OPENAI_CONFIG
 
 app = FastAPI(
     title="HSE Investigation API",
@@ -53,27 +56,38 @@ async def startup_event():
     global overview_agent, assessment_agent, rootcause_agent, actionplan_agent, pdf_agent
     
     print("🚀 Starting HSE Investigation API...")
-    print(f"📊 OpenAI API Key configured: {bool(os.getenv('OPENAI_API_KEY'))}")
+    print(f"📊 OpenRouter API Key configured: {bool(os.getenv('OPENROUTER_API_KEY'))}")
+    
+    # Verify API key is set
+    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("⚠️  WARNING: No API key found in environment variables!")
+        print("⚠️  Set OPENROUTER_API_KEY in .env file")
+        return
     
     try:
-        overview_agent = OverviewAgent(OPENAI_CONFIG)
+        # Initialize agents WITHOUT config parameter (they read from .env internally)
+        overview_agent = OverviewAgent()
         print("✅ Overview Agent initialized")
         
-        assessment_agent = AssessmentAgent(OPENAI_CONFIG)
+        assessment_agent = AssessmentAgent()
         print("✅ Assessment Agent initialized")
         
-        rootcause_agent = RootCauseAgent(OPENAI_CONFIG)
-        print("✅ Root Cause Agent initialized")
+        rootcause_agent = RootCauseAgent()
+        print("✅ Root Cause Agent initialized (DeepSeek V3 + Claude 3.5 Sonnet)")
         
-        actionplan_agent = ActionPlanAgent(OPENAI_CONFIG)
+        actionplan_agent = ActionPlanAgent()
         print("✅ Action Plan Agent initialized")
         
         pdf_agent = PDFReportAgent()
         print("✅ PDF Report Agent initialized")
         
         print("🎉 All agents ready!")
+        print(f"🔑 Using API Key: {api_key[:20]}...{api_key[-10:]}")
     except Exception as e:
         print(f"❌ Error initializing agents: {e}")
+        import traceback
+        traceback.print_exc()
         # Don't crash - let healthcheck show the error
         pass
 
@@ -309,10 +323,14 @@ async def health_check():
     
     all_agents_ready = all(status == "active" for status in agents_status.values())
     
+    # Check for API key
+    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+    
     return {
         "status": "healthy" if all_agents_ready else "degraded",
         "agents": agents_status,
-        "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
+        "api_key_configured": bool(api_key),
+        "api_key_source": "OPENROUTER_API_KEY" if os.getenv("OPENROUTER_API_KEY") else "OPENAI_API_KEY" if os.getenv("OPENAI_API_KEY") else "none",
         "incidents_count": len(incidents_db),
         "timestamp": datetime.now().isoformat()
     }
