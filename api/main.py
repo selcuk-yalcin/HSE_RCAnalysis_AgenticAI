@@ -217,20 +217,31 @@ async def add_assessment(incident_id: str, assessment: AssessmentData):
 async def investigate_incident(incident_id: str, investigation: InvestigationData):
     """
     Part 3: Full investigation with Root Cause Agent
+    NOTE: Can work standalone with just incident description for testing
     """
     if incident_id not in incidents_db:
         raise HTTPException(status_code=404, detail="Incident not found")
     
     incident = incidents_db[incident_id]
     
-    if not incident["part2"]:
-        raise HTTPException(status_code=400, detail="Assessment must be completed first")
+    # Part 1 & Part 2 are now optional - will use defaults if not available
+    part1_data = incident.get("part1") or {
+        "incident_id": incident_id,
+        "description": "To be reviewed - testing mode",
+        "note": "Part 1 not completed - for testing purposes only"
+    }
+    
+    part2_data = incident.get("part2") or {
+        "event_type": "Accident",
+        "investigation_level": "Medium level",
+        "note": "Part 2 not completed - for testing purposes only"
+    }
     
     try:
         # Process with Root Cause Agent
         part3_data = rootcause_agent.analyze_root_causes(
-            incident["part1"],
-            incident["part2"],
+            part1_data,
+            part2_data,
             {
                 "location": investigation.location,
                 "who_involved": investigation.who_involved,
