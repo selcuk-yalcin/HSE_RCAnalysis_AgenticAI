@@ -234,33 +234,36 @@ Return ONLY valid JSON."""
         # DeepSeek'in bulduğu tüm veriyi metne döküyoruz
         raw_data_str = json.dumps(rca_data, indent=2, ensure_ascii=False)
         
-        prompt = f"""You are a professional Report Editor using Claude 3.5 Sonnet.
-        
-        INPUT DATA (Analysis performed by DeepSeek AI):
-        {raw_data_str}
-        
-        TASK:
-        Write a professional, formal 'Root Cause Analysis Report' in TURKISH based on this data.
-        
-        REQUIREMENTS:
-        1. Tone: Official, objective, senior safety engineer style.
-        2. Structure:
-           - YÖNETİCİ ÖZETİ (Executive Summary)
-           - OLAY DETAYLARI (Incident Details)
-           - DOĞRUDAN NEDENLER (Immediate Causes)
-           - KÖK NEDEN ANALİZİ (Detailed 5 Why Chains)
-           - SİSTEMİK BULGULAR (Systemic Failures - The Root Causes)
-           - SONUÇ (Conclusion)
-        3. Do NOT output JSON. Output clean, formatted text.
-        4. Fix any logical gaps or bad translations from the input data.
-        """
+        prompt = f"""Sen profesyonel bir İş Güvenliği Rapor Editörüsün.
+
+GİRDİ VERİSİ (DeepSeek AI tarafından yapılan analiz):
+{raw_data_str}
+
+GÖREV:
+Bu verilere dayanarak profesyonel, resmi bir 'Kök Neden Analiz Raporu' TÜRKÇE olarak yaz.
+
+ZORUNLU GEREKSINIMLER:
+1. Dil: SADECE TÜRKÇE (hiç İngilizce kullanma!)
+2. Ton: Resmi, objektif, kıdemli iş güvenliği uzmanı tarzı
+3. Yapı:
+   - YÖNETİCİ ÖZETİ (Executive Summary)
+   - OLAY DETAYLARI (Incident Details)
+   - DOĞRUDAN NEDENLER (Immediate Causes - input verisindeki tüm immediate causes'ları listele)
+   - KÖK NEDEN ANALİZİ (Her immediate cause için 5 Neden zincirini detaylı açıkla)
+   - TEMEL NEDENLER (Underlying Causes - tüm level 2-4 nedenleri)
+   - SİSTEMİK BULGULAR (Root Causes - level 5 nedenleri)
+   - SONUÇ VE ÖNERİLER
+4. Format: Temiz, düzenli metin (JSON değil)
+5. Input verisindeki kötü çevirileri düzelt, mantık boşluklarını kapat
+
+ÖNEMLİ: Rapor %100 TÜRKÇE olmalı. Hiçbir İngilizce kelime kullanma!"""
 
         # Raporlama için PAHALI ama KALİTELİ modeli kullanıyoruz
         response = self.client.chat.completions.create(
             model="anthropic/claude-3.5-sonnet", 
             temperature=0.3,
             messages=[
-                {"role": "system", "content": "Sen kıdemli bir İş Güvenliği rapor editörüsün."},
+                {"role": "system", "content": "Sen Türkiye'de çalışan kıdemli bir İş Güvenliği Uzmanısın. Tüm raporları TÜRKÇE yazarsın. Hiç İngilizce kullanmazsın."},
                 {"role": "user", "content": prompt}
             ]
         )
