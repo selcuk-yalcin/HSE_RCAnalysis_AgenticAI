@@ -142,8 +142,8 @@ Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
             # MODEL GÜNCELLEMESİ: Claude 3.5 Sonnet
-            model="anthropic/claude-3.5-sonnet",
-            temperature=0.0,
+            model="deepseek/deepseek-v3.2",
+            temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are an HSG245 incident investigation expert. Return only valid JSON."},
                 {"role": "user", "content": prompt}
