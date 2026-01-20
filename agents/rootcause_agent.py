@@ -98,6 +98,10 @@ class RootCauseAgent:
     def _prepare_incident_summary(self, part1_data: Dict, part2_data: Dict, 
                                  investigation_data: Dict = None) -> str:
         """Combine all available information into incident summary"""
+        # DEBUG: Check types
+        print(f"🐛 DEBUG - part1_data type: {type(part1_data)}, value: {part1_data}")
+        print(f"🐛 DEBUG - part2_data type: {type(part2_data)}, value: {part2_data}")
+        
         summary_parts = []
         brief = part1_data.get("brief_details", {})
         if brief.get("what"): summary_parts.append(f"What happened: {brief['what']}")

@@ -273,7 +273,10 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
             "data": part3_data
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_details = f"{str(e)}\n\nTraceback:\n{traceback.format_exc()}"
+        print(f"❌ Part 3 ERROR: {error_details}")
+        raise HTTPException(status_code=500, detail=error_details)
 
 @app.post("/api/v1/incidents/{incident_id}/actionplan")
 async def generate_action_plan(incident_id: str):
