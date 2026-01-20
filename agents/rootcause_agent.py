@@ -42,8 +42,13 @@ class RootCauseAgent:
         print("📋 PART 3: ROOT CAUSE ANALYSIS - Analyzing Incident")
         print("="*80)
         
-        # Prepare incident description
-        incident_summary = self._prepare_incident_summary(part1_data, part2_data, investigation_data)
+        # Prepare incident description (with fallback)
+        try:
+            incident_summary = self._prepare_incident_summary(part1_data, part2_data, investigation_data)
+        except Exception as e:
+            print(f"⚠️ Warning: Could not prepare full summary ({e}). Using investigation data only.")
+            # Fallback: Use only investigation data
+            incident_summary = f"{investigation_data.get('how_happened', 'Incident details not available')}"
         
         # Initialize root cause analysis structure
         rca_data = {
