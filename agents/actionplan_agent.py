@@ -157,7 +157,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
         
         try:
             response = self.client.chat.completions.create(
-                model="openai/gpt-4o-mini",
+                model="anthropic/claude-3.5-sonnet",
                 messages=[
                     {
                         "role": "system", 

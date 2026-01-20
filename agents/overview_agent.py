@@ -106,7 +106,7 @@ If any information is not available, use empty string "".
 Return ONLY valid JSON, no explanations."""
 
         response = self.client.chat.completions.create(
-            model="openai/gpt-4-turbo",
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a health and safety incident documentation expert. Return only valid JSON."},
@@ -158,7 +158,7 @@ Classify this incident into ONE of these categories:
 Return ONLY the category name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="openai/gpt-4o-mini",
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety incident classifier. Return only the category name."},

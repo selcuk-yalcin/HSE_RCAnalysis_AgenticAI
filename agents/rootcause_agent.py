@@ -141,8 +141,8 @@ Return JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            # MODEL GÜNCELLEMESİ: DeepSeek V3
-            model="deepseek/deepseek-chat",
+            # MODEL GÜNCELLEMESİ: Claude 3.5 Sonnet
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.0,
             messages=[
                 {"role": "system", "content": "You are an HSG245 incident investigation expert. Return only valid JSON."},
@@ -199,8 +199,8 @@ IMPORTANT:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            # MODEL GÜNCELLEMESİ: DeepSeek V3
-            model="deepseek/deepseek-chat",
+            # MODEL GÜNCELLEMESİ: Claude 3.5 Sonnet
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.0,
             messages=[
                 {"role": "system", "content": "You are a 5 Why analysis expert. Return only valid JSON."},

@@ -141,7 +141,7 @@ Classify this into ONE of these event types:
 Return ONLY the event type name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="openai/gpt-4-turbo",
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety event classifier. Return only the event type."},
@@ -223,7 +223,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="openai/gpt-4-turbo",
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a RIDDOR expert. Return only valid JSON."},
@@ -287,7 +287,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="openai/gpt-4o-mini",
+            model="anthropic/claude-3.5-sonnet",
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "You are an investigation coordinator. Return only valid JSON."},
