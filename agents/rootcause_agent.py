@@ -175,12 +175,26 @@ OLAY: {incident_summary}
 NEDEN: {cause_en} ({cause_tr})
 
 TASK: Perform 5 WHY analysis.
-Why 1 -> Why 2 -> Why 3 -> Why 4 -> Why 5 (Root Cause)
+Why 1 -> Why 2 (underlying) -> Why 3 (underlying) -> Why 4 (underlying) -> Why 5 (ROOT CAUSE)
 
 Return JSON with:
-- immediate_cause: ...
-- why_chain: Array of 5 items (why_question, because_answer, etc.)
-- root_cause: Final summary
+{{
+  "immediate_cause": {{...}},
+  "why_chain": [
+    {{"level": 1, "cause_type": "immediate", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}},
+    {{"level": 2, "cause_type": "underlying", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}},
+    {{"level": 3, "cause_type": "underlying", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}},
+    {{"level": 4, "cause_type": "underlying", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}},
+    {{"level": 5, "cause_type": "root", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}}
+  ],
+  "root_cause": {{"root": "...", "root_tr": "..."}}
+}}
+
+IMPORTANT: 
+- Level 1: immediate cause (already known)
+- Levels 2-4: UNDERLYING CAUSES (cause_type: "underlying")
+- Level 5: ROOT CAUSE (cause_type: "root")
+- All fields must have Turkish (_tr) translations
 
 Return ONLY valid JSON."""
 
