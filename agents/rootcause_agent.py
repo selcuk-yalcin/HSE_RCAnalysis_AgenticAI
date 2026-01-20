@@ -201,7 +201,11 @@ Return ONLY valid JSON."""
         try:
             chain = json.loads(result)
             root = chain.get("root_cause", {})
-            print(f"      → Kök: {root.get('root_tr', root.get('root', 'N/A'))}")
+            # Safe print: handle both dict and string
+            if isinstance(root, dict):
+                print(f"      → Kök: {root.get('root_tr', root.get('root', 'N/A'))}")
+            else:
+                print(f"      → Kök: {root}")
             return chain
         except json.JSONDecodeError:
             return {"immediate_cause": immediate_cause, "why_chain": [], "root_cause": {}}
