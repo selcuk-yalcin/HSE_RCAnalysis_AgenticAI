@@ -225,17 +225,28 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
     incident = incidents_db[incident_id]
     
     # Part 1 & Part 2 are now optional - will use defaults if not available
-    part1_data = incident.get("part1") or {
-        "incident_id": incident_id,
-        "description": "To be reviewed - testing mode",
-        "note": "Part 1 not completed - for testing purposes only"
-    }
+    part1_raw = incident.get("part1")
+    part2_raw = incident.get("part2")
     
-    part2_data = incident.get("part2") or {
-        "event_type": "Accident",
-        "investigation_level": "Medium level",
-        "note": "Part 2 not completed - for testing purposes only"
-    }
+    # Ensure they are dicts, not None or strings
+    if not part1_raw or not isinstance(part1_raw, dict):
+        part1_data = {
+            "incident_id": incident_id,
+            "description": "To be reviewed - testing mode",
+            "brief_details": {},
+            "note": "Part 1 not completed - for testing purposes only"
+        }
+    else:
+        part1_data = part1_raw
+    
+    if not part2_raw or not isinstance(part2_raw, dict):
+        part2_data = {
+            "event_type": "Accident",
+            "investigation_level": "Medium level",
+            "note": "Part 2 not completed - for testing purposes only"
+        }
+    else:
+        part2_data = part2_raw
     
     try:
         # Process with Root Cause Agent
