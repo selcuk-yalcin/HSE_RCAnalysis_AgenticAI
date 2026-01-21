@@ -28,7 +28,8 @@ class RootCauseAgent:
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key
         )
-        print(f"✅ Root Cause Agent initialized with OpenRouter")
+        # --- DEĞİŞİKLİK 1: İngilizce log -> Türkçe log ---
+        print(f"✅ Kök Neden Ajanı (Root Cause Agent) başlatıldı")
     
     def analyze_root_causes(self, 
                           part1_data: Dict, 
@@ -39,16 +40,16 @@ class RootCauseAgent:
         """
         print("\n" + "="*80)
         print("📋 BÖLÜM 3: KÖK NEDEN ANALİZİ - Olay Analiz Ediliyor")
-        print("📋 PART 3: ROOT CAUSE ANALYSIS - Analyzing Incident")
         print("="*80)
         
         # Prepare incident description (with fallback)
         try:
             incident_summary = self._prepare_incident_summary(part1_data, part2_data, investigation_data)
         except Exception as e:
-            print(f"⚠️ Warning: Could not prepare full summary ({e}). Using investigation data only.")
+            # --- DEĞİŞİKLİK 2: Log Türkçeleştirme ---
+            print(f"⚠️ Uyarı: Tam özet hazırlanamadı ({e}). Sadece soruşturma verisi kullanılıyor.")
             # Fallback: Use only investigation data
-            incident_summary = f"{investigation_data.get('how_happened', 'Incident details not available')}"
+            incident_summary = f"{investigation_data.get('how_happened', 'Olay detayı mevcut değil')}"
         
         # Initialize root cause analysis structure
         rca_data = {
@@ -92,12 +93,19 @@ class RootCauseAgent:
         
         print("\n✅ Kök neden analizi tamamlandı!")
         
-        # --- ESKİ YÖNTEMİ DEVRE DIŞI BIRAKTIK ---
-        # self._print_summary(rca_data)
+        # --- DEĞİŞİKLİK 4 (YENİ KOD): Raporu yakala ve veriye ekle ---
+        try:
+            # Raporu fonksiyondan alıyoruz
+            final_report_text = self._generate_final_report(rca_data)
+            
+            # Admin panelinin okuması için sözlüğe ekliyoruz
+            rca_data["final_report_tr"] = final_report_text
+            
+        except Exception as e:
+            print(f"❌ Rapor oluşturulurken hata: {e}")
+            rca_data["final_report_tr"] = "Rapor oluşturulamadı."
         
-        # --- YENİ YÖNTEM: CLAUDE İLE PROFESYONEL RAPOR ---
-        self._generate_final_report(rca_data)
-        
+        # Veriyi döndür (Artık içinde final_report_tr var!)
         return rca_data
     
     def _prepare_incident_summary(self, part1_data: Dict, part2_data: Dict, 
@@ -224,12 +232,12 @@ Return ONLY valid JSON."""
         except json.JSONDecodeError:
             return {"immediate_cause": immediate_cause, "why_chain": [], "root_cause": {}}
     
-    def _generate_final_report(self, rca_data: Dict):
+    def _generate_final_report(self, rca_data: Dict) -> str:  # --- DEĞİŞİKLİK 3: -> str eklendi ---
         """
-        FINAL EDITOR: Claude 3.5 Sonnet
+        FINAL EDITOR: DeepSeek V3.2
         DeepSeek'in ürettiği ham veriyi (JSON) alır ve mükemmel bir Türkçe rapora çevirir.
         """
-        print("\n✍️ Claude 3.5 Sonnet Final Raporu Yazıyor (Professional Report Generation)...")
+        print("\n✍️ Final Rapor Hazırlanıyor (Profesyonel Rapor Modu)...")
         
         # DeepSeek'in bulduğu tüm veriyi metne döküyoruz
         raw_data_str = json.dumps(rca_data, indent=2, ensure_ascii=False)
@@ -258,7 +266,7 @@ ZORUNLU GEREKSINIMLER:
 
 ÖNEMLİ: Rapor %100 TÜRKÇE olmalı. Hiçbir İngilizce kelime kullanma!"""
 
-        # Raporlama için PAHALI ama KALİTELİ modeli kullanıyoruz
+        # Raporlama için DeepSeek V3.2 kullanıyoruz
         response = self.client.chat.completions.create(
             model="xiaomi/mimo-v2-flash:free", 
             temperature=0.3,
@@ -268,9 +276,14 @@ ZORUNLU GEREKSINIMLER:
             ]
         )
         
+        # --- DEĞİŞİKLİK 3: Cevabı değişkene alıp RETURN etmek ---
+        report_content = response.choices[0].message.content
+        
         print("\n" + "="*80)
-        print(response.choices[0].message.content)
+        print(report_content)
         print("="*80)
+        
+        return report_content  # <--- BU SATIR ÇOK ÖNEMLİ! Raporu dışarı aktarır.
 
     # Helper methods (extract_underlying, extract_root) stay the same...
     def _extract_underlying_from_chain(self, chain: Dict) -> List[Dict]:
