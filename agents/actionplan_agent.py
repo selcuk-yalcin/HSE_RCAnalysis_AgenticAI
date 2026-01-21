@@ -157,7 +157,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
         
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-3.5-sonnet",
+                model="xiaomi/mimo-v2-flash:free",# !Change model here 
                 messages=[
                     {
                         "role": "system", 
