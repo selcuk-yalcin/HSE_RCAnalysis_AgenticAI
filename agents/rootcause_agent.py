@@ -142,7 +142,7 @@ Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
             # MODEL GÜNCELLEMESİ: Claude 3.5 Sonnet
-            model="deepseek/deepseek-v3.2",
+            model="xiaomi/mimo-v2-flash:free",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are an HSG245 incident investigation expert. Return only valid JSON."},
@@ -200,7 +200,7 @@ Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
             # MODEL GÜNCELLEMESİ: Claude 3.5 Sonnet
-            model="deepseek/deepseek-v3.2",
+            model="xiaomi/mimo-v2-flash:free",
             temperature=0.0,
             messages=[
                 {"role": "system", "content": "You are a 5 Why analysis expert. Return only valid JSON."},
@@ -260,7 +260,7 @@ ZORUNLU GEREKSINIMLER:
 
         # Raporlama için PAHALI ama KALİTELİ modeli kullanıyoruz
         response = self.client.chat.completions.create(
-            model="deepseek/deepseek-v3.2", 
+            model="xiaomi/mimo-v2-flash:free", 
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "Sen Türkiye'de çalışan kıdemli bir İş Güvenliği Uzmanısın. Tüm raporları TÜRKÇE yazarsın. Hiç İngilizce kullanmazsın."},
