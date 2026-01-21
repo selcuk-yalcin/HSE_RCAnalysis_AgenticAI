@@ -158,7 +158,7 @@ Classify this incident into ONE of these categories:
 Return ONLY the category name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="xiaomi/mimo-v2-flash:free",
+            model="google/gemma-3-27b-it:free", # Model change 
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety incident classifier. Return only the category name."},
