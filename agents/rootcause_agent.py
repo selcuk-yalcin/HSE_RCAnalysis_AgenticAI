@@ -1,7 +1,7 @@
 """
 Root Cause Agent - Part 3 of HSG245
 Performs 5 Why Analysis and identifies immediate, underlying, and root causes
-Updated Strategy: DeepSeek V3 (Logic) + Claude 3.5 Sonnet (Reporting)
+Updated Strategy: DeepSeek V3 (Logic) + Claude 3.5 Sonnet (Reporting) (During inference, we planned to test many different model in order to improve results) 
 """
 
 from openai import OpenAI
@@ -14,9 +14,9 @@ class RootCauseAgent:
     """
     Part 3: Root Cause Analysis
     Implements 5 Why methodology to identify:
-    - Immediate causes (direct causes of the incident)
+    - Immediate causes (direct causes of the incident) #We will take that causes from our vector databases!!!)
     - Underlying causes (contributing factors)
-    - Root causes (systemic/organizational failures)
+    - Root causes (systemic/organizational failures) (We take list in to account when we will fill out the part!!)
     
     Uses AI to build causal chains and analyze incidents
     """
@@ -62,7 +62,7 @@ class RootCauseAgent:
         }
         
         # STEP 1: Identify immediate causes first (DeepSeek)
-        print("\n🔍 ADIM 1: Doğrudan Nedenleri Belirleme (DeepSeek)...")
+        print("\n🔍 ADIM 1: Doğrudan Nedenleri Belirleme ...")
         immediate_causes = self._identify_immediate_causes(incident_summary)
         rca_data["immediate_causes"] = immediate_causes
         
@@ -150,7 +150,7 @@ CRITICAL: All text fields (cause, cause_tr, evidence, evidence_tr) must be 100% 
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="xiaomi/mimo-v2-flash:free",
+            model="google/gemma-3-27b-it:free",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are an HSG245 incident investigation expert. Return only valid JSON with ALL content in TURKISH language."},
@@ -221,7 +221,7 @@ CRITICAL: All _tr fields must be 100% TURKISH. No English words allowed.
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="xiaomi/mimo-v2-flash:free",
+            model="google/gemma-3-27b-it:free",
             temperature=0.0,
             messages=[
                 {"role": "system", "content": "You are a 5 Why analysis expert. Return only valid JSON with all _tr fields in TURKISH language."},
@@ -293,7 +293,7 @@ MANDATORY REQUIREMENTS:
 CRITICAL: Report must be 100% in TURKISH language. Absolutely NO English words allowed in the output."""
 
         response = self.client.chat.completions.create(
-            model="xiaomi/mimo-v2-flash:free", 
+            model="google/gemma-3-27b-it:free", 
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "You are a senior Occupational Health and Safety Expert working in Turkey. You write ALL reports in TURKISH language. You never use English."},
