@@ -1,6 +1,7 @@
 """
 PDF Report Generator Agent
-Generates HSG245-compliant investigation reports in PDF format
+Generates HSG245-compliant investigation reports in PDF format/ format of the pdf file will be updated
+We dont use any model here!!!
 """
 
 from fpdf import FPDF
