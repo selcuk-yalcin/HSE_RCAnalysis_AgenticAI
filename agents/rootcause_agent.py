@@ -165,7 +165,19 @@ Return ONLY valid JSON."""
         try:
             data = json.loads(result)
             causes = data.get("causes", [])
-            print(f"✅ {len(causes)} doğrudan neden belirlendi")
+            
+            # --- YENİ EKLENEN KISIM: İngilizce alanları Türkçe ile değiştir ---
+            for item in causes:
+                # Eğer Türkçe veri varsa, ana 'cause' alanına onu yaz
+                if item.get("cause_tr"):
+                    item["cause"] = item["cause_tr"] 
+                
+                # Eğer Türkçe kanıt varsa, ana 'evidence' alanına onu yaz
+                if item.get("evidence_tr"):
+                    item["evidence"] = item["evidence_tr"]
+            # ------------------------------------------------------------------
+            
+            print(f"{len(causes)} dogrudan neden belirlendi (Turkcelesstirildi)")
             return causes
         except json.JSONDecodeError:
             return []
@@ -223,12 +235,27 @@ Return ONLY valid JSON."""
         
         try:
             chain = json.loads(result)
+            
+            # --- YENİ EKLENEN KISIM: Zinciri Türkçeleştir ---
+            # 1. Zincirdeki (Why 1, Why 2...) soruları ve cevapları değiştir
+            for step in chain.get("why_chain", []):
+                if step.get("why_question_tr"):
+                    step["why_question"] = step["why_question_tr"]
+                
+                if step.get("because_answer_tr"):
+                    step["because_answer"] = step["because_answer_tr"]
+            
+            # 2. Kök Nedeni (Root Cause) değiştir
             root = chain.get("root_cause", {})
-            # Safe print: handle both dict and string
             if isinstance(root, dict):
-                print(f"      → Kök: {root.get('root_tr', root.get('root', 'N/A'))}")
+                if root.get("root_tr"):
+                    root["root"] = root["root_tr"]
+                print(f"      Kok: {root.get('root', 'N/A')}")
             else:
-                print(f"      → Kök: {root}")
+                # Bazen string gelebilir, onu da handle edelim
+                pass 
+            # ------------------------------------------------
+            
             return chain
         except json.JSONDecodeError:
             return {"immediate_cause": immediate_cause, "why_chain": [], "root_cause": {}}
@@ -287,9 +314,12 @@ CRITICAL: Report must be 100% in TURKISH language. Absolutely NO English words a
         underlying = []
         for why in chain.get("why_chain", []):
             if why.get("cause_type") == "underlying":
+                # Önceliği Türkçeye veriyoruz
+                cause_text = why.get("because_answer_tr") or why.get("because_answer", "")
+                
                 underlying.append({
-                    "cause": why.get("because_answer", ""),
-                    "cause_tr": why.get("because_answer_tr", ""),
+                    "cause": cause_text,     # Artık burası kesin Türkçe
+                    "cause_tr": cause_text,  # Yedek olarak kalsın
                     "level": why.get("level", 0)
                 })
         return underlying
@@ -297,10 +327,20 @@ CRITICAL: Report must be 100% in TURKISH language. Absolutely NO English words a
     def _extract_root_from_chain(self, chain: Dict) -> Dict:
         for why in chain.get("why_chain", []):
             if why.get("level") == 5 or why.get("cause_type") == "root":
+                # Önceliği Türkçeye veriyoruz
+                cause_text = why.get("because_answer_tr") or why.get("because_answer", "")
+                
                 return {
-                    "cause": why.get("because_answer", ""),
-                    "cause_tr": why.get("because_answer_tr", "")
+                    "cause": cause_text,    # Artık burası kesin Türkçe
+                    "cause_tr": cause_text
                 }
+        
+        # Eğer zincirden bulunamazsa root_cause objesine bak
+        root_obj = chain.get("root_cause", {})
+        if isinstance(root_obj, dict):
+             root_text = root_obj.get("root_tr") or root_obj.get("root", "")
+             return {"cause": root_text, "cause_tr": root_text}
+             
         return chain.get("root_cause", {})
 
     def _print_summary(self, rca_data: Dict):
