@@ -111,9 +111,9 @@ class AssessmentData(BaseModel):
 
 class InvestigationData(BaseModel):
     incident_id: str = ""  # Optional - can be inferred from URL path
-    location: str
-    who_involved: str
-    how_happened: str
+    how_happened: str  # Main detailed investigation field (REQUIRED)
+    location: str = ""  # Optional legacy fields
+    who_involved: str = ""
     activities: str = ""
     working_conditions: str = ""
     safety_procedures: str = ""
