@@ -1,6 +1,7 @@
 """
 Report Generator Agent - HSG245 Format
 Generates professional Word/PDF reports in HSG245 format
+We will check report format again
 """
 
 from docx import Document
