@@ -157,7 +157,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
         
         try:
             response = self.client.chat.completions.create(
-                model="xiaomi/mimo-v2-flash:free",# !Change model here 
+                model="google/gemma-3-27b-it:free",# !Change model here 
                 messages=[
                     {
                         "role": "system", 
@@ -261,6 +261,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
                 "Conduct training": "Training Manager",
                 "Review system": "Operations Director"
             },
+            # ! We can put here dateline as 3 month immediatly or so on ...
             "deadlines": {
                 "Review incident": (today + timedelta(days=1)).strftime("%d/%m/%Y"),
                 "Implement measures": (today + timedelta(days=2)).strftime("%d/%m/%Y"),
