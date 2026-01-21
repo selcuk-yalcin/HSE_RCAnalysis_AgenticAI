@@ -129,14 +129,13 @@ class RootCauseAgent:
     
     def _identify_immediate_causes(self, incident_summary: str) -> List[Dict]:
         """
-        STEP 1: Identify immediate causes using DeepSeek V3 (Cost Effective Logic)
+        STEP 1: Identify immediate causes using AI with Turkish output
         """
         prompt = f"""You are a UK Health & Safety incident investigator following HSG245 methodology.
 
-OLAY ÖZETİ / INCIDENT SUMMARY:
+INCIDENT SUMMARY:
 {incident_summary}
 
-GÖREV: Olayın DOĞRUDAN NEDENLERİNİ belirleyin.
 TASK: Identify the IMMEDIATE CAUSES (direct causes) of this incident.
 
 IMMEDIATE CAUSES are:
@@ -146,14 +145,15 @@ IMMEDIATE CAUSES are:
 Return JSON with:
 - causes: Array of 2-4 immediate causes (cause, cause_tr, evidence, evidence_tr)
 
+CRITICAL: All text fields (cause, cause_tr, evidence, evidence_tr) must be 100% in TURKISH language. No English words allowed.
+
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            # MODEL GÜNCELLEMESİ: Claude 3.5 Sonnet
             model="xiaomi/mimo-v2-flash:free",
             temperature=0.1,
             messages=[
-                {"role": "system", "content": "You are an HSG245 incident investigation expert. Return only valid JSON."},
+                {"role": "system", "content": "You are an HSG245 incident investigation expert. Return only valid JSON with ALL content in TURKISH language."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -172,15 +172,15 @@ Return ONLY valid JSON."""
     
     def _perform_5why_for_cause(self, immediate_cause: Dict, incident_summary: str) -> Dict:
         """
-        STEP 2: Perform 5 Why analysis using DeepSeek V3 (Deep Logic)
+        STEP 2: Perform 5 Why analysis with Turkish output
         """
         cause_en = immediate_cause.get("cause", "")
         cause_tr = immediate_cause.get("cause_tr", "")
         
         prompt = f"""You are performing 5 Why Analysis following HSG245 methodology.
 
-OLAY: {incident_summary}
-NEDEN: {cause_en} ({cause_tr})
+INCIDENT: {incident_summary}
+IMMEDIATE CAUSE: {cause_en} ({cause_tr})
 
 TASK: Perform 5 WHY analysis.
 Why 1 -> Why 2 (underlying) -> Why 3 (underlying) -> Why 4 (underlying) -> Why 5 (ROOT CAUSE)
@@ -202,16 +202,17 @@ IMPORTANT:
 - Level 1: immediate cause (already known)
 - Levels 2-4: UNDERLYING CAUSES (cause_type: "underlying")
 - Level 5: ROOT CAUSE (cause_type: "root")
-- All fields must have Turkish (_tr) translations
+- All why_question_tr, because_answer_tr fields must be in TURKISH language
+
+CRITICAL: All _tr fields must be 100% TURKISH. No English words allowed.
 
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            # MODEL GÜNCELLEMESİ: Claude 3.5 Sonnet
             model="xiaomi/mimo-v2-flash:free",
             temperature=0.0,
             messages=[
-                {"role": "system", "content": "You are a 5 Why analysis expert. Return only valid JSON."},
+                {"role": "system", "content": "You are a 5 Why analysis expert. Return only valid JSON with all _tr fields in TURKISH language."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -232,58 +233,54 @@ Return ONLY valid JSON."""
         except json.JSONDecodeError:
             return {"immediate_cause": immediate_cause, "why_chain": [], "root_cause": {}}
     
-    def _generate_final_report(self, rca_data: Dict) -> str:  # --- DEĞİŞİKLİK 3: -> str eklendi ---
+    def _generate_final_report(self, rca_data: Dict) -> str:
         """
-        FINAL EDITOR: DeepSeek V3.2
-        DeepSeek'in ürettiği ham veriyi (JSON) alır ve mükemmel bir Türkçe rapora çevirir.
+        FINAL EDITOR: Generate professional Turkish report
         """
-        print("\n✍️ Final Rapor Hazırlanıyor (Profesyonel Rapor Modu)...")
+        print("\nFinal Rapor Hazirlanyor (Profesyonel Rapor Modu)...")
         
-        # DeepSeek'in bulduğu tüm veriyi metne döküyoruz
         raw_data_str = json.dumps(rca_data, indent=2, ensure_ascii=False)
         
-        prompt = f"""Sen profesyonel bir İş Güvenliği Rapor Editörüsün.
+        prompt = f"""You are a professional Occupational Health and Safety Report Editor.
 
-GİRDİ VERİSİ (DeepSeek AI tarafından yapılan analiz):
+INPUT DATA (AI-generated analysis):
 {raw_data_str}
 
-GÖREV:
-Bu verilere dayanarak profesyonel, resmi bir 'Kök Neden Analiz Raporu' TÜRKÇE olarak yaz.
+TASK:
+Based on this data, write a professional, formal 'Root Cause Analysis Report'.
 
-ZORUNLU GEREKSINIMLER:
-1. Dil: SADECE TÜRKÇE (hiç İngilizce kullanma!)
-2. Ton: Resmi, objektif, kıdemli iş güvenliği uzmanı tarzı
-3. Yapı:
-   - YÖNETİCİ ÖZETİ (Executive Summary)
+MANDATORY REQUIREMENTS:
+1. Language: ONLY TURKISH (no English words!)
+2. Tone: Formal, objective, senior safety expert style
+3. Structure:
+   - YONETICI OZETI (Executive Summary)
    - OLAY DETAYLARI (Incident Details)
-   - DOĞRUDAN NEDENLER (Immediate Causes - input verisindeki tüm immediate causes'ları listele)
-   - KÖK NEDEN ANALİZİ (Her immediate cause için 5 Neden zincirini detaylı açıkla)
-   - TEMEL NEDENLER (Underlying Causes - tüm level 2-4 nedenleri)
-   - SİSTEMİK BULGULAR (Root Causes - level 5 nedenleri)
-   - SONUÇ VE ÖNERİLER
-4. Format: Temiz, düzenli metin (JSON değil)
-5. Input verisindeki kötü çevirileri düzelt, mantık boşluklarını kapat
+   - DOGRUDAN NEDENLER (Immediate Causes - list all immediate causes from input)
+   - KOK NEDEN ANALIZI (For each immediate cause, explain the 5 Why chain in detail)
+   - TEMEL NEDENLER (Underlying Causes - all level 2-4 causes)
+   - SISTEMIK BULGULAR (Root Causes - level 5 causes)
+   - SONUC VE ONERILER (Conclusion and Recommendations)
+4. Format: Clean, organized text (not JSON)
+5. Fix any poor translations in input data, fill logic gaps
 
-ÖNEMLİ: Rapor %100 TÜRKÇE olmalı. Hiçbir İngilizce kelime kullanma!"""
+CRITICAL: Report must be 100% in TURKISH language. Absolutely NO English words allowed in the output."""
 
-        # Raporlama için DeepSeek V3.2 kullanıyoruz
         response = self.client.chat.completions.create(
             model="xiaomi/mimo-v2-flash:free", 
             temperature=0.3,
             messages=[
-                {"role": "system", "content": "Sen Türkiye'de çalışan kıdemli bir İş Güvenliği Uzmanısın. Tüm raporları TÜRKÇE yazarsın. Hiç İngilizce kullanmazsın."},
+                {"role": "system", "content": "You are a senior Occupational Health and Safety Expert working in Turkey. You write ALL reports in TURKISH language. You never use English."},
                 {"role": "user", "content": prompt}
             ]
         )
         
-        # --- DEĞİŞİKLİK 3: Cevabı değişkene alıp RETURN etmek ---
         report_content = response.choices[0].message.content
         
         print("\n" + "="*80)
         print(report_content)
         print("="*80)
         
-        return report_content  # <--- BU SATIR ÇOK ÖNEMLİ! Raporu dışarı aktarır.
+        return report_content
 
     # Helper methods (extract_underlying, extract_root) stay the same...
     def _extract_underlying_from_chain(self, chain: Dict) -> List[Dict]:
