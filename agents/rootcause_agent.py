@@ -168,11 +168,26 @@ GÖREV:
 1. Bu olayın DOĞRUDAN NEDENLERİNİ (Immediate Causes) belirle
 2. Yukarıdaki A ve B kategorilerinden en uygun olanları seç
 3. Tipik olarak 2-4 doğrudan neden olur
+4. Her neden için DETAYLI AÇIKLAMA yaz (neden bu bir doğrudan neden, nasıl katkıda bulundu)
+
+CRITICAL RULES:
+- KOD YAZMA! Sadece açıklama yaz. Örnek: "Operatör makineye yetkisiz müdahale etti" (✅), "A2.1 Ekipman yanlış kullanım" (❌)
+- Her "cause" alanı en az 2 cümle olmalı (ne oldu + neden önemli)
+- "evidence" alanında somut kanıtlar belirt
 
 Return JSON with:
-- causes: Array of 2-4 immediate causes (cause, cause_tr, evidence, evidence_tr)
+{{
+  "causes": [
+    {{
+      "cause": "Detaylı açıklama (kod YOK, sadece açıklama)",
+      "cause_tr": "Detaylı açıklama (kod YOK, sadece açıklama)",
+      "evidence": "Somut kanıtlar ve gözlemler",
+      "evidence_tr": "Somut kanıtlar ve gözlemler"
+    }}
+  ]
+}}
 
-CRITICAL: All text fields must be 100% in TURKISH language.
+CRITICAL: All text fields must be 100% in TURKISH language. NO CATEGORY CODES in cause field!
 
 Return ONLY valid JSON."""
 
@@ -193,7 +208,32 @@ Return ONLY valid JSON."""
             data = json.loads(result)
             causes = data.get("causes", [])
             
-            # --- YENİ EKLENEN KISIM: İngilizce alanları Türkçe ile değiştir ---
+            # --- YENİ: KOD TEMİZLEME ---
+            import re
+            for item in causes:
+                # Kod pattern'i: A1.1, B2.3, vb.
+                code_pattern = r'\b[ABCD]\d+(\.\d+)?\b'
+                
+                # cause alanından kod temizle
+                if item.get("cause"):
+                    original = item["cause"]
+                    cleaned = re.sub(code_pattern, '', item["cause"]).strip()
+                    # Başındaki ":" veya "-" varsa temizle
+                    cleaned = re.sub(r'^[\s\-:]+', '', cleaned).strip()
+                    item["cause"] = cleaned
+                    
+                    if original != cleaned:
+                        print(f"      🧹 Kod temizlendi: '{original[:50]}...' → '{cleaned[:50]}...'")
+                
+                # cause_tr alanından da kod temizle
+                if item.get("cause_tr"):
+                    original_tr = item["cause_tr"]
+                    cleaned_tr = re.sub(code_pattern, '', item["cause_tr"]).strip()
+                    cleaned_tr = re.sub(r'^[\s\-:]+', '', cleaned_tr).strip()
+                    item["cause_tr"] = cleaned_tr
+            # ---------------------------
+            
+            # --- MEVCUT KOD: İngilizce alanları Türkçe ile değiştir ---
             for item in causes:
                 # Eğer Türkçe veri varsa, ana 'cause' alanına onu yaz
                 if item.get("cause_tr"):
@@ -204,7 +244,7 @@ Return ONLY valid JSON."""
                     item["evidence"] = item["evidence_tr"]
             # ------------------------------------------------------------------
             
-            print(f"{len(causes)} dogrudan neden belirlendi (Turkcelesstirildi)")
+            print(f"   ✅ {len(causes)} doğrudan neden belirlendi (Türkçeleştirildi + Kod temizlendi)")
             return causes
         except json.JSONDecodeError:
             return []
@@ -238,27 +278,39 @@ C KATEGORİSİ (KİŞİSEL FAKTÖRLER - Root Causes):
 D KATEGORİSİ (ORGANİZASYONEL FAKTÖRLER - Root Causes):
 {rag_context_d}
 
-GÖREV: 5 Neden Analizi yap
-Why 1 → Why 2 (underlying) → Why 3 (underlying) → Why 4 (underlying) → Why 5 (ROOT CAUSE - C veya D kategorisinden)
+GÖREV: 5 Neden Analizi yap - KRONOLOJİK SIRALAMA ÇOK ÖNEMLİ!
+
+CRITICAL RULE - SIRALAMA:
+- Why 1 (Level 1) → ÖNCE
+- Why 2 (Level 2) → SONRA  
+- Why 3 (Level 3) → SONRA
+- Why 4 (Level 4) → SONRA
+- Why 5 (Level 5 - ROOT) → EN SON
+
+❌ YANLIŞ: 1→3→5→2 (kronolojik kopukluk)
+✅ DOĞRU: 1→2→3→4→5 (mantıklı sıralama)
+
+Her bir "why" bir önceki "because" cevabının nedenidir. Merdiven gibi: 1. basamaktan 2. basamağa, oradan 3. basamağa çık.
 
 Return JSON with:
 {{
   "immediate_cause": {{...}},
   "why_chain": [
-    {{"level": 1, "cause_type": "immediate", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}},
-    {{"level": 2, "cause_type": "underlying", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}},
-    {{"level": 3, "cause_type": "underlying", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}},
-    {{"level": 4, "cause_type": "underlying", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}},
-    {{"level": 5, "cause_type": "root", "why_question": "...", "why_question_tr": "...", "because_answer": "...", "because_answer_tr": "..."}}
+    {{"level": 1, "cause_type": "immediate", "why_question": "Neden bu doğrudan neden meydana geldi?", "why_question_tr": "Neden bu doğrudan neden meydana geldi?", "because_answer": "...", "because_answer_tr": "..."}},
+    {{"level": 2, "cause_type": "underlying", "why_question": "Neden [Level 1 cevabı] oldu?", "why_question_tr": "Neden [Level 1 cevabı] oldu?", "because_answer": "...", "because_answer_tr": "..."}},
+    {{"level": 3, "cause_type": "underlying", "why_question": "Neden [Level 2 cevabı] oldu?", "why_question_tr": "Neden [Level 2 cevabı] oldu?", "because_answer": "...", "because_answer_tr": "..."}},
+    {{"level": 4, "cause_type": "underlying", "why_question": "Neden [Level 3 cevabı] oldu?", "why_question_tr": "Neden [Level 3 cevabı] oldu?", "because_answer": "...", "because_answer_tr": "..."}},
+    {{"level": 5, "cause_type": "root", "why_question": "Neden [Level 4 cevabı] oldu?", "why_question_tr": "Neden [Level 4 cevabı] oldu?", "because_answer": "... (C veya D kategorisinden)", "because_answer_tr": "... (C veya D kategorisinden)"}}
   ],
-  "root_cause": {{"root": "...", "root_tr": "... (C veya D kategorisinden seçilmiş)"}}
+  "root_cause": {{"root": "Level 5 cevabı", "root_tr": "Level 5 cevabı"}}
 }}
 
 IMPORTANT: 
-- Level 1: immediate cause
-- Levels 2-4: UNDERLYING CAUSES  
-- Level 5: ROOT CAUSE (yukarıdaki C/D kategorilerinden en uygun olanı seç)
+- Level 1: immediate cause (başlangıç)
+- Levels 2-4: UNDERLYING CAUSES (ara nedenler - sırayla!)
+- Level 5: ROOT CAUSE (kök neden - yukarıdaki C/D kategorilerinden)
 - All _tr fields: 100% TURKISH
+- SIRALAMAYA DİKKAT: 1→2→3→4→5 (asla atlama yapma!)
 
 Return ONLY valid JSON."""
 
@@ -278,7 +330,33 @@ Return ONLY valid JSON."""
         try:
             chain = json.loads(result)
             
-            # --- YENİ EKLENEN KISIM: Zinciri Türkçeleştir ---
+            # --- YENİ: SIRALAMA KONTROLÜ ---
+            why_chain = chain.get("why_chain", [])
+            if why_chain:
+                # Sıralama kontrolü: level değerleri 1, 2, 3, 4, 5 olmalı
+                expected_levels = [1, 2, 3, 4, 5]
+                actual_levels = [step.get("level", 0) for step in why_chain]
+                
+                if actual_levels != expected_levels:
+                    print(f"      ⚠️ UYARI: Sıralama hatası tespit edildi!")
+                    print(f"         Beklenen: {expected_levels}")
+                    print(f"         Gelen: {actual_levels}")
+                    print(f"      🔧 Düzeltiliyor...")
+                    
+                    # Sıralamayı düzelt
+                    for i, step in enumerate(why_chain, 1):
+                        step["level"] = i
+                        if i == 1:
+                            step["cause_type"] = "immediate"
+                        elif i == 5:
+                            step["cause_type"] = "root"
+                        else:
+                            step["cause_type"] = "underlying"
+                    
+                    print(f"      ✅ Sıralama düzeltildi: 1→2→3→4→5")
+            # -----------------------------------
+            
+            # --- MEVCUT KOD: Zinciri Türkçeleştir ---
             # 1. Zincirdeki (Why 1, Why 2...) soruları ve cevapları değiştir
             for step in chain.get("why_chain", []):
                 if step.get("why_question_tr"):
