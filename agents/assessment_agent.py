@@ -32,7 +32,7 @@ class AssessmentAgent:
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key
         )
-        print(f"✅ Assessment Agent initialized with OpenRouter")
+        print("✅ Assessment Agent initialized with OpenRouter")
     
     def assess_incident(self, part1_data: Dict, incident_details: Dict = None) -> Dict:
         """
@@ -141,7 +141,7 @@ Classify this into ONE of these event types:
 Return ONLY the event type name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-3.5-sonnet",
+            model="meta-llama/llama-3.1-70b-instruct",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety event classifier. Return only the event type."},
@@ -179,7 +179,7 @@ Classify the severity into ONE of these levels:
 Return ONLY the severity level, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-3.5-sonnet", # Model can be change here 
+            model="meta-llama/llama-3.1-70b-instruct", # Model can be change here 
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a severity assessor. Return only the severity level."},
@@ -223,7 +223,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-3.5-sonnet", # model and temp can be change here
+            model="meta-llama/llama-3.1-70b-instruct", # model and temp can be change here
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a RIDDOR expert. Return only valid JSON."},
@@ -249,7 +249,7 @@ Return ONLY valid JSON."""
                 "reason": riddor.get("reason", "")
             }
         except json.JSONDecodeError:
-            print(f"⚠️  JSON parsing error, defaulting to N")
+            print("⚠️  JSON parsing error, defaulting to N")
             return {"reportable": "N", "date_reported": "", "reason": ""}
     
     def _determine_investigation_level(self, part1_data: Dict, part2_data: Dict, description: str) -> Dict:
@@ -287,7 +287,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-3.5-sonnet",
+            model="meta-llama/llama-3.1-70b-instruct",
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "You are an investigation coordinator. Return only valid JSON."},
@@ -311,7 +311,7 @@ Return ONLY valid JSON."""
             
             return assessment
         except json.JSONDecodeError:
-            print(f"⚠️  JSON parsing error, using defaults")
+            print("⚠️  JSON parsing error, using defaults")
             return {
                 "level": "Medium level",
                 "priority": "Medium",
