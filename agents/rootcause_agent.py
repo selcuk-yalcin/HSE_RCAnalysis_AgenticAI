@@ -173,7 +173,7 @@ JSON dön:
 SADECE JSON dön!"""
 
         response = self.client.chat.completions.create(
-            model="meta-llama/llama-3.1-70b-instruct",
+            model="meta-llama/llama-3.2-3b-instruct:free",
             temperature=0.2,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -298,7 +298,7 @@ JSON:
 SADECE JSON!"""
 
         response = self.client.chat.completions.create(
-            model="meta-llama/llama-3.1-70b-instruct",
+            model="meta-llama/llama-3.2-3b-instruct:free",
             temperature=0.1,
             messages=[{"role": "user", "content": prompt}]
         )

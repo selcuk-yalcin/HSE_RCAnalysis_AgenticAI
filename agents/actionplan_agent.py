@@ -157,7 +157,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
         
         try:
             response = self.client.chat.completions.create(
-                model="meta-llama/llama-3.1-70b-instruct",# !Change model here 
+                model="meta-llama/llama-3.2-3b-instruct:free",# !Change model here 
                 messages=[
                     {
                         "role": "system", 
