@@ -24,13 +24,13 @@ class ActionPlanAgent:
     """
     
     def __init__(self):
-        """Initialize Action Plan Agent with OpenRouter"""
+        """Initialize Action Plan Agent (Basitleştirilmiş - RAG Yok)"""
         api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
         self.client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key
         )
-        print(f"✅ Action Plan Agent initialized with OpenRouter")
+        print(f"✅ Aksiyon Planı Ajanı başlatıldı (Basit Mod - RAG Yok)")
     
     def generate_action_plan(self, investigation_data: Dict) -> Dict:
         """
