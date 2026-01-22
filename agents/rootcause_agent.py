@@ -493,4 +493,3 @@ Rapor metni döndür (JSON değil!)."""
             return {"cause": root_text, "cause_tr": root_text}
         
         return chain.get("root_cause", {})
-        """
