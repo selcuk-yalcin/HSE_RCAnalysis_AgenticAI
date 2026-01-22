@@ -157,7 +157,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
         
         try:
             response = self.client.chat.completions.create(
-                model="deepseek/deepseek-r1-0528:free",# !Change model here 
+                model="google/gemini-2.0-flash-001",# !Change model here 
                 messages=[
                     {
                         "role": "system", 
