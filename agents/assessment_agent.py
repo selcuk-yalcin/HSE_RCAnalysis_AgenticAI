@@ -179,7 +179,7 @@ Classify the severity into ONE of these levels:
 Return ONLY the severity level, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="google/gemma-3-27b-it:free", # Model can be change here 
+            model="deepseek/deepseek-r1-0528:free", # Model can be change here 
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a severity assessor. Return only the severity level."},
@@ -223,7 +223,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="google/gemma-3-27b-it:free", # model and temp can be change here 
+            model="deepseek/deepseek-r1-0528:free", # model and temp can be change here 
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a RIDDOR expert. Return only valid JSON."},
@@ -287,7 +287,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="google/gemma-3-27b-it:free",
+            model="deepseek/deepseek-r1-0528:free",
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "You are an investigation coordinator. Return only valid JSON."},
