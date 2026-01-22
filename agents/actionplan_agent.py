@@ -157,7 +157,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
         
         try:
             response = self.client.chat.completions.create(
-                model="liquid/lfm2-8b-a1b",# !Change model here 
+                model="anthropic/claude-sonnet-4.5",# !Change model here 
                 messages=[
                     {
                         "role": "system", 

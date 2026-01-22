@@ -141,7 +141,7 @@ Classify this into ONE of these event types:
 Return ONLY the event type name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="liquid/lfm2-8b-a1b",
+            model="anthropic/claude-sonnet-4.5",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety event classifier. Return only the event type."},
@@ -179,7 +179,7 @@ Classify the severity into ONE of these levels:
 Return ONLY the severity level, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="liquid/lfm2-8b-a1b", # Model can be change here 
+            model="anthropic/claude-sonnet-4.5", # Model can be change here 
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a severity assessor. Return only the severity level."},
@@ -223,7 +223,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="liquid/lfm2-8b-a1b", # model and temp can be change here
+            model="anthropic/claude-sonnet-4.5", # model and temp can be change here
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a RIDDOR expert. Return only valid JSON."},
@@ -287,7 +287,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="liquid/lfm2-8b-a1b",
+            model="anthropic/claude-sonnet-4.5",
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "You are an investigation coordinator. Return only valid JSON."},
