@@ -164,7 +164,7 @@ JSON dön:
 SADECE JSON dön!"""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.0-flash-001",
+            model="liquid/lfm2-8b-a1b",
             temperature=0.2,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -236,7 +236,7 @@ JSON:
 SADECE JSON!"""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.0-flash-001",
+            model="liquid/lfm2-8b-a1b",
             temperature=0.1,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -284,7 +284,7 @@ JSON dön:
 SADECE JSON!"""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.0-flash-001",
+            model="liquid/lfm2-8b-a1b",
             temperature=0.0,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -337,7 +337,7 @@ JSON:
 TÜRKÇE! SADECE JSON!"""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.0-flash-001",
+            model="liquid/lfm2-8b-a1b",
             temperature=0.0,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -389,7 +389,7 @@ KURAL: SADECE TÜRKÇE! Formal üslup.
 Rapor metni döndür (JSON değil!)."""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.0-flash-001",
+            model="liquid/lfm2-8b-a1b",
             temperature=0.3,
             messages=[{"role": "user", "content": prompt}]
         )

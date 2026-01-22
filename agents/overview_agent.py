@@ -106,7 +106,7 @@ If any information is not available, use empty string "".
 Return ONLY valid JSON, no explanations."""
 
         response = self.client.chat.completions.create(
-            model="xiaomi/mimo-v2-flash:free",
+            model="liquid/lfm2-8b-a1b",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a health and safety incident documentation expert. Return only valid JSON."},
@@ -158,7 +158,7 @@ Classify this incident into ONE of these categories:
 Return ONLY the category name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free", # Model change 
+            model="liquid/lfm2-8b-a1b", # Model change 
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety incident classifier. Return only the category name."},
