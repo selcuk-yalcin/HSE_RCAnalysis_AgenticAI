@@ -72,39 +72,48 @@ class RootCauseAgent:
         print("\n🧠 AGENT 1: Planning Agent - Analiz stratejisi belirleniyor...")
         rca_data["analysis_plan"] = self._planning_agent(incident_summary)
         
-        # AGENT 2-3: Search + Validation Loop
-        print("\n🔍 AGENT 2-3: Search + Validation Loop (Immediate Causes)...")
+        # AGENT 2-3: Search + Validation Loop (Immediate Causes - A ve B tabloları)
+        print("\n🔍 AGENT 2-3: Search + Validation Loop (Immediate Causes - A ve B)...")
         immediate_causes = self._search_validate_loop(
             incident=incident_summary,
             categories=['A', 'B'],
-            agent_name="Immediate Cause",
+            agent_name="Immediate Causes",
             expected_count=rca_data["analysis_plan"].get("expected_immediate_count", 3)
         )
         rca_data["immediate_causes"] = immediate_causes
         
-        # AGENT 4: Reasoning - 5 Why chains
+        # AGENT 2-3: Search + Validation Loop (Root Causes - C ve D tabloları)
+        print("\n🔍 AGENT 2-3: Search + Validation Loop (Root Causes - C ve D)...")
+        root_causes = self._search_validate_loop(
+            incident=incident_summary,
+            categories=['C', 'D'],
+            agent_name="Root Causes",
+            expected_count=3  # Birden fazla farklı kök neden
+        )
+        rca_data["root_causes"] = root_causes
+        
+        # AGENT 4: Reasoning - 5 Why chains (underlying causes için)
         print(f"\n🧩 AGENT 4: Reasoning Agent - {len(immediate_causes)} zincir için 5-Why analizi...")
         
         all_chains = []
         all_underlying = []
-        all_root = []
         
         for idx, immediate_cause in enumerate(immediate_causes, 1):
-            print(f"   Zincir {idx}/{len(immediate_causes)}: {immediate_cause.get('cause', '')[:60]}...")
+            cause_text = immediate_cause.get('cause', '')
+            if immediate_cause.get('category_code'):
+                cause_text = f"{immediate_cause['category_code']} - {cause_text}"
+            
+            print(f"   Zincir {idx}/{len(immediate_causes)}: {cause_text[:60]}...")
             
             chain = self._reasoning_agent_5why(immediate_cause, incident_summary)
             all_chains.append(chain)
             
-            # Underlying ve root çıkar
+            # Underlying causes (5-Why zincirinden)
             underlying = self._extract_underlying_from_chain(chain)
-            root = self._extract_root_from_chain(chain)
-            
             all_underlying.extend(underlying)
-            all_root.append(root)
         
         rca_data["five_why_chains"] = all_chains
         rca_data["underlying_causes"] = all_underlying
-        rca_data["root_causes"] = all_root
         
         # AGENT 5: Synthesis - Final report
         print("\n📝 AGENT 5: Synthesis Agent - Final rapor oluşturuluyor...")
@@ -212,24 +221,77 @@ SADECE JSON dön!"""
         """AGENT 2: Search - Kategorilerden neden bul"""
         category_texts = "\n\n".join([get_category_text(cat) for cat in categories])
         
-        prompt = f"""İSG Uzmanı olarak analiz et.
+        # Immediate Causes için (A ve B tabloları)
+        if 'A' in categories or 'B' in categories:
+            prompt = f"""İSG Uzmanı olarak analiz et.
 
 OLAY: {incident}
 
-KATEGORİLER:
+HSG245 KATEGORİ TABLOLARI:
 {category_texts}
 
-GÖREV: Doğrudan nedenleri bul (2-4 tane).
+GÖREV: Olayın DOĞRUDAN NEDENLERİNİ (Immediate Causes) bul.
 
 KURALLAR:
-- KOD YAZMA! Sadece açıklama
-- En az 2 cümle per neden
-- Somut kanıt belirt
+1. A tablosundan (Güvensiz Davranışlar) ve B tablosundan (Güvensiz Durumlar) en uygun maddeleri seç
+2. Her neden için HSG245 tablosundaki AYNEN kategori kodunu ve başlığını belirt (örn: "A4.1 Dikkat dağınıklığı")
+3. Ardından olaya özgü detaylı açıklama ekle (en az 2-3 cümle)
+4. Somut kanıt belirt
+
+ÖRNEK FORMAT:
+- **A4.1 Dikkat dağınıklığı veya bölünmüş dikkat:** İşçinin emniyet kemeri üzerinde taşımasına rağmen yaşam halatını (lanyard) ankraj noktasına bağlamaması dikkat eksikliğinden kaynaklanmıştır.
+- **B4.4 Korunmasız yükseklik veya düşme tehlikesi:** İskele platformunda düşmeyi engelleyici korkulukların bulunmaması güvensiz durum oluşturmuştur.
 
 JSON:
 {{
   "causes": [
-    {{"cause": "detaylı açıklama", "cause_tr": "detaylı açıklama", "evidence": "kanıt", "evidence_tr": "kanıt"}}
+    {{
+      "category_code": "A4.1",
+      "category_title": "Dikkat dağınıklığı veya bölünmüş dikkat",
+      "cause": "İşçinin emniyet kemeri üzerinde taşımasına rağmen yaşam halatını ankraj noktasına bağlamaması dikkat eksikliğinden kaynaklanmıştır.",
+      "cause_tr": "İşçinin emniyet kemeri üzerinde taşımasına rağmen yaşam halatını ankraj noktasına bağlamaması dikkat eksikliğinden kaynaklanmıştır.",
+      "evidence": "Olay sonrası yapılan incelemede yaşam halatının bağlı olmadığı tespit edilmiştir.",
+      "evidence_tr": "Olay sonrası yapılan incelemede yaşam halatının bağlı olmadığı tespit edilmiştir."
+    }}
+  ]
+}}
+
+SADECE JSON!"""
+        
+        # Root Causes için (C ve D tabloları)
+        else:
+            prompt = f"""İSG Uzmanı olarak analiz et.
+
+OLAY: {incident}
+
+HSG245 KATEGORİ TABLOLARI:
+{category_texts}
+
+GÖREV: SİSTEMİK KÖK NEDENLERİ (Root Causes) bul.
+
+KURALLAR:
+1. C tablosundan (Kişisel Faktörler) ve D tablosundan (Organizasyonel Faktörler) FARKLI maddelerden seç
+2. SADECE BİR MADDEDEN DEĞİL, birden fazla farklı kök nedeni tespit et
+3. Her neden için HSG245 tablosundaki kategori kodunu ve başlığını belirt (örn: "D1.4 Üretim baskısının güvenliğin önüne geçmesi")
+4. Ardından olaya özgü detaylı açıklama ekle (en az 2-3 cümle)
+5. Sistemsel/yönetimsel eksikliklere odaklan
+
+ÖRNEK FORMAT:
+- **D1.4 Üretim baskısının güvenliğin önüne geçmesi:** Kurumsal kültürde proje teslim tarihlerinin çalışan güvenliğinden daha öncelikli tutulması.
+- **D1.1 Güvenliğe yönelik zayıf liderlik taahhüdü:** Yönetimin sahada "önce güvenlik" kültürünü benimsetememesi.
+- **D4.1 Risk analizinin yapılmaması veya yetersiz olması:** İş programının güvenlik önlemlerinin tam uygulanmasına zaman tanımayacak kadar sıkışık olması.
+
+JSON:
+{{
+  "causes": [
+    {{
+      "category_code": "D1.4",
+      "category_title": "Üretim baskısının güvenliğin önüne geçmesi",
+      "cause": "Kurumsal kültürde proje teslim tarihlerinin çalışan güvenliğinden daha öncelikli tutulması ve zaman baskısının güvenlik prosedürlerini atlatmaya yol açması.",
+      "cause_tr": "Kurumsal kültürde proje teslim tarihlerinin çalışan güvenliğinden daha öncelikli tutulması ve zaman baskısının güvenlik prosedürlerini atlatmaya yol açması.",
+      "evidence": "Şantiye şefinin öğle paydosuna yetişme hedefi nedeniyle işçilere acele etme talimatı vermesi.",
+      "evidence_tr": "Şantiye şefinin öğle paydosuna yetişme hedefi nedeniyle işçilere acele etme talimatı vermesi."
+    }}
   ]
 }}
 
@@ -243,9 +305,6 @@ SADECE JSON!"""
         
         result = self._extract_json(response.choices[0].message.content)
         causes = result.get("causes", [])
-        
-        # Kod temizleme (korundu)
-        self._clean_category_codes(causes)
         
         return causes
     
@@ -271,9 +330,10 @@ BEKLENEN SAYI: {expected_count}
 KONTROL LİSTESİ:
 1. ✓ Neden sayısı uygun mu? ({len(causes)} vs {expected_count})
 2. ✓ Her neden en az 2 cümle mi?
-3. ✓ Kod içeriyor mu? (A1.1, B2.3 gibi - OLMAMALI!)
+3. ✓ HSG245 kategori kodu var mı? (category_code ve category_title alanları)
 4. ✓ Olayla alakalı mı?
 5. ✓ Kanıt var mı?
+6. ✓ Root causes için: Birden fazla FARKLI maddeden mi seçilmiş? (Sadece bir maddeden olmamalı!)
 
 JSON dön:
 {{
@@ -366,25 +426,77 @@ TÜRKÇE! SADECE JSON!"""
         
         Tüm agent çıktılarını birleştirip profesyonel rapor yaz
         """
-        raw_data_str = json.dumps(rca_data, indent=2, ensure_ascii=False)
+        # Immediate causes formatla (HSG245 kodlarıyla)
+        immediate_formatted = []
+        for cause in rca_data.get("immediate_causes", []):
+            code = cause.get("category_code", "")
+            title = cause.get("category_title", "")
+            desc = cause.get("cause", "")
+            if code and title:
+                immediate_formatted.append(f"**{code} {title}:** {desc}")
+            else:
+                immediate_formatted.append(f"• {desc}")
+        
+        # Root causes formatla (HSG245 kodlarıyla)
+        root_formatted = []
+        for root in rca_data.get("root_causes", []):
+            code = root.get("category_code", "")
+            title = root.get("category_title", "")
+            desc = root.get("cause", "")
+            if code and title:
+                root_formatted.append(f"**[{code}] {title}:** {desc}")
+            else:
+                root_formatted.append(f"• {desc}")
+        
+        # Underlying causes formatla
+        underlying_formatted = []
+        for uc in rca_data.get("underlying_causes", []):
+            underlying_formatted.append(f"• {uc.get('cause', '')}")
         
         prompt = f"""HSG245 Rapor Editörü olarak çalış.
 
-AGENTIC ANALYSIS SONUÇLARI:
-{raw_data_str}
+OLAY ÖZETİ:
+{rca_data.get('incident_summary', '')}
+
+DOĞRUDAN NEDENLER (Immediate Causes):
+{chr(10).join(immediate_formatted)}
+
+ALT NEDENLER / KATKIDA BULUNAN FAKTÖRLER (Underlying Causes):
+{chr(10).join(underlying_formatted)}
+
+KÖK NEDENLER (Root Causes - Sistemsel):
+{chr(10).join(root_formatted)}
 
 GÖREV: Profesyonel kök neden analiz raporu yaz (TÜRKÇE)
 
-YAPI:
-- YÖNETİCİ ÖZETİ
-- ANALİZ STRATEJİSİ (Planning agent sonucu)
-- DOĞRUDAN NEDENLER (Search agent sonucu)
-- 5-WHY ZİNCİRLERİ (Reasoning agent sonucu)
-- KÖK NEDENLER
-- SİSTEMİK BULGULAR
-- ÖNERİLER
+FORMAT (Aşağıdaki gibi olmalı):
 
-KURAL: SADECE TÜRKÇE! Formal üslup.
+## 1. Doğrudan Nedenler (Immediate Causes)
+Olayın gerçekleşmesine neden olan güvensiz hareketler ve güvensiz durumlar.
+
+• **Güvensiz Davranış:** [HSG245 Kodu + Başlık]: [Olaya özel açıklama]
+• **Güvensiz Durum:** [HSG245 Kodu + Başlık]: [Olaya özel açıklama]
+• **Tetikleyici Faktör:** [Varsa]
+
+## 2. Alt Nedenler / Katkıda Bulunan Faktörler (Underlying Causes)
+Doğrudan nedenlerin ortaya çıkmasına izin veren faktörler.
+
+• **Operasyonel Baskı:** [Açıklama]
+• **Denetim Eksikliği:** [Açıklama]
+• **Prosedür İhlali:** [Açıklama]
+
+## 3. Kök Nedenler (Root Causes)
+Sistemsel ve yönetimsel eksiklikler (Sorunun kaynağı).
+
+• **[HSG245 Kodu] Başlık:** [Sistemsel eksiklik açıklaması]
+• **[HSG245 Kodu] Başlık:** [Sistemsel eksiklik açıklaması]
+• **[HSG245 Kodu] Başlık:** [Sistemsel eksiklik açıklaması]
+
+KURAL: 
+- SADECE TÜRKÇE! 
+- Formal üslup
+- HSG245 kodlarını KORU (örn: A4.1, B4.4, D1.4, D1.1)
+- Her bölüm için detaylı açıklama yap
 
 Rapor metni döndür (JSON değil!)."""
 
@@ -414,25 +526,9 @@ Rapor metni döndür (JSON değil!)."""
             return {}
     
     def _clean_category_codes(self, causes: List[Dict]):
-        """Kategori kodlarını temizle (A1.1, B2.3, vb.)"""
-        code_pattern = r'\b[ABCD]\d+(\.\d+)?\b'
-        
+        """Kategori kodlarını KORUYORUZ - Sadece Türkçe alanları ana alanlara kopyala"""
         for item in causes:
-            if item.get("cause"):
-                original = item["cause"]
-                cleaned = re.sub(code_pattern, '', item["cause"]).strip()
-                cleaned = re.sub(r'^[\s\-:]+', '', cleaned).strip()
-                item["cause"] = cleaned
-                
-                if original != cleaned:
-                    print(f"      🧹 Kod temizlendi")
-            
-            if item.get("cause_tr"):
-                cleaned_tr = re.sub(code_pattern, '', item["cause_tr"]).strip()
-                cleaned_tr = re.sub(r'^[\s\-:]+', '', cleaned_tr).strip()
-                item["cause_tr"] = cleaned_tr
-            
-            # Türkçe → Ana alan
+            # Türkçe → Ana alan (Kodlar korunuyor!)
             if item.get("cause_tr"):
                 item["cause"] = item["cause_tr"]
             if item.get("evidence_tr"):
