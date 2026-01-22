@@ -145,6 +145,13 @@ async def create_incident(incident: IncidentCreate):
     Part 1: Create new incident and process with Overview Agent
     Returns incident ID and Part 1 data
     """
+    # Check if agents are initialized
+    if overview_agent is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Service not ready. Overview Agent not initialized. Please check OPENROUTER_API_KEY environment variable."
+        )
+    
     try:
         incident_data = {
             "reported_by": incident.reported_by,
@@ -186,6 +193,12 @@ async def add_assessment(incident_id: str, assessment: AssessmentData):
     """
     Part 2: Add assessment with Assessment Agent
     """
+    if assessment_agent is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Service not ready. Assessment Agent not initialized. Please check OPENROUTER_API_KEY environment variable."
+        )
+    
     if incident_id not in incidents_db:
         raise HTTPException(status_code=404, detail="Incident not found")
     
@@ -219,6 +232,12 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
     Part 3: Full investigation with Root Cause Agent
     NOTE: Can work standalone with just incident description for testing
     """
+    if rootcause_agent is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Service not ready. Root Cause Agent not initialized. Please check OPENROUTER_API_KEY environment variable."
+        )
+    
     if incident_id not in incidents_db:
         raise HTTPException(status_code=404, detail="Incident not found")
     
@@ -283,6 +302,12 @@ async def generate_action_plan(incident_id: str):
     """
     Part 4: Generate action plan with ActionPlan Agent
     """
+    if actionplan_agent is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Service not ready. Action Plan Agent not initialized. Please check OPENROUTER_API_KEY environment variable."
+        )
+    
     if incident_id not in incidents_db:
         raise HTTPException(status_code=404, detail="Incident not found")
     
