@@ -182,7 +182,7 @@ DÖNDÜR (JSON):
 KRİTİK: Tüm metinler %100 TÜRKÇE olmalı. Sadece geçerli JSON döndür."""
 
         response = self.client.chat.completions.create(
-            model="google/gemma-3-27b-it:free",
+            model="google/gemini-2.5-flash",
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "Sen HSG245 uzmanısın. Sadece JSON döndür, Türkçe içerik kullan."},
@@ -274,7 +274,7 @@ DÖNDÜR (JSON):
 KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
 
         response = self.client.chat.completions.create(
-            model="google/gemma-3-27b-it:free",
+            model="google/gemini-2.5-flash",
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "Sen 5-Why uzmanısın. Sadece JSON, Türkçe içerik."},

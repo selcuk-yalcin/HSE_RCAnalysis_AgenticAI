@@ -94,6 +94,78 @@ async def startup_event():
 # In-memory storage (replace with database in production)
 incidents_db = {}
 
+# Helper function to transform V2 format to frontend format
+def transform_v2_to_frontend(part3_raw: dict) -> dict:
+    """
+    Transform rootcause_agent_v2 output to frontend-compatible format
+    
+    V2 Format:
+    {
+        "analysis_branches": [
+            {
+                "immediate_cause": {...},
+                "why_chain": [...],
+                "root_cause": {...}
+            }
+        ],
+        "final_root_causes": [...]
+    }
+    
+    Frontend Format:
+    {
+        "immediate_causes": [...],
+        "underlying_causes": [...],
+        "root_causes": [...]
+    }
+    """
+    immediate_causes = []
+    underlying_causes = []
+    root_causes = []
+    
+    # Extract from analysis branches
+    for branch in part3_raw.get("analysis_branches", []):
+        # Immediate cause (A/B categories)
+        imm = branch.get("immediate_cause", {})
+        if imm:
+            immediate_causes.append({
+                "code": imm.get("code", ""),
+                "category": imm.get("category_type", ""),
+                "description": imm.get("cause_tr", imm.get("cause", "")),
+                "evidence": imm.get("evidence_tr", "")
+            })
+        
+        # Underlying causes (Why 1-4)
+        why_chain = branch.get("why_chain", [])
+        for why in why_chain:
+            underlying_causes.append({
+                "level": why.get("level", 0),
+                "question": why.get("question_tr", ""),
+                "answer": why.get("answer_tr", ""),
+                "branch": branch.get("branch_number", 0)
+            })
+        
+        # Root cause (C/D categories, Why 5)
+        root = branch.get("root_cause", {})
+        if root:
+            root_causes.append({
+                "code": root.get("code", ""),
+                "category": root.get("category_type", ""),
+                "description": root.get("cause_tr", root.get("cause", "")),
+                "explanation": root.get("explanation_tr", ""),
+                "branch": branch.get("branch_number", 0)
+            })
+    
+    return {
+        "immediate_causes": immediate_causes,
+        "underlying_causes": underlying_causes,
+        "root_causes": root_causes,
+        "analysis_method": part3_raw.get("analysis_method", "HSG245 Hierarchical 5-Why"),
+        "incident_summary": part3_raw.get("incident_summary", ""),
+        "final_report_tr": part3_raw.get("final_report_tr", ""),
+        # Keep original V2 data for debugging
+        "_v2_raw": part3_raw
+    }
+
 # Request/Response Models
 class IncidentCreate(BaseModel):
     reported_by: str
@@ -268,8 +340,8 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
         part2_data = part2_raw
     
     try:
-        # Process with Root Cause Agent
-        part3_data = rootcause_agent.analyze_root_causes(
+        # Process with Root Cause Agent (V2 format)
+        part3_raw = rootcause_agent.analyze_root_causes(
             part1_data,
             part2_data,
             {
@@ -282,6 +354,9 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
                 "injuries": investigation.injuries
             }
         )
+        
+        # Transform V2 format to frontend-compatible format
+        part3_data = transform_v2_to_frontend(part3_raw)
         
         # Update database
         incidents_db[incident_id]["part3"] = part3_data

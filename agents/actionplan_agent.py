@@ -79,7 +79,7 @@ class ActionPlanAgent:
     
     def _generate_actions_with_ai(self, root_causes: List, underlying_causes: List, 
                                    immediate_causes: List, severity: str) -> Dict:
-        """Generate action plan using GPT-4"""
+        """Generate action plan using google/gemini-2.5-flash"""
         
         # Prepare causes for prompt
         root_causes_text = self._format_causes_list(root_causes)
@@ -159,7 +159,7 @@ Return ONLY valid JSON.
         
         try:
             response = self.client.chat.completions.create(
-                model="deepseek/deepseek-r1-0528:free",
+                model="google/gemini-2.5-flash",
                 messages=[
                     {
                         "role": "user", 

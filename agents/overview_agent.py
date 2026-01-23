@@ -105,7 +105,7 @@ Return ONLY the JSON object. No explanations, no markdown, just pure JSON."""
 
         try:
             response = self.client.chat.completions.create(
-                model="deepseek/deepseek-r1-0528:free",
+                model="google/gemini-2.5-flash",
                 temperature=0.0,
                 max_tokens=500,
                 messages=[
@@ -160,7 +160,7 @@ Return ONLY the category name (e.g., "Minor injury"), nothing else."""
 
         try:
             response = self.client.chat.completions.create(
-                model="deepseek/deepseek-r1-0528:free", 
+                model="google/gemini-2.5-flash", 
                 temperature=0.0,
                 max_tokens=50,
                 messages=[

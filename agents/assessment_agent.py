@@ -141,7 +141,7 @@ Return ONLY the event type name."""
 
         try:
             response = self.client.chat.completions.create(
-                model="deepseek/deepseek-r1-0528:free",
+                model="google/gemini-2.5-flash",
                 temperature=0.0,
                 max_tokens=50,
                 messages=[
