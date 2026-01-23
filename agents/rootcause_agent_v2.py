@@ -154,29 +154,32 @@ class RootCauseAgentV2:
         rag_context_a = get_category_text('A')
         rag_context_b = get_category_text('B')
         
-        prompt = f"""Sen bir İSG kaza araştırma uzmanısın. HSG245 metodolojisini kullanıyorsun.
+        prompt = f"""
+Sen uzman bir İSG Müfettişisin. Görevin, aşağıdaki iş kazası raporunu analiz etmek ve HSG245 standardına göre "Doğrudan Nedenleri" (Immediate Causes) belirlemektir.
 
+GİRDİLER:
 OLAY ÖZETİ:
 {incident_summary}
 
-A KATEGORİSİ (DAVRANIŞSAL - ACTIONS):
+REFERANS LİSTESİ A (DAVRANIŞSAL KODLAR):
 {rag_context_a}
 
-B KATEGORİSİ (KOŞULLAR - CONDITIONS):
+REFERANS LİSTESİ B (KOŞULLAR KODLARI):
 {rag_context_b}
 
-GÖREV:
-1. Bu olayın DOĞRUDAN NEDENLERİNİ (Immediate Causes) belirle
-2. A kategorisinden (Davranışsal) ve B kategorisinden (Koşullar) seç
-3. Her neden için uygun kategori kodunu belirle (örn: A1.4, B1.6)
-4. Seçtiğin kodun HSG245 tablosundaki standart Türkçe başlığını "standard_title_tr" alanına ekle
+KRİTİK KURALLAR:
+1. FİLTRELEME: Sadece kazayı doğrudan tetikleyen EN BASKIN nedenleri seç. Dolaylı faktörleri (örn: hava kapalıydı ama kaza içeride olduysa) ele.
+2. LİMİT: Maksimum 3 (ÜÇ) adet en kritik nedeni belirle.
+3. SIRALAMA: En kritikten aza doğru sırala.
+4. FORMAT: Sadece saf JSON çıktısı ver. Markdown (```json) etiketi KULLANMA.
 
-ÖNEMLİ: 
-- "standard_title_tr" alanı, yukarıdaki A/B kategorisi tablolarından aldığın kodun orijinal Türkçe karşılığı olmalı
-- Örnek: A1.1 → "Bireysel kural ihlali", B1.6 → "Koruyucu cihaz yönetim kontrolü olmadan devre dışı"
-- "cause_tr" alanı ise bu olaya özgü açıklama olmalı
+ALAN TANIMLARI (Buna Uy):
+- "code": Referans listesinden seçtiğin kod (Örn: A1.4).
+- "standard_title_tr": Referans listesinde o kodun karşısında yazan STANDART BAŞLIK (Değiştirme, birebir al).
+- "cause_tr": Olay özelindeki açıklama. (Örn: Operatör yetkisi olmadığı halde panoyu açtı).
+- "evidence_tr": Olay özetinden bu kararı destekleyen SOMUT KANIT veya ALINTI.
 
-DÖNDÜR (JSON):
+BEKLENEN ÇIKTI (JSON):
 {{
   "causes": [
     {{
@@ -184,22 +187,14 @@ DÖNDÜR (JSON):
       "standard_title_tr": "Yetkisiz faaliyet / değişiklik / devre dışı bırakma",
       "category_type": "DAVRANIŞSAL",
       "cause_tr": "Operatör yetkisi olmadığı halde makineye müdahale etti",
-      "evidence_tr": "Gece vardiyasında güvenlik switch'ini baypas etti"
-    }},
-    {{
-      "code": "B1.6",
-      "standard_title_tr": "Koruyucu cihaz yönetim kontrolü olmadan devre dışı",
-      "category_type": "MEKANİK/FİZİKSEL",
-      "cause_tr": "Güvenlik switch'i baypas edilmişti",
-      "evidence_tr": "Koruyucu cihaz yönetim kontrolü olmadan devre dışı bırakıldı"
+      "evidence_tr": "Raporda 'Operatör bakımcıyı beklemeden kapağı açtı' ifadesi geçmektedir."
     }}
   ]
 }}
-
-KRİTİK: Tüm metinler %100 TÜRKÇE olmalı. Sadece geçerli JSON döndür."""
+"""
 
         response = self.client.chat.completions.create(
-            model="openai/o1-preview",  # Derinlemesine Analiz Yap (Beyin)
+            model="anthropic/claude-3.5-sonnet",  # Derinlemesine Analiz Yap (Beyin)
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "Sen HSG245 uzmanısın. Sadece JSON döndür, Türkçe içerik kullan."},
@@ -302,7 +297,7 @@ DÖNDÜR (JSON):
 KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
 
         response = self.client.chat.completions.create(
-            model="openai/o1-preview",   # Derinlemesine Analiz Yap (Beyin)
+            model="anthropic/claude-3.5-sonnet",   # Derinlemesine Analiz Yap (Beyin)
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "Sen 5-Why uzmanısın. Sadece JSON, Türkçe içerik."},
