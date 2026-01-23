@@ -169,18 +169,26 @@ GÖREV:
 1. Bu olayın DOĞRUDAN NEDENLERİNİ (Immediate Causes) belirle
 2. A kategorisinden (Davranışsal) ve B kategorisinden (Koşullar) seç
 3. Her neden için uygun kategori kodunu belirle (örn: A1.4, B1.6)
+4. Seçtiğin kodun HSG245 tablosundaki standart Türkçe başlığını "standard_title_tr" alanına ekle
+
+ÖNEMLİ: 
+- "standard_title_tr" alanı, yukarıdaki A/B kategorisi tablolarından aldığın kodun orijinal Türkçe karşılığı olmalı
+- Örnek: A1.1 → "Bireysel kural ihlali", B1.6 → "Koruyucu cihaz yönetim kontrolü olmadan devre dışı"
+- "cause_tr" alanı ise bu olaya özgü açıklama olmalı
 
 DÖNDÜR (JSON):
 {{
   "causes": [
     {{
       "code": "A1.4",
+      "standard_title_tr": "Yetkisiz faaliyet / değişiklik / devre dışı bırakma",
       "category_type": "DAVRANIŞSAL",
       "cause_tr": "Operatör yetkisi olmadığı halde makineye müdahale etti",
       "evidence_tr": "Gece vardiyasında güvenlik switch'ini baypas etti"
     }},
     {{
       "code": "B1.6",
+      "standard_title_tr": "Koruyucu cihaz yönetim kontrolü olmadan devre dışı",
       "category_type": "MEKANİK/FİZİKSEL",
       "cause_tr": "Güvenlik switch'i baypas edilmişti",
       "evidence_tr": "Koruyucu cihaz yönetim kontrolü olmadan devre dışı bırakıldı"
@@ -211,7 +219,14 @@ KRİTİK: Tüm metinler %100 TÜRKÇE olmalı. Sadece geçerli JSON döndür."""
         causes = data.get("causes", [])
         
         for cause in causes:
-            print(f"  [{cause.get('code', '???')}] {cause.get('cause_tr', '')}")
+            code = cause.get('code', '???')
+            standard_title = cause.get('standard_title_tr', '')
+            cause_description = cause.get('cause_tr', '')
+            
+            if standard_title:
+                print(f"  [{code}] {standard_title}: {cause_description}")
+            else:
+                print(f"  [{code}] {cause_description}")
         
         return causes
     
@@ -245,6 +260,11 @@ GÖREV:
 2. Why 1 ve Why 2 → Underlying causes (ara nedenler)
 3. Why 3 ve Why 4 → Daha derin ara nedenler
 4. Why 5 → ROOT CAUSE (C veya D kategorisinden seç, kod belirle)
+5. Root cause için HSG245 tablosundaki standart Türkçe başlığını "standard_title_tr" alanına ekle
+
+ÖNEMLİ:
+- "standard_title_tr" alanı, C/D kategorisinden seçtiğin kodun orijinal HSG245 Türkçe başlığı olmalı
+- "cause_tr" alanı bu olaya özgü açıklama olmalı
 
 DÖNDÜR (JSON):
 {{
@@ -272,6 +292,7 @@ DÖNDÜR (JSON):
   ],
   "root_cause": {{
     "code": "D6.1",
+    "standard_title_tr": "Bakım sistemlerinin yetersizliği",
     "category_type": "ORGANİZASYONEL",
     "cause_tr": "Yetersiz Bakım Stratejisi ve Envanter Yönetimi",
     "explanation_tr": "Bakım planlaması yapılmamış, kritik parça stoku takip edilmiyor"
@@ -308,9 +329,16 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
         
         # Root cause yazdır
         root = chain.get("root_cause", {})
-        print(f"   🎯 KÖK NEDEN [{root.get('code', '???')}]:")
-        print(f"      {root.get('cause_tr', '')}")
-        print(f"      ({root.get('explanation_tr', '')})\n")
+        root_code = root.get('code', '???')
+        root_standard_title = root.get('standard_title_tr', '')
+        root_cause_desc = root.get('cause_tr', '')
+        root_explanation = root.get('explanation_tr', '')
+        
+        if root_standard_title:
+            print(f"   🎯 KÖK NEDEN [{root_code}] {root_standard_title}: {root_cause_desc}")
+        else:
+            print(f"   🎯 KÖK NEDEN [{root_code}]: {root_cause_desc}")
+        print(f"      ({root_explanation})\n")
         
         return chain
     
@@ -322,8 +350,18 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
         
         print(f"\n🌳 DAL AĞACI #{branch['branch_number']}:")
         print("│")
-        print(f"├── 📌 DOĞRUDAN NEDEN [{immediate.get('code', '')}]")
-        print(f"│   └── {immediate.get('cause_tr', '')}")
+        
+        # Immediate cause with standard title
+        imm_code = immediate.get('code', '')
+        imm_standard = immediate.get('standard_title_tr', '')
+        imm_cause = immediate.get('cause_tr', '')
+        
+        if imm_standard:
+            print(f"├── 📌 DOĞRUDAN NEDEN [{imm_code}] {imm_standard}")
+            print(f"│   └── {imm_cause}")
+        else:
+            print(f"├── 📌 DOĞRUDAN NEDEN [{imm_code}]")
+            print(f"│   └── {imm_cause}")
         print("│")
         
         for idx, why in enumerate(whys, 1):
@@ -331,9 +369,21 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
             print(f"│   └── {why.get('answer_tr', '')}")
         
         print("│")
-        print(f"└── 🎯 KÖK NEDEN [{root.get('code', '')}]")
-        print(f"    └── {root.get('cause_tr', '')}")
-        print(f"        ({root.get('explanation_tr', '')})")
+        
+        # Root cause with standard title
+        root_code = root.get('code', '')
+        root_standard = root.get('standard_title_tr', '')
+        root_cause = root.get('cause_tr', '')
+        root_explanation = root.get('explanation_tr', '')
+        
+        if root_standard:
+            print(f"└── 🎯 KÖK NEDEN [{root_code}] {root_standard}")
+            print(f"    └── {root_cause}")
+            print(f"        ({root_explanation})")
+        else:
+            print(f"└── 🎯 KÖK NEDEN [{root_code}]")
+            print(f"    └── {root_cause}")
+            print(f"        ({root_explanation})")
     
     def _generate_hierarchical_report(self, rca_data: Dict) -> str:
         """Türkçe hiyerarşik rapor oluştur"""
@@ -354,9 +404,19 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
             report.append("")
             report.append(f"⚡ DAL {branch['branch_number']}: {immediate.get('category_type', '')}")
             report.append("")
-            report.append(f"📌 Doğrudan Neden [{immediate.get('code', '')}]:")
-            report.append(f"   {immediate.get('cause_tr', '')}")
-            report.append(f"   Kanıt: {immediate.get('evidence_tr', '')}")
+            
+            # Immediate cause with standard title
+            imm_code = immediate.get('code', '')
+            imm_standard = immediate.get('standard_title_tr', '')
+            imm_cause = immediate.get('cause_tr', '')
+            imm_evidence = immediate.get('evidence_tr', '')
+            
+            if imm_standard:
+                report.append(f"📌 Doğrudan Neden [{imm_code}] {imm_standard}:")
+            else:
+                report.append(f"📌 Doğrudan Neden [{imm_code}]:")
+            report.append(f"   {imm_cause}")
+            report.append(f"   Kanıt: {imm_evidence}")
             report.append("")
             
             for idx, why in enumerate(whys, 1):
@@ -364,9 +424,20 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
                 report.append(f"   → {why.get('answer_tr', '')}")
             
             report.append("")
-            report.append(f"🎯 KÖK NEDEN [{root.get('code', '')}] - {root.get('category_type', '')}:")
-            report.append(f"   {root.get('cause_tr', '')}")
-            report.append(f"   {root.get('explanation_tr', '')}")
+            
+            # Root cause with standard title
+            root_code = root.get('code', '')
+            root_standard = root.get('standard_title_tr', '')
+            root_category = root.get('category_type', '')
+            root_cause = root.get('cause_tr', '')
+            root_explanation = root.get('explanation_tr', '')
+            
+            if root_standard:
+                report.append(f"🎯 KÖK NEDEN [{root_code}] {root_standard} - {root_category}:")
+            else:
+                report.append(f"🎯 KÖK NEDEN [{root_code}] - {root_category}:")
+            report.append(f"   {root_cause}")
+            report.append(f"   {root_explanation}")
             report.append("")
             report.append("-" * 80)
         
