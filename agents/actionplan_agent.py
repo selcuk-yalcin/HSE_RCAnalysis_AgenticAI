@@ -47,14 +47,35 @@ class ActionPlanAgent:
         print("💡 PART 4: ACTION PLAN - Generating Control Measures")
         print("="*80)
         
+        # ========================================
+        # GUARD CLAUSE: Validate input data
+        # ========================================
+        if not investigation_data or not isinstance(investigation_data, dict):
+            print("\n⚠️  HATA: Araştırma verisi eksik veya geçersiz!")
+            print("⚠️  Varsayılan aksiyon planı devreye giriyor...")
+            return self._generate_fallback_actions()
+        
+        if "root_causes" not in investigation_data:
+            print("\n⚠️  HATA: Kök neden verisi eksik!")
+            print("⚠️  Varsayılan aksiyon planı devreye giriyor...")
+            return self._generate_fallback_actions()
+        
         # Extract data
         root_causes = investigation_data.get("root_causes", [])
         underlying_causes = investigation_data.get("underlying_causes", [])
         immediate_causes = investigation_data.get("immediate_causes", [])
         severity = investigation_data.get("severity", "Medium level")
         
+        # Additional validation: Check if root_causes is actually populated
+        if not root_causes or len(root_causes) == 0:
+            print("\n⚠️  HATA: Kök neden listesi boş!")
+            print("⚠️  Varsayılan aksiyon planı devreye giriyor...")
+            return self._generate_fallback_actions()
+        
         # Generate actions using AI
         print("\n🤖 AI generating risk control measures...")
+        print(f"📊 Input: {len(root_causes)} root causes, {len(immediate_causes)} immediate causes")
+        
         actions = self._generate_actions_with_ai(
             root_causes, 
             underlying_causes, 
@@ -62,14 +83,19 @@ class ActionPlanAgent:
             severity
         )
         
-        # Structure Part 4 data
+        # Check if fallback was returned (already in Part 4 format)
+        if isinstance(actions, dict) and "_fallback" in actions:
+            print("⚠️  Using fallback action plan structure")
+            return actions
+        
+        # Structure Part 4 data from AI-generated actions
         part4_data = {
-            "control_measures": actions["control_measures"],
-            "immediate_actions": actions["immediate"],
-            "short_term_actions": actions["short_term"],
-            "long_term_actions": actions["long_term"],
-            "responsible_persons": actions["responsible"],
-            "target_dates": actions["deadlines"],
+            "control_measures": actions.get("control_measures", []),
+            "immediate_actions": actions.get("immediate", []),
+            "short_term_actions": actions.get("short_term", []),
+            "long_term_actions": actions.get("long_term", []),
+            "responsible_persons": actions.get("responsible", {}),
+            "target_dates": actions.get("deadlines", {}),
             "priority_level": self._calculate_priority(severity),
             "generated_at": datetime.now().strftime("%d.%m.%y %H:%M")
         }
@@ -212,10 +238,16 @@ Return ONLY valid JSON.
         return "\n".join(formatted)
     
     def _generate_fallback_actions(self) -> Dict:
-        """Generate basic fallback actions if AI fails"""
+        """
+        Generate basic fallback actions if AI fails or data is missing
+        Returns Part 4 compatible structure
+        """
+        print("\n🛡️  Generating fallback action plan...")
+        
         today = datetime.now()
         
-        return {
+        # Raw actions structure (for backward compatibility)
+        raw_actions = {
             "control_measures": [
                 {
                     "measure": "Review incident with management team and identify immediate hazards",
@@ -271,7 +303,6 @@ Return ONLY valid JSON.
                 "Conduct training": "Training Manager",
                 "Review system": "Operations Director"
             },
-            # ! We can put here dateline as 3 month immediatly or so on ...
             "deadlines": {
                 "Review incident": (today + timedelta(days=1)).strftime("%d/%m/%Y"),
                 "Implement measures": (today + timedelta(days=2)).strftime("%d/%m/%Y"),
@@ -280,6 +311,22 @@ Return ONLY valid JSON.
                 "Review system": (today + timedelta(days=180)).strftime("%d/%m/%Y")
             }
         }
+        
+        # Return Part 4 compatible structure
+        part4_fallback = {
+            "control_measures": raw_actions["control_measures"],
+            "immediate_actions": raw_actions["immediate"],
+            "short_term_actions": raw_actions["short_term"],
+            "long_term_actions": raw_actions["long_term"],
+            "responsible_persons": raw_actions["responsible"],
+            "target_dates": raw_actions["deadlines"],
+            "priority_level": "Medium",  # Default priority
+            "generated_at": datetime.now().strftime("%d.%m.%y %H:%M"),
+            "_fallback": True  # Flag to indicate this is fallback data
+        }
+        
+        print("✅ Fallback plan generated successfully")
+        return part4_fallback
     
     def _calculate_priority(self, severity: str) -> str:
         """Calculate priority based on severity"""
