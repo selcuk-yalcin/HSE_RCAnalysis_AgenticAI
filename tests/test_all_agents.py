@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
 from agents.overview_agent import OverviewAgent
 from agents.assessment_agent import AssessmentAgent
-from agents.rootcause_agent import RootCauseAgent
+from agents.rootcause_agent_v2 import RootCauseAgentV2 as RootCauseAgent
 from agents.pdf_report_agent import PDFReportAgent
 from agents.orchestrator import RootCauseOrchestrator
 from shared.config import OPENAI_CONFIG

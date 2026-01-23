@@ -41,7 +41,7 @@ print(f"   LLM Context Window'a sığar mı? {'✅ EVET' if len(all_text) < 3000
 # Test 4: Root Cause Agent Import
 print("\n4️⃣ Root Cause Agent Import Testi...")
 try:
-    from agents.rootcause_agent import RootCauseAgent
+    from agents.rootcause_agent_v2 import RootCauseAgentV2 as RootCauseAgent
     agent = RootCauseAgent()
     print("   ✅ Agent başlatıldı")
 except Exception as e:

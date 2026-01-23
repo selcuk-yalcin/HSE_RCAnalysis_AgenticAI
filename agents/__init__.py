@@ -3,7 +3,7 @@
 
 from .overview_agent import OverviewAgent
 from .assessment_agent import AssessmentAgent
-from .rootcause_agent import RootCauseAgent
+from .rootcause_agent_v2 import RootCauseAgentV2 as RootCauseAgent
 from .orchestrator import RootCauseOrchestrator
 from .pdf_report_agent import PDFReportAgent
 

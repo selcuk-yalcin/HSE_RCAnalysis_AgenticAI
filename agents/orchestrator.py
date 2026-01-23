@@ -5,7 +5,7 @@ Root Cause Orchestrator - Coordinates all agents in HSG245 workflow
 from typing import Dict, Optional
 from .overview_agent import OverviewAgent
 from .assessment_agent import AssessmentAgent
-from .rootcause_agent import RootCauseAgent
+from .rootcause_agent_v2 import RootCauseAgentV2 as RootCauseAgent
 
 
 class RootCauseOrchestrator:
