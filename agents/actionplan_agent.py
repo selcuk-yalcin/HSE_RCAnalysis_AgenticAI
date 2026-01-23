@@ -8,7 +8,33 @@ from typing import Dict, List
 from datetime import datetime, timedelta
 import json
 import os
+import re
 from .json_parser import extract_json_from_response, safe_json_parse
+
+
+def repair_json_string(json_str: str) -> str:
+    """
+    Attempt to repair common JSON issues:
+    - Remove trailing commas
+    - Fix unclosed brackets
+    - Remove incomplete last elements
+    """
+    # Remove trailing commas before closing brackets/braces
+    json_str = re.sub(r',\s*([}\]])', r'\1', json_str)
+    
+    # Count opening and closing braces
+    open_braces = json_str.count('{')
+    close_braces = json_str.count('}')
+    open_brackets = json_str.count('[')
+    close_brackets = json_str.count(']')
+    
+    # Add missing closing brackets/braces
+    if open_braces > close_braces:
+        json_str += '}' * (open_braces - close_braces)
+    if open_brackets > close_brackets:
+        json_str += ']' * (open_brackets - close_brackets)
+    
+    return json_str
 
 
 class ActionPlanAgent:
@@ -186,7 +212,7 @@ Generate 2-3 actions per category. Be specific and practical. JSON ONLY.
         
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5",  # actual model 
+                model="openai/gpt-4o-mini",  # More reliable JSON output than Claude
                 messages=[
                     {
                         "role": "system",
@@ -198,7 +224,7 @@ Generate 2-3 actions per category. Be specific and practical. JSON ONLY.
                     }
                 ],
                 temperature=0.0,
-                max_tokens=3000  # Increased from 2000
+                max_tokens=4000  # Increased for complete response
             )
             
             result_text = response.choices[0].message.content.strip()
@@ -209,14 +235,24 @@ Generate 2-3 actions per category. Be specific and practical. JSON ONLY.
             elif "```" in result_text:
                 result_text = result_text.replace("```", "").strip()
             
-            # Use robust JSON parser
+            # Try parsing first
             result = safe_json_parse(
                 result_text,
                 context="Action Plan Generation",
                 default=None
             )
             
-            # If parsing failed, use fallback
+            # If parsing failed, try repairing JSON
+            if result is None:
+                print("🔧 Attempting to repair JSON...")
+                repaired = repair_json_string(result_text)
+                result = safe_json_parse(
+                    repaired,
+                    context="Repaired Action Plan JSON",
+                    default=None
+                )
+            
+            # If still failed, use fallback
             if result is None or not result:
                 print("⚠️  Using fallback action plan")
                 return self._generate_fallback_actions()
