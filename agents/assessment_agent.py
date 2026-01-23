@@ -184,7 +184,7 @@ Return ONLY the severity level."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-3.7-sonnet:thinking", 
+                model="anthropic/claude-sonnet-4.5", 
                 #model=deepseek/deepseek-r1-0528:free"  # test model 
                 temperature=0.0,
                 max_tokens=50,
