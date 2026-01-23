@@ -27,11 +27,10 @@ class RootCauseAgent:
     
     def __init__(self):
         """Initialize Agentic Root Cause Agent"""
-        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
-        self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=api_key
-        )
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY not found in environment variables")
+        self.client = OpenAI(api_key=api_key)
         self.max_iterations = 3  # Validation loop max iterations
         print(f"✅ Kök Neden Ajanı başlatıldı (AGENTIC AI - Multi-Step Reasoning)")
     
@@ -173,7 +172,7 @@ JSON dön:
 SADECE JSON dön!"""
 
         response = self.client.chat.completions.create(
-            model="meta-llama/llama-3.2-3b-instruct:free",
+            model="gpt-3.5-turbo",
             temperature=0.2,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -298,7 +297,7 @@ JSON:
 SADECE JSON!"""
 
         response = self.client.chat.completions.create(
-            model="meta-llama/llama-3.2-3b-instruct:free",
+            model="gpt-3.5-turbo",
             temperature=0.1,
             messages=[{"role": "user", "content": prompt}]
         )

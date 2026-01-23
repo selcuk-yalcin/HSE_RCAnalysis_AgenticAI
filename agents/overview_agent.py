@@ -25,13 +25,12 @@ class OverviewAgent:
     """
     
     def __init__(self):
-        """Initialize Overview Agent with OpenRouter"""
-        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
-        self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=api_key
-        )
-        print("✅ Overview Agent initialized with OpenRouter")
+        """Initialize Overview Agent with OpenAI"""
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY not found in environment variables")
+        self.client = OpenAI(api_key=api_key)
+        print("✅ Overview Agent initialized with OpenAI")
     
     def process_initial_report(self, incident_data: Dict) -> Dict:
         """
@@ -106,7 +105,7 @@ If any information is not available, use empty string "".
 Return ONLY valid JSON, no explanations."""
 
         response = self.client.chat.completions.create(
-            model="meta-llama/llama-3.2-3b-instruct:free",
+            model="gpt-3.5-turbo",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a health and safety incident documentation expert. Return only valid JSON."},
@@ -158,7 +157,7 @@ Classify this incident into ONE of these categories:
 Return ONLY the category name, nothing else."""
 
         response = self.client.chat.completions.create(
-            model="meta-llama/llama-3.2-3b-instruct:free", # Model change 
+            model="gpt-3.5-turbo", # Model change 
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "You are a safety incident classifier. Return only the category name."},
