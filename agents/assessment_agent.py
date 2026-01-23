@@ -142,8 +142,8 @@ Return ONLY the event type name."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5",#actual model 
-                #model = "deepseek/deepseek-r1-0528:free" # test model 
+                #model="anthropic/claude-sonnet-4.5",#actual model
+                model = "google/gemini-2.5-flash-lite" # test model
                 temperature=0.0,
                 max_tokens=50,
                 messages=[
@@ -184,8 +184,8 @@ Return ONLY the severity level."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5", 
-                #model=deepseek/deepseek-r1-0528:free"  # test model 
+                #model="anthropic/claude-sonnet-4.5", 
+                model="google/gemini-2.5-flash-lite"  # test model
                 temperature=0.0,
                 max_tokens=50,
                 messages=[
@@ -228,8 +228,8 @@ Return ONLY JSON."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5" # Yasal Durumu (RIDDOR) Değerlendir
-                #model="openai/gpt-4o-mini",  #test model
+                #model="anthropic/claude-sonnet-4.5" # Yasal Durumu (RIDDOR) Değerlendir
+                model="google/gemini-2.5-flash-lite",  #test model
                 temperature=0.0,
                 max_tokens=200,
                 messages=[
@@ -292,8 +292,8 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5" # 
-                #model="openai/gpt-4o-mini",  #test model 
+                #model="anthropic/claude-sonnet-4.5" # Yasal Durumu (RIDDOR) Değerlendir
+                model="google/gemini-2.5-flash-lite",  #test model
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "You are an investigation coordinator. Return only valid JSON."},
