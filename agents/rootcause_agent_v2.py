@@ -49,6 +49,15 @@ except ImportError:
     except ImportError:
         from .knowledge_base import HSG245_TAXONOMY, get_category_text
 
+# Import robust JSON parser
+try:
+    from .json_parser import extract_json_from_response, safe_json_parse
+except ImportError:
+    try:
+        from json_parser import extract_json_from_response, safe_json_parse
+    except ImportError:
+        from agents.json_parser import extract_json_from_response, safe_json_parse
+
 
 class RootCauseAgentV2:
     """
@@ -182,7 +191,7 @@ DÖNDÜR (JSON):
 KRİTİK: Tüm metinler %100 TÜRKÇE olmalı. Sadece geçerli JSON döndür."""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.5-flash",
+            model="google/gemini-2.5-flash",  #change model
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "Sen HSG245 uzmanısın. Sadece JSON döndür, Türkçe içerik kullan."},
@@ -191,22 +200,20 @@ KRİTİK: Tüm metinler %100 TÜRKÇE olmalı. Sadece geçerli JSON döndür."""
         )
         
         result = response.choices[0].message.content.strip()
-        if result.startswith("```json"):
-            result = result.replace("```json", "").replace("```", "").strip()
-        elif result.startswith("```"):
-            result = result.replace("```", "").strip()
         
-        try:
-            data = json.loads(result)
-            causes = data.get("causes", [])
-            
-            for cause in causes:
-                print(f"  [{cause.get('code', '???')}] {cause.get('cause_tr', '')}")
-            
-            return causes
-        except json.JSONDecodeError as e:
-            print(f"❌ JSON parse hatası: {e}")
-            return []
+        # Use robust JSON parser
+        data = safe_json_parse(
+            result,
+            context="Immediate Causes Identification",
+            default={"causes": []}
+        )
+        
+        causes = data.get("causes", [])
+        
+        for cause in causes:
+            print(f"  [{cause.get('code', '???')}] {cause.get('cause_tr', '')}")
+        
+        return causes
     
     def _perform_5why_chain(self, immediate_cause: Dict, incident_summary: str) -> Dict:
         """
@@ -274,7 +281,7 @@ DÖNDÜR (JSON):
 KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.5-flash",
+            model="google/gemini-2.5-flash",   #change model
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "Sen 5-Why uzmanısın. Sadece JSON, Türkçe içerik."},
@@ -283,31 +290,29 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
         )
         
         result = response.choices[0].message.content.strip()
-        if result.startswith("```json"):
-            result = result.replace("```json", "").replace("```", "").strip()
-        elif result.startswith("```"):
-            result = result.replace("```", "").strip()
         
-        try:
-            chain = json.loads(result)
-            
-            # Why'ları yazdır
-            for why in chain.get("whys", []):
-                level = why.get("level", "?")
-                question = why.get("question_tr", "")
-                answer = why.get("answer_tr", "")
-                print(f"   ❓ Neden {level}? {question}")
-                print(f"      → {answer}\n")
-            
-            # Root cause yazdır
-            root = chain.get("root_cause", {})
-            print(f"   🎯 KÖK NEDEN [{root.get('code', '???')}]:")
-            print(f"      {root.get('cause_tr', '')}")
-            print(f"      ({root.get('explanation_tr', '')})\n")
-            
-            return chain
-        except json.JSONDecodeError:
-            return {"whys": [], "root_cause": {}}
+        # Use robust JSON parser
+        chain = safe_json_parse(
+            result,
+            context=f"5-Why Chain for {code}",
+            default={"whys": [], "root_cause": {}}
+        )
+        
+        # Why'ları yazdır
+        for why in chain.get("whys", []):
+            level = why.get("level", "?")
+            question = why.get("question_tr", "")
+            answer = why.get("answer_tr", "")
+            print(f"   ❓ Neden {level}? {question}")
+            print(f"      → {answer}\n")
+        
+        # Root cause yazdır
+        root = chain.get("root_cause", {})
+        print(f"   🎯 KÖK NEDEN [{root.get('code', '???')}]:")
+        print(f"      {root.get('cause_tr', '')}")
+        print(f"      ({root.get('explanation_tr', '')})\n")
+        
+        return chain
     
     def _print_branch_tree(self, branch: Dict):
         """Dal ağacını güzel yazdır"""

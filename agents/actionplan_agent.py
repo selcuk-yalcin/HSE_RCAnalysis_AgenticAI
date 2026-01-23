@@ -8,6 +8,7 @@ from typing import Dict, List
 from datetime import datetime, timedelta
 import json
 import os
+from .json_parser import extract_json_from_response, safe_json_parse
 
 
 class ActionPlanAgent:
@@ -159,7 +160,7 @@ Return ONLY valid JSON.
         
         try:
             response = self.client.chat.completions.create(
-                model="google/gemini-2.5-flash",
+                model="google/gemini-2.5-flash", #change model
                 messages=[
                     {
                         "role": "user", 
@@ -172,21 +173,19 @@ Return ONLY valid JSON.
             
             result_text = response.choices[0].message.content.strip()
             
-            # Clean markdown
-            if result_text.startswith("```json"):
-                result_text = result_text.replace("```json", "").replace("```", "").strip()
-            elif result_text.startswith("```"):
-                result_text = result_text.replace("```", "").strip()
+            # Use robust JSON parser
+            result = safe_json_parse(
+                result_text,
+                context="Action Plan Generation",
+                default=None
+            )
             
-            # Extract JSON with regex
-            import re
-            json_match = re.search(r'\{.*\}', result_text, re.DOTALL)
-            if json_match:
-                result_text = json_match.group(0)
+            # If parsing failed, use fallback
+            if result is None or not result:
+                print("⚠️  Using fallback action plan")
+                return self._generate_fallback_actions()
             
-            result = json.loads(result_text)
             print("✅ Action plan generated successfully")
-            
             return result
             
         except Exception as e:

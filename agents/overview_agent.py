@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Dict, Optional
 import json
 import os
+from .json_parser import extract_json_from_response, safe_json_parse
 
 
 class OverviewAgent:
@@ -105,7 +106,7 @@ Return ONLY the JSON object. No explanations, no markdown, just pure JSON."""
 
         try:
             response = self.client.chat.completions.create(
-                model="google/gemini-2.5-flash",
+                model="google/gemini-2.5-flash",   #change model
                 temperature=0.0,
                 max_tokens=500,
                 messages=[
@@ -115,19 +116,19 @@ Return ONLY the JSON object. No explanations, no markdown, just pure JSON."""
             
             result = response.choices[0].message.content.strip()
             
-            # Clean various formats
-            if result.startswith("```json"):
-                result = result.replace("```json", "").replace("```", "").strip()
-            elif result.startswith("```"):
-                result = result.replace("```", "").strip()
+            # Use robust JSON parser
+            details = safe_json_parse(
+                result,
+                context="Brief Details Extraction",
+                default={
+                    "what": description[:200],
+                    "where": "",
+                    "when": "",
+                    "who": "",
+                    "emergency_measures": ""
+                }
+            )
             
-            # Extract JSON from response (in case there's thinking text)
-            import re
-            json_match = re.search(r'\{[^}]+\}', result, re.DOTALL)
-            if json_match:
-                result = json_match.group(0)
-            
-            details = json.loads(result)
             print("✅ Brief details extracted successfully")
             return details
         except Exception as e:
@@ -160,7 +161,7 @@ Return ONLY the category name (e.g., "Minor injury"), nothing else."""
 
         try:
             response = self.client.chat.completions.create(
-                model="google/gemini-2.5-flash", 
+                model="google/gemini-2.5-flash",   #change model
                 temperature=0.0,
                 max_tokens=50,
                 messages=[

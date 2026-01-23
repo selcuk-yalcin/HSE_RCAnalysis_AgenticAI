@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Dict, Optional
 import json
 import os
+from .json_parser import extract_json_from_response, safe_json_parse
 
 
 class AssessmentAgent:
@@ -141,7 +142,7 @@ Return ONLY the event type name."""
 
         try:
             response = self.client.chat.completions.create(
-                model="google/gemini-2.5-flash",
+                model="google/gemini-2.5-flash",  #change model
                 temperature=0.0,
                 max_tokens=50,
                 messages=[
@@ -182,7 +183,7 @@ Return ONLY the severity level."""
 
         try:
             response = self.client.chat.completions.create(
-                model="deepseek/deepseek-r1-0528:free",
+                model="deepseek/deepseek-r1-0528:free",  #change model
                 temperature=0.0,
                 max_tokens=50,
                 messages=[
@@ -225,7 +226,7 @@ Return ONLY JSON."""
 
         try:
             response = self.client.chat.completions.create(
-                model="deepseek/deepseek-r1-0528:free",
+                model="deepseek/deepseek-r1-0528:free",  #change model
                 temperature=0.0,
                 max_tokens=200,
                 messages=[
@@ -235,20 +236,14 @@ Return ONLY JSON."""
             
             result = response.choices[0].message.content.strip()
             
-            # Clean JSON
-            if result.startswith("```json"):
-                result = result.replace("```json", "").replace("```", "").strip()
-            elif result.startswith("```"):
-                result = result.replace("```", "").strip()
+            # Use robust JSON parser
+            riddor = safe_json_parse(
+                result, 
+                context="RIDDOR Assessment",
+                default={"reportable": "N", "reason": "Parse failed"}
+            )
             
-            # Extract JSON
-            import re
-            json_match = re.search(r'\{[^}]+\}', result, re.DOTALL)
-            if json_match:
-                result = json_match.group(0)
-            
-            riddor = json.loads(result)
-            print(f"✅ RIDDOR: {riddor['reportable']} - {riddor.get('reason', '')}")
+            print(f"✅ RIDDOR: {riddor.get('reportable', 'N')} - {riddor.get('reason', '')}")
             
             return {
                 "reportable": riddor.get("reportable", "N"),
@@ -294,7 +289,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free",
+            model="deepseek/deepseek-r1-0528:free",   #change model
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "You are an investigation coordinator. Return only valid JSON."},
@@ -304,26 +299,23 @@ Return ONLY valid JSON."""
         
         result = response.choices[0].message.content.strip()
         
-        # Clean JSON
-        if result.startswith("```json"):
-            result = result.replace("```json", "").replace("```", "").strip()
-        elif result.startswith("```"):
-            result = result.replace("```", "").strip()
-        
-        try:
-            assessment = json.loads(result)
-            print(f"✅ Investigation level: {assessment['level']}")
-            print(f"   Priority: {assessment['priority']}")
-            print(f"   Team: {', '.join(assessment.get('team', []))}")
-            
-            return assessment
-        except json.JSONDecodeError:
-            print("⚠️  JSON parsing error, using defaults")
-            return {
+        # Use robust JSON parser
+        assessment = safe_json_parse(
+            result,
+            context="Investigation Level Assessment",
+            default={
                 "level": "Medium level",
                 "priority": "Medium",
-                "team": ["H&S Officer", "Line Manager"]
+                "team": ["H&S Officer", "Line Manager"],
+                "reason": "Default due to parse error"
             }
+        )
+        
+        print(f"✅ Investigation level: {assessment.get('level', 'Medium level')}")
+        print(f"   Priority: {assessment.get('priority', 'Medium')}")
+        print(f"   Team: {', '.join(assessment.get('team', ['H&S Officer']))}")
+        
+        return assessment
     
     def _generate_accident_book_ref(self) -> str:
         """Generate accident book reference number"""
