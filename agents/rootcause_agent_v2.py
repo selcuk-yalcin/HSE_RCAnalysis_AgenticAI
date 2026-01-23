@@ -39,7 +39,15 @@ from openai import OpenAI
 from typing import Dict, List, Optional
 import json
 import os
-from knowledge_base import HSG245_TAXONOMY, get_category_text
+
+# Try different import paths for knowledge_base
+try:
+    from knowledge_base import HSG245_TAXONOMY, get_category_text
+except ImportError:
+    try:
+        from agents.knowledge_base import HSG245_TAXONOMY, get_category_text
+    except ImportError:
+        from .knowledge_base import HSG245_TAXONOMY, get_category_text
 
 
 class RootCauseAgentV2:
