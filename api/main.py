@@ -334,11 +334,50 @@ async def generate_action_plan(incident_id: str):
         raise HTTPException(status_code=400, detail="Investigation not completed")
     
     try:
+        # Extract data from RootCause V2 format
+        part3 = incident["part3"]
+        
+        # Transform V2 hierarchical format to ActionPlan format
+        root_causes = []
+        immediate_causes = []
+        underlying_causes = []
+        
+        # Extract from analysis_branches if available
+        if "analysis_branches" in part3:
+            for branch in part3["analysis_branches"]:
+                # Get immediate cause
+                if "immediate_cause" in branch:
+                    immediate_causes.append({
+                        "cause": branch["immediate_cause"].get("cause_tr", ""),
+                        "code": branch["immediate_cause"].get("code", ""),
+                        "description": branch["immediate_cause"].get("evidence_tr", "")
+                    })
+                
+                # Get underlying causes from why chain
+                if "why_chain" in branch:
+                    for why in branch["why_chain"]:
+                        underlying_causes.append({
+                            "cause": why.get("question_tr", ""),
+                            "description": why.get("answer_tr", "")
+                        })
+                
+                # Get root cause
+                if "root_cause" in branch:
+                    root_causes.append({
+                        "cause": branch["root_cause"].get("cause_tr", ""),
+                        "code": branch["root_cause"].get("code", ""),
+                        "description": branch["root_cause"].get("explanation_tr", "")
+                    })
+        
+        # Fallback: use final_root_causes if available
+        if not root_causes and "final_root_causes" in part3:
+            root_causes = part3["final_root_causes"]
+        
         # Process with ActionPlan Agent
         part4_data = actionplan_agent.generate_action_plan({
-            "root_causes": incident["part3"]["root_causes"],
-            "underlying_causes": incident["part3"]["underlying_causes"],
-            "immediate_causes": incident["part3"]["immediate_causes"],
+            "root_causes": root_causes if root_causes else [],
+            "underlying_causes": underlying_causes if underlying_causes else [],
+            "immediate_causes": immediate_causes if immediate_causes else [],
             "severity": incident["part2"]["investigation_level"]
         })
         
