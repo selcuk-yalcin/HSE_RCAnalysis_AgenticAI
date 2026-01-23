@@ -228,7 +228,7 @@ Return ONLY JSON."""
 
         try:
             response = self.client.chat.completions.create(
-                model=anthropic/claude-sonnet-4.5 # Yasal Durumu (RIDDOR) Değerlendir
+                model="anthropic/claude-sonnet-4.5" # Yasal Durumu (RIDDOR) Değerlendir
                 #model="openai/gpt-4o-mini",  #test model
                 temperature=0.0,
                 max_tokens=200,
@@ -292,7 +292,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-                model=anthropic/claude-sonnet-4.5 # 
+                model="anthropic/claude-sonnet-4.5" # 
                 #model="openai/gpt-4o-mini",  #test model 
             temperature=0.2,
             messages=[
