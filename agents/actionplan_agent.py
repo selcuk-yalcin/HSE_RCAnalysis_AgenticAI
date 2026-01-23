@@ -186,7 +186,7 @@ Return ONLY valid JSON.
         
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-3.7-sonnet:thinking",#actual model 
+                model="anthropic/claude-sonnet-4.5",#actual model 
                 #model = "deepseek/deepseek-r1-0528:free" # test model rofesyonel Plan Yaz
                 messages=[
                     {
