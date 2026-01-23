@@ -1,5 +1,5 @@
 """
-Root Cause Orchestrator - Coordinates all agents in HSG245 workflow
+Root Cause Orchestrator - Coordinates all agents in HSG245 workflow. No model
 """
 
 from typing import Dict, Optional
