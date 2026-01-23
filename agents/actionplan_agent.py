@@ -24,12 +24,13 @@ class ActionPlanAgent:
     """
     
     def __init__(self):
-        """Initialize Action Plan Agent"""
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY not found in environment variables")
-        self.client = OpenAI(api_key=api_key)
-        print("✅ Action Plan Agent initialized with OpenAI")
+        """Initialize Action Plan Agent (Basitleştirilmiş)"""
+        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key
+        )
+        print(f"✅ Aksiyon Planı Ajanı başlatıldı.")
     
     def generate_action_plan(self, investigation_data: Dict) -> Dict:
         """
@@ -156,7 +157,7 @@ Generate at least 2-3 actions per category. Be specific and practical.
         
         try:
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",# !Change model here 
+                model="deepseek/deepseek-r1-0528:free",# !Change model here 
                 messages=[
                     {
                         "role": "system", 
