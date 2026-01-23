@@ -184,7 +184,8 @@ Return ONLY the severity level."""
 
         try:
             response = self.client.chat.completions.create(
-                model="openai/gpt-4o-mini",  # Yasal Durumu (RIDDOR) Değerlendir
+                model="anthropic/claude-3.7-sonnet:thinking", 
+                #model=deepseek/deepseek-r1-0528:free"  # test model 
                 temperature=0.0,
                 max_tokens=50,
                 messages=[
