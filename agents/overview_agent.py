@@ -106,8 +106,7 @@ Return ONLY the JSON object. No explanations, no markdown, just pure JSON."""
 
         try:
             response = self.client.chat.completions.create(
-                #model="anthropic/claude-sonnet-4.5", # Yasal Durumu (RIDDOR) Değerlendir
-                model="google/gemini-2.5-flash-lite",  #test model  # Veriyi Hızlıca Topla
+                model="anthropic/claude-sonnet-4.5",  # stable production model
                 temperature=0.0,
                 max_tokens=500,
                 messages=[
@@ -162,8 +161,7 @@ Return ONLY the category name (e.g., "Minor injury"), nothing else."""
 
         try:
             response = self.client.chat.completions.create(
-                #model="anthropic/claude-sonnet-4.5", # Yasal Durumu (RIDDOR) Değerlendir
-                model="openai/gpt-4o-mini",  #test model,   # Veriyi Hızlıca Topla
+                model="anthropic/claude-sonnet-4.5",  # stable production model
                 temperature=0.0,
                 max_tokens=50,
                 messages=[
