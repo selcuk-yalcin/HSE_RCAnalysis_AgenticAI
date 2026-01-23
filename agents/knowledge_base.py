@@ -1,7 +1,8 @@
 """
 HSG245 Knowledge Base - Basit Sözlük Yapısı
-RAG/Veritabanı gerektirmez. Doğrudan Python sözlüğü olarak tutulur.
+RAG/Veritabanı gerektirmez. Doğrudan Python sözlüğü olarak tutulur. No model 
 """
+
 
 HSG245_TAXONOMY = {
     "immediate_causes_actions": """
