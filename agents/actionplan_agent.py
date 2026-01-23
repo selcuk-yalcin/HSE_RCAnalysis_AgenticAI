@@ -161,44 +161,53 @@ Ensure actions follow the hierarchy of controls:
 4. Administrative controls
 5. PPE (last resort)
 
-Return as JSON with this exact structure:
+CRITICAL: Return ONLY valid JSON. No markdown code blocks, no explanations, no preamble.
+
+Use this exact structure:
 {{
     "control_measures": [
         {{
             "measure": "Specific action description",
             "responsible": "Role/Position",
             "target_date": "DD/MM/YYYY",
-            "category": "immediate|short_term|long_term",
-            "control_type": "elimination|substitution|engineering|administrative|ppe"
+            "category": "immediate",
+            "control_type": "engineering"
         }}
     ],
-    "immediate": ["Action 1", "Action 2", ...],
-    "short_term": ["Action 1", "Action 2", ...],
-    "long_term": ["Action 1", "Action 2", ...],
-    "responsible": {{"action_name": "role"}},
-    "deadlines": {{"action_name": "DD/MM/YYYY"}}
+    "immediate": ["Action 1", "Action 2"],
+    "short_term": ["Action 1", "Action 2"],
+    "long_term": ["Action 1", "Action 2"],
+    "responsible": {{"Action 1": "Safety Manager"}},
+    "deadlines": {{"Action 1": "24/01/2026"}}
 }}
 
-Generate at least 2-3 actions per category. Be specific and practical.
-
-Return ONLY valid JSON.
+Generate 2-3 actions per category. Be specific and practical. JSON ONLY.
 """
         
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5",#actual model 
-                #model = "deepseek/deepseek-r1-0528:free" # test model rofesyonel Plan Yaz
+                model="anthropic/claude-sonnet-4.5",  # actual model 
                 messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a safety expert. Return ONLY valid JSON. No markdown, no explanations, no code blocks. Just pure JSON."
+                    },
                     {
                         "role": "user", 
                         "content": prompt
                     }
                 ],
                 temperature=0.0,
-                max_tokens=2000
+                max_tokens=3000  # Increased from 2000
             )
             
             result_text = response.choices[0].message.content.strip()
+            
+            # Remove markdown code blocks if present
+            if "```json" in result_text:
+                result_text = result_text.replace("```json", "").replace("```", "").strip()
+            elif "```" in result_text:
+                result_text = result_text.replace("```", "").strip()
             
             # Use robust JSON parser
             result = safe_json_parse(
