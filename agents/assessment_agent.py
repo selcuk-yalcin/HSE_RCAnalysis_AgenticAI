@@ -142,7 +142,8 @@ Return ONLY the event type name."""
 
         try:
             response = self.client.chat.completions.create(
-                model="openai/gpt-4o-mini",  # Yasal Durumu (RIDDOR) Değerlendir
+                model="anthropic/claude-sonnet-4.5",#actual model 
+                #model = "deepseek/deepseek-r1-0528:free" # test model 
                 temperature=0.0,
                 max_tokens=50,
                 messages=[
