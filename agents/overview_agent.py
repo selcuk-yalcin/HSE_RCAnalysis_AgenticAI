@@ -88,47 +88,51 @@ class OverviewAgent:
         """
         print("\n🤖 AI extracting brief details...")
         
-        prompt = f"""You are a health and safety incident investigator. 
-Extract the following information from the incident description:
+        prompt = f"""Extract incident information as JSON.
 
-INCIDENT DESCRIPTION:
-{description}
+INCIDENT: {description}
 
-Extract and structure as JSON with these fields:
-- what: What happened (brief summary)
-- where: Where did it happen (location)
-- when: When did it happen (date/time if mentioned)
-- who: Who was involved (person/people)
-- emergency_measures: What emergency measures were taken
+JSON format:
+{{
+  "what": "brief summary",
+  "where": "location",
+  "when": "date/time",
+  "who": "people involved",
+  "emergency_measures": "actions taken"
+}}
 
-If any information is not available, use empty string "".
+Return ONLY the JSON object. No explanations, no markdown, just pure JSON."""
 
-Return ONLY valid JSON, no explanations."""
-
-        response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free",
-            temperature=0.1,
-            messages=[
-                {"role": "system", "content": "You are a health and safety incident documentation expert. Return only valid JSON."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        
-        result = response.choices[0].message.content.strip()
-        
-        # Clean JSON if wrapped in markdown code blocks
-        if result.startswith("```json"):
-            result = result.replace("```json", "").replace("```", "").strip()
-        elif result.startswith("```"):
-            result = result.replace("```", "").strip()
-        
         try:
+            response = self.client.chat.completions.create(
+                model="deepseek/deepseek-r1-0528:free",
+                temperature=0.0,
+                max_tokens=500,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            result = response.choices[0].message.content.strip()
+            
+            # Clean various formats
+            if result.startswith("```json"):
+                result = result.replace("```json", "").replace("```", "").strip()
+            elif result.startswith("```"):
+                result = result.replace("```", "").strip()
+            
+            # Extract JSON from response (in case there's thinking text)
+            import re
+            json_match = re.search(r'\{[^}]+\}', result, re.DOTALL)
+            if json_match:
+                result = json_match.group(0)
+            
             details = json.loads(result)
             print("✅ Brief details extracted successfully")
             return details
-        except json.JSONDecodeError as e:
-            print(f"⚠️  JSON parsing error: {e}")
-            print(f"Raw response: {result}")
+        except Exception as e:
+            print(f"⚠️  Extraction error: {e}")
+            print(f"Raw response: {result if 'result' in locals() else 'No response'}")
             return {
                 "what": description[:200],
                 "where": "",
@@ -144,30 +148,35 @@ Return ONLY valid JSON, no explanations."""
         """
         print("\n🤖 AI classifying incident type...")
         
-        prompt = f"""You are a health and safety incident classifier.
+        prompt = f"""Classify this incident into ONE category:
+1. "Ill health" - disease or health condition
+2. "Minor injury" - first aid only
+3. "Serious injury" - medical attention needed
+4. "Major injury" - severe injury
 
-INCIDENT DESCRIPTION:
-{description}
+INCIDENT: {description}
 
-Classify this incident into ONE of these categories:
-1. "Ill health" - Work-related illness, disease, or health condition
-2. "Minor injury" - First aid treatment, minor cuts, bruises
-3. "Serious injury" - Requires medical attention, lacerations, fractures
-4. "Major injury" - Severe injury, amputation, major fractures, potential fatality
+Return ONLY the category name (e.g., "Minor injury"), nothing else."""
 
-Return ONLY the category name, nothing else."""
-
-        response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free", # Model change 
-            temperature=0.1,
-            messages=[
-                {"role": "system", "content": "You are a safety incident classifier. Return only the category name."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        
-        incident_type = response.choices[0].message.content.strip()
-        print(f"✅ Incident classified as: {incident_type}")
+        try:
+            response = self.client.chat.completions.create(
+                model="deepseek/deepseek-r1-0528:free", 
+                temperature=0.0,
+                max_tokens=50,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            incident_type = response.choices[0].message.content.strip()
+            # Clean any quotes or extra text
+            incident_type = incident_type.replace('"', '').replace("'", "").strip()
+            print(f"✅ Incident classified as: {incident_type}")
+            
+            return incident_type
+        except Exception as e:
+            print(f"⚠️  Classification error: {e}")
+            return "Minor injury"
         
         return incident_type
     

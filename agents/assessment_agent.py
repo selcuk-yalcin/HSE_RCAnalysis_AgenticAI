@@ -127,32 +127,36 @@ class AssessmentAgent:
         """
         print("\n🤖 AI classifying event type...")
         
-        prompt = f"""You are a health and safety event classifier.
+        prompt = f"""Classify this safety event:
 
-INCIDENT INFORMATION:
-{description}
+INCIDENT: {description}
 
-Classify this into ONE of these event types:
-1. "Accident" - An unplanned event that resulted in injury or damage
-2. "Ill health" - Work-related illness or health condition
-3. "Near-miss" - An event that could have resulted in injury but didn't
-4. "Undesired circumstance" - Unsafe condition or situation
+Types:
+1. "Accident" - injury or damage occurred
+2. "Ill health" - work-related illness
+3. "Near-miss" - could have caused injury
+4. "Undesired circumstance" - unsafe condition
 
-Return ONLY the event type name, nothing else."""
+Return ONLY the event type name."""
 
-        response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free",
-            temperature=0.1,
-            messages=[
-                {"role": "system", "content": "You are a safety event classifier. Return only the event type."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        
-        event_type = response.choices[0].message.content.strip()
-        print(f"✅ Event classified as: {event_type}")
-        
-        return event_type
+        try:
+            response = self.client.chat.completions.create(
+                model="deepseek/deepseek-r1-0528:free",
+                temperature=0.0,
+                max_tokens=50,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            event_type = response.choices[0].message.content.strip()
+            event_type = event_type.replace('"', '').replace("'", "").strip()
+            print(f"✅ Event classified as: {event_type}")
+            
+            return event_type
+        except Exception as e:
+            print(f"⚠️  Classification error: {e}")
+            return "Accident"
     
     def _assess_severity(self, description: str, part1_data: Dict) -> str:
         """
@@ -163,34 +167,37 @@ Return ONLY the event type name, nothing else."""
         
         incident_type = part1_data.get("incident_type", "")
         
-        prompt = f"""You are a health and safety severity assessor.
+        prompt = f"""Assess severity:
 
-INCIDENT INFORMATION:
-{description}
+INCIDENT: {description}
+Type: {incident_type}
 
-Incident Type: {incident_type}
+Levels:
+1. "Fatal or major" - death, major fracture, amputation
+2. "Serious" - medical treatment, hospitalization
+3. "Minor" - first aid only
+4. "Damage only" - no injury
 
-Classify the severity into ONE of these levels:
-1. "Fatal or major" - Death, major fracture, amputation, serious burns, unconsciousness
-2. "Serious" - Requires medical treatment, hospitalization, significant injury
-3. "Minor" - First aid treatment only, minor cuts/bruises
-4. "Damage only" - No injury, only property/equipment damage
+Return ONLY the severity level."""
 
-Return ONLY the severity level, nothing else."""
-
-        response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free", # Model can be change here 
-            temperature=0.1,
-            messages=[
-                {"role": "system", "content": "You are a severity assessor. Return only the severity level."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        
-        severity = response.choices[0].message.content.strip()
-        print(f"✅ Severity assessed as: {severity}")
-        
-        return severity
+        try:
+            response = self.client.chat.completions.create(
+                model="deepseek/deepseek-r1-0528:free",
+                temperature=0.0,
+                max_tokens=50,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            severity = response.choices[0].message.content.strip()
+            severity = severity.replace('"', '').replace("'", "").strip()
+            print(f"✅ Severity assessed as: {severity}")
+            
+            return severity
+        except Exception as e:
+            print(f"⚠️  Severity assessment error: {e}")
+            return "Minor"
     
     def _assess_riddor(self, description: str, part1_data: Dict, part2_data: Dict) -> Dict:
         """
@@ -199,58 +206,58 @@ Return ONLY the severity level, nothing else."""
         """
         print("\n🤖 AI assessing RIDDOR reportability...")
         
-        prompt = f"""You are a UK health and safety RIDDOR expert.
+        prompt = f"""RIDDOR assessment:
 
-INCIDENT INFORMATION:
-{description}
-
-Event Type: {part2_data.get('type_of_event', '')}
+INCIDENT: {description}
+Event: {part2_data.get('type_of_event', '')}
 Severity: {part2_data.get('actual_potential_harm', '')}
 
-RIDDOR (Reporting of Injuries, Diseases and Dangerous Occurrences Regulations 2013) requires reporting of:
-- Deaths
-- Specified injuries (fractures, amputations, crush injuries, serious burns, unconsciousness, etc.)
-- Injuries causing over 7 days absence from work
-- Occupational diseases
-- Dangerous occurrences
+RIDDOR reportable if:
+- Death
+- Major fracture, amputation, crush injury, serious burns
+- Over 7 days absence
+- Dangerous occurrence
 
-Determine if this incident is RIDDOR reportable.
+JSON format:
+{{"reportable": "Y" or "N", "reason": "brief explanation"}}
 
-Return a JSON with:
-- reportable: "Y" or "N"
-- reason: Brief explanation why reportable or not
+Return ONLY JSON."""
 
-Return ONLY valid JSON."""
-
-        response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free", # model and temp can be change here
-            temperature=0.1,
-            messages=[
-                {"role": "system", "content": "You are a RIDDOR expert. Return only valid JSON."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        
-        result = response.choices[0].message.content.strip()
-        
-        # Clean JSON
-        if result.startswith("```json"):
-            result = result.replace("```json", "").replace("```", "").strip()
-        elif result.startswith("```"):
-            result = result.replace("```", "").strip()
-        
         try:
+            response = self.client.chat.completions.create(
+                model="deepseek/deepseek-r1-0528:free",
+                temperature=0.0,
+                max_tokens=200,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            result = response.choices[0].message.content.strip()
+            
+            # Clean JSON
+            if result.startswith("```json"):
+                result = result.replace("```json", "").replace("```", "").strip()
+            elif result.startswith("```"):
+                result = result.replace("```", "").strip()
+            
+            # Extract JSON
+            import re
+            json_match = re.search(r'\{[^}]+\}', result, re.DOTALL)
+            if json_match:
+                result = json_match.group(0)
+            
             riddor = json.loads(result)
-            print(f"✅ RIDDOR assessment: {riddor['reportable']} - {riddor.get('reason', '')}")
+            print(f"✅ RIDDOR: {riddor['reportable']} - {riddor.get('reason', '')}")
             
             return {
                 "reportable": riddor.get("reportable", "N"),
                 "date_reported": datetime.now().strftime("%d.%m.%y") if riddor.get("reportable") == "Y" else "",
                 "reason": riddor.get("reason", "")
             }
-        except json.JSONDecodeError:
-            print("⚠️  JSON parsing error, defaulting to N")
-            return {"reportable": "N", "date_reported": "", "reason": ""}
+        except Exception as e:
+            print(f"⚠️  RIDDOR assessment error: {e}")
+            return {"reportable": "N", "date_reported": "", "reason": "Assessment failed"}
     
     def _determine_investigation_level(self, part1_data: Dict, part2_data: Dict, description: str) -> Dict:
         """
