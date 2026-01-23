@@ -153,27 +153,38 @@ Return as JSON with this exact structure:
 }}
 
 Generate at least 2-3 actions per category. Be specific and practical.
+
+Return ONLY valid JSON.
 """
         
         try:
             response = self.client.chat.completions.create(
-                model="deepseek/deepseek-r1-0528:free",# !Change model here 
+                model="deepseek/deepseek-r1-0528:free",
                 messages=[
-                    {
-                        "role": "system", 
-                        "content": "You are a UK Health & Safety expert specializing in incident investigation and risk control following HSG245 guidelines. Generate practical, specific action plans."
-                    },
                     {
                         "role": "user", 
                         "content": prompt
                     }
                 ],
-                temperature=0.3,
-                max_tokens=2000,
-                response_format={"type": "json_object"}
+                temperature=0.0,
+                max_tokens=2000
             )
             
-            result = json.loads(response.choices[0].message.content)
+            result_text = response.choices[0].message.content.strip()
+            
+            # Clean markdown
+            if result_text.startswith("```json"):
+                result_text = result_text.replace("```json", "").replace("```", "").strip()
+            elif result_text.startswith("```"):
+                result_text = result_text.replace("```", "").strip()
+            
+            # Extract JSON with regex
+            import re
+            json_match = re.search(r'\{.*\}', result_text, re.DOTALL)
+            if json_match:
+                result_text = json_match.group(0)
+            
+            result = json.loads(result_text)
             print("✅ Action plan generated successfully")
             
             return result

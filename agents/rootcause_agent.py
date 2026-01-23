@@ -153,36 +153,36 @@ class RootCauseAgent:
         - Dominant category'yi belirle
         - Root cause tipini öngör
         """
-        prompt = f"""Sen bir analiz planlama uzmanısın.
+        prompt = f"""Plan the analysis strategy:
 
-OLAY: {incident}
+INCIDENT: {incident}
 
-GÖREV: Bu olayı analiz etmeden önce bir strateji belirle:
-1. Kaç tane immediate cause bulmamız gerekir? (genelde 2-4)
-2. Dominant category hangisi olmalı? (A: Davranışsal mı, B: Koşullar mı?)
-3. Root cause'lar kişisel mi (C) organizasyonel mi (D) olacak?
+Determine:
+1. Expected immediate causes count (2-4)
+2. Dominant category (A: Behavior or B: Conditions)
+3. Root cause type (C: Personal or D: Organizational)
 
-JSON dön:
-{{
-  "expected_immediate_count": 3,
-  "dominant_category": "A veya B",
-  "expected_root_category": "C veya D",
-  "reasoning": "Neden bu stratejiyi seçtin?"
-}}
+JSON format:
+{{"expected_immediate_count": 3, "dominant_category": "A or B", "expected_root_category": "C or D", "reasoning": "brief reason"}}
 
-SADECE JSON dön!"""
+Return ONLY JSON."""
 
-        response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free",
-            temperature=0.2,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        result = self._extract_json(response.choices[0].message.content)
-        print(f"   Plan: {result.get('reasoning', 'N/A')[:100]}...")
-        print(f"   Beklenen: {result.get('expected_immediate_count', '?')} immediate cause")
-        print(f"   Dominant: {result.get('dominant_category', '?')}")
-        return result
+        try:
+            response = self.client.chat.completions.create(
+                model="deepseek/deepseek-r1-0528:free",
+                temperature=0.0,
+                max_tokens=300,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            
+            result = self._extract_json(response.choices[0].message.content)
+            print(f"   Plan: {result.get('reasoning', 'N/A')[:100]}...")
+            print(f"   Beklenen: {result.get('expected_immediate_count', '?')} immediate cause")
+            print(f"   Dominant: {result.get('dominant_category', '?')}")
+            return result
+        except Exception as e:
+            print(f"   ⚠️ Planning error: {e}")
+            return {"expected_immediate_count": 3, "dominant_category": "A", "expected_root_category": "D", "reasoning": "Default plan"}
     
     # ==================== AGENT 2-3: SEARCH + VALIDATION LOOP ====================
     def _search_validate_loop(self, incident: str, categories: List[str], 
@@ -297,16 +297,21 @@ JSON:
 
 SADECE JSON!"""
 
-        response = self.client.chat.completions.create(
-            model="deepseek/deepseek-r1-0528:free",
-            temperature=0.1,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        result = self._extract_json(response.choices[0].message.content)
-        causes = result.get("causes", [])
-        
-        return causes
+        try:
+            response = self.client.chat.completions.create(
+                model="deepseek/deepseek-r1-0528:free",
+                temperature=0.0,
+                max_tokens=1000,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            
+            result = self._extract_json(response.choices[0].message.content)
+            causes = result.get("causes", [])
+            
+            return causes
+        except Exception as e:
+            print(f"   ⚠️ Search error: {e}")
+            return []
     
     def _validation_agent(self, causes: List[Dict], incident: str, 
                          expected_count: int) -> Tuple[bool, str]:
@@ -512,17 +517,26 @@ Rapor metni döndür (JSON değil!)."""
     
     # ==================== HELPER METHODS ====================
     def _extract_json(self, text: str) -> Dict:
-        """JSON çıkar (markdown temizleme ile)"""
+        """JSON çıkar (markdown temizleme + regex ile)"""
         text = text.strip()
+        
+        # Markdown temizle
         if text.startswith("```json"):
             text = text.replace("```json", "").replace("```", "").strip()
         elif text.startswith("```"):
             text = text.replace("```", "").strip()
         
+        # DeepSeek R1 için: JSON'u regex ile çıkar
+        import re
+        json_match = re.search(r'\{.*\}', text, re.DOTALL)
+        if json_match:
+            text = json_match.group(0)
+        
         try:
             return json.loads(text)
         except json.JSONDecodeError as e:
             print(f"      ⚠️ JSON parse hatası: {e}")
+            print(f"      Raw text: {text[:200]}...")
             return {}
     
     def _clean_category_codes(self, causes: List[Dict]):
