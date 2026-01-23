@@ -39,7 +39,7 @@ from openai import OpenAI
 from typing import Dict, List, Optional
 import json
 import os
-from shared.rag_system import get_rag_system
+from agents.knowledge_base import HSG245_TAXONOMY, get_category_text
 
 
 class RootCauseAgentV2:
@@ -49,22 +49,13 @@ class RootCauseAgentV2:
     """
     
     def __init__(self):
-        """Initialize with RAG system and OpenRouter"""
+        """Initialize with knowledge base and OpenRouter"""
         api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
         self.client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key
         )
-        # RAG sistemi opsiyonel (şimdilik doğrudan kategorileri prompt'a ekleyeceğiz)
-        try:
-            self.rag = get_rag_system()
-            self.use_rag = True
-            print(f"✅ Kök Neden Ajanı V2 başlatıldı (RAG aktif)")
-        except Exception as e:
-            print(f"⚠️ RAG sistemi başlatılamadı: {e}")
-            self.rag = None
-            self.use_rag = False
-            print(f"✅ Kök Neden Ajanı V2 başlatıldı (RAG olmadan)")
+        print("✅ Kök Neden Ajanı V2 başlatıldı (knowledge_base)")
     
     def analyze_root_causes(self, 
                           part1_data: Dict, 
@@ -142,19 +133,9 @@ class RootCauseAgentV2:
         """
         A/B kategorilerinden immediate causes bul (RAG kullanarak veya hardcoded)
         """
-        # RAG'den A ve B kategorilerini çek
-        if self.use_rag:
-            rag_context_a = self.rag.query("A kategorisi davranışsal nedenler immediate causes actions", top_k=5)
-            rag_context_b = self.rag.query("B kategorisi koşullar nedenler immediate causes conditions", top_k=5)
-        else:
-            # Hardcoded kategori örnekleri
-            rag_context_a = """A1.4 Yetkisiz bilinçli sapma
-A1.1 Bireysel kural/prosedür ihlali
-A2.1 Ekipman/tesis/aracın yanlış veya uygunsuz kullanımı"""
-            
-            rag_context_b = """B1.6 Koruyucu sistemlerin yönetim kontrolü olmadan devre dışı bırakılması
-B1.2 Koruyucu cihazlar arızalı
-B2.1 Ekipman/tesis arızası"""
+        # A ve B kategorilerini knowledge_base'den al
+        rag_context_a = get_category_text('A')
+        rag_context_b = get_category_text('B')
         
         prompt = f"""Sen bir İSG kaza araştırma uzmanısın. HSG245 metodolojisini kullanıyorsun.
 
@@ -227,19 +208,9 @@ KRİTİK: Tüm metinler %100 TÜRKÇE olmalı. Sadece geçerli JSON döndür."""
         code = immediate_cause.get("code", "")
         cause_tr = immediate_cause.get("cause_tr", "")
         
-        # RAG'den C ve D kategorilerini çek
-        if self.use_rag:
-            rag_context_c = self.rag.query("C kategorisi kişisel faktörler personal systemic root causes", top_k=3)
-            rag_context_d = self.rag.query("D kategorisi organizasyonel faktörler organizational systemic root causes", top_k=3)
-        else:
-            # Hardcoded kategori örnekleri
-            rag_context_c = """C1.4 Yorgunluk (akut veya kronik)
-C3.1 Yetersiz beceri değerlendirmesi
-C3.5 Güvensiz davranışın pekiştirilmesi"""
-            
-            rag_context_d = """D1.4 Üretim baskısının güvenliğin önüne geçmesi
-D6.1 Yetersiz bakım stratejisi veya planlaması
-D3.1 Eğitimin sağlanmaması veya yetersiz olması"""
+        # C ve D kategorilerini knowledge_base'den al
+        rag_context_c = get_category_text('C')
+        rag_context_d = get_category_text('D')
         
         prompt = f"""Sen İSG kök neden uzmanısın. 5-Why analizi yapıyorsun.
 
