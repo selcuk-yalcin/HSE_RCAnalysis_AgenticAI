@@ -186,7 +186,7 @@ Return ONLY valid JSON.
         
         try:
             response = self.client.chat.completions.create(
-                model="google/gemini-2.5-flash", #change model
+                model="anthropic/claude-3.5-sonnet", # Profesyonel Plan Yaz
                 messages=[
                     {
                         "role": "user", 

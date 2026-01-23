@@ -199,7 +199,7 @@ DÖNDÜR (JSON):
 KRİTİK: Tüm metinler %100 TÜRKÇE olmalı. Sadece geçerli JSON döndür."""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.5-flash",  #change model
+            model="openai/o1-preview",  # Derinlemesine Analiz Yap (Beyin)
             temperature=0.2,
             messages=[
                 {"role": "system", "content": "Sen HSG245 uzmanısın. Sadece JSON döndür, Türkçe içerik kullan."},
@@ -302,7 +302,7 @@ DÖNDÜR (JSON):
 KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
 
         response = self.client.chat.completions.create(
-            model="google/gemini-2.5-flash",   #change model
+            model="openai/o1-preview",   # Derinlemesine Analiz Yap (Beyin)
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "Sen 5-Why uzmanısın. Sadece JSON, Türkçe içerik."},
