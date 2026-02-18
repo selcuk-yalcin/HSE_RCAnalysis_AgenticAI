@@ -54,8 +54,8 @@ def extract_json_from_response(response_text: str, default: Optional[Dict] = Non
             try:
                 return json.loads(json_str)
             except json.JSONDecodeError as e:
-                print(f"⚠️  JSON parse error on extracted string: {e}")
-                print(f"📝 Extracted: {json_str[:200]}...")
+                print(f"  JSON parse error on extracted string: {e}")
+                print(f" Extracted: {json_str[:200]}...")
         
         # Strategy 2: Try parsing the entire response (fallback)
         try:
@@ -72,12 +72,12 @@ def extract_json_from_response(response_text: str, default: Optional[Dict] = Non
             except json.JSONDecodeError:
                 pass
         
-        print(f"❌ Could not extract valid JSON from response")
-        print(f"📄 Response preview: {text[:300]}...")
+        print(f" Could not extract valid JSON from response")
+        print(f" Response preview: {text[:300]}...")
         return default
         
     except Exception as e:
-        print(f"❌ Unexpected error in JSON extraction: {e}")
+        print(f" Unexpected error in JSON extraction: {e}")
         return default
 
 
@@ -108,7 +108,7 @@ def extract_json_array_from_response(response_text: str, default: Optional[list]
             try:
                 return json.loads(json_str)
             except json.JSONDecodeError as e:
-                print(f"⚠️  JSON array parse error: {e}")
+                print(f"  JSON array parse error: {e}")
         
         # Fallback: try entire response
         try:
@@ -116,11 +116,11 @@ def extract_json_array_from_response(response_text: str, default: Optional[list]
         except json.JSONDecodeError:
             pass
         
-        print(f"❌ Could not extract valid JSON array from response")
+        print(f" Could not extract valid JSON array from response")
         return default
         
     except Exception as e:
-        print(f"❌ Unexpected error in JSON array extraction: {e}")
+        print(f" Unexpected error in JSON array extraction: {e}")
         return default
 
 
@@ -146,8 +146,8 @@ def safe_json_parse(response_text: str,
     result = extract_json_from_response(response_text, default)
     
     if result == default and result == {}:
-        print(f"⚠️  Warning: Using default/empty dict for {context}")
+        print(f"  Warning: Using default/empty dict for {context}")
     else:
-        print(f"✅ Successfully parsed JSON from {context}")
+        print(f" Successfully parsed JSON from {context}")
     
     return result
