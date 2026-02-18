@@ -33,7 +33,7 @@ class AssessmentAgent:
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key
         )
-        print("✅ Assessment Agent initialized with OpenRouter")
+        print(" Assessment Agent initialized with OpenRouter")
     
     def assess_incident(self, part1_data: Dict, incident_details: Dict = None) -> Dict:
         """
@@ -126,7 +126,7 @@ class AssessmentAgent:
         Classify event type using AI
         Options: Accident, Ill health, Near-miss, Undesired circumstance
         """
-        print("\n🤖 AI classifying event type...")
+        print("\n AI classifying event type...")
         
         prompt = f"""Classify this safety event:
 
@@ -153,11 +153,11 @@ Return ONLY the event type name."""
             
             event_type = response.choices[0].message.content.strip()
             event_type = event_type.replace('"', '').replace("'", "").strip()
-            print(f"✅ Event classified as: {event_type}")
+            print(f" Event classified as: {event_type}")
             
             return event_type
         except Exception as e:
-            print(f"⚠️  Classification error: {e}")
+            print(f"  Classification error: {e}")
             return "Accident"
     
     def _assess_severity(self, description: str, part1_data: Dict) -> str:
@@ -165,7 +165,7 @@ Return ONLY the event type name."""
         Assess severity level using AI
         Options: Fatal or major, Serious, Minor, Damage only
         """
-        print("\n🤖 AI assessing severity level...")
+        print("\n AI assessing severity level...")
         
         incident_type = part1_data.get("incident_type", "")
         
@@ -195,11 +195,11 @@ Return ONLY the severity level."""
             
             severity = response.choices[0].message.content.strip()
             severity = severity.replace('"', '').replace("'", "").strip()
-            print(f"✅ Severity assessed as: {severity}")
+            print(f" Severity assessed as: {severity}")
             
             return severity
         except Exception as e:
-            print(f"⚠️  Severity assessment error: {e}")
+            print(f"  Severity assessment error: {e}")
             return "Minor"
     
     def _assess_riddor(self, description: str, part1_data: Dict, part2_data: Dict) -> Dict:
@@ -207,7 +207,7 @@ Return ONLY the severity level."""
         Determine if incident is RIDDOR reportable using AI
         RIDDOR = Reporting of Injuries, Diseases and Dangerous Occurrences Regulations
         """
-        print("\n🤖 AI assessing RIDDOR reportability...")
+        print("\n AI assessing RIDDOR reportability...")
         
         prompt = f"""RIDDOR assessment:
 
@@ -245,7 +245,7 @@ Return ONLY JSON."""
                 default={"reportable": "N", "reason": "Parse failed"}
             )
             
-            print(f"✅ RIDDOR: {riddor.get('reportable', 'N')} - {riddor.get('reason', '')}")
+            print(f" RIDDOR: {riddor.get('reportable', 'N')} - {riddor.get('reason', '')}")
             
             return {
                 "reportable": riddor.get("reportable", "N"),
@@ -253,7 +253,7 @@ Return ONLY JSON."""
                 "reason": riddor.get("reason", "")
             }
         except Exception as e:
-            print(f"⚠️  RIDDOR assessment error: {e}")
+            print(f"  RIDDOR assessment error: {e}")
             return {"reportable": "N", "date_reported": "", "reason": "Assessment failed"}
     
     def _determine_investigation_level(self, part1_data: Dict, part2_data: Dict, description: str) -> Dict:
@@ -313,7 +313,7 @@ Return ONLY valid JSON."""
             }
         )
         
-        print(f"✅ Investigation level: {assessment.get('level', 'Medium level')}")
+        print(f" Investigation level: {assessment.get('level', 'Medium level')}")
         print(f"   Priority: {assessment.get('priority', 'Medium')}")
         print(f"   Team: {', '.join(assessment.get('team', ['H&S Officer']))}")
         
@@ -326,7 +326,7 @@ Return ONLY valid JSON."""
     def _print_summary(self, part2_data: Dict):
         """Print formatted summary of Part 2 data"""
         print("\n" + "-"*80)
-        print("📊 PART 2 INITIAL ASSESSMENT SUMMARY")
+        print(" PART 2 INITIAL ASSESSMENT SUMMARY")
         print("-"*80)
         print(f"Event Type:           {part2_data['type_of_event']}")
         print(f"Severity:             {part2_data['actual_potential_harm']}")
@@ -336,7 +336,7 @@ Return ONLY valid JSON."""
         print(f"Accident Book:        {part2_data['accident_book_entry']}")
         if part2_data['accident_book_entry'] == 'Y':
             print(f"Book Reference:       {part2_data['accident_book_ref']}")
-        print(f"\n🔍 Investigation:")
+        print(f"\n Investigation:")
         print(f"Level:                {part2_data['investigation_level']}")
         print(f"Priority:             {part2_data['priority']}")
         print(f"Further Invest Req:   {part2_data['further_investigation_required']}")
