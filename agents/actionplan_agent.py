@@ -57,7 +57,7 @@ class ActionPlanAgent:
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key
         )
-        print(f"✅ Aksiyon Planı Ajanı başlatıldı.")
+        print(f" Aksiyon Planı Ajanı başlatıldı.")
     
     def generate_action_plan(self, investigation_data: Dict) -> Dict:
         """
@@ -77,13 +77,13 @@ class ActionPlanAgent:
         # GUARD CLAUSE: Validate input data
         # ========================================
         if not investigation_data or not isinstance(investigation_data, dict):
-            print("\n⚠️  HATA: Araştırma verisi eksik veya geçersiz!")
-            print("⚠️  Varsayılan aksiyon planı devreye giriyor...")
+            print("\n HATA: Araştırma verisi eksik veya geçersiz!")
+            print(" Varsayılan aksiyon planı devreye giriyor...")
             return self._generate_fallback_actions()
         
         if "root_causes" not in investigation_data:
-            print("\n⚠️  HATA: Kök neden verisi eksik!")
-            print("⚠️  Varsayılan aksiyon planı devreye giriyor...")
+            print("\n  HATA: Kök neden verisi eksik!")
+            print(" Varsayılan aksiyon planı devreye giriyor...")
             return self._generate_fallback_actions()
         
         # Extract data
@@ -94,13 +94,13 @@ class ActionPlanAgent:
         
         # Additional validation: Check if root_causes is actually populated
         if not root_causes or len(root_causes) == 0:
-            print("\n⚠️  HATA: Kök neden listesi boş!")
-            print("⚠️  Varsayılan aksiyon planı devreye giriyor...")
+            print("\n  HATA: Kök neden listesi boş!")
+            print("  Varsayılan aksiyon planı devreye giriyor...")
             return self._generate_fallback_actions()
         
         # Generate actions using AI
-        print("\n🤖 AI generating risk control measures...")
-        print(f"📊 Input: {len(root_causes)} root causes, {len(immediate_causes)} immediate causes")
+        print("\n AI generating risk control measures...")
+        print(f" Input: {len(root_causes)} root causes, {len(immediate_causes)} immediate causes")
         
         actions = self._generate_actions_with_ai(
             root_causes, 
@@ -111,7 +111,7 @@ class ActionPlanAgent:
         
         # Check if fallback was returned (already in Part 4 format)
         if isinstance(actions, dict) and "_fallback" in actions:
-            print("⚠️  Using fallback action plan structure")
+            print("  Using fallback action plan structure")
             return actions
         
         # Structure Part 4 data from AI-generated actions
@@ -254,14 +254,14 @@ Generate 2-3 actions per category. Be specific and practical. JSON ONLY.
             
             # If still failed, use fallback
             if result is None or not result:
-                print("⚠️  Using fallback action plan")
+                print("  Using fallback action plan")
                 return self._generate_fallback_actions()
             
-            print("✅ Action plan generated successfully")
+            print(" Action plan generated successfully")
             return result
             
         except Exception as e:
-            print(f"⚠️  Error generating actions with AI: {e}")
+            print(f"  Error generating actions with AI: {e}")
             # Fallback to default actions
             return self._generate_fallback_actions()
     
@@ -371,7 +371,7 @@ Generate 2-3 actions per category. Be specific and practical. JSON ONLY.
             "_fallback": True  # Flag to indicate this is fallback data
         }
         
-        print("✅ Fallback plan generated successfully")
+        print(" Fallback plan generated successfully")
         return part4_fallback
     
     def _calculate_priority(self, severity: str) -> str:
@@ -388,15 +388,15 @@ Generate 2-3 actions per category. Be specific and practical. JSON ONLY.
     def _print_summary(self, data: Dict):
         """Print action plan summary"""
         print("\n" + "-"*80)
-        print("📊 ACTION PLAN SUMMARY")
+        print(" ACTION PLAN SUMMARY")
         print("-"*80)
         
-        print(f"\n🎯 Priority Level: {data['priority_level']}")
-        print(f"📅 Generated: {data['generated_at']}")
+        print(f"\n Priority Level: {data['priority_level']}")
+        print(f" Generated: {data['generated_at']}")
         
         # Print control measures table
-        print("\n📋 CONTROL MEASURES:")
-        print("\n⚡ IMMEDIATE ACTIONS (24-48 hours):")
+        print("\n CONTROL MEASURES:")
+        print("\n IMMEDIATE ACTIONS (24-48 hours):")
         immediate_count = sum(1 for m in data['control_measures'] if m['category'] == 'immediate')
         print(f"   Total: {immediate_count} actions")
         for measure in data['control_measures']:
@@ -404,7 +404,7 @@ Generate 2-3 actions per category. Be specific and practical. JSON ONLY.
                 print(f"   • {measure['measure']}")
                 print(f"     └─ Responsible: {measure['responsible']} | Due: {measure['target_date']}")
         
-        print("\n📅 SHORT-TERM ACTIONS (1-3 months):")
+        print("\n SHORT-TERM ACTIONS (1-3 months):")
         short_count = sum(1 for m in data['control_measures'] if m['category'] == 'short_term')
         print(f"   Total: {short_count} actions")
         for measure in data['control_measures']:
