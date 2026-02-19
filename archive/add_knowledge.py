@@ -5,7 +5,7 @@ Add your HSG245 text directly to RAG system
 
 from shared.rag_system import get_rag_system
 
-# 📝 HSG245 Root Cause Analysis Taxonomy
+#  HSG245 Root Cause Analysis Taxonomy
 # Format: Her doküman için ayrı string
 KNOWLEDGE_TEXTS = {
     "hsg245_immediate_causes_actions": """
@@ -203,27 +203,27 @@ def main():
     rag = get_rag_system()
     
     # Show current stats
-    print("\n📊 Current Knowledge Base:")
+    print("\n Current Knowledge Base:")
     stats = rag.stats()
     print(f"   Total chunks: {stats['total_chunks']}")
     print(f"   Sources: {stats['source_count']}")
     
     # Upload each document
-    print("\n📤 Uploading documents...")
+    print("\n Uploading documents...")
     total_chunks = 0
     
     for source_name, text in KNOWLEDGE_TEXTS.items():
         if "[BURAYA" in text or len(text.strip()) < 50:
-            print(f"   ⏭️  Skipping {source_name} (placeholder text)")
+            print(f"     Skipping {source_name} (placeholder text)")
             continue
         
-        print(f"\n   📄 Processing: {source_name}")
+        print(f"\n    Processing: {source_name}")
         chunks = rag.add_text(text, source=source_name)
         total_chunks += chunks
     
     # Show final stats
     print("\n" + "=" * 60)
-    print("✅ Upload Complete!")
+    print("Upload Complete!")
     print("=" * 60)
     
     final_stats = rag.stats()
@@ -234,7 +234,7 @@ def main():
         print(f"   - {source}")
     
     # Test query
-    print("\n🔍 Testing query: 'accident investigation'")
+    print("\n Testing query: 'accident investigation'")
     results = rag.query("accident investigation", n_results=2)
     
     for i, result in enumerate(results, 1):
