@@ -11,14 +11,14 @@ def load_text_file(file_path: str):
     """Load a single text file into knowledge base"""
     rag = get_rag_system()
     
-    print(f"\n📂 Loading: {file_path}")
+    print(f"\n Loading: {file_path}")
     chunks_added = rag.add_from_file(file_path)
     
-    print(f"✅ Successfully loaded {chunks_added} chunks")
+    print(f" Successfully loaded {chunks_added} chunks")
     
     # Show stats
     stats = rag.stats()
-    print(f"\n📊 Knowledge Base Stats:")
+    print(f"\n Knowledge Base Stats:")
     print(f"   Total chunks: {stats['total_chunks']}")
     print(f"   Sources: {stats['source_count']}")
     for source in stats['sources']:
@@ -28,14 +28,14 @@ def load_text_string(text: str, source_name: str):
     """Load text from string"""
     rag = get_rag_system()
     
-    print(f"\n📝 Loading text from: {source_name}")
+    print(f"\n Loading text from: {source_name}")
     chunks_added = rag.add_text(text, source=source_name)
     
-    print(f"✅ Successfully loaded {chunks_added} chunks")
+    print(f" Successfully loaded {chunks_added} chunks")
     
     # Show stats
     stats = rag.stats()
-    print(f"\n📊 Knowledge Base Stats:")
+    print(f"\n Knowledge Base Stats:")
     print(f"   Total chunks: {stats['total_chunks']}")
     print(f"   Sources: {stats['source_count']}")
 
@@ -45,16 +45,16 @@ def load_multiple_files(directory: str):
     dir_path = Path(directory)
     
     if not dir_path.exists():
-        print(f"❌ Directory not found: {directory}")
+        print(f" Directory not found: {directory}")
         return
     
     txt_files = list(dir_path.glob("*.txt"))
     
     if not txt_files:
-        print(f"❌ No .txt files found in {directory}")
+        print(f" No .txt files found in {directory}")
         return
     
-    print(f"\n📂 Found {len(txt_files)} text files in {directory}")
+    print(f"\n Found {len(txt_files)} text files in {directory}")
     
     total_chunks = 0
     for file_path in txt_files:
@@ -62,11 +62,11 @@ def load_multiple_files(directory: str):
         chunks = rag.add_from_file(str(file_path))
         total_chunks += chunks
     
-    print(f"\n✅ Loaded {total_chunks} total chunks from {len(txt_files)} files")
+    print(f"\n Loaded {total_chunks} total chunks from {len(txt_files)} files")
     
     # Show stats
     stats = rag.stats()
-    print(f"\n📊 Knowledge Base Stats:")
+    print(f"\n Knowledge Base Stats:")
     print(f"   Total chunks: {stats['total_chunks']}")
     print(f"   Sources: {stats['source_count']}")
 
@@ -74,10 +74,10 @@ def test_query(query: str):
     """Test query on knowledge base"""
     rag = get_rag_system()
     
-    print(f"\n🔍 Testing query: {query}")
+    print(f"\n Testing query: {query}")
     results = rag.query(query, n_results=3)
     
-    print(f"\n📋 Top 3 Results:")
+    print(f"\n Top 3 Results:")
     for i, result in enumerate(results, 1):
         print(f"\n   Result {i} [Source: {result['metadata']['source']}]:")
         print(f"   {result['text'][:200]}...")
@@ -100,13 +100,13 @@ if __name__ == "__main__":
     
     if sys.argv[1] == "--dir":
         if len(sys.argv) < 3:
-            print("❌ Please provide directory path")
+            print(" Please provide directory path")
             sys.exit(1)
         load_multiple_files(sys.argv[2])
     
     elif sys.argv[1] == "--test":
         if len(sys.argv) < 3:
-            print("❌ Please provide query text")
+            print(" Please provide query text")
             sys.exit(1)
         query = " ".join(sys.argv[2:])
         test_query(query)
@@ -116,5 +116,5 @@ if __name__ == "__main__":
         load_text_file(sys.argv[1])
     
     print("\n" + "=" * 60)
-    print("✅ Done!")
+    print("Done!")
     print("=" * 60)
