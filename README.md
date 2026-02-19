@@ -14,7 +14,7 @@ HSE_AgenticAI/
 └── requirements.txt     # Python dependencies
 ```
 
-## 🔗 Repository Structure
+##  Repository Structure
 
 This project uses **two separate repositories**:
 
