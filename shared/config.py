@@ -73,7 +73,7 @@ class Config:
         """Validate configuration and create necessary directories"""
         if not cls.OPENAI_API_KEY:
             raise ValueError(
-                "❌ OPENAI_API_KEY not found!\n"
+                " OPENAI_API_KEY not found!\n"
                 "Please create a .env file with:\n"
                 "OPENAI_API_KEY=your-api-key-here"
             )
@@ -83,10 +83,10 @@ class Config:
                          cls.OUTPUTS_DIR, cls.REPORTS_DIR]:
             directory.mkdir(parents=True, exist_ok=True)
         
-        print(f"✅ Configuration validated")
-        print(f"📁 Project root: {cls.PROJECT_ROOT}")
-        print(f"🤖 OpenAI model: {cls.OPENAI_MODEL}")
-        print(f"🌡️  Temperature: {cls.OPENAI_TEMPERATURE}")
+        print(f" Configuration validated")
+        print(f" Project root: {cls.PROJECT_ROOT}")
+        print(f" OpenAI model: {cls.OPENAI_MODEL}")
+        print(f"  Temperature: {cls.OPENAI_TEMPERATURE}")
         
         return True
     
