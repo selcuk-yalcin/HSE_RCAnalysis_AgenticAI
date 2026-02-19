@@ -45,15 +45,15 @@ def test_environment():
     api_key = os.getenv("OPENAI_API_KEY")
     if api_key:
         masked_key = api_key[:10] + "..." + api_key[-4:]
-        print(f"✅ OpenAI API Key found: {masked_key}")
+        print(f" OpenAI API Key found: {masked_key}")
     else:
-        print("❌ OpenAI API Key NOT found!")
+        print(" OpenAI API Key NOT found!")
         return False
     
     # Check configuration
-    print(f"✅ Model: {OPENAI_CONFIG.get('model')}")
-    print(f"✅ Temperature: {OPENAI_CONFIG.get('temperature')}")
-    print(f"✅ Max Tokens: {OPENAI_CONFIG.get('max_tokens')}")
+    print(f" Model: {OPENAI_CONFIG.get('model')}")
+    print(f" Temperature: {OPENAI_CONFIG.get('temperature')}")
+    print(f" Max Tokens: {OPENAI_CONFIG.get('max_tokens')}")
     
     return True
 
@@ -65,7 +65,7 @@ def test_overview_agent():
     try:
         # Initialize agent
         agent = OverviewAgent(OPENAI_CONFIG)
-        print("✅ Overview Agent initialized successfully")
+        print(" Overview Agent initialized successfully")
         
         # Test incident data
         incident_data = {
@@ -75,7 +75,7 @@ def test_overview_agent():
             "forwarded_to": "Operations Manager"
         }
         
-        print("\n📋 Processing incident report...")
+        print("\n Processing incident report...")
         result = agent.process_initial_report(incident_data)
         
         # Verify results
@@ -83,14 +83,14 @@ def test_overview_agent():
         assert 'incident_type' in result, "Missing incident_type"
         assert 'brief_details' in result, "Missing brief_details"
         
-        print(f"\n✅ Reference Number: {result['ref_no']}")
-        print(f"✅ Incident Type: {result['incident_type']}")
-        print(f"✅ Brief Details extracted successfully")
+        print(f"\n Reference Number: {result['ref_no']}")
+        print(f" Incident Type: {result['incident_type']}")
+        print(f" Brief Details extracted successfully")
         
         return result
         
     except Exception as e:
-        print(f"❌ Overview Agent failed: {str(e)}")
+        print(f" Overview Agent failed: {str(e)}")
         import traceback
         traceback.print_exc()
         return None
@@ -103,10 +103,10 @@ def test_assessment_agent(part1_data):
     try:
         # Initialize agent
         agent = AssessmentAgent(OPENAI_CONFIG)
-        print("✅ Assessment Agent initialized successfully")
+        print(" Assessment Agent initialized successfully")
         
         # Process assessment
-        print("\n📊 Conducting initial assessment...")
+        print("\n Conducting initial assessment...")
         result = agent.assess_incident(part1_data)
         
         # Verify results
@@ -114,15 +114,15 @@ def test_assessment_agent(part1_data):
         assert 'actual_potential_harm' in result, "Missing actual_potential_harm"
         assert 'investigation_level' in result, "Missing investigation_level"
         
-        print(f"\n✅ Event Type: {result['type_of_event']}")
-        print(f"✅ Severity Level: {result['actual_potential_harm']}")
-        print(f"✅ Investigation Level: {result['investigation_level']}")
-        print(f"✅ RIDDOR Reportable: {result.get('riddor_reportable', 'N/A')}")
+        print(f"\n Event Type: {result['type_of_event']}")
+        print(f" Severity Level: {result['actual_potential_harm']}")
+        print(f" Investigation Level: {result['investigation_level']}")
+        print(f" RIDDOR Reportable: {result.get('riddor_reportable', 'N/A')}")
         
         return result
         
     except Exception as e:
-        print(f"❌ Assessment Agent failed: {str(e)}")
+        print(f" Assessment Agent failed: {str(e)}")
         import traceback
         traceback.print_exc()
         return None
@@ -135,10 +135,10 @@ def test_rootcause_agent(part1_data, part2_data):
     try:
         # Initialize agent
         agent = RootCauseAgent(OPENAI_CONFIG)
-        print("✅ Root Cause Agent initialized successfully")
+        print(" Root Cause Agent initialized successfully")
         
         # Perform analysis
-        print("\n🔍 Performing 5 Why analysis...")
+        print("\n Performing 5 Why analysis...")
         result = agent.analyze_root_causes(part1_data, part2_data)
         
         # Verify results
@@ -146,9 +146,9 @@ def test_rootcause_agent(part1_data, part2_data):
         assert 'underlying_causes' in result, "Missing underlying_causes"
         assert 'root_causes' in result, "Missing root_causes"
         
-        print(f"\n✅ Immediate Causes: {len(result['immediate_causes'])} identified")
-        print(f"✅ Underlying Causes: {len(result['underlying_causes'])} identified")
-        print(f"✅ Root Causes: {len(result['root_causes'])} identified")
+        print(f"\n Immediate Causes: {len(result['immediate_causes'])} identified")
+        print(f" Underlying Causes: {len(result['underlying_causes'])} identified")
+        print(f" Root Causes: {len(result['root_causes'])} identified")
         
         # Print sample causes
         if result['immediate_causes']:
@@ -159,7 +159,7 @@ def test_rootcause_agent(part1_data, part2_data):
         return result
         
     except Exception as e:
-        print(f"❌ Root Cause Agent failed: {str(e)}")
+        print(f" Root Cause Agent failed: {str(e)}")
         import traceback
         traceback.print_exc()
         return None
@@ -172,7 +172,7 @@ def test_orchestrator():
     try:
         # Initialize orchestrator
         orchestrator = RootCauseOrchestrator(OPENAI_CONFIG)
-        print("✅ Orchestrator initialized successfully")
+        print(" Orchestrator initialized successfully")
         
         # Full incident data
         incident_data = {
@@ -184,11 +184,11 @@ def test_orchestrator():
             "forwarded_to": "HSE Director and Operations Manager"
         }
         
-        print("\n🚀 Running complete investigation workflow...")
+        print("\n Running complete investigation workflow...")
         print("   This will test all agents in sequence:")
-        print("   1️⃣  Overview Agent")
-        print("   2️⃣  Assessment Agent")
-        print("   3️⃣  Root Cause Agent")
+        print("     Overview Agent")
+        print("     Assessment Agent")
+        print("     Root Cause Agent")
         
         result = orchestrator.run_investigation(incident_data)
         
@@ -197,10 +197,10 @@ def test_orchestrator():
         assert 'part2' in result, "Missing Part 2"
         assert 'part3_rca' in result, "Missing Part 3"
         
-        print("\n✅ Complete investigation workflow successful!")
-        print(f"   📋 Part 1 (Overview): {result['part1']['ref_no']}")
-        print(f"   📊 Part 2 (Assessment): {result['part2']['investigation_level']}")
-        print(f"   🔍 Part 3 (Root Cause): {len(result['part3_rca']['root_causes'])} root causes")
+        print("\n Complete investigation workflow successful!")
+        print(f"    Part 1 (Overview): {result['part1']['ref_no']}")
+        print(f"    Part 2 (Assessment): {result['part2']['investigation_level']}")
+        print(f"    Part 3 (Root Cause): {len(result['part3_rca']['root_causes'])} root causes")
         
         return result
         
@@ -218,7 +218,7 @@ def test_pdf_agent(investigation_data):
     try:
         # Initialize agent
         agent = PDFReportAgent()
-        print("✅ PDF Report Agent initialized successfully")
+        print(" PDF Report Agent initialized successfully")
         
         # Prepare complete investigation data with action plan
         complete_data = {
@@ -247,22 +247,22 @@ def test_pdf_agent(investigation_data):
         }
         
         # Generate report
-        print("\n📄 Generating comprehensive PDF report...")
+        print("\n Generating comprehensive PDF report...")
         filepath = agent.generate_report(complete_data)
         
         # Verify file created
         if Path(filepath).exists():
             file_size = Path(filepath).stat().st_size
-            print(f"\n✅ PDF Report generated successfully!")
-            print(f"   📄 File: {filepath}")
-            print(f"   📊 Size: {file_size:,} bytes")
+            print(f"\n PDF Report generated successfully!")
+            print(f"    File: {filepath}")
+            print(f"    Size: {file_size:,} bytes")
             return filepath
         else:
-            print(f"❌ PDF file not found: {filepath}")
+            print(f" PDF file not found: {filepath}")
             return None
         
     except Exception as e:
-        print(f"❌ PDF Agent failed: {str(e)}")
+        print(f" PDF Agent failed: {str(e)}")
         import traceback
         traceback.print_exc()
         return None
@@ -274,16 +274,16 @@ def test_api_integration():
     
     try:
         from api.main import app
-        print("✅ FastAPI app imported successfully")
+        print(" FastAPI app imported successfully")
         
         # Check if agents are initialized in API
-        print("✅ API configuration validated")
-        print("   ℹ️  Start API server with: python -m uvicorn api.main:app --reload")
+        print(" API configuration validated")
+        print("    Start API server with: python -m uvicorn api.main:app --reload")
         
         return True
         
     except Exception as e:
-        print(f"❌ API integration check failed: {str(e)}")
+        print(f" API integration check failed: {str(e)}")
         return False
 
 
@@ -308,17 +308,17 @@ def generate_test_report(results):
     }
     
     for key, name in test_names.items():
-        status = "✅ PASSED" if results.get(key) else "❌ FAILED"
+        status = " PASSED" if results.get(key) else " FAILED"
         print(f"   {status} - {name}")
     
     # Overall status
     print("\n" + "="*80)
     if passed == total:
-        print("🎉 ALL TESTS PASSED! System is fully operational.")
+        print(" ALL TESTS PASSED! System is fully operational.")
     elif passed >= total * 0.7:
-        print("⚠️  PARTIAL SUCCESS - Most components working, some issues found.")
+        print("  PARTIAL SUCCESS - Most components working, some issues found.")
     else:
-        print("❌ MULTIPLE FAILURES - System requires attention.")
+        print("MULTIPLE FAILURES - System requires attention.")
     print("="*80)
     
     return passed == total
@@ -338,7 +338,7 @@ def main():
     # Test 1: Environment
     results['environment'] = test_environment()
     if not results['environment']:
-        print("\n❌ Environment test failed - cannot continue")
+        print("\n Environment test failed - cannot continue")
         return
     
     # Test 2: Overview Agent
@@ -372,11 +372,11 @@ def main():
     
     # Next steps
     if all_passed:
-        print("\n📝 Next Steps:")
-        print("   1️⃣  Start API server: python -m uvicorn api.main:app --reload")
-        print("   2️⃣  Access API docs: http://localhost:8000/docs")
-        print("   3️⃣  Test endpoints: curl http://localhost:8000/api/v1/health")
-        print("   4️⃣  View PDF report in: outputs/reports/")
+        print("\n Next Steps:")
+        print("     Start API server: python -m uvicorn api.main:app --reload")
+        print("    Access API docs: http://localhost:8000/docs")
+        print("    Test endpoints: curl http://localhost:8000/api/v1/health")
+        print("    View PDF report in: outputs/reports/")
     
     return all_passed
 
