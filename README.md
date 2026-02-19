@@ -2,7 +2,7 @@
 
 Multi-agent root cause investigation system based on HSG245 framework.
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 HSE_AgenticAI/
