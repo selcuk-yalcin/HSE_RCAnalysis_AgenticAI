@@ -155,20 +155,20 @@ def main():
     agent = PDFReportAgent(output_dir="outputs/reports")
     
     # Generate report
-    print("\n🔄 Generating comprehensive HSG245 investigation report...")
+    print("\n Generating comprehensive HSG245 investigation report...")
     filepath = agent.generate_report(investigation_data)
     
     print("\n" + "="*80)
-    print("✅ PDF REPORT GENERATION COMPLETE")
+    print("PDF REPORT GENERATION COMPLETE")
     print("="*80)
-    print(f"\n📄 Report saved to: {filepath}")
-    print(f"📊 Report includes:")
+    print(f"\n Report saved to: {filepath}")
+    print(f"Report includes:")
     print("   • Title page with document information")
     print("   • Part 1: Overview and incident details")
     print("   • Part 2: Initial assessment and classification")
     print("   • Part 3: Root cause analysis and recommendations")
     print("   • Part 4: Risk control action plan with responsibilities")
-    print("\n💡 Open the PDF to view the complete investigation report")
+    print("\n Open the PDF to view the complete investigation report")
     
 
 if __name__ == "__main__":
