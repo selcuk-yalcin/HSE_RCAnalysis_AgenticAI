@@ -29,7 +29,7 @@ This project uses **two separate repositories**:
 - **Deployment**: Vercel (Frontend)
 - **URL**: https://inferaworld-admin.vercel.app
 
-## 🚀 Installation
+##  Installation
 
 ### Prerequisites
 
@@ -86,7 +86,7 @@ See [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) for detailed configurat
 - `OPENAI_TEMPERATURE` - Creativity (default: 0.7)
 - `PORT` - API port (default: 8000)
 
-## 🔄 Git Workflow
+##  Git Workflow
 
 ### Backend Changes
 
@@ -117,13 +117,13 @@ git commit -m "chore: Update admin panel submodule"
 git push origin main
 ```
 
-## 📡 API Endpoints
+## API Endpoints
 
 - `GET /` - API status
 - `POST /api/v1/incidents` - Create new incident
 - `GET /api/v1/health` - Health check
 
-## 🛠️ Technologies
+##  Technologies
 
 ### Backend
 - Python 3.11+
