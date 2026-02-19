@@ -43,9 +43,9 @@ class OpenAIClient:
         self.temperature = temperature
         self.max_tokens = max_tokens
         
-        print(f"✅ OpenAI Client initialized")
-        print(f"🤖 Model: {self.model}")
-        print(f"🌡️  Temperature: {self.temperature}")
+        print(f" OpenAI Client initialized")
+        print(f" Model: {self.model}")
+        print(f"  Temperature: {self.temperature}")
     
     def chat_completion(
         self,
@@ -125,7 +125,7 @@ class OpenAIClient:
         try:
             return json.loads(response_text)
         except json.JSONDecodeError as e:
-            print(f"⚠️  JSON parsing error: {e}")
+            print(f"  JSON parsing error: {e}")
             print(f"Raw response: {response_text}")
             return {"error": "Failed to parse JSON", "raw_response": response_text}
     
