@@ -15,7 +15,7 @@ from pathlib import Path
 class HSG245RAGSystem:
     """
     RAG system for HSG245 incident investigation
-    Stores and retrieves relevant safety knowledge using PostgreSQL + pgvector
+    Stores and retrieves relevant safety knowledge using PostgreSQL + pgvector/mongodb can be used as well or any vector databases
     Uses OpenAI Embeddings API (lightweight, no model downloads)
     """
     
@@ -48,7 +48,7 @@ class HSG245RAGSystem:
         self._setup_database()
         
         doc_count = self._get_document_count()
-        print(f"✅ RAG System initialized with {doc_count} documents")
+        print(f" RAG System initialized with {doc_count} documents")
     
     def _setup_database(self):
         """Setup PostgreSQL database with pgvector extension"""
@@ -77,7 +77,7 @@ class HSG245RAGSystem:
                 WITH (lists = 100);
             """)
             
-        print("✅ Database schema initialized")
+        print("Database schema initialized")
     
     def _get_document_count(self) -> int:
         """Get total number of documents"""
@@ -97,7 +97,7 @@ class HSG245RAGSystem:
         # Split text into chunks
         chunks = self.text_splitter.split_text(text)
         
-        print(f"📄 Processing {len(chunks)} chunks from {source}...")
+        print(f" Processing {len(chunks)} chunks from {source}...")
         
         # Generate embeddings using OpenAI API
         embeddings = []
@@ -124,7 +124,7 @@ class HSG245RAGSystem:
                     VALUES (%s, %s, %s, %s, %s)
                 """, (chunk, embedding, source, i, psycopg2.extras.Json(chunk_metadata)))
         
-        print(f"✅ Added {len(chunks)} chunks to knowledge base")
+        print(f" Added {len(chunks)} chunks to knowledge base")
         return len(chunks)
     
     def add_from_file(self, file_path: str):
@@ -218,7 +218,7 @@ class HSG245RAGSystem:
         """Clear all documents from knowledge base"""
         with self.conn.cursor() as cur:
             cur.execute("TRUNCATE TABLE hsg245_knowledge;")
-        print("⚠️ Knowledge base cleared")
+        print(" Knowledge base cleared")
     
     def stats(self) -> Dict:
         """Get knowledge base statistics"""
