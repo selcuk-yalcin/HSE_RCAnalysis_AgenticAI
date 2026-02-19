@@ -55,37 +55,37 @@ async def startup_event():
     """Initialize agents on startup"""
     global overview_agent, assessment_agent, rootcause_agent, actionplan_agent, pdf_agent
     
-    print("🚀 Starting HSE Investigation API...")
-    print(f"📊 OpenRouter API Key configured: {bool(os.getenv('OPENROUTER_API_KEY'))}")
+    print(" Starting HSE Investigation API...")
+    print(f" OpenRouter API Key configured: {bool(os.getenv('OPENROUTER_API_KEY'))}")
     
     # Verify API key is set
     api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
     if not api_key:
-        print("⚠️  WARNING: No API key found in environment variables!")
-        print("⚠️  Set OPENROUTER_API_KEY in .env file")
+        print("  WARNING: No API key found in environment variables!")
+        print("  Set OPENROUTER_API_KEY in .env file")
         return
     
     try:
         # Initialize agents WITHOUT config parameter (they read from .env internally)
         overview_agent = OverviewAgent()
-        print("✅ Overview Agent initialized")
+        print(" Overview Agent initialized")
         
         assessment_agent = AssessmentAgent()
-        print("✅ Assessment Agent initialized")
+        print(" Assessment Agent initialized")
         
         rootcause_agent = RootCauseAgent()
-        print("✅ Root Cause Agent initialized (DeepSeek V3 + Claude 3.5 Sonnet)")
+        print(" Root Cause Agent initialized (DeepSeek V3 + Claude 3.5 Sonnet)")
         
         actionplan_agent = ActionPlanAgent()
-        print("✅ Action Plan Agent initialized")
+        print(" Action Plan Agent initialized")
         
         pdf_agent = PDFReportAgent()
-        print("✅ PDF Report Agent initialized")
+        print(" PDF Report Agent initialized")
         
-        print("🎉 All agents ready!")
-        print(f"🔑 Using API Key: {api_key[:20]}...{api_key[-10:]}")
+        print(" All agents ready!")
+        print(f" Using API Key: {api_key[:20]}...{api_key[-10:]}")
     except Exception as e:
-        print(f"❌ Error initializing agents: {e}")
+        print(f" Error initializing agents: {e}")
         import traceback
         traceback.print_exc()
         # Don't crash - let healthcheck show the error
@@ -311,7 +311,7 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
     except Exception as e:
         import traceback
         error_details = f"{str(e)}\n\nTraceback:\n{traceback.format_exc()}"
-        print(f"❌ Part 3 ERROR: {error_details}")
+        print(f" Part 3 ERROR: {error_details}")
         raise HTTPException(status_code=500, detail=error_details)
 
 @app.post("/api/v1/incidents/{incident_id}/actionplan")
