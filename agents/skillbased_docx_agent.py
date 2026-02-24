@@ -77,7 +77,7 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
 {
   "cover": {
     "title": "KÖK NEDEN ANALİZİ RAPORU",
-    "subtitle": "HSG245 Metodolojisi ile Hazırlanmıştır",
+    "subtitle": "-----------",
     "ref_no": "...",
     "date": "...",
     "location": "...",
@@ -86,22 +86,18 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
     "incident_summary_short": "2-3 cümle olay özeti"
   },
   "executive_summary": {
-    "what_happened": "Ne oldu - 2 paragraf detaylı",
-    "where_happened": "Nerede oldu - yer ve koşullar",
-    "who_affected": "Kimler etkilendi - kişi/ekipman/çevre detayı",
-    "immediate_response": "İlk müdahale nasıl yapıldı - 2 paragraf",
+    "what_happened": "Ne oldu - 2 paragraf detaylı (Yönetici özeti için kısa ve öz olmalı, Olay Detayları'nda zaten uzun versiyon var)",
+    "where_happened": "Nerede oldu - kısa ve öz (Olay Detayları'nda detaylı versiyon var)",
+    "who_affected": "Kimler etkilendi - özet (Detay Olay Bilgileri'nde zaten var)",
+    "immediate_response": "İlk müdahale nasıl yapıldı - 1-2 cümle özet (Detay zaman çizelgesinde var)",
     "key_findings": [
-      "Temel Bulgu 1 - detaylı açıklama",
-      "Temel Bulgu 2 - detaylı açıklama",
-      "Temel Bulgu 3 - detaylı açıklama",
-      "Temel Bulgu 4 - detaylı açıklama",
-      "Temel Bulgu 5 - detaylı açıklama"
+      "Temel Bulgu 1 - kısa madde halinde",
+      "Temel Bulgu 2 - kısa madde halinde",
+      "Temel Bulgu 3 - kısa madde halinde"
     ],
     "immediate_actions": [
       {"action": "Acil eylem 1", "responsible": "Sorumlu", "status": "Tamamlandı"},
-      {"action": "Acil eylem 2", "responsible": "Sorumlu", "status": "Devam ediyor"},
-      {"action": "Acil eylem 3", "responsible": "Sorumlu", "status": "Planlandı"},
-      {"action": "Acil eylem 4", "responsible": "Sorumlu", "status": "Tamamlandı"}
+      {"action": "Acil eylem 2", "responsible": "Sorumlu", "status": "Devam ediyor"}
     ]
   },
   "incident_details": {
@@ -145,7 +141,7 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
     }
   },
   "analysis_method": {
-    "hsg245_description": "HSG245 metodolojisi nedir ve bu olayda nasıl uygulandı - 3 paragraf",
+    "methodology_description": "Kök neden analizi metodolojisi nedir ve bu olayda nasıl uygulandı - 3 paragraf",
     "five_why_explanation": "5-Why tekniği nasıl uygulandı - 2 paragraf",
     "code_system": [
       {"code": "A", "category": "İnsan Faktörü", "description": "Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk gibi bireysel faktörler"},
@@ -164,8 +160,8 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
   "branches": [
     {
       "branch_number": 1,
-      "branch_title": "DAL 1 - KOŞULSAL NEDEN",
-      "initial_condition": "Bu dalın başlangıç koşulu ve doğrudan neden açıklaması - 2 paragraf detaylı",
+      "branch_title": "KRİTİK FAKTÖR 1 - Ana Başlık",
+      "initial_condition": "Bu kritik faktörün başlangıç koşulu ve doğrudan neden açıklaması - 2 paragraf detaylı",
       "direct_cause": "Doğrudan nedenin teknik açıklaması",
       "why_chain": [
         {"number": 1, "question": "Neden oldu?", "answer": "Çünkü detaylı yanıt", "code": "C", "category": "İş/Görev"},
@@ -403,6 +399,81 @@ def _add_page_break(doc):
     doc.add_page_break()
 
 
+def _add_page_numbers(doc):
+    """Sayfa numaralarını ekle (footer'a)"""
+    section = doc.sections[0]
+    footer = section.footer
+    footer.is_linked_to_previous = False
+    
+    # Footer'ı temizle
+    for paragraph in footer.paragraphs:
+        paragraph.clear()
+    
+    # Yeni paragraph ekle ve sayfa numarasını ortala
+    p = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    
+    # Sayfa numarası field ekle
+    run = p.add_run()
+    fldChar1 = OxmlElement('w:fldChar')
+    fldChar1.set(qn('w:fldCharType'), 'begin')
+    
+    instrText = OxmlElement('w:instrText')
+    instrText.set(qn('xml:space'), 'preserve')
+    instrText.text = "PAGE"
+    
+    fldChar2 = OxmlElement('w:fldChar')
+    fldChar2.set(qn('w:fldCharType'), 'end')
+    
+    run._r.append(fldChar1)
+    run._r.append(instrText)
+    run._r.append(fldChar2)
+    
+    run.font.size = Pt(10)
+    run.font.color.rgb = COLOR["dark_grey"]
+
+
+def _build_table_of_contents(doc):
+    """İçindekiler sayfası oluştur"""
+    _add_section_header(doc, "", "İÇİNDEKİLER")
+    doc.add_paragraph()
+    
+    # İçindekiler listesi
+    toc_items = [
+        ("1", "YÖNETİCİ ÖZETİ"),
+        ("2", "OLAY BİLGİLERİ"),
+        ("   2.1", "Genel Bilgiler"),
+        ("   2.2", "Zaman Çizelgesi"),
+        ("   2.3", "Önem Derecesi"),
+        ("3", "ANALİZ YÖNTEMİ"),
+        ("   3.4", "Analiz Ekibi"),
+        ("4-N", "KRİTİK FAKTÖRLER (5-Why Zincirleri)"),
+        ("6", "KATKIDA BULUNAN FAKTÖRLER"),
+        ("7", "DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER"),
+        ("8", "ÇIKARILAN DERSLER"),
+        ("9", "SONUÇ VE ÖNERİLER"),
+        ("10", "ONAY VE İMZA SAYFASI"),
+    ]
+    
+    for num, title in toc_items:
+        p = doc.add_paragraph()
+        p.paragraph_format.left_indent = Inches(0.3) if num.startswith("   ") else Inches(0)
+        p.paragraph_format.space_after = Pt(6)
+        
+        # Numara
+        run = p.add_run(f"{num.strip()}.  ")
+        run.bold = True
+        run.font.size = Pt(11)
+        run.font.color.rgb = COLOR["dark_blue"]
+        
+        # Başlık
+        run = p.add_run(title)
+        run.font.size = Pt(11)
+        run.font.color.rgb = COLOR["dark_grey"]
+    
+    _add_page_break(doc)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # RAPOR BÖLÜM FONKSİYONLARI
 # ─────────────────────────────────────────────────────────────────────────────
@@ -417,12 +488,7 @@ def _build_cover(doc, cover: dict):
     run.font.size = Pt(26)
     run.font.color.rgb = COLOR["dark_blue"]
     doc.add_paragraph()
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p.add_run(cover.get("subtitle", "HSG245 Metodolojisi ile Hazırlanmıştır"))
-    run.font.size = Pt(14)
-    run.font.color.rgb = COLOR["mid_blue"]
-    run.italic = True
+    # Subtitle removed - HSG245 box no longer displayed
     doc.add_paragraph()
     # Gizlilik banner
     table = doc.add_table(rows=1, cols=1)
@@ -549,38 +615,41 @@ def _build_incident_details(doc, details: dict):
 
 
 def _build_analysis_method(doc, method: dict):
-    _add_section_header(doc, "3", "ANALİZ YÖNTEMİ - HSG245 / 5 WHY")
-    _add_subsection_header(doc, "3.1 HSG245 Metodolojisi")
-    _add_paragraph(doc, method.get("hsg245_description", ""), space_after=8)
-    _add_subsection_header(doc, "3.2 5-Why Tekniği")
-    _add_paragraph(doc, method.get("five_why_explanation", ""), space_after=8)
-    _add_subsection_header(doc, "3.3 Kod Sistemi")
-    codes = method.get("code_system", [])
-    if codes:
-        table = doc.add_table(rows=len(codes) + 1, cols=3)
-        table.style = 'Table Grid'
-        for j, h in enumerate(["Kod", "Kategori", "Açıklama"]):
-            c = table.rows[0].cells[j]
-            _set_cell_bg(c, COLOR["dark_blue"])
-            _set_cell_margins(c)
-            run = c.paragraphs[0].add_run(h)
-            run.bold = True
-            run.font.size = Pt(10)
-            run.font.color.rgb = COLOR["white"]
-        for i, code in enumerate(codes):
-            row = table.rows[i + 1]
-            bg = COLOR["light_grey"] if i % 2 == 0 else COLOR["white"]
-            vals = [code.get("code",""), code.get("category",""), code.get("description","")]
-            for j, val in enumerate(vals):
-                c = row.cells[j]
-                _set_cell_bg(c, bg)
-                _set_cell_margins(c)
-                run = c.paragraphs[0].add_run(str(val))
-                run.bold = (j == 0)
-                run.font.size = Pt(10)
-                run.font.color.rgb = COLOR["dark_blue"] if j == 0 else COLOR["dark_grey"]
-    doc.add_paragraph()
-    _add_subsection_header(doc, "3.4 Analiz Ekibi")
+    _add_section_header(doc, "3", "ANALİZ YÖNTEMİ")
+    
+    # 3.1, 3.2, 3.3 sections hidden from user view (working in background)
+    # _add_subsection_header(doc, "3.1 Metodoloji")
+    # _add_paragraph(doc, method.get("methodology_description", ""), space_after=8)
+    # _add_subsection_header(doc, "3.2 5-Why Tekniği")
+    # _add_paragraph(doc, method.get("five_why_explanation", ""), space_after=8)
+    # _add_subsection_header(doc, "3.3 Kod Sistemi")
+    # codes = method.get("code_system", [])
+    # if codes:
+    #     table = doc.add_table(rows=len(codes) + 1, cols=3)
+    #     table.style = 'Table Grid'
+    #     for j, h in enumerate(["Kod", "Kategori", "Açıklama"]):
+    #         c = table.rows[0].cells[j]
+    #         _set_cell_bg(c, COLOR["dark_blue"])
+    #         _set_cell_margins(c)
+    #         run = c.paragraphs[0].add_run(h)
+    #         run.bold = True
+    #         run.font.size = Pt(10)
+    #         run.font.color.rgb = COLOR["white"]
+    #     for i, code in enumerate(codes):
+    #         row = table.rows[i + 1]
+    #         bg = COLOR["light_grey"] if i % 2 == 0 else COLOR["white"]
+    #         vals = [code.get("code",""), code.get("category",""), code.get("description","")]
+    #         for j, val in enumerate(vals):
+    #             c = row.cells[j]
+    #             _set_cell_bg(c, bg)
+    #             _set_cell_margins(c)
+    #             run = c.paragraphs[0].add_run(str(val))
+    #             run.bold = (j == 0)
+    #             run.font.size = Pt(10)
+    #             run.font.color.rgb = COLOR["dark_blue"] if j == 0 else COLOR["dark_grey"]
+    # doc.add_paragraph()
+    
+    _add_subsection_header(doc, "3.1 Analiz Ekibi")  # Changed from 3.4 to 3.1
     members = method.get("team_members", [])
     if members:
         table = doc.add_table(rows=len(members) + 1, cols=3)
@@ -617,7 +686,7 @@ def _build_branches(doc, branches: list):
         _set_cell_bg(cell, color)
         _set_cell_margins(cell, 120, 120, 160, 160)
         p = cell.paragraphs[0]
-        run = p.add_run(branch.get("branch_title", f"DAL {bn}"))
+        run = p.add_run(branch.get("branch_title", f"KRİTİK FAKTÖR {bn}"))
         run.bold = True
         run.font.size = Pt(13)
         run.font.color.rgb = COLOR["white"]
@@ -663,37 +732,38 @@ def _build_branches(doc, branches: list):
         _add_page_break(doc)
 
 
-def _build_root_causes(doc, root_causes: list):
-    _add_section_header(doc, "6", "NİHAİ KÖK NEDENLER")
-    for i, rc in enumerate(root_causes):
-        color = ROOT_CAUSE_COLORS[i % len(ROOT_CAUSE_COLORS)]
-        table = doc.add_table(rows=1, cols=1)
-        table.style = 'Table Grid'
-        cell = table.cell(0, 0)
-        _set_cell_bg(cell, color)
-        _set_cell_margins(cell, 120, 120, 160, 160)
-        p = cell.paragraphs[0]
-        run = p.add_run(f"KOK NEDEN {i+1}: {rc.get('title','')}")
-        run.bold = True
-        run.font.size = Pt(12)
-        run.font.color.rgb = COLOR["white"]
-        doc.add_paragraph()
-        _add_info_table(doc, {
-            "Kod": rc.get("code",""),
-            "Kategori": rc.get("category",""),
-            "İlgili Birimler": rc.get("contributing_organizations",""),
-        })
-        _add_paragraph(doc, rc.get("detailed_description",""), space_after=8)
-        impacts = rc.get("impacts", [])
-        if impacts:
-            _add_subsection_header(doc, "Bu Nedenden Kaynaklanan Etkiler:")
-            _add_bullet_list(doc, impacts, color)
-        doc.add_paragraph()
-    _add_page_break(doc)
+# Section 6 removed - root causes already detailed in Critical Factor sections
+# def _build_root_causes(doc, root_causes: list):
+#     _add_section_header(doc, "6", "NİHAİ KÖK NEDENLER")
+#     for i, rc in enumerate(root_causes):
+#         color = ROOT_CAUSE_COLORS[i % len(ROOT_CAUSE_COLORS)]
+#         table = doc.add_table(rows=1, cols=1)
+#         table.style = 'Table Grid'
+#         cell = table.cell(0, 0)
+#         _set_cell_bg(cell, color)
+#         _set_cell_margins(cell, 120, 120, 160, 160)
+#         p = cell.paragraphs[0]
+#         run = p.add_run(f"KOK NEDEN {i+1}: {rc.get('title','')}")
+#         run.bold = True
+#         run.font.size = Pt(12)
+#         run.font.color.rgb = COLOR["white"]
+#         doc.add_paragraph()
+#         _add_info_table(doc, {
+#             "Kod": rc.get("code",""),
+#             "Kategori": rc.get("category",""),
+#             "İlgili Birimler": rc.get("contributing_organizations",""),
+#         })
+#         _add_paragraph(doc, rc.get("detailed_description",""), space_after=8)
+#         impacts = rc.get("impacts", [])
+#         if impacts:
+#             _add_subsection_header(doc, "Bu Nedenden Kaynaklanan Etkiler:")
+#             _add_bullet_list(doc, impacts, color)
+#         doc.add_paragraph()
+#     _add_page_break(doc)
 
 
 def _build_contributing_factors(doc, factors: list):
-    _add_section_header(doc, "7", "KATKIDA BULUNAN FAKTÖRLER")
+    _add_section_header(doc, "6", "KATKIDA BULUNAN FAKTÖRLER")
     doc.add_paragraph()
     priority_colors = {"Yüksek": COLOR["red"], "Orta": COLOR["orange"], "Düşük": COLOR["green"]}
     if factors:
@@ -728,7 +798,7 @@ def _build_contributing_factors(doc, factors: list):
 
 
 def _build_corrective_actions(doc, actions: list):
-    _add_section_header(doc, "8", "DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER")
+    _add_section_header(doc, "7", "DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER")
     doc.add_paragraph()
     priority_colors = {
         "ACİL": COLOR["red"], "YÜKSEK": COLOR["orange"],
@@ -768,7 +838,7 @@ def _build_corrective_actions(doc, actions: list):
 
 
 def _build_lessons_learned(doc, lessons: dict):
-    _add_section_header(doc, "9", "CIKARILAN DERSLER")
+    _add_section_header(doc, "8", "CIKARILAN DERSLER")
     doc.add_paragraph()
     sections = [
         ("NE YAPILMALI", lessons.get("what_to_do", []), COLOR["green"]),
@@ -783,16 +853,16 @@ def _build_lessons_learned(doc, lessons: dict):
 
 
 def _build_conclusion(doc, conclusion: dict):
-    _add_section_header(doc, "10", "SONUC VE ONERILER")
-    _add_subsection_header(doc, "10.1 Genel Değerlendirme")
+    _add_section_header(doc, "9", "SONUC VE ONERILER")
+    _add_subsection_header(doc, "9.1 Genel Değerlendirme")
     _add_paragraph(doc, conclusion.get("overall_assessment",""), space_after=8)
-    _add_subsection_header(doc, "10.2 Kısa Vadeli Önlemler (1-2 Ay)")
+    _add_subsection_header(doc, "9.2 Kısa Vadeli Önlemler (1-2 Ay)")
     _add_bullet_list(doc, conclusion.get("short_term_measures",[]))
     doc.add_paragraph()
-    _add_subsection_header(doc, "10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)")
+    _add_subsection_header(doc, "9.3 Uzun Vadeli İyileştirmeler (3-12 Ay)")
     _add_bullet_list(doc, conclusion.get("long_term_improvements",[]))
     doc.add_paragraph()
-    _add_subsection_header(doc, "10.4 Mevcut vs Hedef Karşılaştırması")
+    _add_subsection_header(doc, "9.4 Mevcut vs Hedef Karşılaştırması")
     comparison = conclusion.get("comparison_table", [])
     if comparison:
         table = doc.add_table(rows=len(comparison) + 1, cols=3)
@@ -829,7 +899,7 @@ def _build_conclusion(doc, conclusion: dict):
 
 
 def _build_signature_page(doc):
-    _add_section_header(doc, "11", "ONAY VE IMZA SAYFASI")
+    _add_section_header(doc, "10", "ONAY VE IMZA SAYFASI")
     doc.add_paragraph()
     roles = [
         ("HAZIRLAYAN", "HSE Uzmanı", "HSE Kök Neden Analisti"),
@@ -955,7 +1025,7 @@ class SkillBasedDocxAgent:
 
     def _generate_content_with_claude(self, raw_data: Dict) -> Dict:
         user_msg = (
-            "Aşağıdaki HSG245 kök neden analizi ham verisini kullanarak "
+            "Aşağıdaki kök neden analizi ham verisini kullanarak "
             "profesyonel HSE raporu içeriğini üret.\n\n"
             "Ham Veri:\n```json\n"
             + json.dumps(raw_data, ensure_ascii=False, indent=2)
@@ -1056,16 +1126,26 @@ class SkillBasedDocxAgent:
         section.top_margin = Cm(2.54)
         section.bottom_margin = Cm(2.54)
 
+        # Sayfa numaralarını ekle
+        _add_page_numbers(doc)
+
+        # 1. Kapak Sayfası
         _build_cover(doc, content.get("cover", {}))
+        
+        # 2. İçindekiler Sayfası
+        _build_table_of_contents(doc)
+        
+        # 3. Rapor içeriği
         _build_executive_summary(doc, content.get("executive_summary", {}), content.get("root_causes", []))
         _build_incident_details(doc, content.get("incident_details", {}))
         _build_analysis_method(doc, content.get("analysis_method", {}))
         branches = content.get("branches", [])
         if branches:
             _build_branches(doc, branches)
-        root_causes = content.get("root_causes", [])
-        if root_causes:
-            _build_root_causes(doc, root_causes)
+        # Section 6 removed - root causes already in Critical Factor sections
+        # root_causes = content.get("root_causes", [])
+        # if root_causes:
+        #     _build_root_causes(doc, root_causes)
         _build_contributing_factors(doc, content.get("contributing_factors", []))
         _build_corrective_actions(doc, content.get("corrective_actions", []))
         _build_lessons_learned(doc, content.get("lessons_learned", {}))
@@ -1716,8 +1796,7 @@ class SkillBasedDocxAgent:
             <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
             <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
             <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
-            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
-            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 Kritik Faktörler</a></li>
             <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
             <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
             <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
@@ -1752,7 +1831,6 @@ class SkillBasedDocxAgent:
         <!-- KAPAK SAYFASI -->
         <div class="cover" id="cover">
             <h1 contenteditable="true">{cover.get('title', 'KÖK NEDEN ANALİZİ RAPORU')}</h1>
-            <div class="subtitle" contenteditable="true">{cover.get('subtitle', 'HSG245 Metodolojisi ile Hazırlanmıştır')}</div>
             
             <div class="confidential-banner" contenteditable="true">
                 {cover.get('confidentiality', 'GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR')}
@@ -1799,8 +1877,9 @@ class SkillBasedDocxAgent:
         # 4-N. DALLAR
         html += self._html_branches(branches)
         
+        # Section 6 removed - root causes already in Critical Factor sections
         # N+1. KÖK NEDENLER
-        html += self._html_root_causes(root_causes)
+        # html += self._html_root_causes(root_causes)
         
         # N+2. KATKIDA BULUNAN FAKTÖRLER
         html += self._html_contributing_factors(contributing_factors)
@@ -2175,10 +2254,10 @@ class SkillBasedDocxAgent:
         """Analiz yöntemi HTML."""
         html = f"""
         <div class="section" id="analysis-method">
-            <div class="section-header">3. ANALİZ YÖNTEMİ - HSG245 / 5 WHY</div>
+            <div class="section-header">3. ANALİZ YÖNTEMİ</div>
             
-            <div class="subsection-header">3.1 HSG245 Metodolojisi</div>
-            <div class="paragraph" contenteditable="true">{method.get('hsg245_description', '')}</div>
+            <div class="subsection-header">3.1 Metodoloji</div>
+            <div class="paragraph" contenteditable="true">{method.get('methodology_description', '')}</div>
             
             <div class="subsection-header">3.2 5-Why Tekniği</div>
             <div class="paragraph" contenteditable="true">{method.get('five_why_explanation', '')}</div>
@@ -2246,7 +2325,7 @@ class SkillBasedDocxAgent:
             bn = branch.get("branch_number", 1)
             html += f"""
             <div class="subsection">
-            <div class="section-header">{3+bn}. {branch.get('branch_title', f'DAL {bn}')}</div>
+            <div class="section-header">{3+bn}. {branch.get('branch_title', f'KRİTİK FAKTÖR {bn}')}</div>
             
             <div class="subsection-header">{3+bn}.1 Başlangıç Durumu ve Doğrudan Neden</div>
             <div class="paragraph" contenteditable="true">{branch.get('initial_condition', '')}</div>
@@ -2302,58 +2381,59 @@ class SkillBasedDocxAgent:
         
         return html
 
-    def _html_root_causes(self, root_causes: List[Dict]) -> str:
-        """Nihai kök nedenler HTML."""
-        html = """
-        <div class="section" id="root-causes">
-            <div class="section-header">6. NİHAİ KÖK NEDENLER</div>
-"""
-        
-        for i, rc in enumerate(root_causes):
-            html += f"""
-            <div class="root-cause-box root-cause-{i+1}">
-                <div class="root-cause-header" contenteditable="true">KÖK NEDEN {i+1}: {rc.get('title', '')}</div>
-                <div class="root-cause-content">
-                    <table style="margin-bottom: 20px;">
-                        <tr>
-                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
-                            <td contenteditable="true">{rc.get('code', '')}</td>
-                        </tr>
-                        <tr>
-                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
-                            <td contenteditable="true">{rc.get('category', '')}</td>
-                        </tr>
-                        <tr>
-                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
-                            <td contenteditable="true">{rc.get('contributing_organizations', '')}</td>
-                        </tr>
-                    </table>
-                    
-                    <div class="paragraph" contenteditable="true">{rc.get('detailed_description', '')}</div>
-                    
-                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
-                    <ul class="bullet-list">
-"""
-            
-            for impact in rc.get("impacts", []):
-                html += f'<li contenteditable="true">{impact}</li>\n'
-            
-            html += """
-                    </ul>
-                </div>
-            </div>
-"""
-        
-        html += """
-        </div>
-"""
-        return html
+    # Section 6 removed - root causes already detailed in Critical Factor sections
+    # def _html_root_causes(self, root_causes: List[Dict]) -> str:
+    #     """Nihai kök nedenler HTML."""
+    #     html = """
+    #     <div class="section" id="root-causes">
+    #         <div class="section-header">6. NİHAİ KÖK NEDENLER</div>
+    # """
+    #     
+    #     for i, rc in enumerate(root_causes):
+    #         html += f"""
+    #         <div class="root-cause-box root-cause-{i+1}">
+    #             <div class="root-cause-header" contenteditable="true">KÖK NEDEN {i+1}: {rc.get('title', '')}</div>
+    #             <div class="root-cause-content">
+    #                 <table style="margin-bottom: 20px;">
+    #                     <tr>
+    #                         <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+    #                         <td contenteditable="true">{rc.get('code', '')}</td>
+    #                     </tr>
+    #                     <tr>
+    #                         <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+    #                         <td contenteditable="true">{rc.get('category', '')}</td>
+    #                     </tr>
+    #                     <tr>
+    #                         <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+    #                         <td contenteditable="true">{rc.get('contributing_organizations', '')}</td>
+    #                     </tr>
+    #                 </table>
+    #                 
+    #                 <div class="paragraph" contenteditable="true">{rc.get('detailed_description', '')}</div>
+    #                 
+    #                 <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+    #                 <ul class="bullet-list">
+    # """
+    #         
+    #         for impact in rc.get("impacts", []):
+    #             html += f'<li contenteditable="true">{impact}</li>\n'
+    #         
+    #         html += """
+    #                 </ul>
+    #             </div>
+    #         </div>
+    # """
+    #     
+    #     html += """
+    #     </div>
+    # """
+    #     return html
 
     def _html_contributing_factors(self, factors: List[Dict]) -> str:
         """Katkıda bulunan faktörler HTML."""
         html = """
         <div class="section" id="contributing-factors">
-            <div class="section-header">7. KATKIDA BULUNAN FAKTÖRLER</div>
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
             
             <table>
                 <thead>
@@ -2389,7 +2469,7 @@ class SkillBasedDocxAgent:
         """Düzeltici faaliyetler HTML."""
         html = """
         <div class="section" id="corrective-actions">
-            <div class="section-header">8. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
             
             <table>
                 <thead>
@@ -2438,7 +2518,7 @@ class SkillBasedDocxAgent:
         
         html = """
         <div class="section" id="lessons-learned">
-            <div class="section-header">9. ÇIKARILAN DERSLER</div>
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
 """
         
         for title, items, color in sections:
@@ -2460,12 +2540,12 @@ class SkillBasedDocxAgent:
         """Sonuç ve öneriler HTML."""
         html = f"""
         <div class="section" id="conclusion">
-            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            <div class="section-header">9. SONUÇ VE ÖNERİLER</div>
             
-            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="subsection-header">9.1 Genel Değerlendirme</div>
             <div class="paragraph" contenteditable="true">{conclusion.get('overall_assessment', '')}</div>
             
-            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <div class="subsection-header">9.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
             <ul class="bullet-list">
 """
         
@@ -2475,7 +2555,7 @@ class SkillBasedDocxAgent:
         html += """
             </ul>
             
-            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <div class="subsection-header">9.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
             <ul class="bullet-list">
 """
         
@@ -2485,7 +2565,7 @@ class SkillBasedDocxAgent:
         html += """
             </ul>
             
-            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <div class="subsection-header">9.4 Mevcut vs Hedef Karşılaştırması</div>
             <table class="comparison-table">
                 <thead>
                     <tr>
@@ -2517,7 +2597,7 @@ class SkillBasedDocxAgent:
         """İmza sayfası HTML."""
         html = """
         <div class="section signature-section" id="signatures">
-            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            <div class="section-header">10. ONAY VE İMZA SAYFASI</div>
             
             <table class="signature-table">
                 <thead>
