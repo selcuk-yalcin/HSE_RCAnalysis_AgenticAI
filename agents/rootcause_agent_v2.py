@@ -194,8 +194,7 @@ BEKLENEN ÇIKTI (JSON):
 """
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-sonnet-4.5",  # actual model 
-            # model="deepseek/deepseek-r1-0528:free"  # test model 
+            model="anthropic/claude-sonnet-4.5",
             temperature=0.2,
             messages=[
                 {
@@ -310,8 +309,7 @@ DÖNDÜR (JSON):
 KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-opus-4.6",  # actual model 
-            # model="deepseek/deepseek-r1-0528:free"  # test model 
+            model="anthropic/claude-opus-4.6",
             temperature=0.3,
             messages=[
                 {
