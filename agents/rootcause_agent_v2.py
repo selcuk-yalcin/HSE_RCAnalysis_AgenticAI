@@ -203,14 +203,14 @@ BEKLENEN ÇIKTI (JSON):
                         {
                             "type": "text",
                             "text": "Sen HSG245 uzmanısın. Sadece JSON döndür, Türkçe içerik kullan.",
-                            "cache_control": {"type": "ephemeral"}  # Sistem promptu cache'le
+                            "cache_control": {"type": "ephemeral"}
                         }
                     ]
                 },
                 {"role": "user", "content": prompt}
             ],
             extra_headers={
-                "anthropic-version": "2023-06-01"  # Prompt caching için gerekli
+                "anthropic-version": "2023-06-01"
             }
         )
         
@@ -318,14 +318,14 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
                         {
                             "type": "text",
                             "text": "Sen 5-Why uzmanısın. Sadece JSON, Türkçe içerik.",
-                            "cache_control": {"type": "ephemeral"}  # Cache sistem promptu
+                            "cache_control": {"type": "ephemeral"}
                         }
                     ]
                 },
                 {"role": "user", "content": prompt}
             ],
             extra_headers={
-                "anthropic-version": "2023-06-01"  # Prompt caching için gerekli
+                "anthropic-version": "2023-06-01"
             }
         )
         
@@ -463,7 +463,7 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür."""
         return "\n".join(report)
     
     def _prepare_incident_summary(self, part1_data: Dict, part2_data: Dict, 
-                                 investigation_data: Dict = None) -> str:
+                                  investigation_data: Dict = None) -> str:
         """Olay özetini hazırla"""
         summary_parts = []
         
