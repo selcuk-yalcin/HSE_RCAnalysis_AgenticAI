@@ -804,36 +804,108 @@ def _build_corrective_actions(doc, actions: list):
         "ACİL": COLOR["red"], "YÜKSEK": COLOR["orange"],
         "ORTA": COLOR["green"], "DÜŞÜK": COLOR["mid_blue"],
     }
+    
     if actions:
-        table = doc.add_table(rows=len(actions) + 1, cols=6)
-        table.style = 'Table Grid'
-        for j, h in enumerate(["No", "Faaliyet", "Öncelik", "Sorumlu", "Süre", "KPI"]):
-            c = table.rows[0].cells[j]
-            _set_cell_bg(c, COLOR["dark_blue"])
-            _set_cell_margins(c)
-            run = c.paragraphs[0].add_run(h)
+        for i, act in enumerate(actions):
+            # Her faaliyet için 2 satırlı tablo oluştur
+            table = doc.add_table(rows=2, cols=4)
+            table.style = 'Table Grid'
+            
+            # === ÜST SATIR: NO + FAALİYET (birleşik hücreler) ===
+            # İlk hücre: NO (dar)
+            no_cell = table.rows[0].cells[0]
+            _set_cell_bg(no_cell, COLOR["dark_blue"])
+            _set_cell_margins(no_cell, 80, 80, 100, 100)
+            p = no_cell.paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = p.add_run("NO")
             run.bold = True
             run.font.size = Pt(10)
             run.font.color.rgb = COLOR["white"]
-        for i, act in enumerate(actions):
-            row = table.rows[i + 1]
-            bg = COLOR["light_grey"] if i % 2 == 0 else COLOR["white"]
-            priority = act.get("priority","ORTA")
-            vals = [str(act.get("no",i+1)), act.get("action",""), priority,
-                    act.get("responsible",""), act.get("deadline",""), act.get("kpi","")]
-            for j, val in enumerate(vals):
-                c = row.cells[j]
-                if j == 2:
-                    _set_cell_bg(c, priority_colors.get(priority, COLOR["light_grey"]))
-                    run = c.paragraphs[0].add_run(str(val))
+            
+            # Kalan 3 hücreyi birleştir: FAALİYET (geniş)
+            faaliyet_cell = table.rows[0].cells[1].merge(table.rows[0].cells[2]).merge(table.rows[0].cells[3])
+            _set_cell_bg(faaliyet_cell, COLOR["dark_blue"])
+            _set_cell_margins(faaliyet_cell, 80, 80, 100, 100)
+            p = faaliyet_cell.paragraphs[0]
+            run = p.add_run("FAALİYET")
+            run.bold = True
+            run.font.size = Pt(10)
+            run.font.color.rgb = COLOR["white"]
+            
+            # === ALT SATIR: ÖNCELİK | SORUMLU | SÜRE | KPI ===
+            # NO hücresi (numara)
+            no_val_cell = table.rows[1].cells[0]
+            _set_cell_bg(no_val_cell, COLOR["light_grey"])
+            _set_cell_margins(no_val_cell, 80, 80, 100, 100)
+            p = no_val_cell.paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = p.add_run(str(act.get("no", i+1)))
+            run.bold = True
+            run.font.size = Pt(11)
+            run.font.color.rgb = COLOR["dark_blue"]
+            
+            # Faaliyet açıklaması (3 hücreyi birleştir - geniş alan)
+            action_cell = table.rows[1].cells[1].merge(table.rows[1].cells[2]).merge(table.rows[1].cells[3])
+            _set_cell_bg(action_cell, COLOR["white"])
+            _set_cell_margins(action_cell, 120, 120, 150, 150)
+            p = action_cell.paragraphs[0]
+            run = p.add_run(act.get("action", ""))
+            run.font.size = Pt(10)
+            run.font.color.rgb = COLOR["dark_grey"]
+            
+            # Boşluk ekle
+            doc.add_paragraph()
+            
+            # === İKİNCİ TABLO: ÖNCELİK | SORUMLU | SÜRE | KPI ===
+            detail_table = doc.add_table(rows=2, cols=4)
+            detail_table.style = 'Table Grid'
+            
+            # Header satırı
+            headers = ["ÖNCELİK", "SORUMLU", "SÜRE", "KPI"]
+            for j, header in enumerate(headers):
+                cell = detail_table.rows[0].cells[j]
+                _set_cell_bg(cell, COLOR["mid_blue"])
+                _set_cell_margins(cell, 60, 60, 80, 80)
+                p = cell.paragraphs[0]
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                run = p.add_run(header)
+                run.bold = True
+                run.font.size = Pt(9)
+                run.font.color.rgb = COLOR["white"]
+            
+            # Değer satırı
+            priority = act.get("priority", "ORTA")
+            values = [
+                priority,
+                act.get("responsible", ""),
+                act.get("deadline", ""),
+                act.get("kpi", "")
+            ]
+            
+            for j, val in enumerate(values):
+                cell = detail_table.rows[1].cells[j]
+                _set_cell_margins(cell, 60, 60, 80, 80)
+                
+                if j == 0:  # Öncelik - renkli
+                    _set_cell_bg(cell, priority_colors.get(priority, COLOR["light_grey"]))
+                    p = cell.paragraphs[0]
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    run = p.add_run(str(val))
                     run.font.color.rgb = COLOR["white"]
                     run.bold = True
-                else:
-                    _set_cell_bg(c, bg)
-                    run = c.paragraphs[0].add_run(str(val))
+                    run.font.size = Pt(10)
+                else:  # Diğerleri - normal
+                    _set_cell_bg(cell, COLOR["light_grey"])
+                    p = cell.paragraphs[0]
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    run = p.add_run(str(val))
                     run.font.color.rgb = COLOR["dark_grey"]
-                _set_cell_margins(c)
-                run.font.size = Pt(9)
+                    run.font.size = Pt(9)
+            
+            # Faaliyetler arası boşluk
+            doc.add_paragraph()
+    
     _add_page_break(doc)
 
 
@@ -2466,43 +2538,67 @@ class SkillBasedDocxAgent:
         return html
 
     def _html_corrective_actions(self, actions: List[Dict]) -> str:
-        """Düzeltici faaliyetler HTML."""
+        """Düzeltici faaliyetler HTML - Her faaliyet için 2 tablo (NO+FAALİYET, sonra detaylar)"""
         html = """
         <div class="section" id="corrective-actions">
             <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">No</th>
-                        <th style="width: 35%;">Faaliyet</th>
-                        <th style="width: 10%;">Öncelik</th>
-                        <th style="width: 15%;">Sorumlu</th>
-                        <th style="width: 10%;">Süre</th>
-                        <th style="width: 25%;">KPI</th>
-                    </tr>
-                </thead>
-                <tbody>
 """
         
         for act in actions:
             priority = act.get("priority", "ORTA")
-            priority_class = "priority-urgent" if priority == "ACİL" else ("priority-high" if priority == "YÜKSEK" else ("priority-medium" if priority == "ORTA" else "priority-low"))
+            priority_colors = {
+                "ACİL": "#C0392B",
+                "YÜKSEK": "#E67E22", 
+                "ORTA": "#27AE60",
+                "DÜŞÜK": "#2E6DA4"
+            }
+            priority_color = priority_colors.get(priority, "#95A5A6")
             
             html += f"""
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
                     <tr>
-                        <td>{act.get('no', '')}</td>
-                        <td contenteditable="true">{act.get('action', '')}</td>
-                        <td><span class="{priority_class}">{priority}</span></td>
-                        <td contenteditable="true">{act.get('responsible', '')}</td>
-                        <td contenteditable="true">{act.get('deadline', '')}</td>
-                        <td contenteditable="true">{act.get('kpi', '')}</td>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
                     </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            {act.get('no', '')}
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            {act.get('action', '')}
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: {priority_color}; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            {priority}
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            {act.get('responsible', '')}
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            {act.get('deadline', '')}
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            {act.get('kpi', '')}
+                        </td>
+                    </tr>
+                </table>
+            </div>
 """
         
         html += """
-                </tbody>
-            </table>
         </div>
 """
         return html
