@@ -1,0 +1,1135 @@
+# HSE RCA PDF Rapor Üretici - Tam Çalışır Kod
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+HSE Root Cause Analysis PDF Report Generator
+SKILL.md tabanlı profesyonel rapor üretici
+"""
+
+import json
+import os
+import sys
+from functools import partial
+
+# ReportLab imports
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import mm
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import (
+    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
+    HRFlowable, PageBreak, KeepTogether
+)
+from reportlab.pdfgen import canvas as pdfcanvas
+from reportlab.graphics.shapes import Drawing, Rect, String, Line
+from reportlab.graphics import renderPDF
+
+# ═══════════════════════════════════════════════════════════════
+# RENK PALETİ
+# ═══════════════════════════════════════════════════════════════
+
+class HSEColors:
+    primary_dark   = colors.HexColor("#1A2744")
+    primary_mid    = colors.HexColor("#2C4A8A")
+    primary_light  = colors.HexColor("#4A90D9")
+    accent_orange  = colors.HexColor("#E8631A")
+    accent_amber   = colors.HexColor("#F5A623")
+    success_green  = colors.HexColor("#2ECC71")
+    warning_yellow = colors.HexColor("#F39C12")
+    danger_red     = colors.HexColor("#E74C3C")
+    medium_orange  = colors.HexColor("#E67E22")
+    bg_light       = colors.HexColor("#F8F9FA")
+    bg_gray        = colors.HexColor("#ECF0F1")
+    text_dark      = colors.HexColor("#2C3E50")
+    text_medium    = colors.HexColor("#5D6D7E")
+    border_light   = colors.HexColor("#BDC3C7")
+    white          = colors.white
+    black          = colors.black
+
+SEVERITY_COLORS = {
+    "CRITICAL":    HSEColors.danger_red,
+    "HIGH":        HSEColors.accent_orange,
+    "MEDIUM":      HSEColors.medium_orange,
+    "LOW":         HSEColors.success_green,
+    "IN_PROGRESS": HSEColors.warning_yellow,
+    "COMPLETED":   HSEColors.success_green,
+    "PLANNED":     HSEColors.primary_light,
+}
+
+CONFIDENCE_COLORS = {
+    "HIGH":   HSEColors.success_green,
+    "MEDIUM": HSEColors.warning_yellow,
+    "LOW":    HSEColors.danger_red,
+}
+
+# ═══════════════════════════════════════════════════════════════
+# SAYFA SABİTLERİ
+# ═══════════════════════════════════════════════════════════════
+
+PAGE_WIDTH, PAGE_HEIGHT = A4
+MARGIN = 40
+CONTENT_WIDTH = PAGE_WIDTH - 2 * MARGIN
+
+# ═══════════════════════════════════════════════════════════════
+# JSON DOĞRULAMA
+# ═══════════════════════════════════════════════════════════════
+
+def validate_rca_json(data):
+    """Gelen JSON'u doğrula ve eksik alanları kontrol et"""
+    required_fields = ["incident_title", "five_whys", "root_cause", "corrective_actions"]
+    missing = [f for f in required_fields if f not in data]
+    if missing:
+        raise ValueError(f"Eksik zorunlu alanlar: {missing}")
+
+    why_count = len(data.get("five_whys", []))
+    if why_count < 3:
+        print(f"UYARI: Yalnizca {why_count} Why adimi var (ideal: 5, minimum: 3)")
+    elif why_count > 7:
+        print(f"UYARI: {why_count} Why adimi var (ideal: 5, maksimum: 7)")
+
+    if not data.get("risk_assessment"):
+        print("UYARI: risk_assessment alani eksik - Risk bolumu 'Veri Yetersiz' olarak isaretlenecek")
+
+    return True
+
+# ═══════════════════════════════════════════════════════════════
+# METİN YARDIMCI FONKSİYONLARI
+# ═══════════════════════════════════════════════════════════════
+
+def safe_text(text, max_len=None):
+    """Metni güvenli hale getir - None kontrolü ve uzunluk sınırı"""
+    if text is None:
+        return ""
+    text = str(text)
+    if max_len and len(text) > max_len:
+        return text[:max_len - 3] + "..."
+    return text
+
+def truncate(text, max_len=90):
+    """Metni belirtilen uzunlukta kes"""
+    text = safe_text(text)
+    if len(text) > max_len:
+        return text[:max_len - 3] + "..."
+    return text
+
+# ═══════════════════════════════════════════════════════════════
+# HEADER / FOOTER
+# ═══════════════════════════════════════════════════════════════
+
+def add_page_header(canvas, doc, data):
+    """Her sayfaya kurumsal header ve footer ekle"""
+    canvas.saveState()
+
+    # ── Üst header bar (lacivert) ──────────────────────────────
+    canvas.setFillColor(HSEColors.primary_dark)
+    canvas.rect(0, PAGE_HEIGHT - 58, PAGE_WIDTH, 58, fill=1, stroke=0)
+
+    # HSE logosu / başlık (sol)
+    canvas.setFillColor(HSEColors.white)
+    canvas.setFont("Helvetica-Bold", 18)
+    canvas.drawString(MARGIN, PAGE_HEIGHT - 32, "HSE")
+
+    canvas.setFillColor(HSEColors.primary_light)
+    canvas.setFont("Helvetica-Bold", 9)
+    canvas.drawString(MARGIN + 42, PAGE_HEIGHT - 26, "ROOT CAUSE ANALYSIS REPORT")
+
+    canvas.setFillColor(HSEColors.bg_gray)
+    canvas.setFont("Helvetica", 8)
+    canvas.drawString(MARGIN + 42, PAGE_HEIGHT - 38, safe_text(data.get("incident_type", "HSE Investigation")))
+
+    # Olay ID ve tarih (sağ)
+    canvas.setFillColor(HSEColors.accent_amber)
+    canvas.setFont("Helvetica-Bold", 11)
+    canvas.drawRightString(PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 26,
+                           f"#{safe_text(data.get('incident_id', 'N/A'))}")
+    canvas.setFillColor(HSEColors.bg_gray)
+    canvas.setFont("Helvetica", 8)
+    canvas.drawRightString(PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 40,
+                           safe_text(data.get("incident_date", "")))
+
+    # Turuncu alt şerit
+    canvas.setFillColor(HSEColors.accent_orange)
+    canvas.rect(0, PAGE_HEIGHT - 61, PAGE_WIDTH, 3, fill=1, stroke=0)
+
+    # ── Alt footer ─────────────────────────────────────────────
+    canvas.setFillColor(HSEColors.bg_gray)
+    canvas.rect(0, 0, PAGE_WIDTH, 28, fill=1, stroke=0)
+
+    canvas.setFillColor(HSEColors.primary_dark)
+    canvas.rect(0, 27, PAGE_WIDTH, 1, fill=1, stroke=0)
+
+    canvas.setFillColor(HSEColors.text_medium)
+    canvas.setFont("Helvetica", 7)
+    canvas.drawString(MARGIN, 10, "GIZLI — Yalnizca Ic Kullanim Icin | HSE Root Cause Analysis")
+    canvas.drawRightString(PAGE_WIDTH - MARGIN, 10,
+                           f"Sayfa {doc.page}  |  {safe_text(data.get('department', ''))}")
+
+    canvas.restoreState()
+
+# ═══════════════════════════════════════════════════════════════
+# STİL TANIMLAMALARI
+# ═══════════════════════════════════════════════════════════════
+
+def get_styles():
+    """Tüm paragraf stillerini döndür"""
+    return {
+        "h1": ParagraphStyle(
+            "H1", fontName="Helvetica-Bold", fontSize=16,
+            textColor=HSEColors.primary_dark, spaceAfter=8, spaceBefore=16,
+            leading=20
+        ),
+        "h2": ParagraphStyle(
+            "H2", fontName="Helvetica-Bold", fontSize=13,
+            textColor=HSEColors.primary_mid, spaceAfter=6, spaceBefore=12,
+            leading=16
+        ),
+        "h3": ParagraphStyle(
+            "H3", fontName="Helvetica-Bold", fontSize=10,
+            textColor=HSEColors.text_dark, spaceAfter=5, spaceBefore=8,
+            leading=13
+        ),
+        "body": ParagraphStyle(
+            "Body", fontName="Helvetica", fontSize=9,
+            textColor=HSEColors.text_dark, spaceAfter=5, leading=13
+        ),
+        "body_bold": ParagraphStyle(
+            "BodyBold", fontName="Helvetica-Bold", fontSize=9,
+            textColor=HSEColors.text_dark, spaceAfter=5, leading=13
+        ),
+        "small": ParagraphStyle(
+            "Small", fontName="Helvetica", fontSize=7,
+            textColor=HSEColors.text_medium, leading=10
+        ),
+        "small_italic": ParagraphStyle(
+            "SmallItalic", fontName="Helvetica-Oblique", fontSize=7,
+            textColor=HSEColors.text_medium, leading=10
+        ),
+        "label": ParagraphStyle(
+            "Label", fontName="Helvetica-Bold", fontSize=8,
+            textColor=HSEColors.text_medium, leading=11
+        ),
+        "white_bold": ParagraphStyle(
+            "WhiteBold", fontName="Helvetica-Bold", fontSize=9,
+            textColor=HSEColors.white, leading=12
+        ),
+        "white_center": ParagraphStyle(
+            "WhiteCenter", fontName="Helvetica-Bold", fontSize=9,
+            textColor=HSEColors.white, alignment=TA_CENTER, leading=12
+        ),
+        "center": ParagraphStyle(
+            "Center", fontName="Helvetica", fontSize=9,
+            textColor=HSEColors.text_dark, alignment=TA_CENTER, leading=12
+        ),
+        "center_bold": ParagraphStyle(
+            "CenterBold", fontName="Helvetica-Bold", fontSize=9,
+            textColor=HSEColors.text_dark, alignment=TA_CENTER, leading=12
+        ),
+        "highlight": ParagraphStyle(
+            "Highlight", fontName="Helvetica-Bold", fontSize=11,
+            textColor=HSEColors.danger_red, spaceAfter=8,
+            leftIndent=10, leading=15
+        ),
+        "lessons": ParagraphStyle(
+            "Lessons", fontName="Helvetica-Oblique", fontSize=10,
+            textColor=HSEColors.primary_dark, leading=15,
+            leftIndent=10, rightIndent=10
+        ),
+    }
+
+# ═══════════════════════════════════════════════════════════════
+# SAYFA 1: KAPAK SAYFASI
+# ═══════════════════════════════════════════════════════════════
+
+def build_cover_page(data, styles):
+    """Profesyonel kapak sayfası elemanları"""
+    elements = []
+
+    # ── Ana başlık kutusu ──────────────────────────────────────
+    cover_title_style = ParagraphStyle(
+        "CoverTitle", fontName="Helvetica-Bold", fontSize=26,
+        textColor=HSEColors.white, alignment=TA_CENTER, leading=32, spaceAfter=6
+    )
+    cover_sub_style = ParagraphStyle(
+        "CoverSub", fontName="Helvetica", fontSize=13,
+        textColor=HSEColors.primary_light, alignment=TA_CENTER, leading=17
+    )
+    cover_id_style = ParagraphStyle(
+        "CoverID", fontName="Helvetica-Bold", fontSize=10,
+        textColor=HSEColors.accent_amber, alignment=TA_CENTER, leading=14
+    )
+
+    cover_data = [
+        [Paragraph("ROOT CAUSE ANALYSIS", cover_title_style)],
+        [Paragraph("HSE Inceleme Raporu", cover_sub_style)],
+        [Spacer(1, 8)],
+        [Paragraph(f"Rapor No: {safe_text(data.get('incident_id', 'N/A'))}", cover_id_style)],
+    ]
+    cover_table = Table(cover_data, colWidths=[CONTENT_WIDTH])
+    cover_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), HSEColors.primary_dark),
+        ("TOPPADDING",    (0, 0), (-1, -1), 6),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 30),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 30),
+        ("TOPPADDING",    (0, 0), (0, 0), 35),
+        ("BOTTOMPADDING", (0, -1), (0, -1), 30),
+    ]))
+    elements.append(Spacer(1, 10))
+    elements.append(cover_table)
+    elements.append(Spacer(1, 12))
+
+    # ── Severity badge ─────────────────────────────────────────
+    sev = safe_text(data.get("severity", "MEDIUM"))
+    sev_color = SEVERITY_COLORS.get(sev, HSEColors.accent_orange)
+
+    badge_style = ParagraphStyle(
+        "Badge", fontName="Helvetica-Bold", fontSize=11,
+        textColor=HSEColors.white, alignment=TA_CENTER
+    )
+    badge_table = Table(
+        [[Paragraph(f"!  {sev} SIDDET SEVIYESI", badge_style)]],
+        colWidths=[220]
+    )
+    badge_table.setStyle(TableStyle([
+        ("BACKGROUND",    (0, 0), (-1, -1), sev_color),
+        ("TOPPADDING",    (0, 0), (-1, -1), 10),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+        ("ALIGN",         (0, 0), (-1, -1), "CENTER"),
+    ]))
+
+    # Badge'i ortala
+    badge_wrapper = Table([[badge_table]], colWidths=[CONTENT_WIDTH])
+    badge_wrapper.setStyle(TableStyle([
+        ("ALIGN",         (0, 0), (-1, -1), "CENTER"),
+        ("TOPPADDING",    (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(badge_wrapper)
+    elements.append(Spacer(1, 16))
+
+    # ── Olay bilgileri tablosu ─────────────────────────────────
+    info_label_style = ParagraphStyle(
+        "InfoLabel", fontName="Helvetica-Bold", fontSize=8,
+        textColor=HSEColors.text_medium, leading=11
+    )
+    info_value_style = ParagraphStyle(
+        "InfoValue", fontName="Helvetica-Bold", fontSize=9,
+        textColor=HSEColors.text_dark, leading=12
+    )
+
+    # Olay başlığını kısalt
+    incident_title = truncate(safe_text(data.get("incident_title", "")), 60)
+
+    info_rows = [
+        [
+            Paragraph("OLAY BASLIGI", info_label_style),
+            Paragraph(incident_title, info_value_style),
+            Paragraph("OLAY TARIHI", info_label_style),
+            Paragraph(safe_text(data.get("incident_date", "")), info_value_style),
+        ],
+        [
+            Paragraph("LOKASYON", info_label_style),
+            Paragraph(truncate(safe_text(data.get("location", "")), 35), info_value_style),
+            Paragraph("DEPARTMAN", info_label_style),
+            Paragraph(safe_text(data.get("department", "")), info_value_style),
+        ],
+        [
+            Paragraph("RAPORLAYAN", info_label_style),
+            Paragraph(safe_text(data.get("reported_by", "")), info_value_style),
+            Paragraph("INCELEME TARIHI", info_label_style),
+            Paragraph(safe_text(data.get("investigation_date", "")), info_value_style),
+        ],
+        [
+            Paragraph("INCELEYENLER", info_label_style),
+            Paragraph(safe_text(data.get("investigated_by", "")), info_value_style),
+            Paragraph("OLAY TIPI", info_label_style),
+            Paragraph(safe_text(data.get("incident_type", "")), info_value_style),
+        ],
+    ]
+
+    info_table = Table(info_rows, colWidths=[110, 165, 110, 130])
+    info_table.setStyle(TableStyle([
+        ("BACKGROUND",    (0, 0), (0, -1), HSEColors.bg_gray),
+        ("BACKGROUND",    (2, 0), (2, -1), HSEColors.bg_gray),
+        ("BACKGROUND",    (1, 0), (1, -1), HSEColors.bg_light),
+        ("BACKGROUND",    (3, 0), (3, -1), HSEColors.bg_light),
+        ("TOPPADDING",    (0, 0), (-1, -1), 9),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 9),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 10),
+        ("GRID",          (0, 0), (-1, -1), 0.5, HSEColors.border_light),
+        ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+    elements.append(info_table)
+    elements.append(Spacer(1, 14))
+
+    # ── Olay açıklaması ────────────────────────────────────────
+    elements.append(Paragraph("OLAY ACIKLAMASI", styles["h2"]))
+    elements.append(HRFlowable(
+        width="100%", thickness=2,
+        color=HSEColors.accent_orange, spaceAfter=8
+    ))
+
+    desc_text = safe_text(data.get("description", "Aciklama mevcut degil."))
+    # Satır sonlarını temizle
+    desc_text = desc_text.replace("\n", " ").replace("  ", " ")
+    desc_para = Paragraph(desc_text, styles["body"])
+    desc_box = Table([[desc_para]], colWidths=[CONTENT_WIDTH])
+    desc_box.setStyle(TableStyle([
+        ("BACKGROUND",    (0, 0), (-1, -1), HSEColors.bg_light),
+        ("TOPPADDING",    (0, 0), (-1, -1), 12),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 15),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 15),
+        ("LINEBEFORE",    (0, 0), (0, -1), 4, HSEColors.primary_mid),
+    ]))
+    elements.append(desc_box)
+    elements.append(Spacer(1, 12))
+
+    # ── Anlık etkiler ──────────────────────────────────────────
+    consequences = data.get("immediate_consequences", [])
+    if consequences:
+        elements.append(Paragraph("ANLIK ETKILER VE SONUCLAR", styles["h3"]))
+        cons_rows = []
+        for c in consequences:
+            cons_rows.append([Paragraph(f"  •  {safe_text(c)}", styles["body"])])
+
+        cons_table = Table(cons_rows, colWidths=[CONTENT_WIDTH])
+        cons_table.setStyle(TableStyle([
+            ("BACKGROUND",    (0, 0), (-1, -1), HSEColors.bg_light),
+            ("TOPPADDING",    (0, 0), (-1, -1), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 12),
+            ("RIGHTPADDING",  (0, 0), (-1, -1), 12),
+            ("LINEAFTER",     (0, 0), (0, -1), 4, HSEColors.accent_orange),
+            ("ROWBACKGROUNDS", (0, 0), (-1, -1),
+             [HSEColors.bg_light, HSEColors.white]),
+        ]))
+        elements.append(cons_table)
+
+    return elements
+
+# ═══════════════════════════════════════════════════════════════
+# SAYFA 2: 5 WHY ZİNCİRİ
+# ═══════════════════════════════════════════════════════════════
+
+def build_five_why_section(data, styles):
+    """5 Why analiz zinciri - tablo formatında görsel sunum"""
+    elements = []
+
+    elements.append(Paragraph("5 WHY ANALIZ ZINCIRI", styles["h1"]))
+    elements.append(HRFlowable(
+        width="100%", thickness=2,
+        color=HSEColors.primary_mid, spaceAfter=10
+    ))
+
+    five_whys = data.get("five_whys", [])
+    total = len(five_whys)
+
+    for idx, why in enumerate(five_whys):
+        why_num  = why.get("why", idx + 1)
+        question = safe_text(why.get("question", f"Neden {why_num}?"))
+        answer   = safe_text(why.get("answer", "Cevap mevcut degil."))
+        evidence = safe_text(why.get("evidence", ""))
+        conf     = safe_text(why.get("confidence", "MEDIUM"))
+        conf_color = CONFIDENCE_COLORS.get(conf, HSEColors.warning_yellow)
+
+        # Soru satırı
+        q_style = ParagraphStyle(
+            f"Q{why_num}", fontName="Helvetica-Bold", fontSize=9,
+            textColor=HSEColors.white, leading=13
+        )
+        a_style = ParagraphStyle(
+            f"A{why_num}", fontName="Helvetica", fontSize=9,
+            textColor=HSEColors.text_dark, leading=13
+        )
+        ev_style = ParagraphStyle(
+            f"Ev{why_num}", fontName="Helvetica-Oblique", fontSize=7,
+            textColor=HSEColors.text_medium, leading=10
+        )
+        conf_style = ParagraphStyle(
+            f"Conf{why_num}", fontName="Helvetica-Bold", fontSize=8,
+            textColor=HSEColors.white, alignment=TA_CENTER, leading=11
+        )
+        num_style = ParagraphStyle(
+            f"Num{why_num}", fontName="Helvetica-Bold", fontSize=14,
+            textColor=HSEColors.white, alignment=TA_CENTER, leading=18
+        )
+
+        # Neden numarası dairesi (sol sütun)
+        num_cell = Paragraph(str(why_num), num_style)
+
+        # Soru metni
+        q_text = truncate(question, 100)
+        q_para = Paragraph(f"NEDEN {why_num}: {q_text}", q_style)
+
+        # Güven badge
+        conf_para = Paragraph(conf, conf_style)
+
+        # Cevap
+        a_text = truncate(answer, 110)
+        a_para = Paragraph(f"Cevap: {a_text}", a_style)
+
+        # Kanıt
+        ev_para = Paragraph(
+            f"Kanit: {truncate(evidence, 90)}" if evidence else "",
+            ev_style
+        )
+
+        # Ana why tablosu
+        why_inner = Table([
+            [q_para,  conf_para],
+            [a_para,  ""],
+            [ev_para, ""],
+        ], colWidths=[CONTENT_WIDTH - 80 - 30, 75])
+
+        why_inner.setStyle(TableStyle([
+            # Soru satırı - koyu mavi
+            ("BACKGROUND",    (0, 0), (0, 0), HSEColors.primary_dark),
+            ("BACKGROUND",    (1, 0), (1, 0), conf_color),
+            # Cevap satırları - açık
+            ("BACKGROUND",    (0, 1), (0, 2), HSEColors.bg_light),
+            ("BACKGROUND",    (1, 1), (1, 2), HSEColors.bg_gray),
+            ("TOPPADDING",    (0, 0), (-1, -1), 7),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+            ("RIGHTPADDING",  (0, 0), (-1, -1), 10),
+            ("SPAN",          (1, 1), (1, 2)),
+            ("GRID",          (0, 0), (-1, -1), 0.5, HSEColors.border_light),
+            ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+            ("VALIGN",        (1, 1), (1, 2), "MIDDLE"),
+        ]))
+
+        # Numara + içerik yan yana
+        outer_table = Table([
+            [Paragraph(str(why_num), num_style), why_inner]
+        ], colWidths=[30, CONTENT_WIDTH - 30])
+
+        outer_table.setStyle(TableStyle([
+            ("BACKGROUND",    (0, 0), (0, 0), HSEColors.primary_mid),
+            ("TOPPADDING",    (0, 0), (-1, -1), 0),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ("LEFTPADDING",   (0, 0), (0, 0), 0),
+            ("RIGHTPADDING",  (0, 0), (0, 0), 0),
+            ("LEFTPADDING",   (1, 0), (1, 0), 0),
+            ("RIGHTPADDING",  (1, 0), (1, 0), 0),
+            ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+        ]))
+
+        elements.append(KeepTogether([outer_table]))
+
+        # Ok (son eleman hariç)
+        if idx < total - 1:
+            elements.append(Spacer(1, 2))
+            arrow_style = ParagraphStyle(
+                "Arrow", fontName="Helvetica-Bold", fontSize=18,
+                textColor=HSEColors.accent_orange, alignment=TA_CENTER
+            )
+            arrow_tbl = Table(
+                [[Paragraph("v", arrow_style)]],
+                colWidths=[CONTENT_WIDTH]
+            )
+            arrow_tbl.setStyle(TableStyle([
+                ("TOPPADDING",    (0, 0), (-1, -1), 0),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ]))
+            elements.append(arrow_tbl)
+            elements.append(Spacer(1, 2))
+        else:
+            elements.append(Spacer(1, 10))
+
+    # ── Kök Neden Kutusu ───────────────────────────────────────
+    root_cause = safe_text(data.get("root_cause", "Kok neden tespit edilemedi."))
+    root_style = ParagraphStyle(
+        "Root", fontName="Helvetica-Bold", fontSize=11,
+        textColor=HSEColors.white, alignment=TA_CENTER, leading=16
+    )
+    root_label_style = ParagraphStyle(
+        "RootLabel", fontName="Helvetica-Bold", fontSize=9,
+        textColor=HSEColors.accent_amber, alignment=TA_CENTER, leading=13
+    )
+
+    root_table = Table([
+        [Paragraph("KOK NEDEN TESPITI", root_label_style)],
+        [Paragraph(truncate(root_cause, 150), root_style)],
+    ], colWidths=[CONTENT_WIDTH])
+
+    root_table.setStyle(TableStyle([
+        ("BACKGROUND",    (0, 0), (-1, -1), HSEColors.danger_red),
+        ("BACKGROUND",    (0, 0), (0, 0),   colors.HexColor("#C0392B")),
+        ("TOPPADDING",    (0, 0), (-1, -1), 12),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 20),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 20),
+        ("LINEABOVE",     (0, 0), (-1, 0),  3, HSEColors.accent_amber),
+    ]))
+    elements.append(root_table)
+
+    return elements
+
+# ═══════════════════════════════════════════════════════════════
+# KPI ÖZET KUTULARI (Flowable olarak)
+# ═══════════════════════════════════════════════════════════════
+
+def build_kpi_summary(data, styles):
+    """4 adet KPI özet kutusu - tablo formatında"""
+    risk    = data.get("risk_assessment", {})
+    actions = data.get("corrective_actions", [])
+
+    completed_count = sum(
+        1 for a in actions if a.get("status") == "COMPLETED"
+    )
+
+    kpis = [
+        {
+            "label": "5 WHY ADIMI",
+            "value": str(len(data.get("five_whys", []))),
+            "sub":   "Analiz Zinciri",
+            "color": HSEColors.primary_mid,
+        },
+        {
+            "label": "RISK (ONCE)",
+            "value": str(risk.get("risk_score_before", "N/A")),
+            "sub":   safe_text(risk.get("risk_level_before", "")),
+            "color": HSEColors.danger_red,
+        },
+        {
+            "label": "RISK (SONRA)",
+            "value": str(risk.get("risk_score_after", "N/A")),
+            "sub":   safe_text(risk.get("risk_level_after", "")),
+            "color": HSEColors.success_green,
+        },
+        {
+            "label": "DUZELTICI FAALIYET",
+            "value": str(len(actions)),
+            "sub":   f"{completed_count} Tamamlandi",
+            "color": HSEColors.accent_orange,
+        },
+    ]
+
+    kpi_cells = []
+    for kpi in kpis:
+        label_s = ParagraphStyle(
+            "KpiLabel", fontName="Helvetica-Bold", fontSize=7,
+            textColor=HSEColors.white, alignment=TA_CENTER, leading=10
+        )
+        value_s = ParagraphStyle(
+            "KpiValue", fontName="Helvetica-Bold", fontSize=22,
+            textColor=kpi["color"], alignment=TA_CENTER, leading=28
+        )
+        sub_s = ParagraphStyle(
+            "KpiSub", fontName="Helvetica", fontSize=7,
+            textColor=HSEColors.text_medium, alignment=TA_CENTER, leading=10
+        )
+
+        cell_inner = Table([
+            [Paragraph(kpi["label"], label_s)],
+            [Paragraph(kpi["value"], value_s)],
+            [Paragraph(kpi["sub"],   sub_s)],
+        ], colWidths=[118])
+
+        cell_inner.setStyle(TableStyle([
+            ("BACKGROUND",    (0, 0), (0, 0), kpi["color"]),
+            ("BACKGROUND",    (0, 1), (0, 2), HSEColors.white),
+            ("TOPPADDING",    (0, 0), (-1, -1), 7),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 5),
+            ("RIGHTPADDING",  (0, 0), (-1, -1), 5),
+            ("BOX",           (0, 0), (-1, -1), 1, HSEColors.border_light),
+            ("ALIGN",         (0, 0), (-1, -1), "CENTER"),
+        ]))
+        kpi_cells.append(cell_inner)
+
+    kpi_row = Table([kpi_cells], colWidths=[120, 120, 120, 120])
+    kpi_row.setStyle(TableStyle([
+        ("LEFTPADDING",   (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 4),
+        ("TOPPADDING",    (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("ALIGN",         (0, 0), (-1, -1), "CENTER"),
+    ]))
+
+    return kpi_row
+
+# ═══════════════════════════════════════════════════════════════
+# RİSK MATRİSİ (5x5) - Flowable Tablo
+# ═══════════════════════════════════════════════════════════════
+
+def build_risk_matrix_table(data, styles):
+    """5x5 Risk Matrisi - tablo formatında, öncesi/sonrası işaretli"""
+    risk = data.get("risk_assessment", {})
+
+    if not risk:
+        return [Paragraph("Risk degerlendirme verisi mevcut degil.", styles["body"])]
+
+    elements = []
+
+    # Matris renk haritası (satır: şiddet 5→1, sütun: olasılık 1→5)
+    MATRIX_COLORS = [
+        # Olasılık: 1    2    3    4    5
+        [colors.HexColor("#F39C12"), colors.HexColor("#F39C12"),
+         colors.HexColor("#2ECC71"), colors.HexColor("#2ECC71"),
+         colors.HexColor("#2ECC71")],   # Şiddet 1
+        [colors.HexColor("#E67E22"), colors.HexColor("#F39C12"),
+         colors.HexColor("#F39C12"),    colors.HexColor("#2ECC71"),
+         colors.HexColor("#2ECC71")],   # Şiddet 2
+        [colors.HexColor("#E67E22"), colors.HexColor("#E67E22"),
+         colors.HexColor("#F39C12"),    colors.HexColor("#F39C12"),
+         colors.HexColor("#2ECC71")],   # Şiddet 3
+        [colors.HexColor("#E74C3C"), colors.HexColor("#E74C3C"),
+         colors.HexColor("#E67E22"),    colors.HexColor("#F39C12"),
+         colors.HexColor("#F39C12")],   # Şiddet 4
+        [colors.HexColor("#E74C3C"), colors.HexColor("#E74C3C"),
+         colors.HexColor("#E74C3C"),    colors.HexColor("#E67E22"),
+         colors.HexColor("#E67E22")],   # Şiddet 5
+    ]
+
+    L_before = risk.get("likelihood_before", 4) - 1  # 0-indexed
+    S_before = risk.get("severity_before",   5) - 1
+    L_after  = risk.get("likelihood_after",  2) - 1
+    S_after  = risk.get("severity_after",    4) - 1
+
+    # Matris başlık satırı
+    header_style = ParagraphStyle(
+        "MH", fontName="Helvetica-Bold", fontSize=7,
+        textColor=HSEColors.white, alignment=TA_CENTER, leading=10
+    )
+    cell_style = ParagraphStyle(
+        "MC", fontName="Helvetica-Bold", fontSize=8,
+        textColor=HSEColors.white, alignment=TA_CENTER, leading=11
+    )
+    marker_style = ParagraphStyle(
+        "MM", fontName="Helvetica-Bold", fontSize=9,
+        textColor=HSEColors.white, alignment=TA_CENTER, leading=12
+    )
+    axis_style = ParagraphStyle(
+        "MA", fontName="Helvetica-Bold", fontSize=7,
+        textColor=HSEColors.text_medium, alignment=TA_CENTER, leading=10
+    )
+
+    # Matris satırları oluştur (şiddet 5'ten 1'e)
+    matrix_rows = []
+
+    # Başlık satırı
+    header_row = [Paragraph("SID/OL", header_style)]
+    for col in range(1, 6):
+        header_row.append(Paragraph(str(col), header_style))
+    matrix_rows.append(header_row)
+
+    # Veri satırları
+    for row_idx in range(4, -1, -1):  # 4→0 (şiddet 5→1)
+        severity_val = row_idx + 1
+        data_row = [Paragraph(str(severity_val), header_style)]
+
+        for col_idx in range(5):  # 0→4 (olasılık 1→5)
+            score = (col_idx + 1) * severity_val
+            cell_text = str(score)
+
+            # Öncesi/sonrası işaretleri
+            if row_idx == S_before and col_idx == L_before:
+                cell_text = "O"   # Öncesi
+            elif row_idx == S_after and col_idx == L_after:
+                cell_text = "S"   # Sonrası
+
+            data_row.append(Paragraph(cell_text, marker_style))
+
+        matrix_rows.append(data_row)
+
+    CELL_W = 38
+    matrix_table = Table(
+        matrix_rows,
+        colWidths=[CELL_W] * 6,
+        rowHeights=[22] + [30] * 5
+    )
+
+    # Stil komutları
+    style_cmds = [
+        # Başlık satırı ve sütunu
+        ("BACKGROUND", (0, 0), (-1, 0), HSEColors.primary_dark),
+        ("BACKGROUND", (0, 0), (0, -1), HSEColors.primary_dark),
+        ("TEXTCOLOR",  (0, 0), (-1, 0), HSEColors.white),
+        ("TEXTCOLOR",  (0, 0), (0, -1), HSEColors.white),
+        ("GRID",       (0, 0), (-1, -1), 0.5, HSEColors.white),
+        ("ALIGN",      (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN",     (0, 0), (-1, -1), "MIDDLE"),
+        ("FONTNAME",   (0, 0), (-1, -1), "Helvetica-Bold"),
+        ("FONTSIZE",   (0, 0), (-1, -1), 8),
+    ]
+
+    # Hücre renkleri
+    for row_idx in range(4, -1, -1):
+        table_row = 5 - row_idx  # Tablo satır indeksi (1-5)
+        for col_idx in range(5):
+            table_col = col_idx + 1  # Tablo sütun indeksi (1-5)
+            bg_color = MATRIX_COLORS[row_idx][col_idx]
+            style_cmds.append(
+                ("BACKGROUND", (table_col, table_row),
+                 (table_col, table_row), bg_color)
+            )
+
+    matrix_table.setStyle(TableStyle(style_cmds))
+
+    # Eksen etiketleri + matris
+    elements.append(Paragraph("OLASILIK (1=Dusuk, 5=Yuksek) -->", axis_style))
+    elements.append(Spacer(1, 4))
+
+    # Matris + şiddet etiketi yan yana
+    sid_style = ParagraphStyle(
+        "Sid", fontName="Helvetica-Bold", fontSize=7,
+        textColor=HSEColors.text_medium, alignment=TA_CENTER, leading=10
+    )
+    legend_style = ParagraphStyle(
+        "Leg", fontName="Helvetica", fontSize=8,
+        textColor=HSEColors.text_dark, leading=12
+    )
+
+    legend_data = [
+        [Paragraph("O = Onceki Risk Konumu", legend_style)],
+        [Paragraph("S = Sonraki Risk Konumu", legend_style)],
+        [Spacer(1, 6)],
+        [Paragraph(
+            f"Onceki: {risk.get('risk_level_before','N/A')} "
+            f"({risk.get('risk_score_before','N/A')})",
+            ParagraphStyle("L1", fontName="Helvetica-Bold", fontSize=8,
+                           textColor=HSEColors.danger_red, leading=12)
+        )],
+        [Paragraph(
+            f"Sonraki: {risk.get('risk_level_after','N/A')} "
+            f"({risk.get('risk_score_after','N/A')})",
+            ParagraphStyle("L2", fontName="Helvetica-Bold", fontSize=8,
+                           textColor=HSEColors.success_green, leading=12)
+        )],
+        [Spacer(1, 6)],
+        [Paragraph(
+            f"Risk Azalmasi: "
+            f"{risk.get('risk_score_before',0) - risk.get('risk_score_after',0)} puan",
+            ParagraphStyle("L3", fontName="Helvetica-Bold", fontSize=9,
+                           textColor=HSEColors.primary_mid, leading=13)
+        )],
+    ]
+    legend_table = Table(legend_data, colWidths=[160])
+    legend_table.setStyle(TableStyle([
+        ("BACKGROUND",    (0, 0), (-1, -1), HSEColors.bg_light),
+        ("TOPPADDING",    (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 10),
+        ("BOX",           (0, 0), (-1, -1), 1, HSEColors.border_light),
+    ]))
+
+    combined = Table(
+        [[matrix_table, Spacer(20, 1), legend_table]],
+        colWidths=[6 * CELL_W, 20, 160]
+    )
+    combined.setStyle(TableStyle([
+        ("VALIGN",        (0, 0), (-1, -1), "TOP"),
+        ("TOPPADDING",    (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 0),
+    ]))
+    elements.append(combined)
+
+    return elements
+
+# ═══════════════════════════════════════════════════════════════
+# RİSK DEĞERLENDİRME TABLOSU
+# ═══════════════════════════════════════════════════════════════
+
+def build_risk_assessment_table(data, styles):
+    """Risk değerlendirme karşılaştırma tablosu"""
+    risk = data.get("risk_assessment", {})
+
+    if not risk:
+        return Paragraph("Risk degerlendirme verisi mevcut degil.", styles["body"])
+
+    header_s = ParagraphStyle(
+        "RH", fontName="Helvetica-Bold", fontSize=9,
+        textColor=HSEColors.white, alignment=TA_CENTER, leading=12
+    )
+    cell_s = ParagraphStyle(
+        "RC", fontName="Helvetica", fontSize=9,
+        textColor=HSEColors.text_dark, leading=12
+    )
+    cell_bold_s = ParagraphStyle(
+        "RCB", fontName="Helvetica-Bold", fontSize=9,
+        textColor=HSEColors.text_dark, leading=12
+    )
+    center_s = ParagraphStyle(
+        "RCC", fontName="Helvetica", fontSize=9,
+        textColor=HSEColors.text_dark, alignment=TA_CENTER, leading=12
+    )
+
+    l_b = risk.get("likelihood_before", 0)
+    l_a = risk.get("likelihood_after",  0)
+    s_b = risk.get("severity_before",   0)
+    s_a = risk.get("severity_after",    0)
+    rs_b = risk.get("risk_score_before", 0)
+    rs_a = risk.get("risk_score_after",  0)
+
+    rows = [
+        # Başlık
+        [
+            Paragraph("PARAMETRE",     header_s),
+            Paragraph("ONCE",          header_s),
+            Paragraph("SONRA",         header_s),
+            Paragraph("IYILESME",      header_s),
+        ],
+        [
+            Paragraph("Olasilik",      cell_s),
+            Paragraph(str(l_b),        center_s),
+            Paragraph(str(l_a),        center_s),
+            Paragraph(f"v {l_b - l_a} puan", cell_s),
+        ],
+        [
+            Paragraph("Siddet",        cell_s),
+            Paragraph(str(s_b),        center_s),
+            Paragraph(str(s_a),        center_s),
+            Paragraph(
+                f"v {s_b - s_a} puan" if s_b != s_a else "Sabit",
+                cell_s
+            ),
+        ],
+        [
+            Paragraph("Risk Skoru",    cell_bold_s),
+            Paragraph(str(rs_b),       ParagraphStyle(
+                "RScore", fontName="Helvetica-Bold", fontSize=11,
+                textColor=HSEColors.danger_red, alignment=TA_CENTER, leading=14
+            )),
+            Paragraph(str(rs_a),       ParagraphStyle(
+                "RScoreA", fontName="Helvetica-Bold", fontSize=11,
+                textColor=HSEColors.success_green, alignment=TA_CENTER, leading=14
+            )),
+            Paragraph(f"v {rs_b - rs_a} puan azalma", cell_bold_s),
+        ],
+        [
+            Paragraph("Risk Seviyesi", cell_s),
+            Paragraph(safe_text(risk.get("risk_level_before", "")), center_s),
+            Paragraph(safe_text(risk.get("risk_level_after",  "")), center_s),
+            Paragraph("", cell_s),
+        ],
+    ]
+
+    tbl = Table(rows, colWidths=[150, 90, 90, 185])
+    tbl.setStyle(TableStyle([
+        ("BACKGROUND",    (0, 0), (-1, 0), HSEColors.primary_dark),
+        ("TEXTCOLOR",     (0, 0), (-1, 0), HSEColors.white),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+         [HSEColors.white, HSEColors.bg_light]),
+        # Risk seviyesi renkleri
+        ("BACKGROUND",    (1, 4), (1, 4), HSEColors.danger_red),
+        ("TEXTCOLOR",     (1, 4), (1, 4), HSEColors.white),
+        ("BACKGROUND",    (2, 4), (2, 4), HSEColors.success_green),
+        ("TEXTCOLOR",     (2, 4), (2, 4), HSEColors.white),
+        ("GRID",          (0, 0), (-1, -1), 0.5, HSEColors.border_light),
+        ("TOPPADDING",    (0, 0), (-1, -1), 9),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 9),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 12),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 12),
+        ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+        ("FONTNAME",      (0, 0), (-1, 0), "Helvetica-Bold"),
+    ]))
+
+    return tbl
+
+# ═══════════════════════════════════════════════════════════════
+# DÜZELTİCİ FAALİYETLER TABLOSU
+# ═══════════════════════════════════════════════════════════════
+
+def build_corrective_actions_table(data, styles):
+    """Düzeltici faaliyetler için renkli, öncelikli tablo"""
+    actions = data.get("corrective_actions", [])
+
+    if not actions:
+        return Paragraph("Duzeltici faaliyet verisi mevcut degil.", styles["body"])
+
+    header_s = ParagraphStyle(
+        "CAH", fontName="Helvetica-Bold", fontSize=8,
+        textColor=HSEColors.white, alignment=TA_CENTER, leading=11
+    )
+    cell_s = ParagraphStyle(
+        "CAC", fontName="Helvetica", fontSize=8,
+        textColor=HSEColors.text_dark, leading=11
+    )
+    cell_bold_s = ParagraphStyle(
+        "CACB", fontName="Helvetica-Bold", fontSize=8,
+        textColor=HSEColors.text_dark, leading=11
+    )
+    badge_s = ParagraphStyle(
+        "CAB", fontName="Helvetica-Bold", fontSize=7,
+        textColor=HSEColors.white, alignment=TA_CENTER, leading=10
+    )
+
+    headers = [
+        Paragraph("ID",        header_s),
+        Paragraph("FAALIYET",  header_s),
+        Paragraph("SORUMLU",   header_s),
+        Paragraph("TARIH",     header_s),
+        Paragraph("ONCELIK",   header_s),
+        Paragraph("DURUM",     header_s),
+    ]
+
+    rows = [headers]
+
+    for action in actions:
+        priority = safe_text(action.get("priority", "MEDIUM"))
+        status   = safe_text(action.get("status",   "PLANNED"))
+        desc     = truncate(safe_text(action.get("description", "")), 65)
+
+        rows.append([
+            Paragraph(f'<b>{safe_text(action.get("id",""))}</b>', cell_bold_s),
+            Paragraph(desc, cell_s),
+            Paragraph(safe_text(action.get("responsible", "")), cell_s),
+            Paragraph(safe_text(action.get("due_date", "")),    cell_s),
+            Paragraph(priority, badge_s),
+            Paragraph(status,   badge_s),
+        ])
+
+    col_widths = [38, 195, 85, 65, 55, 77]
+    tbl = Table(rows, colWidths=col_widths, repeatRows=1)
+
+    style_cmds = [
+        ("BACKGROUND",    (0, 0), (-1, 0), HSEColors.primary_dark),
+        ("TEXTCOLOR",     (0, 0), (-1, 0), HSEColors.white),
+        ("TOPPADDING",    (0, 0), (-1, -1), 7),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 7),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 7),
+        ("GRID",          (0, 0), (-1, -1), 0.5, HSEColors.border_light),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+         [HSEColors.white, HSEColors.bg_light]),
+        ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+        ("FONTNAME",      (0, 0), (-1, 0), "Helvetica-Bold"),
+    ]
+
+    # Öncelik ve durum sütunlarına renk
+    for i, action in enumerate(actions, 1):
+        prio   = safe_text(action.get("priority", "MEDIUM"))
+        status = safe_text(action.get("status",   "PLANNED"))
+        p_color = SEVERITY_COLORS.get(prio,   HSEColors.warning_yellow)
+        s_color = SEVERITY_COLORS.get(status, HSEColors.primary_light)
+        style_cmds.append(("BACKGROUND", (4, i), (4, i), p_color))
+        style_cmds.append(("BACKGROUND", (5, i), (5, i), s_color))
+        style_cmds.append(("TEXTCOLOR",  (4, i), (4, i), HSEColors.white))
+        style_cmds.append(("TEXTCOLOR",  (5, i), (5, i), HSEColors.white))
+
+    tbl.setStyle(TableStyle(style_cmds))
+    return tbl
+
+# ═══════════════════════════════════════════════════════════════
+# KATKI SAĞLAYAN FAKTÖRLER
+# ═══════════════════════════════════════════════════════════════
+
+def build_contributing_factors(data, styles):
+    """Katkıda bulunan faktörler bölümü"""
+    factors = data.get("contributing_factors", [])
+    elements = []
+
+    if not factors:
+        return elements
+
+    elements.append(Paragraph("KATKI SAGLAYAN FAKTORLER", styles["h2"]))
+    elements.append(HRFlowable(
+        width="100%", thickness=1,
+        color=HSEColors.border_light, spaceAfter=8
+    ))
+
+    factor_rows = []
+    for i, factor in enumerate(factors):
+        num_s = ParagraphStyle(
+            f"FN{i}", fontName="Helvetica-Bold", fontSize=9,
+            textColor=HSEColors.white, alignment=TA_CENTER, leading=12
+        )
+        txt_s = ParagraphStyle(
+            f"FT{i}", fontName="Helvetica", fontSize=9,
+            textColor=HSEColors.text_dark, leading=12
+        )
+        factor_rows.append([
+            Paragraph(str(i + 1), num_s),
+            Paragraph(safe_text(factor), txt_s),
+        ])
+
+    f_table = Table(factor_rows, colWidths=[28, CONTENT_WIDTH - 28])
+    f_style_cmds = [
+        ("BACKGROUND",    (0, 0), (0, -1), HSEColors.accent_orange),
+        ("BACKGROUND",    (1, 0), (1, -1), HSEColors.bg_light),
+        ("TOPPADDING",    (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 8),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 8),
+        ("GRID",          (0, 0), (-1, -1), 0.5, HSEColors.border_light),
+        ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+        ("ROWBACKGROUNDS", (1, 0), (1, -1),
+         [HSEColors.bg_light, HSEColors.white]),
+    ]
+    f_table.setStyle(TableStyle(f_style_cmds))
+    elements.append(f_table)
+
+    return elements
+
+# ═══════════════════════════════════════════════════════════════
+# ÇIKARILAN DERSLER & İMZA
+# ═══════════════════════════════════════════════════════════════
+
+def build_lessons_and_signature(data, styles):
+    """Çıkarılan dersler ve imza alanları"""
+    elements = []
+
+    # ── Çıkarılan Dersler ──────────────────────────────────────
+    elements.append(Paragraph("CIKARILAN DERSLER", styles["h1"]))
+    elements.append(HRFlowable(
+        width="100%", thickness=2,
+        color=HSEColors.primary_light, spaceAfter=10
+    ))
+
+    lessons = safe_text(data.get("lessons_learned", "Ders bilgisi mevcut degil."))
+    lessons_para = Paragraph(lessons, styles["lessons"])
+    lessons_box = Table([[lessons_para]], colWidths=[CONTENT_WIDTH])
+    lessons_box.setStyle(TableStyle([
+        ("BACKGROUND",    (0, 0), (-1, -1), HSEColors.bg_light),
+        ("TOPPADDING",    (0, 0), (-1, -1), 20),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 20),
+        ("LEFTPADDING",   (0, 0), (-1, -1), 20),
+        ("RIGHTPADDING",  (0, 0), (-1, -1), 20),
+        ("LINEBEFORE",    (0, 0), (0, -1), 5, HSEColors.primary_mid),
+    ]))
+    elements.append(lessons_box)
+    elements.append(Spacer(1, 20))
+
+    # ── Analiz Özeti ───────────────────────────────────────────
+    elements.append(Paragraph("ANALIZ OZETI", styles["h2"]))
+    elements.append(HRFlowable(
+        width="100%", thickness=1,
+        color=HSEColors.border_light, spaceAfter=8
+    ))
+
+    summary_s = ParagraphStyle(
+        "Sum", fontName="Helvetica", fontSize=9,
+        textColor=HSEColors.text_dark, leading=13
+    )
+    summary_bold_s = ParagraphStyle(
+        "SumB", fontName="Helvetica-Bold", fontSize=9,
+        textColor=HSEColors.text_dark, leading=13
+    )
+
+    method      = safe_text(data.get("analysis_method",  "5-Why Metodolojisi"))
+    branches    = safe_text(data.get("total_branches",   "N/A"))
+    root_causes = safe_text(data.get("total_root_causes","N/A"))
+    similar     = safe_text(data.get("similar_incidents","0"))
+    cost        = data.get("estimated_cost", 0)
+    cost_str    = f"{cost:,} TL" if cost else "Hesaplanmadi"
+
+    summary_rows = [
+        [Paragraph("Analiz Yontemi",    summary_bold_s), Paragraph(method,      summary_s),
+         Paragraph("Benzer Olaylar",    summary_bold_s), Paragraph(similar,     summary_s)],
+        [Paragraph("Toplam Dal",        summary_bold_s), Paragraph(branches,    summary_s),
+         Paragraph("Toplam Kok Neden",  summary_bold_s), Paragraph(root_causes, summary_s)],
+        [Paragraph("Tahmini Maliyet",   summary_bold_s), Paragraph(cost_str,    summary_s),
+         Paragraph("Olay ID",           summary_bold_s),
+         Paragraph(safe_text(data.get("incident_id", "")), summary_s)],
+    ]
+
+    sum_tbl = Table(summary_rows, colWidths=[

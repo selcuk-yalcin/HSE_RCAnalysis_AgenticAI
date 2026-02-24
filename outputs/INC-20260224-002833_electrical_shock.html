@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">HSG245 Metodolojisi ile Hazırlanmıştır</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260224-002833</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">20 Şubat 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Üretim Tesisi - Ana Elektrik Panosu (MDB-02)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Majör Yaralanma - Elektrik Çarpması</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Bakım teknisyeni, 380V yüksek voltaj elektrik panosunda LOTO prosedürü uygulamadan ve yalıtkan eldiven kullanmadan müdahale ederken elektrik çarpması sonucu kalp durması yaşamış, 2. derece yanıklar almış ve yoğun bakıma kaldırılmıştır.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">20 Şubat 2026 tarihinde saat 15:20'de üretim tesisindeki ana elektrik panosunda (MDB-02) gerçekleştirilen rutin bakım çalışması sırasında elektrik teknisyeni ciddi bir elektrik çarpması kazası geçirmiştir. Teknisyen, 380V yüksek voltaj elektrik panosuna enerji izolasyonu (LOTO - Lock Out Tag Out) prosedürü uygulamadan ve zorunlu kişisel koruyucu ekipman olan yalıtkan eldivenleri kullanmadan müdahale etmiştir.
+
+Elektrik çarpması sonucunda teknisyen kalp durması yaşamış, vücudunun çeşitli bölgelerinde 2. derece elektrik yanıkları oluşmuştur. Olay yerinde bulunan iş arkadaşları tarafından acil müdahale başlatılmış, 112 acil servis ekipleri çağrılmış ve teknisyen defibrilasyon uygulanarak hayata döndürülmüştür. Yaralı çalışan ambulansla hastaneye kaldırılmış ve yoğun bakım ünitesinde tedavi altına alınmıştır. Bu olay RIDDOR (Reporting of Injuries, Diseases and Dangerous Occurrences Regulations) kapsamında raporlanması gereken majör bir yaralanma olarak sınıflandırılmıştır.</div>
+<div class="paragraph" contenteditable="true">Olay, üretim tesisinin elektrik dağıtım odasında bulunan ana elektrik panosu (MDB-02) önünde meydana gelmiştir. Bu alan, 380V yüksek voltaj elektrik ekipmanlarının bulunduğu, sadece yetkili elektrik personelinin erişimine açık olması gereken kısıtlı bir bölgedir. Elektrik panosu, üretim hattının ana güç kaynağını sağlayan kritik bir ekipmandır ve düzenli bakım gerektirmektedir. Olay anında çalışma alanında yeterli aydınlatma bulunmakta, ancak güvenlik bariyerleri ve uyarı işaretlemeleri yetersiz durumdaydı.</div>
+<div class="paragraph" contenteditable="true">Olaydan doğrudan etkilenen kişi, 8 yıllık deneyime sahip elektrik bakım teknisyeni olup, elektrik güvenliği konusunda temel eğitimler almış ancak son 2 yıl içinde tazeleme eğitimi görmemiştir. Teknisyen kalp durması, 2. derece yanıklar ve travmatik şok yaşamış, yoğun bakımda tedavi görmüştür. Dolaylı olarak olay yerinde bulunan 2 iş arkadaşı psikolojik travma yaşamış, üretim hattı 4 saat süreyle durdurulmuş, 25 kişilik vardiya çalışması etkilenmiştir. Ayrıca elektrik panosu hasara uğramış, yaklaşık 150.000 TL maddi hasar oluşmuştur.</div>
+<div class="paragraph" contenteditable="true">Olay anında çalışma alanında bulunan vardiya amiri durumu fark ederek hemen acil durum prosedürünü başlatmıştır. İlk olarak ana elektrik şalteri kapatılarak enerji kesilmiş, yaralı çalışanın elektrik kaynağından ayrılması sağlanmıştır. Tesiste görevli ilk yardım ekibi 2 dakika içinde olay yerine ulaşmış, yaralının nabzı ve solunumu olmadığı tespit edilerek kardiyopulmoner resüsitasyon (CPR) başlatılmıştır. Eş zamanlı olarak 112 acil servis çağrılmış ve tesis yönetimi bilgilendirilmiştir.
+
+İlk yardım ekibi tarafından otomatik eksternal defibrilatör (AED) kullanılarak 2 şok uygulanmış ve yaralının kalp atışı geri kazandırılmıştır. 112 ekipleri 8 dakika içinde olay yerine ulaşmış, ileri yaşam desteği sağlanarak yaralı ambulansla hastaneye sevk edilmiştir. Olay yeri güvenlik şeridi ile çevrilmiş, kanıt toplama işlemi başlatılmış, tüm elektrik sistemleri güvenlik kontrolünden geçirilmiş ve üretim hattı geçici olarak durdurulmuştur. HSE departmanı ve üst yönetim 15 dakika içinde bilgilendirilmiş, olay RIDDOR kapsamında yetkili mercilere 24 saat içinde raporlanmıştır.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Elektrik Çalışmaları İçin İş İzin Sistemi Eksikliği: Yüksek voltaj elektrik çalışmaları için özel iş izin prosedürü tanımlanmamış, mevcut iş izin sistemi sadece sıcak işleri kapsıyor ve elektrik güvenliği kontrolleri (LOTO, KKE kontrolü, enerji izolasyonu doğrulaması) sisteme entegre edilmemiştir. Risk değerlendirmesi yapılırken elektrik çalışmalarının kritik kontrol gereksinimleri yeterince belirlenmemiş ve dokümante edilmemiştir.</li>
+<li contenteditable="true">Yetersiz Saha Gözetimi ve Denetim Mekanizması: Elektrik bakım çalışmaları sırasında yeterli gözetim yapılmamakta, prosedür ihlalleri tespit edilememekte ve düzeltici önlemler alınmamaktadır. Bakım sorumluları çok sayıda işten sorumlu olduğu için saha denetimi için yeterli zaman ayıramamakta, güvenli olmayan davranışlar normalleşmekte ve tekrarlanmaktadır. LOTO prosedürünün atlanması gibi kritik güvenlik ihlalleri fark edilmemekte veya göz ardı edilmektedir.</li>
+<li contenteditable="true">Hesap Verebilirlik Sisteminin Olmaması: Güvenlik prosedürlerine uyumsuzluk gösteren çalışanlar için net hesap verebilirlik mekanizması oluşturulmamış, prosedür ihlalleri tespit edilse bile düzeltici önlem alınmamış ve disiplin süreci işletilmemiştir. Daha önce benzer prosedür ihlalleri yaşanmış ancak herhangi bir uyarı veya düzeltme yapılmamış, bu durum çalışanlarda 'kısa yoldan yapmanın kabul edilebilir' algısı oluşturmuştur.</li>
+<li contenteditable="true">Kişisel Koruyucu Ekipman Yönetim Sistemi Yetersizliği: Yalıtkan eldivenler gibi kritik KKE'ler çalışma alanında hazır bulundurulmamakta, merkezi depodan her iş öncesi alınması gerekmekte ancak bu kontrol zorunlu tutulmamaktadır. İş öncesi KKE kontrol listesi uygulanmamakta, eksik veya hatalı KKE kullanımı tespit edilememekte ve çalışanlar zaman kazanmak için KKE kullanmadan işe başlayabilmektedir.</li>
+<li contenteditable="true">Eğitim ve Yetkinlik Yönetimi Eksiklikleri: Elektrik teknisyenleri temel elektrik güvenliği eğitimi almış ancak LOTO prosedürü, yüksek voltaj güvenliği ve acil durum müdahalesi konularında düzenli tazeleme eğitimleri yapılmamaktadır. Son 2 yıl içinde elektrik güvenliği eğitimi verilmemiş, yetkinlik değerlendirmeleri yapılmamış ve saha uygulamalarında prosedür uyumu izlenmemiştir. Çalışanların risk algısı ve güvenlik kültürü yetersiz seviyededir.</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Kritik Kök Nedenler</div>
+
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Elektrik Çalışmaları İçin İş İzin Sisteminin Etkisiz Olması</div>
+                <div class="box-content" contenteditable="true">[D4.4 / Organizasyonel]
+                
+Yüksek voltaj elektrik çalışmaları için özel iş izin prosedürü oluşturulmamış ve mevcut iş izin sistemi sadece sıcak işleri (kaynak, kesme vb.) kapsamaktadır. Elektrik çalışmaları bu sistemin dışında bırakıldığı için, kritik güvenlik kontrolleri (KKE kullanımı, enerji izolasyonu, yetkilendirme, göze...</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Elektrik Bakım Çalışmalarında Yetersiz Gözetim ve Denetim</div>
+                <div class="box-content" contenteditable="true">[D1.2 / Organizasyonel]
+                
+Bakım teknisyenlerinin saha çalışmaları yeterince denetlenmiyor, LOTO gibi kritik prosedürlerin uygulanıp uygulanmadığı kontrol edilmiyor ve prosedür ihlalleri tespit edilip düzeltilmiyor. Bakım sorumluları çok sayıda işten sorumlu olduğu için (elektrik, mekanik, bina bakımı, proje yönetimi vb.) sah...</div>
+            </div>
+
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: LOTO Prosedürü İhlallerinde Hesap Verebilirlik Sisteminin Olmaması</div>
+                <div class="box-content" contenteditable="true">[D1.3 / Organizasyonel]
+                
+Güvenlik prosedürlerine uyumsuzluk gösteren çalışanlar için net hesap verebilirlik mekanizması oluşturulmamış, prosedür ihlalleri tespit edilse bile düzeltici önlem alınmamış, soruşturma yapılmamış ve disiplin süreci işletilmemiştir. LOTO gibi kritik güvenlik prosedürlerinin ihlali kayıt altına alın...</div>
+            </div>
+
+            <div class="subsection-header">1.4 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Tüm elektrik panolarına LOTO kilitleri ve etiketleri yerleştirildi, enerji izolasyonu zorunlu hale getirildi</td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Elektrik çalışma alanlarına yalıtkan eldiven, yalıtkan ayakkabı ve yüz siperliği içeren KKE setleri yerleştirildi</td>
+                        <td contenteditable="true">HSE Koordinatörü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm elektrik teknisyenlerine acil LOTO ve elektrik güvenliği eğitimi verildi, yetkinlik testleri yapıldı</td>
+                        <td contenteditable="true">Eğitim Sorumlusu</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Elektrik çalışmaları için geçici iş izni sistemi oluşturuldu ve uygulamaya konuldu</td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260224-002833</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">20 Şubat 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">15:20</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Üretim Tesisi - Ana Elektrik Panosu (MDB-02)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Elektrik Dağıtım Odası / Bakım Departmanı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Elektrik Bakım Teknisyeni (8 yıl deneyim)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası (08:00-16:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Ana Elektrik Panosu MDB-02 (380V Yüksek Voltaj)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Elektrik enerjisi (380V AC)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Kapalı alan - İç mekan, normal oda sıcaklığı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Yeterli (LED aydınlatma mevcut)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart iş elbisesi, güvenlik ayakkabısı (Yalıtkan eldiven, yüz siperliği KULLANILMADI)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Majör Yaralanma - Elektrik Çarpması</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Kalp durması, 2. derece yanıklar, yoğun bakım</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 (doğrudan), 2 (dolaylı - psikolojik)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Seviye 1 - Ölümcül/Majör Yaralanma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Evet - 24.02.26 tarihinde raporlandı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Vardiya Amiri ve 2 bakım teknisyeni</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet - 112 acil servis 8 dakikada ulaştı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Yoğun bakıma yatış - Tedavi devam ediyor</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:00</div>
+                    <div class="timeline-event" contenteditable="true">Bakım teknisyeni rutin bakım çalışması için elektrik dağıtım odasına giriş yaptı, iş emri aldı ancak iş izni düzenlenmedi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:10</div>
+                    <div class="timeline-event" contenteditable="true">Teknisyen merkezi depodan KKE almadan doğrudan çalışma alanına geldi, yalıtkan eldiven ve diğer koruyucu ekipmanları almadı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:15</div>
+                    <div class="timeline-event" contenteditable="true">Ana elektrik panosuna (MDB-02) yaklaştı, LOTO prosedürü uygulamadan enerji izolasyonu yapmadan paneli açtı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:20</div>
+                    <div class="timeline-event" contenteditable="true">Enerjili 380V elektrik panosuna çıplak elle müdahale ederken elektrik çarpması meydana geldi, teknisyen yere düştü ve kalp durması yaşadı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:21</div>
+                    <div class="timeline-event" contenteditable="true">Vardiya amiri durumu fark etti, ana şalteri kapattı, 112'yi aradı, ilk yardım ekibini çağırdı ve CPR başlattı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:23</div>
+                    <div class="timeline-event" contenteditable="true">Tesis ilk yardım ekibi olay yerine ulaştı, AED ile 2 şok uygulandı, kalp atışı geri kazandırıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:28</div>
+                    <div class="timeline-event" contenteditable="true">112 acil servis ekipleri olay yerine ulaştı, ileri yaşam desteği başlatıldı, yaralı ambulansa alındı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:35</div>
+                    <div class="timeline-event" contenteditable="true">Yaralı hastaneye sevk edildi, HSE departmanı ve üst yönetim bilgilendirildi, olay yeri güvenlik altına alındı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:00</div>
+                    <div class="timeline-event" contenteditable="true">Olay araştırma ekibi oluşturuldu, kanıt toplama ve fotoğraflama işlemi başlatıldı, üretim hattı durduruldu</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">18:00</div>
+                    <div class="timeline-event" contenteditable="true">İlk olay raporu hazırlandı, RIDDOR bildirimi için hazırlık başlatıldı, tüm elektrik sistemleri güvenlik kontrolünden geçirildi</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - HSG245 / 5 WHY</div>
+            
+            <div class="subsection-header">3.1 HSG245 Metodolojisi</div>
+            <div class="paragraph" contenteditable="true">HSG245 (Health and Safety Executive Guidance 245) metodolojisi, İngiltere İş Sağlığı ve Güvenliği Kurumu tarafından geliştirilen sistematik kök neden analizi yaklaşımıdır. Bu metodoloji, iş kazalarını ve tehlikeli olayları araştırmak için hiyerarşik bir yapı kullanır ve olayları dört ana kategoride sınıflandırır: (A) Davranışsal Faktörler - çalışanların eylemleri ve kararları, (B) Koşulsal Faktörler - fiziksel çevre ve ekipman durumu, (C) İş/Görev Faktörleri - iş tasarımı ve süreçler, (D) Organizasyonel Faktörler - yönetim sistemleri ve kültür.
+
+Bu olay araştırmasında HSG245 metodolojisi üç ayrı analiz dalında uygulanmıştır. Birinci dal, teknisyenin yalıtkan eldiven kullanmaması davranışsal faktöründen başlayarak iş izin sisteminin etkisizliği organizasyonel kök nedenine ulaşmıştır. İkinci dal, enerjili elektrik panosuna müdahale koşulsal faktöründen başlayarak yetersiz gözetim ve denetim organizasyonel kök nedenine ulaşmıştır. Üçüncü dal, LOTO prosedürü ihlali davranışsal faktöründen başlayarak hesap verebilirlik eksikliği organizasyonel kök nedenine ulaşmıştır.
+
+HSG245 yaklaşımı, yüzeysel nedenlerin ötesine geçerek sistemik organizasyonel zayıflıkları ortaya çıkarmayı hedefler. Bu sayede sadece bireysel hataları değil, bu hataları mümkün kılan yönetim sistemi eksikliklerini de tespit eder ve kalıcı çözümler geliştirilmesini sağlar. Metodoloji, benzer olayların tekrarını önlemek için organizasyonel öğrenmeyi ve sürekli iyileştirmeyi teşvik eder.</div>
+            
+            <div class="subsection-header">3.2 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why (5 Neden) tekniği, bir sorunun kök nedenine ulaşmak için art arda 'Neden?' sorusu sorarak derinlemesine analiz yapan basit ama etkili bir araçtır. Her 'Neden?' sorusu, bir önceki cevabın altında yatan nedeni araştırır ve genellikle 5 seviye sonunda organizasyonel kök nedene ulaşılır. Bu teknik, yüzeysel semptomlardan ziyade gerçek nedenleri bulmayı amaçlar.
+
+Bu olay analizinde 5-Why tekniği üç farklı dalda sistematik olarak uygulanmıştır. Her dalda, doğrudan nedenden başlayarak 5 seviye derinliğinde sorgulamalar yapılmış ve her seviyede elde edilen cevap bir sonraki 'Neden?' sorusunun temelini oluşturmuştur. Örneğin birinci dalda: 'Neden eldiven kullanılmadı?' sorusundan başlayarak 'Neden risk değerlendirmesi eksikti?' sorusuna kadar ilerlenmiş ve her adımda somut kanıtlar ve gözlemler kullanılmıştır. Teknik, bireysel hatalardan organizasyonel sistem eksikliklerine doğru mantıksal bir akış sağlamış ve üç farklı kök neden tespit edilmesini mümkün kılmıştır.</div>
+            
+            <div class="subsection-header">3.3 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışsal Faktör</td>
+                        <td contenteditable="true">Çalışanların eylemleri, kararları, bilgi ve beceri düzeyleri, prosedür uyumu, risk algısı, dikkatsizlik, yorgunluk gibi bireysel insan faktörleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktör</td>
+                        <td contenteditable="true">Fiziksel çevre koşulları, ekipman durumu, enerji kaynakları, malzeme özellikleri, hava koşulları, aydınlatma, gürültü, sıcaklık, alan düzeni gibi çevresel faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">İş tasarımı, görev karmaşıklığı, iş yükü, ergonomi, ekipman uygunluğu, süreç tasarımı, teknik özellikler gibi iş ve görevle ilgili faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Yönetim sistemleri, politikalar, prosedürler, eğitim programları, gözetim mekanizmaları, iş izin sistemleri, risk değerlendirmeleri, güvenlik kültürü, kaynak tahsisi gibi organizasyonel faktörler</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.4 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Ahmet Yılmaz</td>
+                        <td contenteditable="true">Kıdemli HSE Müdürü - Baş Araştırmacı</td>
+                        <td contenteditable="true">21.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Mehmet Demir</td>
+                        <td contenteditable="true">Elektrik Güvenliği Uzmanı - Teknik Danışman</td>
+                        <td contenteditable="true">21.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ayşe Kaya</td>
+                        <td contenteditable="true">Bakım Müdürü - Departman Temsilcisi</td>
+                        <td contenteditable="true">21.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Fatma Şahin</td>
+                        <td contenteditable="true">Üretim Müdürü - Operasyonel Temsilci</td>
+                        <td contenteditable="true">21.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Dr. Hasan Çelik</td>
+                        <td contenteditable="true">İş Yeri Hekimi - Sağlık Uzmanı</td>
+                        <td contenteditable="true">22.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Zeynep Arslan</td>
+                        <td contenteditable="true">İnsan Kaynakları Müdürü - İK Temsilcisi</td>
+                        <td contenteditable="true">22.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ali Öztürk</td>
+                        <td contenteditable="true">LOTO Uzmanı - Prosedür Danışmanı</td>
+                        <td contenteditable="true">22.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Murat Yıldız</td>
+                        <td contenteditable="true">Bağımsız Güvenlik Danışmanı - Dış Uzman</td>
+                        <td contenteditable="true">23.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Elif Aydın</td>
+                        <td contenteditable="true">Çalışan Temsilcisi - Sendika Delegesi</td>
+                        <td contenteditable="true">23.02.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">4. DAL 1 - DAVRANIŞSAL FAKTÖR: KİŞİSEL KORUYUCU EKİPMAN KULLANILMAMASI</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Elektrik bakım teknisyeni, 380V yüksek voltaj elektrik panosunda çalışma yaparken zorunlu kişisel koruyucu ekipman olan yalıtkan eldivenleri kullanmamıştır. Yüksek voltaj elektrik çalışmalarında yalıtkan eldivenler, elektrik çarpmasına karşı birincil koruma bariyeridir ve kullanımı yasal zorunluluktur. Teknisyen, elektrik güvenliği eğitimi almış ve yalıtkan eldiven kullanımının gerekliliğini bilmesine rağmen, bu kritik güvenlik önlemini atlayarak doğrudan çıplak elle enerjili panoya müdahale etmiştir.
+
+Olay raporunda 'Bakım teknisyeni elektrik çalışması sırasında uygun koruyucu ekipman kullanmadı' ifadesi açıkça belirtilmiştir. Olay sonrası yapılan incelemede, teknisyenin o gün merkezi KKE deposundan yalıtkan eldiven almadığı, doğrudan çalışma alanına gittiği ve eldivensiz çalışmaya başladığı tespit edilmiştir. Bu davranış, elektrik güvenliği kurallarının ciddi ihlali olup, kazanın doğrudan nedenlerinden biridir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Yüksek voltaj elektrik çalışması için zorunlu olan yalıtkan eldivenlerin kullanılmaması, teknisyenin 380V elektrik akımına doğrudan maruz kalmasına neden olmuştur. Yalıtkan eldivenler 1000V'a kadar koruma sağlar ve bu olayda kullanılsaydı elektrik çarpması önlenebilirdi.</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden elektrik teknisyeni yalıtkan eldiven kullanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Yalıtkan eldivenler çalışma alanında hazır bulunmuyordu ve teknisyen işi hızlı bitirmek için merkezi depodan almadan, eldivensiz çalışmaya devam etti. Teknisyen zaman baskısı hissettiğini ve 'kısa bir iş' olduğu için eldiven kullanmadan yapabileceğini düşündüğünü ifade etmiştir.</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden yalıtkan eldivenler çalışma alanında hazır bulunmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Kişisel koruyucu ekipmanlar merkezi depoda tutuluyordu ve her iş öncesi teknisyenlerin depodan alması gerekiyordu. Ancak iş öncesi KKE kontrolü zorunlu tutulmadığı için teknisyenler bazen KKE almadan işe başlayabiliyordu. Çalışma alanında KKE dolabı veya hazır ekipman seti bulunmuyordu.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden iş öncesi KKE kontrolü yapılmıyordu ve zorunlu tutulmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Elektrik çalışmaları için iş izin sistemi uygulanmıyordu ve dolayısıyla KKE kontrol listesi de zorunlu tutulmuyordu. İş izni olmadan çalışmalar başlayabildiği için, hangi KKE'lerin gerekli olduğu ve bunların kontrol edilip edilmediği sistematik olarak takip edilmiyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden elektrik çalışmaları için iş izin sistemi uygulanmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Yüksek voltaj elektrik çalışmaları için özel iş izin prosedürü tanımlanmamıştı. Mevcut iş izin sistemi sadece sıcak işleri (kaynak, kesme vb.) kapsıyordu ve elektrik çalışmaları bu sistemin dışında bırakılmıştı. Yönetim, elektrik işlerinin 'rutin bakım' kapsamında olduğunu düşünüyor ve özel izin gerektirmediğini varsayıyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden yüksek voltaj elektrik çalışmaları için özel iş izin prosedürü tanımlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk değerlendirmesi yapılırken elektrik çalışmalarının kritik kontrol gereksinimleri (LOTO, KKE, enerji izolasyonu doğrulaması, yetkilendirme vb.) yeterince belirlenmemiş ve iş izin sistemine entegre edilmemişti. Elektrik riskleri genel olarak tanımlanmış ancak spesifik kontrol önlemleri ve bunların nasıl uygulanacağı detaylandırılmamıştı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Elektrik Çalışmaları İçin İş İzin Sisteminin Etkisiz Olması</div>
+                <div class="box-content" contenteditable="true">[D4.4 / Organizasyonel]
+
+Yüksek voltaj elektrik çalışmaları için özel iş izin prosedürü oluşturulmamış, risk kontrolleri (KKE kullanımı, enerji izolasyonu, yetkilendirme, gözetim vb.) iş izin sistemine entegre edilmemiştir. Mevcut iş izin sistemi sadece sıcak işleri kapsadığı için, elektrik çalışmaları sistematik kontrol dışında kalmış ve kritik güvenlik önlemleri atlanabilir hale gelmiştir. Risk değerlendirmesinde elektrik çalışmalarının özel gereksinimleri yeterince detaylandırılmamış, hangi durumlarda hangi kontrollerin zorunlu olduğu net olarak tanımlanmamıştır.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">İş izin sistemi elektrik çalışmalarını kapsamamakta, sadece sıcak işler için prosedür bulunmaktadır</li>
+<li contenteditable="true">Risk değerlendirmesinde elektrik çalışmalarının kritik kontrol gereksinimleri detaylandırılmamış ve iş izin sistemine bağlanmamıştır</li>
+<li contenteditable="true">KKE kontrol listesi ve iş öncesi güvenlik kontrolleri zorunlu tutulmamakta, sistematik takip yapılmamaktadır</li>
+<li contenteditable="true">Yüksek riskli işler için özel yetkilendirme ve onay mekanizması bulunmamakta, teknisyenler kendi inisiyatifleriyle işe başlayabilmektedir</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">5. DAL 2 - KOŞULSAL FAKTÖR: ENERJİLİ SİSTEME MÜDAHALE</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Ana elektrik panosu (MDB-02) 380V yüksek voltaj ile enerjili durumdayken bakım teknisyeni tarafından müdahale edilmiştir. Elektrik güvenliği kurallarına göre, elektrik panolarına bakım ve onarım çalışmaları yapılmadan önce mutlaka enerji izolasyonu (LOTO - Lock Out Tag Out) prosedürü uygulanmalı, elektrik kaynağı kesilmeli, kilitlenmeli, etiketlenmeli ve enerji yokluğu test cihazları ile doğrulanmalıdır. Bu prosedür, elektrik çarpması riskini ortadan kaldıran en kritik güvenlik önlemidir.
+
+Olay raporunda 'Lokasyon Ana Elektrik Panosu (MDB-02) olarak belirtilmiş ve elektrik çarpması meydana gelmiştir' ifadesi yer almaktadır. Olay sonrası teknik incelemede, elektrik panosunun olay anında enerjili olduğu, ana şalterin açık konumda olduğu ve herhangi bir LOTO kilidi veya uyarı etiketi bulunmadığı tespit edilmiştir. Teknisyen, enerjili panoya doğrudan müdahale ederken elektrik akımına maruz kalmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">380V yüksek voltaj elektrik panosuna enerji izolasyonu yapılmadan, LOTO prosedürü uygulanmadan müdahale edilmesi, teknisyenin doğrudan elektrik akımına maruz kalmasına ve elektrik çarpması yaşamasına neden olmuştur.</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden ana elektrik panosu enerjili durumdayken müdahale edildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Enerji izolasyonu (LOTO) prosedürü uygulanmadı ve elektrik kaynağı kesilmeden, elektrikli (live) bakım yapıldı. Teknisyen, panodaki bir bağlantıyı kontrol etmek için enerjili sistemde çalışmanın daha hızlı olacağını düşündü.</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden enerji izolasyonu prosedürü uygulanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Bakım teknisyeni LOTO prosedürünü biliyordu ve daha önce eğitim almıştı, ancak bu işte zaman kazanmak ve üretim duruşunu minimize etmek için prosedürü atladı. Teknisyen, 'sadece hızlı bir kontrol' yapacağını ve risk almadığını düşündü.</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden teknisyen prosedürü atlama davranışını sergiledi ve bunu kabul edilebilir buldu?</div>
+                    <div class="why-answer" contenteditable="true">→ Daha önce de benzer şekilde kısa yoldan yapılan elektrik işlerinde kaza olmamış, bu tür prosedür ihlalleri tespit edilmemiş veya düzeltilmemiş, dolayısıyla teknisyen bu davranışın kabul edilebilir olduğunu düşünmüştür. Geçmiş deneyimler, 'her zaman böyle yapıyoruz ve bir şey olmuyor' algısı oluşturmuştur.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden güvensiz davranışlar tespit edilmedi, düzeltilmedi veya önlenmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Elektrik bakım çalışmaları sırasında sahada yeterli gözetim yapılmıyor, prosedür ihlalleri gözlemlenmiyor ve müdahale edilmiyor. Bakım sorumluları ofiste veya başka işlerde olduğu için saha denetimi yapamıyor, teknisyenler gözetimsiz çalışıyor.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden prosedür ihlalleri tespit edilip düzeltilmiyor ve saha gözetimi yetersiz?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim ve gözetim sistemi zayıf, bakım sorumluları çok sayıda işten sorumlu ve saha denetimi için yeterli zaman ayıramıyor. Güvenlik denetimleri planlı ve sistematik yapılmıyor, sapmalara müdahale mekanizması yok. Güvenlik performansı ölçülmüyor ve izlenmiyor.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Elektrik Bakım Çalışmalarında Yetersiz Gözetim ve Denetim</div>
+                <div class="box-content" contenteditable="true">[D1.2 / Organizasyonel]
+
+Bakım teknisyenlerinin saha çalışmaları yeterince denetlenmiyor, LOTO gibi kritik prosedürlerin uygulanıp uygulanmadığı kontrol edilmiyor ve prosedür ihlalleri tespit edilip düzeltilmiyor. Bakım sorumluları çok sayıda işten sorumlu olduğu için saha denetimi için yeterli zaman ayıramıyor, planlı güvenlik denetimleri yapılmıyor. Güvensiz davranışlar normalleşiyor, 'kısa yoldan yapma' kültürü oluşuyor ve bu davranışlara müdahale edilmediği için tekrarlanıyor. Güvenlik performansı sistematik olarak ölçülmüyor ve iyileştirme fırsatları kaçırılıyor.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Bakım sorumluları çok sayıda işten sorumlu, saha denetimi için yeterli zaman ve kaynak ayrılmamış</li>
+<li contenteditable="true">Planlı güvenlik denetimleri ve prosedür uyum kontrolleri sistematik olarak yapılmıyor</li>
+<li contenteditable="true">Güvensiz davranışlar ve prosedür ihlalleri tespit edilse bile düzeltici önlem alınmıyor, kayıt tutulmuyor</li>
+<li contenteditable="true">Güvenlik performans göstergeleri (KPI) tanımlanmamış, ölçülmüyor ve yönetime raporlanmıyor</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">6. DAL 3 - DAVRANIŞSAL FAKTÖR: PROSEDÜR İHLALİ</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Elektrik bakım teknisyeni, LOTO (Lock Out Tag Out) prosedürünü uygulamadan enerjili elektrik panosuna müdahale etmiştir. LOTO prosedürü, enerji kaynaklarının kontrollü bir şekilde izole edilmesi, kilitlenmesi ve etiketlenmesi yoluyla beklenmedik enerji akışını önleyen kritik bir güvenlik prosedürüdür. Bu prosedür, elektrik, mekanik, hidrolik, pnömatik ve diğer enerji kaynaklarından kaynaklanan kazaları önlemek için uluslararası standartlarda zorunlu tutulmaktadır.
+
+Elektrik Bakım Sorumlusu İbrahim Aydın tarafından hazırlanan olay raporunda, bakım çalışması sırasında elektrik çarpması meydana geldiği açıkça belirtilmiştir. Olay sonrası yapılan soruşturmada, teknisyenin LOTO prosedürü konusunda eğitim aldığı ancak bu olayda prosedürü uygulamadığı tespit edilmiştir. Bu, bilinçli bir prosedür ihlali olup, kazanın temel nedenlerinden biridir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">LOTO prosedürünün uygulanmaması, elektrik panosunun enerjili kalmasına ve teknisyenin elektrik akımına maruz kalmasına doğrudan neden olmuştur. Prosedür uygulanmış olsaydı, enerji kaynağı kesilir, kilitlenir ve kaza önlenirdi.</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden teknisyen LOTO prosedürünü uygulamadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Teknisyen işin acil olduğunu düşündü ve LOTO prosedürü uygulamanın zaman kaybı olacağını, üretim duruşunu uzatacağını varsaydı. Ayrıca 'sadece hızlı bir kontrol' yapacağını ve ciddi bir risk olmadığını düşündü.</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden teknisyen LOTO prosedürünü atlamanın kabul edilebilir olduğunu düşündü?</div>
+                    <div class="why-answer" contenteditable="true">→ Daha önce benzer durumlarda LOTO uygulanmadan yapılan elektrik müdahalelerinde herhangi bir uyarı, düzeltme veya disiplin cezası verilmemişti. Teknisyen ve meslektaşları, zaman baskısı olduğunda prosedürü atlamanın 'normal' olduğunu düşünüyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden prosedür ihlalleri tespit edilip düzeltilmedi ve uyarı yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Elektrik bakım çalışmaları sırasında yeterli gözetim ve denetim yapılmıyordu. Bakım sorumluları sahada bulunmuyor, teknisyenler gözetimsiz çalışıyor ve prosedür uyumu kontrol edilmiyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden elektrik bakım çalışmalarında gözetim ve denetim yetersizdi?</div>
+                    <div class="why-answer" contenteditable="true">→ Bakım sorumluları çok sayıda işten sorumluydu (elektrik, mekanik, bina bakımı vb.) ve saha denetimi için yeterli zaman ayıramıyordu. Ayrıca gözetim ve denetim sorumluluğu net olarak tanımlanmamış, performans beklentileri belirlenmemişti.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden prosedür ihlalleri ve güvenli olmayan davranışlar için hesap sorulmadı ve düzeltici önlem alınmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim tarafından güvenlik kurallarına uyumsuzluklar için net hesap verebilirlik sistemi oluşturulmamış ve uygulanmamıştı. Prosedür ihlalleri tespit edilse bile kayıt tutulmuyor, soruşturma yapılmıyor ve disiplin süreci işletilmiyordu. Güvenlik kuralları 'tavsiye' olarak görülüyor, zorunluluk olarak algılanmıyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: LOTO Prosedürü İhlallerinde Hesap Verebilirlik Sisteminin Olmaması</div>
+                <div class="box-content" contenteditable="true">[D1.3 / Organizasyonel]
+
+Güvenlik prosedürlerine uyumsuzluk gösteren çalışanlar için net hesap verebilirlik mekanizması oluşturulmamış, prosedür ihlalleri tespit edilse bile düzeltici önlem alınmamış, soruşturma yapılmamış ve disiplin süreci işletilmemiştir. LOTO gibi kritik güvenlik prosedürlerinin ihlali kayıt altına alınmıyor, kök neden analizi yapılmıyor ve tekrarı önleyici aksiyonlar alınmıyor. Bu durum, çalışanlarda 'prosedür ihlalinin sonuçsuz kalacağı' algısı oluşturmuş ve güvenli olmayan davranışların normalleşmesine yol açmıştır. Yönetim, güvenlik kurallarına uyumu sağlamak için gerekli liderliği göstermemiş, hesap verebilirlik kültürü oluşturulmamıştır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Prosedür ihlalleri için net hesap verebilirlik mekanizması ve disiplin süreci tanımlanmamış ve uygulanmıyor</li>
+<li contenteditable="true">Güvenlik kurallarına uyumsuzluklar kayıt altına alınmıyor, soruşturma yapılmıyor ve düzeltici önlem alınmıyor</li>
+<li contenteditable="true">Yönetim, güvenlik kurallarına uyum konusunda net beklentiler belirlemiyor ve liderlik göstermiyor</li>
+<li contenteditable="true">Güvenlik performansı bireysel performans değerlendirmelerine dahil edilmemiş, ödül-ceza sistemi yok</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">6. NİHAİ KÖK NEDENLER</div>
+
+            <div class="root-cause-box root-cause-1">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 1: Elektrik Çalışmaları İçin İş İzin Sisteminin Etkisiz Olması</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D4.4</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">HSE Departmanı (risk değerlendirmesi ve iş izin sistemi tasarımı), Bakım Departmanı (prosedür uygulama), Üst Yönetim (kaynak tahsisi ve politika onayı)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Yüksek voltaj elektrik çalışmaları için özel iş izin prosedürü oluşturulmamış ve mevcut iş izin sistemi sadece sıcak işleri (kaynak, kesme vb.) kapsamaktadır. Elektrik çalışmaları bu sistemin dışında bırakıldığı için, kritik güvenlik kontrolleri (KKE kullanımı, enerji izolasyonu, yetkilendirme, gözetim, acil durum hazırlığı vb.) sistematik olarak uygulanmamakta ve atlanabilmektedir.
+
+Risk değerlendirmesi yapılırken elektrik çalışmalarının özel gereksinimleri yeterince detaylandırılmamış, hangi durumlarda hangi kontrollerin zorunlu olduğu net olarak tanımlanmamış ve iş izin sistemine entegre edilmemiştir. Sonuç olarak, teknisyenler yüksek riskli elektrik işlerine herhangi bir izin almadan, kontrol listesi doldurmadan ve güvenlik önlemlerini doğrulatmadan başlayabilmektedir.
+
+İş izin sistemi, yüksek riskli işlerde çok katmanlı güvenlik kontrolü sağlayan kritik bir yönetim aracıdır. Etkili bir iş izni, işin risklerini değerlendirir, gerekli kontrolleri tanımlar, yetkilendirilmiş kişilerin onayını alır, iş öncesi güvenlik toplantısı yapılmasını sağlar ve işin güvenli tamamlanmasını doğrular. Bu sistemin elektrik çalışmalarını kapsamaması, çok ciddi bir organizasyonel eksikliktir.
+
+Bu kök neden, sadece bu olayı değil, gelecekte benzer elektrik kazalarını da mümkün kılan sistemik bir zayıflıktır. İş izin sistemi olmadan, her elektrik çalışması bireysel kararlar ve değişken uygulamalara bağlı kalmakta, standart güvenlik seviyesi sağlanamamaktadır.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">Kritik güvenlik kontrolleri (LOTO, KKE, enerji doğrulama) sistematik olarak uygulanmıyor ve atlanabiliyor</li>
+<li contenteditable="true">Yüksek riskli elektrik işleri için yetkilendirme ve onay mekanizması bulunmuyor, herkes her işe başlayabiliyor</li>
+<li contenteditable="true">İş öncesi risk değerlendirmesi ve güvenlik toplantısı yapılmıyor, riskler analiz edilmiyor</li>
+<li contenteditable="true">Acil durum hazırlığı (ilk yardım, kurtarma ekipmanı, iletişim) kontrol edilmiyor ve eksiklikler tespit edilemiyor</li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="root-cause-box root-cause-2">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 2: Elektrik Bakım Çalışmalarında Yetersiz Gözetim ve Denetim</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D1.2</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">Bakım Departmanı (gözetim kaynakları ve önceliklendirme), HSE Departmanı (denetim programları), Üst Yönetim (kaynak tahsisi ve performans beklentileri)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Bakım teknisyenlerinin saha çalışmaları yeterince denetlenmiyor, LOTO gibi kritik prosedürlerin uygulanıp uygulanmadığı kontrol edilmiyor ve prosedür ihlalleri tespit edilip düzeltilmiyor. Bakım sorumluları çok sayıda işten sorumlu olduğu için (elektrik, mekanik, bina bakımı, proje yönetimi vb.) saha denetimi için yeterli zaman ayıramamakta ve teknisyenler çoğu zaman gözetimsiz çalışmaktadır.
+
+Planlı güvenlik denetimleri ve prosedür uyum kontrolleri sistematik olarak yapılmamakta, güvenlik performansı ölçülmemekte ve izlenmemektedir. Güvensiz davranışlar gözlemlense bile kayıt tutulmamakta, kök neden analizi yapılmamakta ve düzeltici önlemler alınmamaktadır. Bu durum, güvensiz davranışların normalleşmesine ve 'kısa yoldan yapma' kültürünün oluşmasına yol açmaktadır.
+
+Etkili gözetim, sadece fiziksel varlık değil, aktif gözlem, koçluk, geri bildirim ve düzeltici müdahale gerektirir. Gözetim yapan kişilerin yeterli yetkinliğe, zamana ve otoriteye sahip olması, güvenlik beklentilerinin net olması ve performansın ölçülmesi gerekir. Mevcut durumda bu unsurların hiçbiri yeterli seviyede değildir.
+
+Yetersiz gözetim, organizasyonun güvenlik kurallarına verdiği önemi yansıtır. Çalışanlar, yönetimin güvenliği ciddiye alıp almadığını gözetim seviyesinden anlar. Gözetimsiz ortamda, prosedürler 'kağıt üzerinde' kalır ve uygulanmaz.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">Prosedür ihlalleri ve güvensiz davranışlar tespit edilemiyor, düzeltilemiyor ve tekrarlanıyor</li>
+<li contenteditable="true">Çalışanlar gözetimsiz kaldığı için kendi inisiyatifleriyle riskli kararlar alabiliyor</li>
+<li contenteditable="true">Güvenlik kültürü zayıflıyor, 'kısa yoldan yapma' ve 'yakalanmazsan sorun yok' algısı oluşuyor</li>
+<li contenteditable="true">Eğitim ve prosedürlerin etkinliği ölçülemiyor, iyileştirme fırsatları kaçırılıyor</li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="root-cause-box root-cause-3">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 3: LOTO Prosedürü İhlallerinde Hesap Verebilirlik Sisteminin Olmaması</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D1.3</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">Üst Yönetim (politika ve liderlik), İnsan Kaynakları (disiplin süreci ve performans yönetimi), HSE Departmanı (olay soruşturma ve takip), Bakım Departmanı (günlük uygulama ve gözetim)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Güvenlik prosedürlerine uyumsuzluk gösteren çalışanlar için net hesap verebilirlik mekanizması oluşturulmamış, prosedür ihlalleri tespit edilse bile düzeltici önlem alınmamış, soruşturma yapılmamış ve disiplin süreci işletilmemiştir. LOTO gibi kritik güvenlik prosedürlerinin ihlali kayıt altına alınmamakta, kök neden analizi yapılmamakta ve tekrarı önleyici aksiyonlar alınmamaktadır.
+
+Bu durum, çalışanlarda 'prosedür ihlalinin sonuçsuz kalacağı' ve 'kurallara uymadan da iş yapılabileceği' algısı oluşturmuş ve güvenli olmayan davranışların normalleşmesine yol açmıştır. Özellikle zaman baskısı veya üretim hedefleri olduğunda, güvenlik kurallarının 'esnetilebileceği' düşünülmektedir.
+
+Hesap verebilirlik, sadece ceza vermek değildir. Etkili bir hesap verebilirlik sistemi, net beklentiler belirler, performansı ölçer, geri bildirim verir, koçluk yapar ve gerektiğinde adil ve tutarlı sonuçlar uygular. Ayrıca, güvenli davranışları tanır ve ödüllendirir. Mevcut durumda, ne güvenli davranışlar tanınmakta ne de güvensiz davranışlar düzeltilmektedir.
+
+Yönetim, güvenlik kurallarına uyum konusunda net liderlik göstermemiş, 'güvenlik önceliğimizdir' sözlerini eylemlerle desteklememiştir. Güvenlik performansı bireysel performans değerlendirmelerine dahil edilmemiş, ödül-ceza sistemi oluşturulmamış ve güvenlik kültürü geliştirilmemiştir.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">Prosedür ihlalleri sonuçsuz kaldığı için tekrarlanıyor ve yaygınlaşıyor</li>
+<li contenteditable="true">Çalışanlar güvenlik kurallarını 'tavsiye' olarak görüyor, zorunluluk olarak algılamıyor</li>
+<li contenteditable="true">Güvenlik kültürü zayıf, 'kural tanımaz' davranışlar kabul görüyor</li>
+<li contenteditable="true">Yönetimin güvenlik liderliği sorgulanıyor, 'güvenlik önceliğimizdir' sözlerine inanılmıyor</li>
+
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">7. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Elektrik güvenliği riskleri ve LOTO prosedürünün önemi çalışanlara yeterince iletilmemiş, güvenlik toplantıları düzenli yapılmamış, olay paylaşımları ve ders çıkarma toplantıları gerçekleştirilmemiştir. Vardiya devir-teslimlerinde güvenlik konuları yeterince vurgulanmamaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">Elektrik teknisyenleri temel elektrik güvenliği eğitimi almış ancak LOTO prosedürü, yüksek voltaj güvenliği, acil durum müdahalesi ve risk değerlendirmesi konularında düzenli tazeleme eğitimleri yapılmamıştır. Son 2 yıl içinde elektrik güvenliği eğitimi verilmemiş, yetkinlik değerlendirmeleri yapılmamış ve saha uygulamalarında prosedür uyumu izlenmemiştir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Zaman Baskısı ve Üretim Hedefleri</td>
+                        <td contenteditable="true">Bakım teknisyenleri üretim duruşunu minimize etmek için zaman baskısı hissediyor ve güvenlik prosedürlerini 'zaman kaybı' olarak görüyorlar. Yönetim, üretim hedeflerini güvenlik hedeflerinden daha fazla vurguluyor ve hızlı iş bitirmeyi teşvik ediyor. Güvenli çalışma için yeterli zaman planlanmıyor.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman ve KKE Yönetimi Eksikliği</td>
+                        <td contenteditable="true">Yalıtkan eldivenler ve diğer kritik KKE'ler çalışma alanında hazır bulundurulmuyor, merkezi depodan alınması gerekiyor ancak bu kontrol zorunlu tutulmuyor. KKE'lerin periyodik testi, bakımı ve değişimi sistematik yapılmıyor. LOTO kilitleri ve etiketleri yeterli sayıda ve uygun yerlerde bulunmuyor.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Risk Algısı ve Güvenlik Kültürü Zayıflığı</td>
+                        <td contenteditable="true">Çalışanların elektrik risklerine karşı algısı düşük, 'bana bir şey olmaz' ve 'her zaman böyle yapıyoruz' düşüncesi yaygın. Güvenlik kurallarına uyum 'isteğe bağlı' olarak görülüyor, zorunluluk olarak algılanmıyor. Güvenli davranışlar tanınmıyor ve ödüllendirilmiyor, güvensiz davranışlar düzeltilmiyor.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Karmaşıklığı ve Erişilebilirlik</td>
+                        <td contenteditable="true">LOTO prosedürü karmaşık, uzun ve anlaşılması zor olabilir. Prosedürler güncel değil, sahada erişilebilir değil ve pratik uygulamaya uygun değil. Çalışanlar prosedürleri okumak ve anlamak için zaman ayırmıyor, 'deneyime dayalı' çalışmayı tercih ediyor.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yönetim Denetim ve Liderlik Eksikliği</td>
+                        <td contenteditable="true">Üst yönetim güvenlik performansını düzenli olarak gözden geçirmiyor, saha ziyaretleri yapmıyor ve güvenlik liderliği göstermiyor. Güvenlik komitesi toplantıları düzenli yapılmıyor, güvenlik hedefleri belirlenmemiş ve performans ölçülmüyor. Yönetim, 'güvenlik önceliğimizdir' sözlerini eylemlerle desteklemiyor.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kaynak Yetersizliği</td>
+                        <td contenteditable="true">Güvenlik ekipmanları, eğitim programları ve gözetim kaynakları için yeterli bütçe ayrılmamış. Bakım departmanı yetersiz personelle çalışıyor, iş yükü yüksek ve saha denetimi için zaman yok. HSE departmanı kaynak kısıtlaması yaşıyor ve proaktif güvenlik çalışmaları yapamıyor.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Olay Raporlama ve Öğrenme Sistemi Eksikliği</td>
+                        <td contenteditable="true">Ramak kala olaylar ve küçük kazalar raporlanmıyor, analiz edilmiyor ve ders çıkarılmıyor. Benzer olaylar tekrarlanıyor çünkü kök nedenler tespit edilmiyor ve düzeltici önlemler alınmıyor. Olay veritabanı yok, trend analizi yapılmıyor ve proaktif önlemler alınamıyor.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">8. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Yüksek voltaj elektrik çalışmaları için özel iş izin prosedürü geliştirilecek, LOTO, KKE kontrolü, enerji doğrulama, yetkilendirme ve acil durum hazırlığı kontrol listesi oluşturulacak ve zorunlu hale getirilecektir. İş izni olmadan elektrik çalışması yapılması yasaklanacaktır.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">İş izin sistemi uygulanma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Tüm elektrik panolarına LOTO kilitleri, etiketleri ve enerji test cihazları yerleştirilecek. Her elektrik teknisyenine kişisel LOTO kilidi ve etiketi verilecek. LOTO uygulama talimatları panolar üzerine asılacaktır.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm panolarda LOTO ekipmanı mevcut</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Elektrik çalışma alanlarına yalıtkan eldiven (1000V), yalıtkan ayakkabı, yüz siperliği, ark flaş koruyucu giysi içeren tam KKE setleri yerleştirilecek. KKE kontrol listesi oluşturulacak ve iş öncesi kontrol zorunlu hale getirilecektir.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Koordinatörü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm çalışma alanlarında KKE seti mevcut</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Tüm elektrik teknisyenlerine ve bakım personeline acil LOTO eğitimi, yüksek voltaj güvenliği eğitimi, acil durum müdahalesi ve CPR/AED eğitimi verilecek. Eğitim sonrası yetkinlik testi yapılacak ve başarısız olanlar sertifikalandırılmayacaktır.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Eğitim Koordinatörü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Tüm personel eğitim ve test başarısı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Elektrik çalışmaları için günlük gözetim planı oluşturulacak, bakım sorumluları her gün en az 2 saha denetimi yapacak ve prosedür uyumunu kontrol edecektir. Denetim sonuçları kayıt altına alınacak ve haftalık olarak HSE'ye raporlanacaktır.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Günlük denetim sayısı minimum 2, kayıt oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Prosedür ihlalleri için net hesap verebilirlik sistemi ve disiplin prosedürü oluşturulacak. LOTO ihlali 'sıfır tolerans' kuralı kapsamına alınacak, ilk ihlalde yazılı uyarı, ikinci ihlalde işten uzaklaştırma uygulanacaktır. Tüm ihlaller kayıt altına alınacak ve kök neden analizi yapılacaktır.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Tüm ihlaller kayıtlı, disiplin süreci %100 uygulanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Elektrik güvenliği risk değerlendirmesi güncellenecek, tüm elektrik çalışmaları için kritik kontrol gereksinimleri detaylandırılacak ve iş izin sistemine entegre edilecektir. Risk değerlendirmesi sonuçları tüm çalışanlarla paylaşılacaktır.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Risk değerlendirmesi tamamlandı ve paylaşıldı</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Haftalık güvenlik toplantıları başlatılacak, elektrik güvenliği riskleri, LOTO önemi, olay paylaşımları ve ders çıkarma konuları düzenli olarak ele alınacaktır. Toplantı katılımı zorunlu olacak ve kayıt tutulacaktır.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Vardiya Amiri</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Haftalık toplantı yapılıyor, katılım %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Güvenlik performans göstergeleri (KPI) tanımlanacak: LOTO uyum oranı, iş izni uyum oranı, KKE kullanım oranı, prosedür ihlal sayısı, ramak kala raporlama sayısı. KPI'lar aylık olarak ölçülecek ve yönetime raporlanacaktır.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">KPI'lar tanımlandı, aylık raporlama yapılıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Elektrik güvenliği için 6 aylık tazeleme eğitim programı oluşturulacak, LOTO prosedürü, yeni teknolojiler, olay paylaşımları ve en iyi uygulamalar düzenli olarak eğitilecektir. Eğitim etkinliği saha gözlemleriyle değerlendirilecektir.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Eğitim Koordinatörü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">6 aylık eğitim programı uygulanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Ramak kala olay raporlama sistemi oluşturulacak, çalışanlar prosedür ihlalleri ve güvensiz durumları raporlamaya teşvik edilecek. Raporlama yapan çalışanlar tanınacak ve ödüllendirilecek. Tüm raporlar analiz edilecek ve düzeltici önlemler alınacaktır.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Koordinatörü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Aylık ramak kala rapor sayısı minimum 10</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Üst yönetim aylık güvenlik gözden geçirme toplantıları yapacak, güvenlik performansını değerlendirecek, saha ziyaretleri gerçekleştirecek ve güvenlik liderliği gösterecektir. Güvenlik hedefleri iş hedefleriyle eşit öncelikte ele alınacaktır.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Genel Müdür</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Aylık güvenlik toplantısı yapılıyor, saha ziyareti minimum 2</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">9. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Yüksek Riskli İşler İçin İş İzin Sistemi Zorunlu Olmalı: Elektrik, yüksekte çalışma, confined space gibi yüksek riskli işler için özel iş izin prosedürleri oluşturulmalı, kritik güvenlik kontrolleri (LOTO, KKE, enerji doğrulama, yetkilendirme, gözetim, acil durum hazırlığı) sisteme entegre edilmeli ve iş izni olmadan çalışma yapılması kesinlikle yasaklanmalıdır. İş izin sistemi, çok katmanlı güvenlik kontrolü sağlar ve kritik adımların atlanmasını önler.
+• LOTO Prosedürü Sıfır Tolerans Kuralı Olmalı: Enerji izolasyonu (LOTO) prosedürü, elektrik ve mekanik kazaları önleyen en kritik güvenlik önlemidir ve hiçbir koşulda atlanmamalıdır. LOTO ihlali 'sıfır tolerans' kuralı kapsamına alınmalı, her ihlal ciddi disiplin cezası ile sonuçlanmalı ve çalışanlara bu kuralın önemi sürekli hatırlatılmalıdır. LOTO, 'isteğe bağlı' değil, 'yaşamsal zorunluluk' olarak algılanmalıdır.
+• Kritik KKE'ler Çalışma Alanında Hazır Bulundurulmalı: Yalıtkan eldivenler, yüz siperlikleri, ark flaş koruyucu giysiler gibi kritik kişisel koruyucu ekipmanlar çalışma alanında hazır bulundurulmalı, merkezi depodan alınması gerekmemeli ve iş öncesi KKE kontrolü zorunlu hale getirilmelidir. KKE'lerin periyodik testi, bakımı ve değişimi sistematik olarak yapılmalı ve kayıt tutulmalıdır. Eksik veya hatalı KKE ile çalışma kesinlikle yasaklanmalıdır.
+• Etkili Gözetim ve Denetim Sistemi Kurulmalı: Yüksek riskli işlerde etkili gözetim ve denetim sistemi kurulmalı, bakım sorumluları yeterli zaman ayırarak düzenli saha denetimleri yapmalı, prosedür uyumunu kontrol etmeli ve güvensiz davranışları hemen düzeltmelidir. Gözetim sadece fiziksel varlık değil, aktif gözlem, koçluk, geri bildirim ve düzeltici müdahale içermelidir. Güvenlik performansı ölçülmeli ve sürekli iyileştirilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Güvenlik Kültürü Dönüşümü: Organizasyonda güvenlik kültürü dönüşümü başlatılmalı, 'güvenlik önceliğimizdir' sözleri eylemlerle desteklenmeli, yönetim güvenlik liderliği göstermeli ve çalışanlar güvenlik sorumluluğunu içselleştirmelidir. Güvenli davranışlar tanınmalı ve ödüllendirilmeli, güvensiz davranışlar düzeltilmeli ve hesap verebilirlik sağlanmalıdır. Güvenlik, 'HSE departmanının işi' değil, 'herkesin sorumluluğu' olarak benimsenmelidir.
+• Sürekli Eğitim ve Yetkinlik Geliştirme: Elektrik güvenliği, LOTO, acil durum müdahalesi konularında sürekli eğitim ve yetkinlik geliştirme programları oluşturulmalı, düzenli tazeleme eğitimleri yapılmalı ve yetkinlik değerlendirmeleri ile sertifikalandırma sistemi kurulmalıdır. Eğitim sadece sınıf eğitimi değil, saha uygulamaları, simülasyonlar ve koçluk içermelidir. Eğitim etkinliği ölçülmeli ve sürekli iyileştirilmelidir.
+• Proaktif Risk Yönetimi: Reaktif yaklaşımdan (kaza olduktan sonra önlem alma) proaktif yaklaşıma (kaza olmadan riskleri tespit edip önlem alma) geçilmelidir. Düzenli risk değerlendirmeleri, ramak kala olay analizleri, güvenlik denetimleri ve trend analizleri yapılmalı, potansiyel riskler tespit edilmeli ve önleyici aksiyonlar alınmalıdır. Güvenlik, 'yangın söndürme' değil, 'yangın önleme' odaklı olmalıdır.
+• Teknoloji ve Otomasyon Kullanımı: Elektrik güvenliğini artırmak için teknoloji ve otomasyon kullanılmalıdır. Uzaktan enerji izolasyon sistemleri, otomatik LOTO kilitleri, enerji varlığı algılama sensörleri, ark flaş algılama sistemleri gibi teknolojiler değerlendirilmeli ve uygulanmalıdır. Teknoloji, insan hatasını minimize eder ve güvenlik seviyesini artırır.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Bu Olayın Tüm Organizasyonla Paylaşılması: Bu elektrik çarpması olayı, tüm organizasyonla (sadece elektrik personeli değil, tüm çalışanlar) paylaşılmalı, olay detayları, kök nedenler, alınan dersler ve düzeltici önlemler anlatılmalıdır. Olay paylaşımı, 'suçlama' değil, 'öğrenme' odaklı olmalı ve benzer kazaların önlenmesi için farkındalık yaratmalıdır. Görsel materyaller (fotoğraflar, videolar) kullanılarak etki artırılmalıdır.
+• Düzenli Güvenlik İletişimi ve Toplantıları: Haftalık güvenlik toplantıları, aylık güvenlik bültenleri, güvenlik panoları, e-posta bildirimleri gibi çeşitli iletişim kanalları kullanılarak güvenlik mesajları sürekli iletilmelidir. İletişim tek yönlü değil, çift yönlü olmalı, çalışanların soruları, endişeleri ve önerileri dinlenmeli ve yanıtlanmalıdır. Güvenlik iletişimi, 'bilgilendirme' değil, 'davranış değişikliği' hedeflemelidir.
+• Başarı Hikayeleri ve En İyi Uygulamaların Paylaşılması: Sadece kazalar değil, başarı hikayeleri ve en iyi uygulamalar da paylaşılmalıdır. Güvenli davranış sergileyen, prosedürlere uyan, ramak kala olay raporlayan çalışanlar tanınmalı ve hikayелeri paylaşılmalıdır. Pozitif örnekler, motivasyon artırır ve güvenlik kültürünü güçlendirir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• LOTO Prosedürü Uygulamalı Eğitim Programı: Tüm elektrik ve bakım personeline LOTO prosedürü konusunda kapsamlı uygulamalı eğitim programı verilmelidir. Eğitim sadece teorik bilgi değil, gerçek ekipmanlar üzerinde uygulama, farklı senaryolar, hata analizi ve acil durum simülasyonları içermelidir. Her çalışan, LOTO prosedürünü bağımsız olarak uygulayabilecek yetkinliğe ulaşmalı ve sertifikalandırılmalıdır.
+• Elektrik Güvenliği ve Yüksek Voltaj Eğitimi: Elektrik teknisyenlerine yüksek voltaj güvenliği, ark flaş riskleri, elektrik çarpması fizyolojisi, güvenli çalışma mesafeleri, enerji doğrulama yöntemleri konularında detaylı eğitim verilmelidir. Eğitim, ulusal ve uluslararası standartlara (NFPA 70E, IEC 61482 vb.) uygun olmalı ve sertifikalı eğitmenler tarafından verilmelidir.
+• Acil Durum Müdahalesi ve İlk Yardım Eğitimi: Tüm çalışanlara (sadece elektrik personeli değil) elektrik çarpması acil durum müdahalesi, CPR, AED kullanımı, yanık tedavisi konularında pratik eğitim verilmelidir. Düzenli tatbikatlar yapılmalı, acil durum ekipmanları test edilmeli ve çalışanların hazırlık seviyesi değerlendirilmelidir. Acil durum müdahalesi, 'bilgi' değil, 'refleks' haline gelmelidir.
+• Güvenlik Liderliği ve Davranışsal Güvenlik Eğitimi: Yöneticilere ve gözetmenlere güvenlik liderliği, davranışsal güvenlik, etkili gözetim, koçluk ve geri bildirim verme konularında eğitim verilmelidir. Yöneticiler, güvenlik kurallarını uygulatmak, güvenli davranışları teşvik etmek ve güvensiz davranışları düzeltmek için gerekli becerilere sahip olmalıdır. Güvenlik liderliği, 'pozisyon' değil, 'yetkinlik' gerektirir.</div>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">20 Şubat 2026 tarihinde meydana gelen elektrik çarpması kazası, organizasyonumuzun elektrik güvenliği yönetim sistemindeki ciddi eksiklikleri ortaya çıkarmıştır. Bu olay, sadece bireysel bir hata değil, sistemik organizasyonel zayıflıkların sonucudur. HSG245 metodolojisi kullanılarak yapılan kapsamlı kök neden analizi, üç temel organizasyonel kök neden tespit etmiştir: (1) Elektrik çalışmaları için iş izin sisteminin etkisiz olması, (2) Elektrik bakım çalışmalarında yetersiz gözetim ve denetim, (3) LOTO prosedürü ihlallerinde hesap verebilirlik sisteminin olmaması.
+
+Bu kök nedenler, birbirini destekleyen ve güçlendiren sistemik zayıflıklardır. İş izin sistemi olmadığı için kritik güvenlik kontrolleri atlanabilmekte, yetersiz gözetim nedeniyle prosedür ihlalleri tespit edilememekte ve hesap verebilirlik eksikliği nedeniyle güvensiz davranışlar normalleşmektedir. Bu sistemik sorunlar çözülmeden, benzer kazaların tekrarlanma riski yüksek seviyede devam edecektir.
+
+Olayın ciddiyeti göz önüne alındığında (kalp durması, yoğun bakım, RIDDOR kapsamında raporlama), acil ve kapsamlı düzeltici önlemler alınması zorunludur. Bu raporda tanımlanan 12 düzeltici önlem, kısa, orta ve uzun vadeli iyileştirmeleri kapsamakta ve tüm kök nedenleri ele almaktadır. Bu önlemlerin zamanında ve etkili bir şekilde uygulanması, benzer kazaların önlenmesi ve güvenlik kültürünün güçlendirilmesi için kritik öneme sahiptir.
+
+Sonuç olarak, bu olay organizasyonumuz için önemli bir öğrenme fırsatıdır. Yapılan hatalardan ders çıkararak, sistemik iyileştirmeler yaparak ve güvenlik kültürünü dönüştürerek, daha güvenli bir çalışma ortamı oluşturabiliriz. Güvenlik, sadece HSE departmanının değil, tüm organizasyonun ve her bireyin sorumluluğudur.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Acil İş İzin Sistemi Uygulaması (1 hafta): Yüksek voltaj elektrik çalışmaları için geçici iş izin sistemi hemen uygulamaya konulacak, LOTO, KKE kontrolü ve enerji doğrulama zorunlu hale getirilecek. İş izni olmadan elektrik çalışması yapılması yasaklanacak ve tüm personel bilgilendirilecektir.</li>
+<li contenteditable="true">LOTO Ekipmanlarının Yerleştirilmesi (1 hafta): Tüm elektrik panolarına LOTO kilitleri, etiketleri ve enerji test cihazları acilen yerleştirilecek. Her elektrik teknisyenine kişisel LOTO kilidi verilecek ve kullanım talimatları panolar üzerine asılacaktır.</li>
+<li contenteditable="true">Kritik KKE Setlerinin Hazırlanması (1 hafta): Elektrik çalışma alanlarına yalıtkan eldiven, ayakkabı, yüz siperliği içeren tam KKE setleri yerleştirilecek. İş öncesi KKE kontrolü zorunlu hale getirilecek ve eksik KKE ile çalışma yasaklanacaktır.</li>
+<li contenteditable="true">Acil Eğitim Programı (2 hafta): Tüm elektrik ve bakım personeline acil LOTO eğitimi, yüksek voltaj güvenliği eğitimi ve acil durum müdahalesi eğitimi verilecek. Eğitim sonrası yetkinlik testi yapılacak ve başarısız olanlar sertifikalandırılmayacaktır.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kapsamlı İş İzin Sistemi Geliştirilmesi (3 ay): Tüm yüksek riskli işler için (elektrik, yüksekte çalışma, confined space, sıcak işler vb.) kapsamlı iş izin sistemi geliştirilecek, dijital platform üzerinden uygulanacak ve sürekli iyileştirilecektir. Sistem, risk değerlendirmesi, kontrol önlemleri, yetkilendirme, gözetim ve performans ölçümünü entegre edecektir.</li>
+<li contenteditable="true">Güvenlik Kültürü Dönüşüm Programı (12 ay): Organizasyonda güvenlik kültürü dönüşümü için kapsamlı program başlatılacak. Yönetim güvenlik liderliği eğitimi alacak, çalışanlar güvenlik sorumluluğunu içselleştirecek, güvenli davranışlar tanınacak ve ödüllendirilecek, hesap verebilirlik sistemi kurulacaktır. Güvenlik kültürü ölçülecek ve sürekli iyileştirilecektir.</li>
+<li contenteditable="true">Sürekli Eğitim ve Yetkinlik Geliştirme Sistemi (6 ay): Elektrik güvenliği, LOTO, acil durum müdahalesi konularında sürekli eğitim programı oluşturulacak, 6 aylık tazeleme eğitimleri yapılacak, yetkinlik değerlendirmeleri ve sertifikalandırma sistemi kurulacaktır. Eğitim etkinliği saha gözlemleriyle ölçülecek ve iyileştirilecektir.</li>
+<li contenteditable="true">Proaktif Güvenlik Yönetim Sistemi (12 ay): Reaktif yaklaşımdan proaktif yaklaşıma geçiş için ramak kala olay raporlama sistemi, düzenli güvenlik denetimleri, risk değerlendirme güncellemeleri, trend analizleri ve önleyici aksiyon programı oluşturulacaktır. Güvenlik performans göstergeleri tanımlanacak, ölçülecek ve sürekli iyileştirilecektir.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Elektrik Çalışmaları Risk Seviyesi</td>
+                        <td class="current" contenteditable="true">Çok Yüksek (Kontrol yok)</td>
+                        <td class="target" contenteditable="true">Düşük (Çok katmanlı kontrol)</td>
+                    </tr>
+
+                    <tr>
+                        <td>İş İzin Sistemi Uygulaması</td>
+                        <td class="current" contenteditable="true">Yok (Elektrik işleri kapsam dışı)</td>
+                        <td class="target" contenteditable="true">%100 (Tüm yüksek riskli işler)</td>
+                    </tr>
+
+                    <tr>
+                        <td>LOTO Prosedürü Uyum Oranı</td>
+                        <td class="current" contenteditable="true">%30 (Düzensiz uygulama)</td>
+                        <td class="target" contenteditable="true">%100 (Sıfır tolerans)</td>
+                    </tr>
+
+                    <tr>
+                        <td>KKE Kullanım Oranı</td>
+                        <td class="current" contenteditable="true">%60 (İsteğe bağlı)</td>
+                        <td class="target" contenteditable="true">%100 (Zorunlu ve kontrollü)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Saha Gözetim ve Denetim</td>
+                        <td class="current" contenteditable="true">Yetersiz (Aylık 2-3 denetim)</td>
+                        <td class="target" contenteditable="true">Etkili (Günlük 2+ denetim)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür İhlal Tespit ve Düzeltme</td>
+                        <td class="current" contenteditable="true">%20 (Çoğu tespit edilmiyor)</td>
+                        <td class="target" contenteditable="true">%100 (Tümü kayıtlı ve düzeltiliyor)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Elektrik Güvenliği Eğitim Sıklığı</td>
+                        <td class="current" contenteditable="true">2 yılda bir (Düzensiz)</td>
+                        <td class="target" contenteditable="true">6 ayda bir (Düzenli tazeleme)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Hesap Verebilirlik Sistemi</td>
+                        <td class="current" contenteditable="true">Yok (İhlaller sonuçsuz)</td>
+                        <td class="target" contenteditable="true">Tam (Adil ve tutarlı uygulama)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Kültürü Seviyesi</td>
+                        <td class="current" contenteditable="true">Reaktif (Kaza sonrası önlem)</td>
+                        <td class="target" contenteditable="true">Proaktif (Kaza öncesi önlem)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Ramak Kala Raporlama</td>
+                        <td class="current" contenteditable="true">0-2/ay (Raporlanmıyor)</td>
+                        <td class="target" contenteditable="true">10+/ay (Aktif raporlama)</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    
+    <script>
+        // Otomatik kaydetme için localStorage kullan
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                localStorage.setItem('hse_report_backup_' + Date.now(), document.body.innerHTML);
+            }
+        });
+        
+        // Print fonksiyonu
+        function printReport() {
+            window.print();
+        }
+        
+        // Export to PDF hint
+        console.log('💡 Bu raporu PDF olarak kaydetmek için tarayıcınızın yazdır (Ctrl+P) fonksiyonunu kullanın ve "PDF olarak kaydet" seçeneğini seçin.');
+    </script>
+</body>
+</html>

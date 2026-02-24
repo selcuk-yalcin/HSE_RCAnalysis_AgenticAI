@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">HSG245 Metodolojisi ile Hazırlanmıştır</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260224-013003</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">24 Şubat 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Ambalaj Hattı 3 - Konveyör Bandı Sistemi</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Major Injury - Makine Sıkışması/Ezilme</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">22 Şubat 2026 tarihinde saat 11:15'te Ambalaj Hattı 3'te çalışan operatör, konveyör bandında sıkışan ürünü çıkarmak için acil durdurma düğmesini kullanmadan ve LOTO prosedürünü uygulamadan koruyucu kapağı açarak müdahale etmiş, bu sırada bandın çalışmaya devam etmesi sonucu ciddi ezilme yaralanması meydana gelmiştir.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">22 Şubat 2026 tarihinde saat 11:15'te Ambalaj Hattı 3'te görevli operatör, konveyör bandı sisteminde sıkışan bir ürünü çıkarmak amacıyla müdahale ederken ciddi bir iş kazası meydana gelmiştir. Operatör, acil durdurma düğmesini kullanmadan ve Lock-Out/Tag-Out (LOTO) prosedürünü uygulamadan doğrudan koruyucu kapağı açarak sıkışan ürüne ulaşmaya çalışmıştır. Koruyucu kapak açıldığında konveyör bandı çalışmaya devam etmiş ve operatörün eli hareketli parçalar arasında sıkışarak ezilme yaralanması meydana gelmiştir.
+
+Olay, üretim vardiyası sırasında yüksek tempolu çalışma koşullarında gerçekleşmiştir. Operatör, üretim hedeflerine yetişme baskısı altında hızlı müdahale etme isteğiyle güvenlik prosedürlerini atlayarak doğrudan müdahale etmiştir. Emniyet kilidi (interlock) sisteminin bulunmaması veya devre dışı olması nedeniyle koruyucu kapak açıldığında makine otomatik olarak durmamış, bu durum kazanın gerçekleşmesine doğrudan katkıda bulunmuştur. Olay, RIDDOR kapsamında raporlanması gereken major injury kategorisinde değerlendirilmiştir.</div>
+<div class="paragraph" contenteditable="true">Olay, üretim tesisinin Ambalaj Hattı 3 bölümünde, konveyör bandı sisteminin ürün transfer noktasında meydana gelmiştir. Bu bölüm, yüksek hızda çalışan otomatik ambalaj sistemlerinin bulunduğu, sürekli operatör gözetimi gerektiren kritik bir üretim alanıdır. Çalışma ortamı, yüksek gürültü seviyesi, sürekli hareket halindeki makineler ve zaman baskısının yoğun olduğu bir atmosfere sahiptir. Olay anında vardiya değişimi öncesi son üretim yoğunluğu yaşanmakta ve hat üzerinde hedeflenen üretim miktarına ulaşma baskısı bulunmaktaydı.</div>
+<div class="paragraph" contenteditable="true">Olaydan doğrudan etkilenen kişi, Ambalaj Hattı 3'te görevli deneyimli bir konveyör bandı operatörüdür. Operatör, ciddi el ezilmesi yaralanması geçirmiş ve acil tıbbi müdahale gerektiren durumda hastaneye sevk edilmiştir. Yaralanma, RIDDOR kapsamında major injury olarak sınıflandırılmış olup, operatörün uzun süreli iş göremezlik durumu ve olası kalıcı sakatlık riski bulunmaktadır. Dolaylı olarak, aynı hatta çalışan diğer operatörler psikolojik travma yaşamış, üretim hattı durdurulmuş ve tüm vardiya çalışanları olay nedeniyle etkilenmiştir. Ekipman açısından konveyör bandı sistemi hasar görmüş ve kapsamlı güvenlik incelemesi gerekmiştir.</div>
+<div class="paragraph" contenteditable="true">Olay meydana geldiği anda, yakındaki çalışma arkadaşları durumu fark ederek hemen acil durdurma düğmesine basarak konveyör bandını durdurmuşlardır. Hat şefi Ayşe Demir derhal olay yerine gelmiş ve yaralı operatörün ilk yardım müdahalesini başlatmıştır. Tesisin acil müdahale ekibi çağrılmış ve yaralı operatöre temel ilk yardım uygulanmıştır. Aynı zamanda 112 Acil Servis aranarak ambulans talep edilmiş ve yaralı operatör profesyonel tıbbi müdahale için hastaneye sevk edilmiştir.
+
+Olay yeri derhal güvenlik şeridi ile çevrilmiş, kanıt ve delillerin korunması için alan izole edilmiştir. Üretim hattı tamamen durdurulmuş ve tüm Ambalaj Hattı 3 operasyonları askıya alınmıştır. HSE departmanı ve üst yönetim bilgilendirilmiş, olay RIDDOR kapsamında yetkili makamlara 24 Şubat 2026 tarihinde raporlanmıştır. Kaza defterine 055/26 referans numarası ile kayıt yapılmıştır. Aynı gün içinde HSE yetkilisi tarafından ilk değerlendirme yapılmış ve yüksek seviyeli araştırma gerekliliği tespit edilmiştir. Çok disiplinli araştırma ekibi oluşturulmuş ve kapsamlı kök neden analizi süreci başlatılmıştır.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Operatör, konveyör bandını durdurmadan ve LOTO prosedürünü uygulamadan doğrudan müdahale etmiştir. Bu davranış, güvenlik prosedürlerinin bilinçli olarak atlanması ve üretim baskısı altında hızlı çözüm arayışının bir sonucudur. Operatörün geçmişte benzer şekilde müdahale ettiği ve bu davranış için herhangi bir uyarı almadığı tespit edilmiştir.</li>
+<li contenteditable="true">Konveyör bandı sisteminde emniyet kilidi (interlock) sistemi bulunmamaktadır veya devre dışı bırakılmıştır. Koruyucu kapak açıldığında makineyi otomatik olarak durduracak kritik güvenlik sistemi çalışmamaktadır. Bu durum, tasarım aşamasında güvenlik gereksinimlerinin yeterince değerlendirilmediğini ve risk analizinin eksik yapıldığını göstermektedir.</li>
+<li contenteditable="true">Saha gözetimi ve denetimi yetersizdir. Hat şefleri ve vardiya amirleri, operatörlerin çalışma yöntemlerini düzenli olarak kontrol etmemekte, güvensiz davranışları tespit edip düzeltmemektedir. Üretim hedeflerine odaklanma nedeniyle güvenlik denetimi için yeterli zaman ayrılmamakta ve gözetim sorumluluklarının net tanımı bulunmamaktadır.</li>
+<li contenteditable="true">Yönetim, güvenlik prosedürü ihlallerini biliyor ancak üretim öncelikleri nedeniyle bu sapmalara tolerans göstermektedir. LOTO prosedürünün atlanması, koruyucu ekipmanların devre dışı bırakılması gibi güvensiz davranışlar normalleşmiş ve düzeltici önlem alınmamıştır. Bu durum, organizasyonda güvenlik kültürünün zayıf olduğunu ve üretim-güvenlik dengesinin bozulduğunu göstermektedir.</li>
+<li contenteditable="true">Makine ve ekipman tasarımlarında güvenlik gözden geçirme prosedürü bulunmamaktadır. Tasarım onayı öncesi sistematik risk analizi ve güvenlik kontrol listesi uygulaması yapılmamaktadır. Bu eksiklik, kritik emniyet sistemlerinin tasarım aşamasında gözden kaçmasına ve tehlikeli çalışma koşullarının oluşmasına neden olmaktadır.</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Kritik Kök Nedenler</div>
+
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Saha Gözetiminin Yetersizliği ve Güvensiz Davranışların Tespit Edilememesi</div>
+                <div class="box-content" contenteditable="true">[D1.2 / Organizasyonel]
+                
+Organizasyonda saha gözetimi ve denetimi, güvenlik yönetim sisteminin kritik bir bileşeni olarak sistematik bir şekilde yürütülmemektedir. Hat şefleri ve vardiya amirleri, operatörlerin günlük çalışma yöntemlerini düzenli olarak gözlemleme, güvensiz davranışları tespit etme ve anında düzeltme soruml...</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Yönetimin Üretim Baskısı Nedeniyle LOTO Prosedürü İhlallerine Tolerans Göstermesi</div>
+                <div class="box-content" contenteditable="true">[D1.9 / Organizasyonel]
+                
+Organizasyonun üst yönetimi ve orta kademe yöneticileri, üretim hedeflerine ulaşmanın kritik öncelik olduğu bir kültür oluşturmuş ve sürdürmektedir. Bu kültürde, güvenlik prosedürlerinin ihlal edildiği açıkça bilinmesine rağmen, kısa vadeli üretim hedeflerini tehlikeye atmamak için bu sapmalara sist...</div>
+            </div>
+
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Tasarım Sürecinde Güvenlik Gözden Geçirme Prosedürünün Olmaması</div>
+                <div class="box-content" contenteditable="true">[D5.2 / Organizasyonel]
+                
+Organizasyonda makine ve ekipman tasarımlarının, yerleşim değişikliklerinin ve modifikasyonların güvenlik açısından sistematik olarak değerlendirilmesi için resmi bir süreç ve prosedür bulunmamaktadır. Bu durum, kritik emniyet sistemlerinin tasarım aşamasında gözden kaçmasına, tehlikeli çalışma koşu...</div>
+            </div>
+
+            <div class="subsection-header">1.4 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Tüm konveyör bandı sistemlerinde emniyet kilidi kontrolü yapılmış ve eksik/arızalı sistemler tespit edilmiştir</td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ambalaj Hattı 3 tamamen devre dışı bırakılmış ve güvenlik iyileştirmeleri tamamlanana kadar operasyona alınmayacaktır</td>
+                        <td contenteditable="true">Üretim Müdürü</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm operatörlere acil LOTO prosedürü eğitimi verilmiş ve yetkinlik testleri yapılmıştır</td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Güvenlik prosedürü ihlallerinin raporlanması için anonim bildirim sistemi kurulmuştur</td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">Planlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260224-013003</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">22 Şubat 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">11:15</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Ambalaj Hattı 3 - Konveyör Bandı Sistemi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Ambalaj Departmanı / Hat 3</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Konveyör Bandı Operatörü (İsim gizlilik nedeniyle belirtilmemiştir)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası (08:00-16:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Konveyör Bandı Sistemi - Ürün Transfer Ünitesi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Ambalajlanmış ürün paketleri</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Kapalı alan - İç mekan koşulları normal</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Yeterli - Standart fabrika aydınlatması</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">İş eldiveni, güvenlik ayakkabısı, iş tulumu (Ancak eldivenler ezilme koruması sağlamamaktadır)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Major Injury - Makine Sıkışması/Ezilme</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Ciddi el ezilmesi, kemik kırığı şüphesi, yumuşak doku hasarı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 (Bir operatör)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Major Injury - Uzun süreli iş göremezlik ve kalıcı sakatlık riski</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Evet - 24 Şubat 2026 tarihinde raporlanmıştır</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Aynı hatta çalışan operatör arkadaşı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet - 112 Acil Servis çağrılmış ve ambulans gelmiştir</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Hastaneye sevk edilmiş, yatış durumu devam etmektedir</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:00</div>
+                    <div class="timeline-event" contenteditable="true">Vardiya normal üretim temposunda devam etmektedir. Üretim hedeflerine yetişme baskısı yüksektir ve hat şefi hedef miktarları vurgulamaktadır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:10</div>
+                    <div class="timeline-event" contenteditable="true">Konveyör bandında ürün sıkışması meydana gelir. Operatör durumu fark eder ve hızlı müdahale etme kararı alır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:12</div>
+                    <div class="timeline-event" contenteditable="true">Operatör, acil durdurma düğmesini kullanmadan ve LOTO prosedürünü uygulamadan koruyucu kapağı açar ve sıkışan ürüne ulaşmaya çalışır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:15</div>
+                    <div class="timeline-event" contenteditable="true">Operatörün eli hareketli konveyör bandı parçaları arasında sıkışır ve ciddi ezilme yaralanması meydana gelir. Operatör acı içinde yardım çağırır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:16</div>
+                    <div class="timeline-event" contenteditable="true">Yakındaki çalışma arkadaşı durumu fark eder ve hemen acil durdurma düğmesine basarak bandı durdurur. Hat şefi Ayşe Demir olay yerine koşar.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:18</div>
+                    <div class="timeline-event" contenteditable="true">İlk yardım ekibi çağrılır ve 112 Acil Servis aranır. Yaralı operatöre temel ilk yardım uygulanmaya başlanır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:25</div>
+                    <div class="timeline-event" contenteditable="true">Ambulans tesise ulaşır ve yaralı operatör profesyonel tıbbi müdahale altına alınır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:35</div>
+                    <div class="timeline-event" contenteditable="true">Yaralı operatör hastaneye sevk edilir. Olay yeri güvenlik şeridi ile çevrilir ve kanıt koruma altına alınır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">12:00</div>
+                    <div class="timeline-event" contenteditable="true">HSE departmanı ve üst yönetim bilgilendirilir. Tüm Ambalaj Hattı 3 operasyonları durdurulur.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:00</div>
+                    <div class="timeline-event" contenteditable="true">HSE yetkilisi tarafından ilk olay yeri incelemesi yapılır ve yüksek seviyeli araştırma kararı alınır.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - HSG245 / 5 WHY</div>
+            
+            <div class="subsection-header">3.1 HSG245 Metodolojisi</div>
+            <div class="paragraph" contenteditable="true">HSG245 (Investigating Accidents and Incidents), İngiltere Sağlık ve Güvenlik İdaresi (HSE) tarafından yayınlanan, iş kazalarının ve olaylarının sistematik olarak araştırılması için geliştirilmiş kapsamlı bir metodoloji rehberidir. Bu metodoloji, olayların yüzeysel nedenlerinin ötesine geçerek, organizasyonel ve sistemik kök nedenleri belirlemeyi amaçlar. HSG245, hiyerarşik bir yaklaşım kullanarak olayları dört ana kategori altında sınıflandırır: İnsan Faktörleri (A), Organizasyonel Faktörler (B), İş/Görev Faktörleri (C) ve Çevresel Faktörler (D). Bu sınıflandırma, araştırmacıların olayın tüm boyutlarını kapsamlı bir şekilde değerlendirmesini sağlar.
+
+Bu olay analizinde HSG245 metodolojisi, üç farklı dal üzerinden uygulanmıştır. Birinci dal, operatörün güvenlik ekipmanlarını devre dışı bırakması davranışsal nedenini (A3.5) incelemiş ve yetersiz gözetim organizasyonel kök nedenine (D1.2) ulaşmıştır. İkinci dal, LOTO prosedürü ihlali davranışsal nedenini (A1.1) analiz etmiş ve yönetimin sapmalara toleransı organizasyonel kök nedenini (D1.9) tespit etmiştir. Üçüncü dal ise emniyet kilidi sisteminin yokluğu koşulsal nedenini (B1.1) incelemiş ve yetersiz tasarım gözden geçirme organizasyonel kök nedenini (D5.2) belirlemiştir. Her dal, 5-Why tekniği kullanılarak derinlemesine sorgulanmış ve davranışsal/koşulsal nedenlerden organizasyonel kök nedenlere ulaşılmıştır.
+
+HSG245'in en önemli özelliği, suçlama kültürü yerine öğrenme kültürünü teşvik etmesidir. Metodoloji, bireyleri suçlamak yerine sistemik zayıflıkları belirlemeye odaklanır. Bu yaklaşım, organizasyonların benzer olayların tekrarını önlemek için etkili düzeltici önlemler almasını sağlar. Analiz sonucunda belirlenen üç organizasyonel kök neden (yetersiz gözetim, sapmalara tolerans, yetersiz tasarım gözden geçirme), organizasyonun güvenlik yönetim sistemindeki temel zayıflıkları ortaya koymuş ve kapsamlı iyileştirme fırsatları sunmuştur.</div>
+            
+            <div class="subsection-header">3.2 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why (5 Neden) tekniği, Toyota Üretim Sistemi'nden kaynaklanan ve kök neden analizinde yaygın olarak kullanılan basit ama etkili bir sorgulama yöntemidir. Teknik, bir problemin yüzeysel belirtilerinden başlayarak, her cevaba 'Neden?' sorusunu sorarak derinlemesine inmek ve gerçek kök nedene ulaşmak üzerine kuruludur. Genellikle beş kez 'neden' sorusu sorulması, çoğu durumda kök nedene ulaşmak için yeterli olmaktadır, ancak bazı durumlarda daha az veya daha fazla soru gerekebilir. Bu analizde, her üç dal için de 4-5 seviyeli neden zinciri oluşturulmuş ve davranışsal/koşulsal nedenlerden organizasyonel kök nedenlere sistematik olarak ulaşılmıştır.
+
+Bu olay analizinde 5-Why tekniği, HSG245 hiyerarşik yapısı ile entegre edilerek uygulanmıştır. Her dalda, doğrudan neden (A veya B kategorisi) tespit edildikten sonra, 'Neden bu durum oluştu?' sorusu tekrar tekrar sorulmuş ve her cevap bir sonraki neden seviyesini oluşturmuştur. Örneğin, ikinci dalda operatörün LOTO prosedürünü atlama davranışı (A1.1) tespit edildikten sonra, neden atladığı sorulmuş (üretim baskısı), ardından neden üretim baskısı olduğu (yönetim öncelikleri), neden yönetimin müdahale etmediği (sapmaların normalleşmesi), neden normalleştiği (etkisiz gözetim) ve nihayet neden gözetimin etkisiz olduğu (yönetimin toleransı) sorgulanarak D1.9 kök nedenine ulaşılmıştır. Bu sistematik sorgulama, yüzeysel çözümler yerine gerçek kök nedenleri hedefleyen etkili düzeltici önlemlerin geliştirilmesini sağlamıştır.</div>
+            
+            <div class="subsection-header">3.3 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü</td>
+                        <td contenteditable="true">Bireysel davranışlar, bilgi eksikliği, beceri yetersizliği, prosedür ihlalleri, dikkatsizlik, yorgunluk, motivasyon eksikliği gibi doğrudan insan kaynaklı faktörler. Bu kategori, çalışanların bilinçli veya bilinçsiz olarak gerçekleştirdiği güvensiz eylemleri kapsar.</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktör</td>
+                        <td contenteditable="true">Ekipman arızası, makine tasarım hatası, koruyucu sistemlerin yetersizliği, malzeme kusurları, fiziksel tehlikeler gibi çalışma ortamının fiziksel koşullarına ilişkin faktörler. Bu kategori, donanım ve ekipman kaynaklı nedenleri içerir.</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">İş yükü, görev karmaşıklığı, zaman baskısı, ergonomik sorunlar, prosedür eksiklikleri, iş planlaması hataları gibi işin doğası ve organizasyonuna ilişkin faktörler. Bu kategori, görevin nasıl tasarlandığı ve yönetildiği ile ilgili nedenleri kapsar.</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Yönetim kararları, politika yetersizlikleri, güvenlik kültürü eksiklikleri, kaynak tahsisi sorunları, iletişim bozuklukları, eğitim yetersizlikleri, gözetim eksiklikleri gibi organizasyonun sistemik ve yönetimsel faktörleri. Bu kategori, kök nedenlerin çoğunlukla bulunduğu seviyedir ve sürdürülebilir iyileştirmeler için kritik öneme sahiptir.</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.4 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Kıdemli HSE Yöneticisi</td>
+                        <td contenteditable="true">Baş Araştırmacı - Araştırma sürecinin koordinasyonu ve metodoloji uygulaması</td>
+                        <td contenteditable="true">24 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İş Sağlığı Hekimi</td>
+                        <td contenteditable="true">Tıbbi Değerlendirme Uzmanı - Yaralanma şiddeti ve tıbbi sonuçların değerlendirilmesi</td>
+                        <td contenteditable="true">24 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Makine Güvenliği Mühendisi</td>
+                        <td contenteditable="true">Teknik Uzman - Ekipman ve emniyet sistemlerinin teknik analizi</td>
+                        <td contenteditable="true">25 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Üretim Müdürü</td>
+                        <td contenteditable="true">Departman Temsilcisi - Operasyonel süreçler ve üretim koşullarının değerlendirilmesi</td>
+                        <td contenteditable="true">25 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İnsan Faktörleri Uzmanı</td>
+                        <td contenteditable="true">Davranışsal Analiz Uzmanı - İnsan faktörleri ve ergonomi değerlendirmesi</td>
+                        <td contenteditable="true">26 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Bakım Süpervizörü</td>
+                        <td contenteditable="true">Bakım Sistemleri Temsilcisi - Ekipman bakım geçmişi ve teknik durum analizi</td>
+                        <td contenteditable="true">26 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Çalışan Temsilcisi</td>
+                        <td contenteditable="true">İşçi Sağlığı ve Güvenliği Temsilcisi - Çalışan perspektifi ve saha koşullarının değerlendirilmesi</td>
+                        <td contenteditable="true">27 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hukuk/Uyum Yetkilisi</td>
+                        <td contenteditable="true">Yasal Uyum Danışmanı - RIDDOR ve yasal gereksinimlerin değerlendirilmesi</td>
+                        <td contenteditable="true">27 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Harici Makine Güvenliği Danışmanı</td>
+                        <td contenteditable="true">Bağımsız Teknik Değerlendirici - Objektif teknik değerlendirme ve standart uygunluk analizi</td>
+                        <td contenteditable="true">28 Şubat 2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">4. DAL 1 - DAVRANIŞSAL NEDEN: GÜVENLİK EKİPMANLARININ DEVRE DIŞI BIRAKILMASI</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bu dalın başlangıç noktası, operatörün konveyör bandının acil durdurma düğmesini kullanmadan ve koruyucu kapağı açarak sıkışan ürüne doğrudan müdahale etmesi davranışıdır. Operatör, güvenlik prosedürlerinin gerektirdiği adımları bilinçli olarak atlayarak, hızlı bir çözüm yolu seçmiştir. Bu davranış, HSG245 sınıflandırmasında A3.5 kodu ile tanımlanan 'Güvenlik/koruyucu cihazların sökülmesi, baypas edilmesi veya devre dışı bırakılması' kategorisine girmektedir. Olay raporunda açıkça belirtildiği üzere, operatör koruyucu kapağı açarak sıkışan ürünü çıkarmaya çalışırken yaralanmıştır.
+
+Bu davranışın altında yatan temel motivasyon, üretim akışını hızlı bir şekilde restore etme ve zaman kaybını minimize etme isteğidir. Operatör, geçmiş deneyimlerinde benzer kısa yollar kullandığında herhangi bir olumsuz sonuçla karşılaşmamış ve bu davranış için uyarı almamıştır. Bu durum, güvensiz davranışın normalleşmesine ve operatörün risk algısının azalmasına neden olmuştur. Ayrıca, üretim hedeflerine yetişme baskısı, operatörün güvenlik prosedürlerini ikinci plana atmasına ve hızlı çözüm arayışına girmesine yol açmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Operatör, konveyör bandının acil durdurma düğmesini kullanmadan ve koruyucu kapağı açarak sıkışan ürüne doğrudan müdahale etmiştir. Bu davranış, temel güvenlik prosedürlerinin bilinçli olarak ihlal edilmesi anlamına gelmektedir.</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden operatör acil durdurma düğmesini kullanmadan müdahale etti?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör sıkışan ürünü hızlıca çıkarmanın daha pratik olduğunu düşündü ve bu yöntemi daha önce de kullanmıştı. Acil durdurma prosedürünün zaman kaybettireceğini ve üretim hedeflerini olumsuz etkileyeceğini değerlendirdi.</div>
+                    <span class="why-code">A - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden operatör bu güvensiz davranışı daha önce de uygulamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Geçmişte aynı şekilde müdahale ettiğinde herhangi bir kaza olmamış ve bu davranış için uyarı almamıştı. Operatör, bu davranışın kabul edilebilir olduğunu düşünmeye başlamış ve risk algısı azalmıştır.</div>
+                    <span class="why-code">A - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden bu güvensiz davranış fark edilip düzeltilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Hat şefi ve vardiya amirleri sahada yeterli gözetim yapmıyordu ve operatörlerin çalışma yöntemlerini düzenli kontrol etmiyordu. Güvensiz davranışlar tespit edilemediği için düzeltici önlem alınamamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden gözetim ve denetim yetersizdi?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim üretim hedeflerine odaklanmış durumda ve güvenlik denetimi için yeterli zaman ayrılmıyordu, ayrıca gözetim sorumluluklarının net tanımı yoktu. Saha denetimi sistematik bir süreç olarak kurgulanmamış ve önceliklendirilmemiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Saha Gözetiminin Yetersizliği ve Güvensiz Davranışların Tespit Edilememesi</div>
+                <div class="box-content" contenteditable="true">[D1.2 / Organizasyonel]
+
+Organizasyonda saha gözetimi ve denetimi sistematik bir şekilde yürütülmemektedir. Hat şefleri ve vardiya amirleri, operatörlerin çalışma yöntemlerini düzenli olarak gözlemleme, güvensiz davranışları tespit etme ve düzeltme sorumluluğunu yerine getirmemektedir. Üretim hedeflerine odaklanma ve zaman baskısı nedeniyle, güvenlik denetimi ikinci plana atılmakta ve yeterli kaynak ayrılmamaktadır. Gözetim sorumluluklarının net tanımlanmaması, performans kriterlerinde güvenlik gözetiminin yer almaması ve saha denetim prosedürlerinin eksikliği, bu durumun temel nedenleridir. Sonuç olarak, operatörlerin güvensiz davranışları fark edilmemekte, düzeltilmemekte ve normalleşmektedir.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Saha gözetimi için sistematik prosedür ve kontrol listesi bulunmamaktadır. Hat şeflerinin ve vardiya amirlerinin ne sıklıkla, hangi kriterlere göre gözetim yapacağı tanımlanmamıştır.</li>
+<li contenteditable="true">Yönetim performans değerlendirmelerinde üretim hedeflerini ön planda tutmakta, güvenlik gözetimi ve denetim performansı ölçülmemekte ve ödüllendirilmemektedir.</li>
+<li contenteditable="true">Hat şefleri ve vardiya amirleri, güvenlik gözetimi konusunda yeterli eğitim almamış ve güvensiz davranışları tespit etme, müdahale etme yetkinliklerine sahip değildir.</li>
+<li contenteditable="true">Organizasyonda güvenlik gözlemleri ve davranış bazlı güvenlik (BBS) programı bulunmamakta, proaktif güvenlik kültürü geliştirilmemiştir.</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">5. DAL 2 - DAVRANIŞSAL NEDEN: LOTO PROSEDÜRÜ İHLALİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bu dalın başlangıç noktası, operatörün makineyi durdurmadan ve Lock-Out/Tag-Out (LOTO) prosedürünü uygulamadan doğrudan müdahale etmesi davranışıdır. LOTO prosedürü, enerji kaynaklarının izole edilmesi ve makinenin beklenmedik şekilde çalışmasının önlenmesi için kritik bir güvenlik prosedürüdür. Operatör, bu prosedürü bilmesine rağmen bilinçli olarak atlamış ve hızlı müdahale yolunu seçmiştir. Bu davranış, HSG245 sınıflandırmasında A1.1 kodu ile tanımlanan 'Bireysel kural/prosedür ihlali' kategorisine girmektedir.
+
+Olay açıklamasında, operatörün bandı durdurmadan ve güvenlik prosedürlerini izlemeden doğrudan müdahale ettiği açıkça belirtilmektedir. Bu davranışın altında yatan temel neden, üretim hedeflerine yetişme baskısı ve LOTO prosedürünün zaman alıcı olarak algılanmasıdır. Operatör, prosedürü uygulamanın üretim akışını yavaşlatacağını ve hedeflere ulaşmayı zorlaştıracağını düşünmüştür. Ayrıca, geçmişte benzer kısa yollar kullanıldığında yönetim tarafından herhangi bir müdahale yapılmadığı için, bu davranışın kabul edilebilir olduğu algısı oluşmuştur.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Operatör, makineyi durdurmadan ve LOTO prosedürünü uygulamadan doğrudan müdahale etmiştir. Bu davranış, kritik bir güvenlik prosedürünün bilinçli olarak ihlal edilmesi anlamına gelmektedir.</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden operatör makineyi durdurmadan ve LOTO prosedürünü uygulamadan müdahale etti?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör LOTO prosedürünü biliyordu ancak hızlı müdahale etmek için atladı, çünkü üretim hedeflerine yetişme baskısı vardı. Prosedürün zaman alıcı olduğunu ve üretim kaybına neden olacağını düşündü.</div>
+                    <span class="why-code">A - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden operatör üretim baskısı nedeniyle güvenlik prosedürünü atladı?</div>
+                    <div class="why-answer" contenteditable="true">→ Hat şefi ve yönetim, üretim hedeflerine ulaşmayı öncelik olarak vurguluyor ve prosedür ihlallerine müdahale etmiyordu. Operatör, üretim hedeflerinin güvenlik prosedürlerinden daha önemli olduğu mesajını almıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden yönetim prosedür ihlallerine müdahale etmiyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Daha önce benzer kısa yollar kullanıldığında hiçbir düzeltici önlem alınmamış, bu davranışlar normalleşmişti. Yönetim, bu sapmaları görmezden gelmiş ve sessiz onay vermiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden güvensiz davranışlar normalleşmişti ve düzeltilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Gözetim sistemi etkisiz çalışıyor, saha denetimleri yetersiz ve sapmaları tespit edip düzeltme mekanizması yoktu. Prosedür ihlalleri sistematik olarak izlenmemekte ve raporlanmamaktadır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden gözetim sistemi etkisiz ve sapmaları düzeltme mekanizması yoktu?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim güvenlik kurallarının ihlal edildiğini biliyor ancak üretim hedefleri öncelikli olduğu için bu sapmalara tolerans gösteriyordu. Üretim-güvenlik dengesinde üretim açıkça önceliklendirilmiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Yönetimin Üretim Baskısı Nedeniyle LOTO Prosedürü İhlallerine Tolerans Göstermesi</div>
+                <div class="box-content" contenteditable="true">[D1.9 / Organizasyonel]
+
+Organizasyonun üst yönetimi ve orta kademe yöneticileri, üretim hedeflerine ulaşmanın kritik öncelik olduğu bir kültür oluşturmuştur. Bu kültürde, güvenlik prosedürlerinin ihlal edildiği bilinmesine rağmen, üretim hedeflerini tehlikeye atmamak için bu sapmalara müdahale edilmemektedir. LOTO prosedürünün atlanması, koruyucu ekipmanların devre dışı bırakılması, hızlı müdahale için kısa yolların kullanılması gibi güvensiz davranışlar, yönetim tarafından sessizce tolere edilmekte ve hatta dolaylı olarak teşvik edilmektedir. Operatörler, üretim hedeflerine ulaşmak için güvenlik prosedürlerini atlayabilecekleri mesajını almakta ve bu davranışlar normalleşmektedir. Yönetim, kısa vadeli üretim kazançlarını uzun vadeli güvenlik risklerinin önüne koymakta ve bu durum ciddi kazalara zemin hazırlamaktadır.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Üst yönetim, performans toplantılarında ve iletişimlerinde sürekli olarak üretim hedeflerini vurgulamakta, güvenlik performansına yeterli önem vermemektedir.</li>
+<li contenteditable="true">Prosedür ihlalleri tespit edildiğinde disiplin süreci işletilmemekte, güvensiz davranışlara karşı caydırıcı önlemler alınmamaktadır.</li>
+<li contenteditable="true">Yöneticilerin performans değerlendirmelerinde güvenlik kriterleri düşük ağırlıkta yer almakta veya hiç bulunmamaktadır. Üretim hedeflerine ulaşma başarı kriteri olarak ön planda tutulmaktadır.</li>
+<li contenteditable="true">Organizasyonda 'üretim her şeyden önemlidir' kültürü yerleşmiş durumda ve güvenlik ikinci planda kalmaktadır. Yönetim, sözde güvenliği desteklese de eylemleri farklı mesajlar vermektedir.</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">6. DAL 3 - KOŞULSAL NEDEN: EMNİYET KİLİDİ SİSTEMİNİN YOKLUĞU</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bu dalın başlangıç noktası, konveyör bandı sisteminde emniyet kilidi (interlock) sisteminin bulunmaması veya devre dışı olması koşulsal durumudur. Emniyet kilidi sistemi, koruyucu kapak açıldığında makineyi otomatik olarak durduran kritik bir güvenlik sistemidir ve makine güvenliği standartlarının temel gereksinimlerinden biridir. Bu olayda, operatör koruyucu kapağı açmasına rağmen konveyör bandı çalışmaya devam etmiş ve bu durum kazanın gerçekleşmesine doğrudan katkıda bulunmuştur. Bu koşul, HSG245 sınıflandırmasında B1.1 kodu ile tanımlanan 'Koruyucu cihazların etkisiz olması' kategorisine girmektedir.
+
+Emniyet kilidi sisteminin olmaması veya çalışmaması, makinenin tasarım aşamasında güvenlik gereksinimlerinin yeterince değerlendirilmediğini göstermektedir. Modern makine güvenliği standartları (ISO 14119, EN 1037 gibi), hareketli parçalara erişim sağlayan tüm koruyucu kapakların interlock sistemi ile donatılmasını zorunlu kılmaktadır. Bu sistemin yokluğu, operatörün güvensiz davranışının ölümcül sonuçlara yol açmasına olanak tanımıştır. Eğer emniyet kilidi sistemi çalışıyor olsaydı, operatör koruyucu kapağı açtığında makine otomatik olarak duracak ve kaza önlenecekti.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Konveyör bandının koruyucu kapağı açıldığında makineyi otomatik olarak durduracak emniyet kilidi sistemi mevcut değildi veya çalışmıyordu. Bu durum, kritik bir güvenlik sisteminin eksikliği anlamına gelmektedir.</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden emniyet kilidi sistemi mevcut değildi veya çalışmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Sistem başlangıçta tasarlanmamış veya sonradan devre dışı bırakılmıştı. Makine tedarik edildiğinde veya kurulduğunda bu kritik güvenlik özelliği dahil edilmemiştir.</div>
+                    <span class="why-code">B - Koşulsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden bu kritik güvenlik sistemi tasarıma dahil edilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Konveyör bandı sistemi tasarlanırken emniyet kilidi gereksinimi değerlendirilmemişti. Tasarım spesifikasyonlarında bu güvenlik özelliği yer almamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden tasarım aşamasında bu güvenlik gereksinimi gözden kaçmıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Tasarım öncesi kapsamlı risk değerlendirmesi yapılmamış, tehlike senaryoları belirlenmemişti. Operatörün koruyucu kapağı açarak müdahale etme riski öngörülmemiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden risk değerlendirmesi yapılmadan tasarım onaylanmıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Tasarım gözden geçirme sürecinde güvenlik kontrolleri ve risk analizi zorunluluğu yoktu. Tasarım onayı sadece teknik ve maliyet kriterlerine göre yapılmıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden tasarım sürecinde güvenlik gözden geçirmesi zorunlu değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Tasarım aşamasında güvenlik gereksinimlerinin sistematik olarak değerlendirilmesi için resmi süreç ve prosedür bulunmuyordu. Organizasyonda tasarım güvenliği yönetim sistemi kurulmamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Tasarım Sürecinde Güvenlik Gözden Geçirme Prosedürünün Olmaması</div>
+                <div class="box-content" contenteditable="true">[D5.2 / Organizasyonel]
+
+Organizasyonda makine ve ekipman tasarımlarının güvenlik açısından sistematik olarak değerlendirilmesi için resmi bir süreç bulunmamaktadır. Yeni ekipman tedariki, mevcut ekipmanların modifikasyonu veya yerleşim değişiklikleri yapılırken, güvenlik gereksinimleri ve risk analizi zorunlu bir adım olarak tanımlanmamıştır. Tasarım gözden geçirme sürecinde, teknik spesifikasyonlar, maliyet ve üretim verimliliği kriterleri ön planda tutulmakta, güvenlik kriterleri ikinci planda kalmaktadır. Tasarım onayı öncesi güvenlik kontrol listesi, risk değerlendirmesi, tehlike analizi gibi araçlar sistematik olarak kullanılmamaktadır. Bu durum, kritik emniyet sistemlerinin tasarım aşamasında gözden kaçmasına, tehlikeli çalışma koşullarının oluşmasına ve kazalara zemin hazırlamaktadır. Organizasyonun tasarım güvenliği yönetim sistemi kurması ve tüm tasarım süreçlerine güvenlik gözden geçirmesini entegre etmesi gerekmektedir.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Organizasyonda tasarım güvenliği prosedürü ve kontrol listesi bulunmamaktadır. Tasarım sürecinin hangi aşamalarında, kimler tarafından, hangi kriterlere göre güvenlik değerlendirmesi yapılacağı tanımlanmamıştır.</li>
+<li contenteditable="true">Tasarım ekiplerinde HSE uzmanı bulunmamakta veya HSE'nin tasarım sürecine katılımı zorunlu kılınmamaktadır. Güvenlik değerlendirmesi için yeterli yetkinlik ve kaynak ayrılmamaktadır.</li>
+<li contenteditable="true">Makine güvenliği standartları (ISO 12100, ISO 14119, EN 1037 vb.) organizasyonda bilinmemekte veya uygulanmamaktadır. Tasarım kriterleri arasında standart uygunluk yer almamaktadır.</li>
+<li contenteditable="true">Tedarikçi seçimi ve ekipman satın alma süreçlerinde güvenlik kriterleri düşük öncelikte yer almaktadır. Maliyet ve teknik özellikler ön planda tutulmakta, güvenlik özellikleri ikinci planda kalmaktadır.</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">6. NİHAİ KÖK NEDENLER</div>
+
+            <div class="root-cause-box root-cause-1">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 1: Saha Gözetiminin Yetersizliği ve Güvensiz Davranışların Tespit Edilememesi</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D1.2</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">Üretim Departmanı (hat şefleri ve vardiya amirleri), İnsan Kaynakları Departmanı (performans yönetimi ve eğitim), HSE Departmanı (gözetim standartları ve eğitim desteği), Üst Yönetim (önceliklendirme ve kaynak tahsisi)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Organizasyonda saha gözetimi ve denetimi, güvenlik yönetim sisteminin kritik bir bileşeni olarak sistematik bir şekilde yürütülmemektedir. Hat şefleri ve vardiya amirleri, operatörlerin günlük çalışma yöntemlerini düzenli olarak gözlemleme, güvensiz davranışları tespit etme ve anında düzeltme sorumluluğunu yerine getirmemektedir. Bu durum, birden fazla organizasyonel eksikliğin bir araya gelmesinden kaynaklanmaktadır.
+
+İlk olarak, saha gözetimi için net prosedür ve standartlar bulunmamaktadır. Hat şeflerinin ve vardiya amirlerinin ne sıklıkla, hangi alanlarda, hangi kriterlere göre gözetim yapacağı tanımlanmamıştır. Gözetim faaliyetleri, yöneticilerin kişisel inisiyatifine bırakılmış durumda ve sistematik bir yaklaşım yoktur. İkinci olarak, yönetim performans değerlendirmelerinde üretim hedeflerini ön planda tutmakta, güvenlik gözetimi ve denetim performansı ölçülmemekte ve ödüllendirilmemektedir. Bu durum, yöneticilerin zamanlarını ve enerjilerini üretim hedeflerine odaklamalarına, güvenlik gözetimini ikinci plana atmalarına neden olmaktadır.
+
+Üçüncü olarak, hat şefleri ve vardiya amirleri, güvenlik gözetimi konusunda yeterli eğitim almamış ve güvensiz davranışları tespit etme, müdahale etme, düzeltici geri bildirim verme yetkinliklerine sahip değildir. Gözetim sadece üretim miktarı ve kalite kontrolü olarak algılanmakta, güvenlik boyutu ihmal edilmektedir. Son olarak, organizasyonda güvenlik gözlemleri ve davranış bazlı güvenlik (BBS) programı bulunmamakta, proaktif güvenlik kültürü geliştirilmemiştir. Sonuç olarak, operatörlerin güvensiz davranışları fark edilmemekte, düzeltilmemekte ve zamanla normalleşmektedir. Bu durum, kazalara zemin hazırlamakta ve güvenlik kültürünü zayıflatmaktadır.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">Güvensiz davranışlar tespit edilemediği için düzeltilememekte, zamanla normalleşmekte ve organizasyonun güvenlik kültürü zayıflamaktadır.</li>
+<li contenteditable="true">Operatörler, güvenlik prosedürlerini atlayabilecekleri ve bunun sonuçsuz kalacağı algısına kapılmakta, risk algıları azalmaktadır.</li>
+<li contenteditable="true">Benzer güvensiz davranışlar diğer operatörler tarafından da gözlemlenmekte ve taklit edilmekte, güvensiz uygulamalar yayılmaktadır.</li>
+<li contenteditable="true">Kazalar meydana geldikten sonra reaktif olarak müdahale edilmekte, proaktif önleme fırsatları kaçırılmaktadır.</li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="root-cause-box root-cause-2">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 2: Yönetimin Üretim Baskısı Nedeniyle LOTO Prosedürü İhlallerine Tolerans Göstermesi</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D1.9</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">Üst Yönetim (stratejik önceliklendirme ve kültür oluşturma), Üretim Departmanı (operasyonel baskı ve gözetim), İnsan Kaynakları Departmanı (performans yönetimi ve disiplin süreci), HSE Departmanı (prosedür uygulaması ve denetim)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Organizasyonun üst yönetimi ve orta kademe yöneticileri, üretim hedeflerine ulaşmanın kritik öncelik olduğu bir kültür oluşturmuş ve sürdürmektedir. Bu kültürde, güvenlik prosedürlerinin ihlal edildiği açıkça bilinmesine rağmen, kısa vadeli üretim hedeflerini tehlikeye atmamak için bu sapmalara sistematik olarak müdahale edilmemektedir. Bu durum, organizasyonda 'üretim her şeyden önemlidir' algısının yerleşmesine ve güvenliğin ikinci plana atılmasına neden olmaktadır.
+
+Yönetimin bu toleransı, birden fazla şekilde kendini göstermektedir. İlk olarak, üst yönetim performans toplantılarında ve günlük iletişimlerinde sürekli olarak üretim hedeflerini, üretim miktarlarını, teslimat tarihlerini vurgulamakta, güvenlik performansına yeterli önem vermemektedir. Güvenlik, sadece kaza olduğunda veya denetim öncesinde gündeme gelmektedir. İkinci olarak, prosedür ihlalleri tespit edildiğinde disiplin süreci işletilmemekte, güvensiz davranışlara karşı caydırıcı önlemler alınmamaktadır. Operatörler, prosedür ihlallerinin sonuçsuz kalacağını öğrenmekte ve bu davranışları tekrarlamaktadır.
+
+Üçüncü olarak, yöneticilerin performans değerlendirmelerinde ve ödüllendirme sistemlerinde güvenlik kriterleri düşük ağırlıkta yer almakta veya hiç bulunmamaktadır. Üretim hedeflerine ulaşma, başarı kriteri olarak ön planda tutulmakta, güvenlik performansı ikincil kalmaktadır. Bu durum, yöneticilerin davranışlarını şekillendirmekte ve güvenlik gözetimini ihmal etmelerine neden olmaktadır. Son olarak, organizasyonda 'üretim her şeyden önemlidir' kültürü yerleşmiş durumda ve yönetim, sözde güvenliği desteklese de eylemleri farklı mesajlar vermektedir. Operatörler, yönetimin gerçek önceliklerini eylemlerinden okumakta ve buna göre davranmaktadır. Bu durum, LOTO prosedürünün atlanması, koruyucu ekipmanların devre dışı bırakılması, hızlı müdahale için kısa yolların kullanılması gibi güvensiz davranışların normalleşmesine ve ciddi kazalara zemin hazırlamaktadır.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">Güvenlik prosedürleri, sadece kağıt üzerinde kalmakta, uygulamada atlanmakta ve etkisiz hale gelmektedir.</li>
+<li contenteditable="true">Operatörler, üretim hedeflerine ulaşmak için güvenlik risklerini göze almakta ve kendilerini tehlikeye atmaktadır.</li>
+<li contenteditable="true">Organizasyonda güvenlik kültürü zayıflamakta, güvenlik sadece formalite olarak algılanmakta ve ciddiye alınmamaktadır.</li>
+<li contenteditable="true">Benzer kazaların tekrarlanma riski yüksek olmakta, organizasyon reaktif bir güvenlik yaklaşımında kalmaktadır.</li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="root-cause-box root-cause-3">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 3: Tasarım Sürecinde Güvenlik Gözden Geçirme Prosedürünün Olmaması</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D5.2</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">Mühendislik Departmanı (tasarım ve spesifikasyon), Satın Alma Departmanı (tedarikçi seçimi ve ekipman alımı), HSE Departmanı (güvenlik standartları ve risk değerlendirmesi), Üst Yönetim (tasarım süreç tanımı ve kaynak tahsisi)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Organizasyonda makine ve ekipman tasarımlarının, yerleşim değişikliklerinin ve modifikasyonların güvenlik açısından sistematik olarak değerlendirilmesi için resmi bir süreç ve prosedür bulunmamaktadır. Bu durum, kritik emniyet sistemlerinin tasarım aşamasında gözden kaçmasına, tehlikeli çalışma koşullarının oluşmasına ve kazalara zemin hazırlamaktadır. Tasarım güvenliği, modern güvenlik yönetiminin en önemli bileşenlerinden biridir çünkü tasarım aşamasında alınan kararlar, ekipmanın tüm yaşam döngüsü boyunca güvenlik performansını belirlemektedir.
+
+Organizasyondaki mevcut durum, birden fazla eksikliği içermektedir. İlk olarak, tasarım güvenliği prosedürü ve kontrol listesi bulunmamaktadır. Yeni ekipman tedariki, mevcut ekipmanların modifikasyonu veya yerleşim değişiklikleri yapılırken, güvenlik gereksinimleri ve risk analizi zorunlu bir adım olarak tanımlanmamıştır. Tasarım sürecinin hangi aşamalarında, kimler tarafından, hangi kriterlere göre güvenlik değerlendirmesi yapılacağı net değildir. İkinci olarak, tasarım ekiplerinde HSE uzmanı bulunmamakta veya HSE'nin tasarım sürecine katılımı zorunlu kılınmamaktadır. Tasarım kararları, mühendislik ve üretim ekipleri tarafından alınmakta, güvenlik boyutu sonradan düşünülmektedir.
+
+Üçüncü olarak, makine güvenliği standartları (ISO 12100 - Makine Güvenliği Genel Tasarım İlkeleri, ISO 14119 - Koruyucularla İlişkili Kilitleme Cihazları, EN 1037 - Beklenmedik Çalıştırmanın Önlenmesi gibi) organizasyonda bilinmemekte veya sistematik olarak uygulanmamaktadır. Tasarım kriterleri arasında standart uygunluk yer almamakta, sadece teknik işlevsellik ve maliyet değerlendirilmektedir. Dördüncü olarak, tedarikçi seçimi ve ekipman satın alma süreçlerinde güvenlik kriterleri düşük öncelikte yer almaktadır. Satın alma kararları, maliyet ve teknik özellikler temelinde alınmakta, emniyet sistemleri ve güvenlik özellikleri ikinci planda kalmaktadır. Son olarak, tasarım gözden geçirme sürecinde risk değerlendirmesi, tehlike analizi, FMEA (Failure Mode and Effects Analysis) gibi araçlar sistematik olarak kullanılmamaktadır. Bu durum, bu olayda olduğu gibi, emniyet kilidi sisteminin eksikliği gibi kritik güvenlik açıklarının tasarım aşamasında tespit edilememesine neden olmaktadır.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">Kritik emniyet sistemleri tasarım aşamasında gözden kaçmakta ve tehlikeli çalışma koşulları oluşmaktadır.</li>
+<li contenteditable="true">Ekipman devreye alındıktan sonra güvenlik eksiklikleri tespit edilmekte ve düzeltme maliyeti çok daha yüksek olmaktadır.</li>
+<li contenteditable="true">Operatörler, tasarım kaynaklı tehlikelerle karşı karşıya kalmakta ve davranışsal önlemlerle bu tehlikeleri yönetmeye çalışmaktadır.</li>
+<li contenteditable="true">Organizasyon, reaktif güvenlik yaklaşımında kalmakta, proaktif tasarım güvenliği fırsatlarını kaçırmaktadır.</li>
+
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">7. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Vardiya değişimlerinde ve operasyonel süreçlerde güvenlik bilgilerinin yeterince paylaşılmaması, operatörlerin riskleri tam olarak anlamamasına neden olmaktadır. Özellikle ekipman arızaları, yakın kaçış olayları ve güvensiz koşullar hakkında bilgi akışı yetersizdir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">Operatörlere verilen LOTO eğitimi teorik düzeyde kalmakta, pratik uygulamalar ve senaryolar üzerinden yetkinlik geliştirilmemektedir. Ayrıca, eğitim etkinliği ölçülmemekte ve periyodik tazeleme eğitimleri yapılmamaktadır. Operatörler prosedürü bilmelerine rağmen uygulama becerileri ve motivasyonları yetersizdir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yorgunluk/Stres</td>
+                        <td contenteditable="true">Üretim hedeflerine yetişme baskısı, operatörlerde stres ve zaman baskısı yaratmaktadır. Bu durum, hızlı karar alma ihtiyacı ve kısa yollar kullanma eğilimi oluşturmaktadır. Vardiya sonuna yaklaşıldıkça yorgunluk artmakta ve risk algısı azalmaktadır.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman Bakım Eksikliği</td>
+                        <td contenteditable="true">Konveyör bandı sisteminde sık sık ürün sıkışması meydana gelmesi, ekipmanın bakım ve ayar ihtiyacını göstermektedir. Reaktif bakım yaklaşımı nedeniyle arızalar önlenmemekte, operatörler sık sık müdahale etmek zorunda kalmaktadır. Proaktif bakım programı ve öngörücü bakım uygulamaları yetersizdir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Uyumsuzluğu</td>
+                        <td contenteditable="true">LOTO prosedürü, operasyonel gerçekliklerle uyumlu değildir ve uygulanması zaman alıcı olarak algılanmaktadır. Prosedür, operatörlerin katılımı olmadan hazırlanmış ve saha koşulları yeterince dikkate alınmamıştır. Bu durum, prosedürün benimsenmemesine ve atlanmasına neden olmaktadır.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yönetim Denetim Eksikliği</td>
+                        <td contenteditable="true">Üst yönetim, güvenlik performansını düzenli olarak izlememekte ve değerlendirmemektedir. Güvenlik denetimleri, yönetim gözden geçirmeleri ve performans raporlamaları yetersizdir. Yönetim, güvenlik konusunda görünür liderlik sergilememekte ve güvenlik önceliğini eylemleriyle göstermemektedir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Çevresel Koşullar</td>
+                        <td contenteditable="true">Yüksek gürültü seviyesi, sürekli hareket halindeki makineler ve yoğun çalışma ortamı, operatörlerin dikkatini dağıtmakta ve risk algısını azaltmaktadır. Ancak bu faktörün etkisi, organizasyonel faktörlere göre daha düşük seviyededir.</td>
+                        <td class="impact-low" contenteditable="true">Düşük</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">8. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Tüm konveyör bandı sistemlerinde emniyet kilidi (interlock) sistemlerinin acil montajı yapılacaktır. Koruyucu kapaklar açıldığında makinelerin otomatik olarak durması sağlanacak, sistemler test edilecek ve belgelendirilecektir. Bu eylem, benzer kazaların tekrarını önlemek için kritik öneme sahiptir.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm konveyör bantlarında interlock sistemi kurulumu %100 tamamlanması</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Ambalaj Hattı 3 ve benzer risklere sahip tüm hatlar, güvenlik iyileştirmeleri tamamlanana kadar operasyona alınmayacaktır. Kapsamlı risk değerlendirmesi yapılacak, tüm güvenlik eksiklikleri giderilecek ve HSE onayı alınacaktır.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Üretim Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Risk değerlendirmesi tamamlanması ve tüm kritik risklerin giderilmesi</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Tüm operatörlere acil LOTO prosedürü eğitimi verilecektir. Eğitim, teorik bilginin yanı sıra pratik uygulamalar, simülasyonlar ve senaryolar içerecektir. Eğitim sonrası yetkinlik testleri yapılacak ve başarısız olanlar tekrar eğitilecektir. Eğitim etkinliği ölçülecek ve kayıt altına alınacaktır.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm operatörlerin eğitimi tamamlaması ve yetkinlik testinden %100 başarı</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Güvenlik prosedürü ihlallerinin anonim olarak raporlanması için güvenli bildirim sistemi kurulacaktır. Operatörler, misilleme korkusu olmadan güvensiz koşulları ve davranışları raporlayabilecektir. Bildirimlere hızlı geri bildirim verilecek ve düzeltici önlemler alınacaktır.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Bildirim sisteminin kurulması ve ilk ayda en az 10 bildirim alınması</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Saha gözetimi prosedürü geliştirilecek ve uygulanacaktır. Hat şefleri ve vardiya amirleri için gözetim kontrol listeleri hazırlanacak, gözetim sıklığı ve kriterleri tanımlanacaktır. Gözetim faaliyetleri kayıt altına alınacak ve performans değerlendirmelerine dahil edilecektir.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Vardiya Amiri</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Günlük gözetim kayıtlarının %100 tutulması ve aylık raporlama</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Hat şefleri ve vardiya amirlerine güvenlik liderliği eğitimi verilecektir. Eğitim, güvensiz davranışları tespit etme, müdahale etme, düzeltici geri bildirim verme, güvenlik koçluğu yapma konularını içerecektir. Eğitim sonrası yöneticilerin saha gözetim yetkinlikleri geliştirilecektir.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Eğitim Koordinatörü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Tüm hat şefi ve vardiya amirlerinin eğitimi tamamlaması</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Davranış Bazlı Güvenlik (BBS) programı başlatılacaktır. Güvenlik gözlemleri sistematik hale getirilecek, operatörler güvenli ve güvensiz davranışları gözlemleyecek ve raporlayacaktır. Pozitif davranışlar ödüllendirilecek, güvensiz davranışlar koçluk ile düzeltilecektir.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Süreç Mühendisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Aylık en az 50 güvenlik gözlemi yapılması ve kayıt altına alınması</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Yönetici performans değerlendirme sistemine güvenlik kriterleri eklenecektir. Üretim hedeflerinin yanı sıra güvenlik performansı, gözetim kalitesi, olay oranları, eğitim tamamlama gibi kriterler değerlendirilecek ve ödüllendirme sistemine dahil edilecektir.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Kalite Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Performans değerlendirme formlarında güvenlik kriterlerinin en az %30 ağırlıkta olması</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Tasarım güvenliği prosedürü geliştirilecek ve uygulanacaktır. Yeni ekipman tedariki, modifikasyon ve yerleşim değişikliklerinde güvenlik gözden geçirmesi zorunlu hale getirilecektir. Tasarım kontrol listesi, risk değerlendirmesi ve HSE onayı sürece entegre edilecektir.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Tüm yeni tasarımların %100 güvenlik gözden geçirmesinden geçmesi</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Konveyör bandı sistemlerinde proaktif bakım programı uygulanacaktır. Ürün sıkışması sıklığı azaltılacak, ekipman güvenilirliği artırılacak ve operatör müdahale ihtiyacı minimize edilecektir. Öngörücü bakım teknolojileri değerlendirilecektir.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Ürün sıkışması olaylarında %50 azalma</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">LOTO prosedürü, operatörlerin katılımı ile gözden geçirilecek ve iyileştirilecektir. Prosedür, operasyonel gerçekliklerle uyumlu hale getirilecek, basitleştirilecek ve uygulanabilirliği artırılacaktır. Prosedür değişiklikleri eğitimlerle desteklenecektir.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Teknik Direktör</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Prosedür uyum oranında %80'e çıkış</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Güvenlik kültürü değerlendirmesi yapılacak ve iyileştirme programı geliştirilecektir. Çalışan anketleri, odak grup görüşmeleri ve gözlemler ile mevcut güvenlik kültürü analiz edilecektir. Üretim-güvenlik dengesini sağlayan, proaktif güvenlik kültürü oluşturma programı başlatılacaktır.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Genel Müdür</td>
+                        <td contenteditable="true">12 ay</td>
+                        <td contenteditable="true">Güvenlik kültürü anket skorunda %30 iyileşme</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">9. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Makine müdahalesi öncesi MUTLAKA acil durdurma düğmesine basılmalı ve LOTO prosedürü eksiksiz uygulanmalıdır. Hiçbir üretim hedefi, bir çalışanın hayatından daha önemli değildir. Operatörler, zaman baskısı altında olsalar bile güvenlik prosedürlerini atlamamalı, yöneticiler bu konuda net mesaj vermeli ve desteklemelidir.
+• Tüm hareketli parçalara erişim sağlayan koruyucu kapaklar, emniyet kilidi (interlock) sistemi ile donatılmalıdır. Koruyucu kapak açıldığında makine otomatik olarak durmalı ve enerji kaynakları izole edilmelidir. Bu, makine güvenliği standartlarının temel gereksinimidir ve tartışmasız uygulanmalıdır.
+• Saha gözetimi sistematik ve düzenli olarak yapılmalı, güvensiz davranışlar anında tespit edilip düzeltilmelidir. Yöneticiler, sadece üretim miktarını değil, güvenlik performansını da aktif olarak izlemeli ve önceliklendirmelidir. Güvenlik gözetimi, yönetim sorumluluğunun ayrılmaz bir parçasıdır.
+• Yönetim, üretim hedefleri kadar güvenlik performansını da önceliklendirmeli ve bu önceliği eylemleriyle göstermelidir. Güvenlik prosedürü ihlallerine tolerans gösterilmemeli, disiplin süreci işletilmeli ve güvenli davranışlar ödüllendirilmelidir. Organizasyonda 'güvenlik önce' kültürü oluşturulmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Tasarım güvenliği yönetim sistemi kurulmalı ve tüm ekipman tasarımlarında güvenlik gözden geçirmesi zorunlu hale getirilmelidir. Makine güvenliği standartları (ISO 12100, ISO 14119, EN 1037) organizasyonda benimsenmeli ve sistematik olarak uygulanmalıdır. Tasarım aşamasında alınan güvenlik kararları, ekipmanın tüm yaşam döngüsü boyunca koruma sağlar.
+• Davranış Bazlı Güvenlik (BBS) programı ile proaktif güvenlik kültürü geliştirilmelidir. Güvenlik gözlemleri, koçluk, pozitif pekiştirme ve sürekli iyileştirme döngüsü ile güvensiz davranışlar azaltılmalı, güvenli davranışlar artırılmalıdır. Güvenlik, herkesin sorumluluğu olarak benimsenmelidir.
+• Yönetici performans değerlendirme ve ödüllendirme sistemine güvenlik kriterleri entegre edilmelidir. Üretim hedefleri kadar güvenlik performansı da ölçülmeli, değerlendirilmeli ve ödüllendirilmelidir. Yöneticiler, güvenlik liderliği sergilediklerinde tanınmalı ve desteklenmelidir.
+• Sürekli iyileştirme kültürü oluşturulmalı, yakın kaçış olayları, güvensiz koşullar ve iyileştirme önerileri sistematik olarak raporlanmalı ve değerlendirilmelidir. Organizasyon, reaktif yaklaşımdan proaktif yaklaşıma geçmeli ve kazalar olmadan riskleri yönetmelidir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Bu olay ve öğrenilen dersler, tüm operatörlere, yöneticilere ve ilgili departmanlara detaylı olarak paylaşılacaktır. Olay analizi sunumları, güvenlik toplantıları ve eğitimler ile farkındalık artırılacaktır.
+• Benzer risklere sahip diğer tesisler ve hatlar bilgilendirilecek, aynı güvenlik eksikliklerinin kontrolü yapılacaktır. Organizasyon genelinde öğrenme kültürü teşvik edilecektir.
+• Düzeltici önlemlerin uygulanma durumu düzenli olarak raporlanacak ve paylaşılacaktır. Şeffaflık ve hesap verebilirlik sağlanacaktır.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• LOTO prosedürü eğitimi, teorik bilginin yanı sıra pratik uygulamalar, simülasyonlar ve gerçek senaryolar içerecek şekilde yeniden tasarlanacaktır. Eğitim etkinliği ölçülecek ve sürekli iyileştirilecektir.
+• Hat şefleri ve vardiya amirlerine güvenlik liderliği, koçluk, güvensiz davranışlara müdahale etme konularında kapsamlı eğitim verilecektir. Yöneticilerin güvenlik yetkinlikleri geliştirilecektir.
+• Tüm çalışanlara makine güvenliği, risk algısı, güvenlik kültürü konularında farkındalık eğitimleri verilecektir. Güvenlik, organizasyonun DNA'sına işlenecektir.
+• Tasarım ekiplerine ve satın alma personeline makine güvenliği standartları, tasarım risk değerlendirmesi, güvenlik spesifikasyonları konularında teknik eğitim verilecektir.</div>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">22 Şubat 2026 tarihinde Ambalaj Hattı 3'te meydana gelen makine sıkışması/ezilme kazası, organizasyonun güvenlik yönetim sistemindeki çok katmanlı ve sistemik zayıflıkları ortaya çıkarmıştır. HSG245 metodolojisi kullanılarak yapılan kapsamlı kök neden analizi, olayın yüzeysel nedenlerinin ötesine geçerek üç temel organizasyonel kök neden belirlemiştir: (1) Saha gözetiminin yetersizliği ve güvensiz davranışların tespit edilememesi, (2) Yönetimin üretim baskısı nedeniyle LOTO prosedürü ihlallerine tolerans göstermesi, ve (3) Tasarım sürecinde güvenlik gözden geçirme prosedürünün olmaması. Bu kök nedenler, organizasyonun güvenlik kültürü, yönetim öncelikleri ve sistemik süreçlerindeki temel sorunları yansıtmaktadır.
+
+Analiz, operatörün güvensiz davranışının (LOTO prosedürünü atlama, koruyucu kapağı açma) izole bir bireysel hata olmadığını, organizasyonel faktörlerin bir sonucu olduğunu açıkça göstermiştir. Operatör, üretim hedeflerine yetişme baskısı altında, geçmişte benzer davranışların sonuçsuz kaldığını gözlemleyerek, yetersiz gözetim ortamında ve emniyet kilidi sisteminin olmadığı koşullarda bu davranışı sergilemiştir. Dolayısıyla, etkili ve sürdürülebilir düzeltici önlemler, bireysel davranışları değiştirmeye değil, organizasyonel sistemleri iyileştirmeye odaklanmalıdır.
+
+Bu raporda önerilen 12 düzeltici önlem, acil teknik iyileştirmelerden (emniyet kilidi montajı) uzun vadeli kültürel değişime (güvenlik kültürü geliştirme) kadar geniş bir yelpazede organizasyonel dönüşümü hedeflemektedir. Önlemlerin başarılı uygulanması, üst yönetimin kararlı liderliği, yeterli kaynak tahsisi ve tüm seviyelerde sahiplenme gerektirir. Organizasyon, bu kazayı bir dönüm noktası olarak kullanmalı ve reaktif güvenlik yaklaşımından proaktif, sistemik ve kültürel güvenlik yaklaşımına geçmelidir.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm konveyör bandı sistemlerinde emniyet kilidi montajı acil olarak tamamlanacak ve test edilecektir (1 hafta). Bu, benzer kazaların tekrarını önlemek için kritik teknik önlemdir.</li>
+<li contenteditable="true">Tüm operatörlere acil LOTO eğitimi verilecek, yetkinlik testleri yapılacak ve kayıt altına alınacaktır (1 hafta). Operatörlerin prosedür bilgisi ve uygulama becerileri güçlendirilecektir.</li>
+<li contenteditable="true">Ambalaj Hattı 3 ve benzer riskli hatlar, kapsamlı risk değerlendirmesi ve güvenlik iyileştirmeleri tamamlanana kadar operasyona alınmayacaktır (2 hafta). Acil risk azaltma önceliklendirilecektir.</li>
+<li contenteditable="true">Güvenlik prosedürü ihlallerinin anonim raporlanması için güvenli bildirim sistemi kurulacaktır (1 ay). Operatörler, misilleme korkusu olmadan güvensiz koşulları raporlayabilecektir.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Saha gözetimi prosedürü geliştirilecek, hat şefleri ve vardiya amirlerine güvenlik liderliği eğitimi verilecek ve gözetim performansı ölçülecektir (2-3 ay). Sistematik gözetim kültürü oluşturulacaktır.</li>
+<li contenteditable="true">Davranış Bazlı Güvenlik (BBS) programı başlatılacak, güvenlik gözlemleri sistematik hale getirilecek ve proaktif güvenlik kültürü geliştirilecektir (3 ay). Organizasyon, reaktif yaklaşımdan proaktif yaklaşıma geçecektir.</li>
+<li contenteditable="true">Tasarım güvenliği prosedürü geliştirilecek, tüm yeni ekipman ve modifikasyonlarda güvenlik gözden geçirmesi zorunlu hale getirilecektir (3 ay). Tasarım aşamasında güvenlik entegre edilecektir.</li>
+<li contenteditable="true">Güvenlik kültürü değerlendirmesi yapılacak ve kapsamlı iyileştirme programı başlatılacaktır (12 ay). Üretim-güvenlik dengesini sağlayan, 'güvenlik önce' kültürü oluşturulacaktır.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Seviyesi</td>
+                        <td class="current" contenteditable="true">Yüksek - Emniyet kilidi yok, prosedür ihlalleri yaygın</td>
+                        <td class="target" contenteditable="true">Düşük - Tüm sistemlerde interlock, prosedür uyumu %95+</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Uyum Oranı</td>
+                        <td class="current" contenteditable="true">%60 - LOTO sık atlanıyor, gözetim yetersiz</td>
+                        <td class="target" contenteditable="true">%95+ - Sistematik gözetim, BBS programı aktif</td>
+                    </tr>
+
+                    <tr>
+                        <td>Eğitim Kapsamı</td>
+                        <td class="current" contenteditable="true">Temel - Teorik, etkinlik ölçülmüyor</td>
+                        <td class="target" contenteditable="true">Kapsamlı - Pratik, simülasyon, yetkinlik testi</td>
+                    </tr>
+
+                    <tr>
+                        <td>Bakım Periyodu</td>
+                        <td class="current" contenteditable="true">Reaktif - Arıza sonrası müdahale</td>
+                        <td class="target" contenteditable="true">Proaktif - Öngörücü bakım, güvenilirlik odaklı</td>
+                    </tr>
+
+                    <tr>
+                        <td>Denetim Sıklığı</td>
+                        <td class="current" contenteditable="true">Aylık - Düzensiz, kayıt tutulmuyor</td>
+                        <td class="target" contenteditable="true">Haftalık - Sistematik, kayıtlı, raporlanan</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Kültürü</td>
+                        <td class="current" contenteditable="true">Zayıf - Üretim öncelikli, tolerans var</td>
+                        <td class="target" contenteditable="true">Güçlü - Güvenlik önce, sıfır tolerans</td>
+                    </tr>
+
+                    <tr>
+                        <td>Tasarım Güvenliği</td>
+                        <td class="current" contenteditable="true">Yok - Güvenlik sonradan düşünülüyor</td>
+                        <td class="target" contenteditable="true">Entegre - Tüm tasarımlarda zorunlu gözden geçirme</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    
+    <script>
+        // Otomatik kaydetme için localStorage kullan
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                localStorage.setItem('hse_report_backup_' + Date.now(), document.body.innerHTML);
+            }
+        });
+        
+        // Print fonksiyonu
+        function printReport() {
+            window.print();
+        }
+        
+        // Export to PDF hint
+        console.log('💡 Bu raporu PDF olarak kaydetmek için tarayıcınızın yazdır (Ctrl+P) fonksiyonunu kullanın ve "PDF olarak kaydet" seçeneğini seçin.');
+    </script>
+</body>
+</html>

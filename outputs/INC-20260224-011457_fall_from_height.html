@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">HSG245 Metodolojisi ile Hazırlanmıştır</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260224-011457</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">24 Şubat 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Yapı İnşaat Şantiyesi - 4. Kat İskele Alanı</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Majör Yaralanma - Yüksekten Düşme</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">İskele montaj işçisi Hasan Yıldız (32), 6 metre yükseklikteki iskeleden düşerek ağır yaralanmıştır. L2 omurga kırığı, pelvis çatlağı ve iç kanama nedeniyle yoğun bakıma alınmıştır. Emniyet kemeri kullanılmamış, korkuluk ve güvenlik ağı bulunmamaktadır.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">18 Şubat 2026 tarihinde saat 10:35'te, Yapı İnşaat Şantiyesi'nin 4. katında iskele montaj çalışması sırasında, 32 yaşındaki işçi Hasan Yıldız 6 metre yükseklikten düşerek ağır yaralanmıştır. Olay anında işçi emniyet kemeri takmamaktaydı ve çalıştığı iskele alanında korkuluk ile güvenlik ağı bulunmamaktaydı. Düşme sonrası işçi hareketsiz halde yerde bulunmuş ve iş arkadaşları tarafından ilk yardım uygulanmıştır.
+
+Yaralanan işçi 10:55'te gelen 112 ambulansı ile hastaneye sevk edilmiş ve 11:20'de hastaneye kabul edilmiştir. Yapılan tıbbi muayenelerde L2 (ikinci lomber) omurga kırığı, pelvis çatlağı ve iç kanama tespit edilmiş olup, hasta yoğun bakım ünitesine alınmıştır. Bu yaralanma RIDDOR (Reporting of Injuries, Diseases and Dangerous Occurrences Regulations) kapsamında raporlanması gereken majör yaralanma kategorisindedir ve olay aynı gün yetkili mercilere bildirilmiştir.</div>
+<div class="paragraph" contenteditable="true">Olay, Yapı İnşaat Şantiyesi'nin 4. katında, iskele montaj alanında meydana gelmiştir. İskele yapısı binanın dış cephesinde konumlanmış olup, zemin seviyesinden yaklaşık 6 metre yüksekliktedir. Olay anında hava koşulları normal, görüş mesafesi açık ve aydınlatma yeterli seviyedeydi. Ancak çalışma alanında kritik güvenlik önlemleri eksikti: korkuluk sistemleri tamamlanmamış, güvenlik ağları gerilmemiş ve düşme önleyici sistemler kurulmamıştı. İskele platformu montajı tamamlanmamış durumda olmasına rağmen, çalışmalara başlanmıştı.</div>
+<div class="paragraph" contenteditable="true">Birincil etkilenen kişi, 8 aylık deneyime sahip 32 yaşındaki iskele montaj işçisi Hasan Yıldız'dır. Yaralanan işçi L2 omurga kırığı, pelvis çatlağı ve iç kanama nedeniyle yoğun bakımda tedavi görmektedir. Olay, işçinin tanıkları olan Ali Demir (İşçi) ve Mehmet Kara (Usta) tarafından görülmüş ve şantiye şefi Mustafa Çelik tarafından raporlanmıştır. Olayın psikolojik etkileri tüm şantiye çalışanları üzerinde hissedilmiş, çalışma morali olumsuz etkilenmiştir. Ayrıca şirketin itibarı, yasal yükümlülükleri ve sigorta primleri de bu olaydan doğrudan etkilenmiştir. İskele ekipmanı hasar görmemiş ancak tüm yüksekte çalışmalar güvenlik incelemeleri tamamlanana kadar durdurulmuştur.</div>
+<div class="paragraph" contenteditable="true">Olay sonrası acil müdahale protokolü derhal devreye alınmıştır. İş arkadaşları yaralıya ilk yardım uygulamış, 112 acil servis ekipleri çağrılmış ve yaralı 20 dakika içinde ambulansla hastaneye sevk edilmiştir. Şantiye şefi Mustafa Çelik olay yerini güvence altına almış ve tüm yüksekte çalışmaları durdurmuştur. Olay yeri fotoğraflanmış, tanık ifadeleri alınmış ve olay RIDDOR kapsamında aynı gün yetkili mercilere bildirilmiştir.
+
+Acil önlemler kapsamında tüm iskele yapıları yeniden kontrol edilmiş, eksik korkuluklar tamamlanmış ve güvenlik ağları gerilmiştir. Tüm çalışanlara emniyet kemeri kullanımının zorunlu olduğu hatırlatılmış ve acil güvenlik brifingleri verilmiştir. Proje takvimi gözden geçirilmiş ve güvenlik standartları sağlanana kadar yüksekte çalışmalara izin verilmeyeceği kararlaştırılmıştır. HSE ekibi derhal kök neden analizi başlatmış ve yüksek seviyeli araştırma ekibi oluşturulmuştur.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Temel Bulgu 1: İşçi 6 metre yükseklikte çalışırken emniyet kemeri takmamıştır. Emniyet kemerinin zorunlu olduğunu bilmesine rağmen, rahatsız edici bulduğu için kullanmamayı tercih etmiştir. Bu durum, kişisel koruyucu ekipman kullanımında ciddi bir davranışsal risk faktörünü ortaya koymaktadır.</li>
+<li contenteditable="true">Temel Bulgu 2: İskele montajı tamamlanmadan çalışmalara başlanmıştır. 6 metre yükseklikteki iskele platformunda korkuluk sistemleri takılmamış, güvenlik ağları gerilmemiş ve düşme önleyici sistemler kurulmamıştır. Bu durum, yapısal güvenlik önlemlerinin kritik eksikliğini göstermektedir.</li>
+<li contenteditable="true">Temel Bulgu 3: Şantiyede yüksekte çalışmalar için sistematik gözetim ve denetim mekanizması bulunmamaktadır. İşçilerin emniyet kemeri kullanıp kullanmadığı, güvenlik prosedürlerine uyup uymadığı düzenli olarak kontrol edilmemektedir. Şantiye şefi ve ustabaşı birden fazla noktayı aynı anda kontrol etmeye çalışmakta, ancak yeterli denetim personeli bulunmamaktadır.</li>
+<li contenteditable="true">Temel Bulgu 4: Yüksekte çalışma için iş izin sistemi uygulanmamaktadır. İskele güvenlik kontrollerinin tamamlanıp tamamlanmadığı, korkuluk ve güvenlik ağlarının yerinde olup olmadığı kontrol edilmeden çalışmalara izin verilmektedir. Risk kontrolleri sistematik olarak takip edilmemektedir.</li>
+<li contenteditable="true">Temel Bulgu 5: İşçilere yüksekte çalışma konusunda yeterli ve sistematik eğitim verilmemektedir. Eğitim ihtiyaç analizi yapılmamakta, yeni işe alınan işçiler yetkinlik değerlendirmesi yapılmadan tehlikeli işlere başlatılmaktadır. Yüksekte çalışma gibi kritik işler için zorunlu eğitim matrisi oluşturulmamıştır.</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Kritik Kök Nedenler</div>
+
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Yüksekte Çalışmalarda Yetersiz Gözetim ve Denetim Sistemi</div>
+                <div class="box-content" contenteditable="true">[D1.2 / Organizasyonel]
+                
+Şantiyede yüksekte çalışmalar için sistematik bir gözetim ve denetim sistemi bulunmamaktadır. İskele alanlarında düzenli denetim planı yoktur ve emniyet kemeri kullanımı ile diğer güvenlik kurallarına uyum kontrol edilmemektedir. Denetim sorumluluğu net tanımlanmamış olup, hangi personelin hangi ala...</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Yüksekte Çalışma İçin İş İzin Sisteminin Olmaması ve Risk Kontrollerinin Takip Edilmemesi</div>
+                <div class="box-content" contenteditable="true">[D4.4 / Organizasyonel]
+                
+Şantiyede yüksekte çalışma gibi tehlikeli işler için iş izin sistemi uygulanmamaktadır. Yüksekte çalışma öncesi iskele güvenlik kontrollerinin yapılmasını sağlayacak bir sistem mevcut değildir. Korkuluk, güvenlik ağı gibi kritik güvenlik önlemlerinin tamamlanıp tamamlanmadığı kontrol edilmemekte ve ...</div>
+            </div>
+
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Yüksekte Çalışacak İşçiler İçin Eğitim İhtiyaç Analizi Yapılmamış ve Sistematik Eğitim Programı Oluşturulmamış</div>
+                <div class="box-content" contenteditable="true">[D3.2 / Organizasyonel]
+                
+Şantiyede işe alınan işçilerin hangi konularda eğitime ihtiyaç duyduğu belirlenmemektedir. Yüksekte çalışma gibi kritik işler için zorunlu eğitim matrisi oluşturulmamış ve işçiler yetkinlik değerlendirmesi yapılmadan tehlikeli işlere başlatılmaktadır. Eğitim ihtiyaç analizi yapılmamakta, eğitim faal...</div>
+            </div>
+
+            <div class="subsection-header">1.4 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Tüm yüksekte çalışmalar durduruldu ve güvenlik incelemeleri tamamlanana kadar devam etmeyecek</td>
+                        <td contenteditable="true">Şantiye Şefi - Mustafa Çelik</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm iskele yapıları yeniden kontrol edildi, eksik korkuluklar tamamlandı ve güvenlik ağları gerildi</td>
+                        <td contenteditable="true">İskele Montaj Ustası - Mehmet Kara</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm çalışanlara emniyet kemeri kullanımı zorunluluğu hatırlatıldı ve acil güvenlik brifingi verildi</td>
+                        <td contenteditable="true">HSE Görevlisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Olay RIDDOR kapsamında yetkili mercilere bildirildi ve kaza defterine kaydedildi</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260224-011457</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">18 Şubat 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">10:35 (Düşme Anı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Yapı İnşaat Şantiyesi - 4. Kat İskele Alanı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">İskele Montaj Bölümü - Dış Cephe</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Hasan Yıldız (32 yaş, 8 ay deneyim)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası (08:00-17:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">İskele Platformu (6 metre yükseklik)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">İskele Boruları, Bağlantı Elemanları</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Normal, Açık Hava, Görüş Mesafesi İyi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Doğal Gün Işığı - Yeterli</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Baret (Var), Emniyet Kemeri (Takılmamış), İş Ayakkabısı (Var), Eldiven (Var)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Majör Yaralanma - Yüksekten Düşme</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">L2 Omurga Kırığı, Pelvis Çatlağı, İç Kanama</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 Kişi (Hasan Yıldız)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Seviye 1 - Ölümcül veya Majör Yaralanma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Evet - 24.02.2026 tarihinde raporlandı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Ali Demir (İşçi) ve Mehmet Kara (Usta)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet - 112 Ambulans (10:55'te geldi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Yoğun Bakım Ünitesine Yatış (11:20 - Devam Ediyor)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:00</div>
+                    <div class="timeline-event" contenteditable="true">Vardiya başlangıcı - İskele montaj ekibi çalışmaya başladı. Güvenlik brifingleri yapıldı ancak iskele güvenlik kontrolü yapılmadı.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:30</div>
+                    <div class="timeline-event" contenteditable="true">Hasan Yıldız 4. kat iskele platformuna çıktı. Emniyet kemeri takmadan çalışmaya başladı. Korkuluk ve güvenlik ağı eksikliği fark edilmedi.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:35</div>
+                    <div class="timeline-event" contenteditable="true">Düşme olayı gerçekleşti - Hasan Yıldız 6 metre yükseklikten zemine düştü. İş arkadaşları düşme sesini duydu ve olay yerine koştu.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:37</div>
+                    <div class="timeline-event" contenteditable="true">İlk müdahale - Ali Demir ve Mehmet Kara yaralıya ilk yardım uygulamaya başladı. Yaralı hareketsiz, bilinç seviyesi düşük durumda bulundu.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:40</div>
+                    <div class="timeline-event" contenteditable="true">112 Acil Servis çağrıldı - Şantiye şefi Mustafa Çelik acil servisi aradı ve tüm yüksekte çalışmaları durdurdu. Olay yeri güvence altına alındı.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:55</div>
+                    <div class="timeline-event" contenteditable="true">Ambulans gelişi - 112 ekipleri olay yerine ulaştı. Yaralıya tıbbi müdahale yapıldı, boyun ve sırt sabitleme işlemi uygulandı.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:20</div>
+                    <div class="timeline-event" contenteditable="true">Hastane kabulü - Hasan Yıldız hastaneye ulaştı. Acil serviste yapılan muayenelerde L2 omurga kırığı, pelvis çatlağı ve iç kanama tespit edildi.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:45</div>
+                    <div class="timeline-event" contenteditable="true">Yoğun bakıma alınma - Yaralı yoğun bakım ünitesine alındı. Ailesi bilgilendirildi ve HSE ekibi kök neden analizi başlattı.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:00</div>
+                    <div class="timeline-event" contenteditable="true">RIDDOR bildirimi - Olay yetkili mercilere raporlandı (Ref: 055/26). Kaza defterine kaydedildi ve yüksek seviyeli araştırma ekibi oluşturuldu.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - HSG245 / 5 WHY</div>
+            
+            <div class="subsection-header">3.1 HSG245 Metodolojisi</div>
+            <div class="paragraph" contenteditable="true">HSG245 (Investigating Accidents and Incidents), İngiltere Sağlık ve Güvenlik İdaresi (HSE) tarafından yayınlanan, iş kazalarının ve olaylarının sistematik olarak araştırılması için geliştirilmiş kapsamlı bir metodoloji kılavuzudur. Bu metodoloji, olayların yüzeysel nedenlerinin ötesine geçerek, organizasyonel ve sistemik kök nedenleri belirlemeyi amaçlar. HSG245, hiyerarşik bir yaklaşım benimser: önce bireysel davranışlar ve fiziksel koşullar (A ve B kategorileri) incelenir, ardından bu faktörlerin altında yatan iş/görev faktörleri (C kategorisi) ve en nihayetinde organizasyonel faktörler (D kategorisi) araştırılır.
+
+Bu olayda HSG245 metodolojisi uygulanarak, üç farklı analiz dalı oluşturulmuştur. Birinci dal, işçinin emniyet kemeri takmaması davranışından başlayarak yetersiz gözetim ve denetim sistemine ulaşmıştır. İkinci dal, korkuluk ve güvenlik ağı eksikliği koşulundan başlayarak iş izin sisteminin etkisizliğine ulaşmıştır. Üçüncü dal ise prosedür ihlalinden başlayarak eğitim ihtiyaçlarının belirlenmemesi sorununa ulaşmıştır. Her dal, 5-Why tekniği kullanılarak derinlemesine analiz edilmiş ve organizasyonel kök nedenlere ulaşılmıştır. Bu yaklaşım, olayın çok faktörlü doğasını ortaya koymuş ve kapsamlı düzeltici eylemlerin geliştirilmesine olanak sağlamıştır.</div>
+            
+            <div class="subsection-header">3.2 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why (5 Neden) tekniği, bir sorunun kök nedenine ulaşmak için 'Neden?' sorusunun ardışık olarak en az beş kez sorulmasını içeren sistematik bir analiz yöntemidir. Bu teknik, Toyota Üretim Sistemi'nden kaynaklanmakta olup, yüzeysel belirtilerin altında yatan gerçek nedenleri ortaya çıkarmayı amaçlar. Her 'Neden?' sorusu, bir önceki yanıtın nedenini araştırır ve böylece neden-sonuç zinciri derinleşir. Beşinci 'Neden?' genellikle organizasyonel veya sistemik bir kök nedene ulaşır.
+
+Bu olay analizinde, 5-Why tekniği üç farklı dalda uygulanmıştır. Her dalda, doğrudan nedenden başlayarak dört kez 'Neden?' sorusu sorulmuş ve beşinci adımda organizasyonel kök nedene ulaşılmıştır. Örneğin, birinci dalda 'İşçi neden emniyet kemeri takmadı?' sorusundan başlanmış, 'Neden kemersiz çalıştığı fark edilmedi?', 'Neden sürekli gözetim yoktu?', 'Neden yeterli denetim personeli yoktu?' sorularıyla devam edilmiş ve sonunda 'Yüksekte çalışmalarda yetersiz gözetim ve denetim sistemi' kök nedenine ulaşılmıştır. Bu sistematik yaklaşım, olayın gerçek nedenlerini ortaya çıkarmış ve etkili düzeltici eylemlerin belirlenmesini sağlamıştır.</div>
+            
+            <div class="subsection-header">3.3 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışsal Faktör</td>
+                        <td contenteditable="true">Bireysel kural/prosedür ihlali, bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk, stres, motivasyon eksikliği, kişisel koruyucu ekipman kullanmama gibi insan davranışlarından kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktör</td>
+                        <td contenteditable="true">Ekipman arızası, tasarım hatası, korunmasız yükseklik, yetersiz aydınlatma, gürültü, sıcaklık, alan düzeni, fiziksel tehlikeler, malzeme eksikliği gibi çalışma ortamı ve fiziksel koşullardan kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">İş tasarımı yetersizliği, ergonomi sorunları, fiziksel yük, zaman baskısı, karmaşık prosedürler, yetersiz araç/gereç, bakım eksikliği gibi işin doğası ve görev gereksinimlerinden kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Prosedür eksikliği, iletişim bozukluğu, yönetim kararları, politika yetersizlikleri, eğitim eksikliği, gözetim yetersizliği, iş izin sistemi etkisizliği, kaynak yetersizliği, güvenlik kültürü zayıflığı gibi organizasyonel sistemlerden kaynaklanan faktörler</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.4 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Kıdemli HSE Yöneticisi</td>
+                        <td contenteditable="true">Baş Araştırmacı ve Analiz Koordinatörü</td>
+                        <td contenteditable="true">24 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Dış HSE Danışmanı/Müfettişi</td>
+                        <td contenteditable="true">Bağımsız Uzman ve Metodoloji Danışmanı</td>
+                        <td contenteditable="true">24 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İnşaat Güvenliği Uzmanı</td>
+                        <td contenteditable="true">Teknik Güvenlik Değerlendirmesi</td>
+                        <td contenteditable="true">24 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İskele Teknik Uzmanı</td>
+                        <td contenteditable="true">İskele Yapısal Analiz ve Güvenlik Standartları</td>
+                        <td contenteditable="true">25 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Şantiye Müdürü - Mustafa Çelik</td>
+                        <td contenteditable="true">Operasyonel Bilgi ve Tanık İfadesi</td>
+                        <td contenteditable="true">24 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İnsan Kaynakları Temsilcisi</td>
+                        <td contenteditable="true">Personel Kayıtları ve Eğitim Geçmişi</td>
+                        <td contenteditable="true">25 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tıbbi Danışman</td>
+                        <td contenteditable="true">Yaralanma Değerlendirmesi ve Tıbbi Raporlama</td>
+                        <td contenteditable="true">25 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hukuk Müşaviri</td>
+                        <td contenteditable="true">Yasal Uyumluluk ve RIDDOR Raporlama</td>
+                        <td contenteditable="true">24 Şubat 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İşçi Temsilcisi/Sendika Temsilcisi</td>
+                        <td contenteditable="true">Çalışan Perspektifi ve Güvenlik Kültürü Değerlendirmesi</td>
+                        <td contenteditable="true">25 Şubat 2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">4. DAL 1 - DAVRANIŞSAL NEDEN: EMNİYET KEMERİ KULLANILMAMASI</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bu dalın başlangıç noktası, işçi Hasan Yıldız'ın 6 metre yükseklikteki iskele platformunda çalışırken emniyet kemeri takmaması davranışıdır. Emniyet kemeri, yüksekte çalışmalarda en kritik kişisel koruyucu ekipman olup, düşme durumunda yaralanmayı önleyen veya şiddetini azaltan birincil güvenlik bariyeridir. İşçinin emniyet kemerini kullanmaması, doğrudan düşme olayına ve ağır yaralanmaya yol açmıştır.
+
+Hasan Yıldız'ın emniyet kemeri kullanımının zorunlu olduğunu bildiği, ancak rahatsız edici bulduğu için takmadığı tespit edilmiştir. Bu durum, bilinçli bir kural ihlalini göstermektedir. Ancak bu davranışsal faktörün altında yatan organizasyonel nedenler araştırılmadan, sadece bireysel suçlama yapılması sorunu çözmeyecektir. Bu nedenle, 5-Why tekniği kullanılarak bu davranışın altında yatan sistemik nedenler araştırılmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">İşçi 6 metre yükseklikte çalışırken emniyet kemeri takmamıştır. Emniyet kemerinin zorunlu olduğunu bilmesine rağmen, rahatsız edici bulduğu için kullanmamayı tercih etmiştir. Bu davranış, HSG245 kodlama sisteminde A3.2 (Gerekli KKD/koruyucu yöntemlerin kullanılmaması) kategorisine girmektedir.</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden işçi emniyet kemeri takmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Emniyet kemeri kullanımının zorunlu olduğunu biliyordu ancak rahatsız edici bulduğu için takmadı. İşçi, kemer takmanın hareketlerini kısıtladığını ve işini yavaşlattığını düşünüyordu.</div>
+                    <span class="why-code">A3.2 - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden kemersiz çalıştığı fark edilmedi veya müdahale edilmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Şantiyede sürekli gözetim yoktu, işçiler kendi başlarına çalışıyordu. Şantiye şefi ve ustabaşı aynı anda birden fazla noktayı kontrol etmeye çalışıyordu ve bu işçinin kemersiz çalıştığını fark etmedi.</div>
+                    <span class="why-code">D1.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden sürekli gözetim ve denetim yapılmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Şantiye şefi ve ustabaşı aynı anda birden fazla noktayı kontrol etmeye çalışıyordu, yeterli denetim personeli yoktu. Şantiyede çalışan işçi sayısına göre gözetim personeli yetersizdi.</div>
+                    <span class="why-code">D1.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden yeterli denetim personeli yoktu ve güvenlik kurallarına uymayanlar tespit edilemiyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Yüksekte çalışma alanlarında düzenli denetim planı yoktu, gözetim sorumluluğu net tanımlanmamıştı. Hangi personelin hangi alanları ne sıklıkla kontrol edeceği belirlenmemişti.</div>
+                    <span class="why-code">D1.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden düzenli denetim planı ve net gözetim sorumluluğu yoktu?</div>
+                    <div class="why-answer" contenteditable="true">→ Şirketin yüksekte çalışmalar için sistematik bir gözetim ve denetim sistemi bulunmamaktaydı. Gözetim faaliyetleri plansız ve rastgele yapılmaktaydı.</div>
+                    <span class="why-code">D1.2 - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Yüksekte Çalışmalarda Yetersiz Gözetim ve Denetim Sistemi</div>
+                <div class="box-content" contenteditable="true">[D1.2 / Organizasyonel]
+
+Şantiyede yüksekte çalışmalar için sistematik bir gözetim ve denetim sistemi bulunmamaktadır. İskele alanlarında düzenli denetim planı yoktur, emniyet kemeri kullanımı ve diğer güvenlik kurallarına uyum kontrol edilmemektedir. Denetim sorumluluğu net tanımlanmamış olup, hangi personelin hangi alanları ne sıklıkla kontrol edeceği belirlenmemiştir. Şantiye şefi ve ustabaşı aynı anda birden fazla noktayı kontrol etmeye çalışmakta, ancak yeterli denetim personeli bulunmamaktadır. Bu durum, güvenlik kurallarına uymayanların tespit edilememesine ve düzeltici müdahalelerin yapılamamasına yol açmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yüksekte çalışma alanları için yazılı gözetim ve denetim prosedürü bulunmamaktadır. Hangi güvenlik kontrollerinin ne sıklıkla yapılacağı tanımlanmamıştır.</li>
+<li contenteditable="true">Gözetim personelinin yetki ve sorumlulukları net olarak belirlenmemiştir. Denetim yapma yetkisi, uygunsuzlukları durdurma yetkisi ve raporlama sorumluluğu tanımlanmamıştır.</li>
+<li contenteditable="true">Denetim sonuçlarının kayıt altına alınması ve takip edilmesi için bir sistem yoktur. Tespit edilen uygunsuzlukların düzeltilip düzeltilmediği kontrol edilmemektedir.</li>
+<li contenteditable="true">Şantiyede çalışan işçi sayısına göre yeterli sayıda gözetim personeli istihdam edilmemektedir. İş yükü analizi yapılmamış ve personel planlaması güvenlik gereksinimleri dikkate alınmadan yapılmıştır.</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">5. DAL 2 - KOŞULSAL NEDEN: KORKULUK VE GÜVENLİK AĞI EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bu dalın başlangıç noktası, 6 metre yükseklikteki iskele platformunda korkuluk ve güvenlik ağı bulunmaması fiziksel koşuludur. Korkuluklar ve güvenlik ağları, yüksekte çalışmalarda düşmeyi önleyen veya düşme mesafesini sınırlayan pasif güvenlik sistemleridir. Bu sistemler, işçinin davranışından bağımsız olarak koruma sağlar ve bu nedenle güvenlik hiyerarşisinde kişisel koruyucu ekipmandan daha üst seviyede yer alır.
+
+Olay yerinde yapılan incelemede, iskele montajının tamamlanmadığı, korkuluk sistemlerinin takılmadığı ve güvenlik ağlarının gerilmediği tespit edilmiştir. İskele platformu yapısal olarak tamamlanmamış olmasına rağmen, işçilerin bu alanda çalışmaya başladığı görülmüştür. Bu durum, ciddi bir güvenlik açığını ve kontrol eksikliğini göstermektedir. 5-Why tekniği kullanılarak, bu fiziksel koşulun altında yatan organizasyonel nedenler araştırılmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">6 metre yükseklikteki iskelede korkuluk ve güvenlik ağı bulunmamaktadır. İskele montajı tamamlanmadan çalışmalara başlanmıştır. Bu durum, HSG245 kodlama sisteminde B4.4 (Korunmasız yükseklik veya düşme tehlikesi) kategorisine girmektedir.</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden 6 metre yükseklikteki iskelede korkuluk ve güvenlik ağı bulunmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ İskele montajı tamamlandıktan sonra korkuluk ve güvenlik ağı takılmamış, eksik bırakılmıştı. Montaj ekibi, iskele platformunu kurmuş ancak güvenlik sistemlerini tamamlamamıştı.</div>
+                    <span class="why-code">B4.4 - Koşulsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden iskele montajı eksik bırakılmıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ İskele montajının tamamlanıp tamamlanmadığı kontrol edilmemişti, işçiler eksik montajla çalışmaya başlamıştı. Montaj ekibi işini bitirmiş sayılmış ve başka bir alana geçmişti.</div>
+                    <span class="why-code">D4.4 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden iskele montajı kontrol edilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Yüksekte çalışma öncesi iskele güvenlik kontrolü yapılması için bir sistem veya prosedür yoktu. Hangi kontrollerin yapılacağı, kim tarafından yapılacağı ve nasıl onaylanacağı tanımlanmamıştı.</div>
+                    <span class="why-code">D4.4 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden yüksekte çalışma için kontrol sistemi yoktu?</div>
+                    <div class="why-answer" contenteditable="true">→ Yüksekte çalışma için iş izin sistemi uygulanmıyordu, risk kontrolleri takip edilmiyordu. İşçiler, güvenlik önlemlerinin tamamlanıp tamamlanmadığına bakılmaksızın çalışmaya başlayabiliyordu.</div>
+                    <span class="why-code">D4.4 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden iş izin sistemi uygulanmıyordu ve risk kontrolleri takip edilmiyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Şirketin yüksekte çalışma gibi tehlikeli işler için iş izin sistemi politikası ve prosedürü bulunmamaktaydı. Tehlikeli işlerin tanımlanması ve kontrol gereksinimleri belirlenmemişti.</div>
+                    <span class="why-code">D4.4 - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Yüksekte Çalışma İçin İş İzin Sisteminin Olmaması ve Risk Kontrollerinin Takip Edilmemesi</div>
+                <div class="box-content" contenteditable="true">[D4.4 / Organizasyonel]
+
+Şantiyede yüksekte çalışma gibi tehlikeli işler için iş izin sistemi uygulanmamaktadır. Yüksekte çalışma öncesi iskele güvenlik kontrollerinin yapılmasını sağlayacak bir sistem mevcut değildir. Korkuluk, güvenlik ağı gibi kritik güvenlik önlemlerinin tamamlanıp tamamlanmadığı kontrol edilmemekte ve onaylanmamaktadır. İşçiler, güvenlik önlemlerinin hazır olup olmadığına bakılmaksızın çalışmaya başlayabilmektedir. İş izin sistemi politikası ve prosedürü bulunmamakta, tehlikeli işlerin tanımlanması ve kontrol gereksinimleri belirlenmemiştir. Bu durum, kritik güvenlik bariyerlerinin eksik kalmasına ve işçilerin korunmasız ortamlarda çalışmasına yol açmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yüksekte çalışma, sıcak iş, kapalı alan girişi gibi tehlikeli işler için iş izin sistemi politikası ve prosedürü oluşturulmamıştır. Hangi işlerin izin gerektirdiği tanımlanmamıştır.</li>
+<li contenteditable="true">İş izni başvuru, değerlendirme, onaylama ve iptal süreçleri belirlenmemiştir. İzin formları, kontrol listeleri ve kayıt sistemleri mevcut değildir.</li>
+<li contenteditable="true">İş izni vermek için yetkilendirilmiş personel atanmamıştır. Yetkilendirme kriterleri ve eğitim gereksinimleri tanımlanmamıştır.</li>
+<li contenteditable="true">İş öncesi risk değerlendirmesi ve kontrol önlemlerinin tamamlanma durumunun doğrulanması için bir mekanizma yoktur. Güvenlik bariyerlerinin yerinde olup olmadığı sistematik olarak kontrol edilmemektedir.</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">6. DAL 3 - DAVRANIŞSAL NEDEN: PROSEDÜR İHLALİ VE EĞİTİM EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bu dalın başlangıç noktası, işçinin yüksekte çalışma prosedürlerini ihlal ederek emniyet tedbiri almadan çalışması davranışıdır. Yüksekte çalışma, en tehlikeli iş aktivitelerinden biri olup, sıkı prosedürlere ve güvenlik önlemlerine uyumu gerektirir. İşçinin emniyet kemeri takmadan ve korkuluksuz alanda çalışması, yüksekte çalışma prosedürlerinin ciddi şekilde ihlal edildiğini göstermektedir.
+
+Ancak bu davranışsal faktörün altında, işçinin yüksekte çalışma prosedürlerini yeterince bilmemesi ve uygulamaması yatmaktadır. İşçinin prosedürleri bilmemesi, eğitim eksikliğine işaret etmektedir. 5-Why tekniği kullanılarak, bu davranışın altında yatan eğitim ve yetkinlik yönetimi eksiklikleri araştırılmıştır. Analiz, bireysel davranıştan başlayarak organizasyonel eğitim sisteminin yetersizliğine ulaşmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">İşçi yüksekte çalışma prosedürlerini ihlal ederek emniyet tedbiri almadan çalışmıştır. 6 metre yükseklikte emniyet kemeri takılmadan çalışılması, yüksekte çalışma prosedürlerinin ihlal edildiğini göstermektedir. Bu durum, HSG245 kodlama sisteminde A1.1 (Bireysel kural/prosedür ihlali) kategorisine girmektedir.</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden işçi emniyet kemeri takmadan ve korkuluksuz alanda çalıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ İşçi yüksekte çalışma prosedürlerini bilmiyordu ve uygulamıyordu. Emniyet kemerinin ne zaman ve nasıl kullanılması gerektiği konusunda yeterli bilgiye sahip değildi.</div>
+                    <span class="why-code">A1.1 - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden işçi yüksekte çalışma prosedürlerini bilmiyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ İşçiye yüksekte çalışma konusunda yeterli eğitim verilmemişti. İşe başlarken temel güvenlik eğitimi almış ancak yüksekte çalışma özel eğitimi almamıştı.</div>
+                    <span class="why-code">D3.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden işçiye yüksekte çalışma eğitimi verilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Şantiyede eğitim ihtiyaç analizi yapılmıyor, işçiler doğrudan işe başlatılıyordu. Hangi işçinin hangi eğitimlere ihtiyaç duyduğu belirlenmemişti.</div>
+                    <span class="why-code">D3.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden eğitim ihtiyaç analizi yapılmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Şirketin sistematik bir eğitim programı ve yetkinlik değerlendirme sistemi yoktu. Eğitim faaliyetleri plansız ve rastgele yapılmaktaydı.</div>
+                    <span class="why-code">D3.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden sistematik eğitim programı ve yetkinlik değerlendirme sistemi yoktu?</div>
+                    <div class="why-answer" contenteditable="true">→ Şirket yönetimi, eğitim ihtiyaçlarının belirlenmesi ve sistematik eğitim programının oluşturulması için gerekli kaynakları ayırmamış ve öncelik vermemişti.</div>
+                    <span class="why-code">D3.2 - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Yüksekte Çalışacak İşçiler İçin Eğitim İhtiyaç Analizi Yapılmamış ve Sistematik Eğitim Programı Oluşturulmamış</div>
+                <div class="box-content" contenteditable="true">[D3.2 / Organizasyonel]
+
+Şantiyede işe alınan işçilerin hangi konularda eğitime ihtiyaç duyduğu belirlenmemektedir. Yüksekte çalışma gibi kritik işler için zorunlu eğitim matrisi oluşturulmamış ve işçiler yetkinlik değerlendirmesi yapılmadan tehlikeli işlere başlatılmaktadır. Eğitim ihtiyaç analizi yapılmamakta, eğitim faaliyetleri plansız ve rastgele yürütülmektedir. Şirketin sistematik bir eğitim programı ve yetkinlik değerlendirme sistemi bulunmamaktadır. İşçilerin aldıkları eğitimler kayıt altına alınmamakta, eğitim etkinliği değerlendirilmemekte ve periyodik tazeleme eğitimleri yapılmamaktadır. Bu durum, işçilerin yeterli bilgi ve beceriye sahip olmadan tehlikeli işlerde çalışmasına yol açmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">İşe alım sürecinde eğitim ihtiyaç analizi yapılmamakta, işçilerin mevcut yetkinlikleri değerlendirilmemektedir. Hangi işçinin hangi eğitimlere ihtiyaç duyduğu belirlenmemektedir.</li>
+<li contenteditable="true">Yüksekte çalışma, iskele montajı, acil durum müdahalesi gibi kritik işler için zorunlu eğitim matrisi oluşturulmamıştır. Hangi işin hangi eğitimleri gerektirdiği tanımlanmamıştır.</li>
+<li contenteditable="true">Eğitim kayıtları sistematik olarak tutulmamakta, işçilerin aldıkları eğitimler ve geçerlilik süreleri takip edilmemektedir. Eğitim geçmişi doğrulanmadan işçiler tehlikeli işlere atanmaktadır.</li>
+<li contenteditable="true">Eğitim etkinliği değerlendirilmemekte, işçilerin öğrendiklerini uygulamaya aktarıp aktarmadıkları kontrol edilmemektedir. Periyodik tazeleme eğitimleri ve yetkinlik testleri yapılmamaktadır.</li>
+
+            </ul>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">6. NİHAİ KÖK NEDENLER</div>
+
+            <div class="root-cause-box root-cause-1">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 1: Yüksekte Çalışmalarda Yetersiz Gözetim ve Denetim Sistemi</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D1.2</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">Üst Yönetim (gözetim kaynaklarının tahsisi), İnsan Kaynakları (denetim personeli istihdamı ve eğitimi), Şantiye Yönetimi (gözetim planlaması ve uygulaması), HSE Departmanı (gözetim prosedürlerinin geliştirilmesi ve denetimi)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Şantiyede yüksekte çalışmalar için sistematik bir gözetim ve denetim sistemi bulunmamaktadır. İskele alanlarında düzenli denetim planı yoktur ve emniyet kemeri kullanımı ile diğer güvenlik kurallarına uyum kontrol edilmemektedir. Denetim sorumluluğu net tanımlanmamış olup, hangi personelin hangi alanları ne sıklıkla kontrol edeceği belirlenmemiştir. Şantiye şefi ve ustabaşı aynı anda birden fazla noktayı kontrol etmeye çalışmakta, ancak yeterli denetim personeli bulunmamaktadır.
+
+Gözetim personelinin yetki ve sorumlulukları net olarak belirlenmemiştir. Denetim yapma yetkisi, uygunsuzlukları durdurma yetkisi ve raporlama sorumluluğu tanımlanmamıştır. Denetim sonuçlarının kayıt altına alınması ve takip edilmesi için bir sistem yoktur. Tespit edilen uygunsuzlukların düzeltilip düzeltilmediği kontrol edilmemektedir. Şantiyede çalışan işçi sayısına göre yeterli sayıda gözetim personeli istihdam edilmemektedir. İş yükü analizi yapılmamış ve personel planlaması güvenlik gereksinimleri dikkate alınmadan yapılmıştır.
+
+Bu sistemik eksiklik, güvenlik kurallarına uymayanların tespit edilememesine ve düzeltici müdahalelerin yapılamamasına yol açmaktadır. İşçiler, denetim olmadığını bildikleri için güvenlik kurallarını ihlal etme eğilimi göstermektedir. Gözetim eksikliği, güvenlik kültürünün zayıflamasına ve risk alma davranışlarının normalleşmesine neden olmaktadır. Etkili bir gözetim ve denetim sistemi olmadan, güvenlik prosedürlerinin uygulanması sağlanamaz ve benzer olayların tekrarı kaçınılmaz hale gelir.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">Güvenlik kurallarına uymayanların tespit edilememesi ve düzeltici müdahalelerin yapılamaması, işçilerin korunmasız ortamlarda çalışmasına yol açmaktadır.</li>
+<li contenteditable="true">Gözetim eksikliği, güvenlik kültürünün zayıflamasına ve risk alma davranışlarının normalleşmesine neden olmaktadır. İşçiler, denetim olmadığını bildikleri için güvenlik kurallarını ihlal etme eğilimi göstermektedir.</li>
+<li contenteditable="true">Yeterli denetim personeli olmaması, şantiye şefi ve ustabaşının iş yükünü artırmakta ve etkili gözetim yapılmasını engellemektedir.</li>
+<li contenteditable="true">Denetim sonuçlarının kayıt altına alınmaması ve takip edilmemesi, sürekli iyileştirme fırsatlarının kaçırılmasına ve aynı hataların tekrarlanmasına yol açmaktadır.</li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="root-cause-box root-cause-2">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 2: Yüksekte Çalışma İçin İş İzin Sisteminin Olmaması ve Risk Kontrollerinin Takip Edilmemesi</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D4.4</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">Üst Yönetim (iş izin sistemi politikasının onaylanması ve kaynakların tahsisi), HSE Departmanı (iş izin prosedürlerinin geliştirilmesi ve eğitimi), Şantiye Yönetimi (iş izin sisteminin uygulanması ve denetimi), Operasyon Yönetimi (iş izni gereksinimlerinin operasyonel planlara entegrasyonu)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Şantiyede yüksekte çalışma gibi tehlikeli işler için iş izin sistemi uygulanmamaktadır. Yüksekte çalışma öncesi iskele güvenlik kontrollerinin yapılmasını sağlayacak bir sistem mevcut değildir. Korkuluk, güvenlik ağı gibi kritik güvenlik önlemlerinin tamamlanıp tamamlanmadığı kontrol edilmemekte ve onaylanmamaktadır. İşçiler, güvenlik önlemlerinin hazır olup olmadığına bakılmaksızın çalışmaya başlayabilmektedir.
+
+Yüksekte çalışma, sıcak iş, kapalı alan girişi gibi tehlikeli işler için iş izin sistemi politikası ve prosedürü oluşturulmamıştır. Hangi işlerin izin gerektirdiği tanımlanmamıştır. İş izni başvuru, değerlendirme, onaylama ve iptal süreçleri belirlenmemiştir. İzin formları, kontrol listeleri ve kayıt sistemleri mevcut değildir. İş izni vermek için yetkilendirilmiş personel atanmamıştır. Yetkilendirme kriterleri ve eğitim gereksinimleri tanımlanmamıştır.
+
+İş öncesi risk değerlendirmesi ve kontrol önlemlerinin tamamlanma durumunun doğrulanması için bir mekanizma yoktur. Güvenlik bariyerlerinin yerinde olup olmadığı sistematik olarak kontrol edilmemektedir. Bu durum, kritik güvenlik bariyerlerinin eksik kalmasına ve işçilerin korunmasız ortamlarda çalışmasına yol açmaktadır. İş izin sistemi, tehlikeli işlerin başlatılmadan önce risk değerlendirmesinin yapılmasını, kontrol önlemlerinin uygulanmasını ve yetkilendirilmiş personel tarafından onaylanmasını sağlayan kritik bir yönetim aracıdır. Bu sistemin olmaması, organizasyonun tehlikeli işleri kontrol altına alma kapasitesini ciddi şekilde zayıflatmaktadır.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">Kritik güvenlik bariyerlerinin (korkuluk, güvenlik ağı, emniyet kemeri bağlantı noktaları) eksik kalması ve işçilerin korunmasız ortamlarda çalışması, ölümcül veya majör yaralanma riskini önemli ölçüde artırmaktadır.</li>
+<li contenteditable="true">İş öncesi risk değerlendirmesinin yapılmaması, tehlikelerin belirlenmemesine ve uygun kontrol önlemlerinin alınmamasına yol açmaktadır.</li>
+<li contenteditable="true">İş izni olmadan başlatılan tehlikeli işler, yetkisiz ve eğitimsiz personelin bu işleri yapmasına olanak tanımakta, risk seviyesini daha da artırmaktadır.</li>
+<li contenteditable="true">İş izin kayıtlarının olmaması, tehlikeli işlerin takibini ve denetimini imkansız hale getirmekte, yasal uyumluluk sorunlarına yol açmaktadır.</li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="root-cause-box root-cause-3">
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN 3: Yüksekte Çalışacak İşçiler İçin Eğitim İhtiyaç Analizi Yapılmamış ve Sistematik Eğitim Programı Oluşturulmamış</div>
+                <div class="root-cause-content">
+                    <table style="margin-bottom: 20px;">
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
+                            <td contenteditable="true">D3.2</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td contenteditable="true">Organizasyonel</td>
+                        </tr>
+                        <tr>
+                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td contenteditable="true">Üst Yönetim (eğitim politikasının onaylanması ve bütçenin tahsisi), İnsan Kaynakları (eğitim ihtiyaç analizinin yapılması, eğitim programlarının geliştirilmesi ve kayıtların tutulması), HSE Departmanı (güvenlik eğitimi içeriklerinin belirlenmesi ve etkinliğinin değerlendirilmesi), Şantiye Yönetimi (eğitim gereksinimlerinin belirlenmesi ve eğitim planının uygulanması)</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="paragraph" contenteditable="true">Şantiyede işe alınan işçilerin hangi konularda eğitime ihtiyaç duyduğu belirlenmemektedir. Yüksekte çalışma gibi kritik işler için zorunlu eğitim matrisi oluşturulmamış ve işçiler yetkinlik değerlendirmesi yapılmadan tehlikeli işlere başlatılmaktadır. Eğitim ihtiyaç analizi yapılmamakta, eğitim faaliyetleri plansız ve rastgele yürütülmektedir. Şirketin sistematik bir eğitim programı ve yetkinlik değerlendirme sistemi bulunmamaktadır.
+
+İşe alım sürecinde eğitim ihtiyaç analizi yapılmamakta, işçilerin mevcut yetkinlikleri değerlendirilmemektedir. Hangi işçinin hangi eğitimlere ihtiyaç duyduğu belirlenmemektedir. Yüksekte çalışma, iskele montajı, acil durum müdahalesi gibi kritik işler için zorunlu eğitim matrisi oluşturulmamıştır. Hangi işin hangi eğitimleri gerektirdiği tanımlanmamıştır. Eğitim kayıtları sistematik olarak tutulmamakta, işçilerin aldıkları eğitimler ve geçerlilik süreleri takip edilmemektedir. Eğitim geçmişi doğrulanmadan işçiler tehlikeli işlere atanmaktadır.
+
+Eğitim etkinliği değerlendirilmemekte, işçilerin öğrendiklerini uygulamaya aktarıp aktarmadıkları kontrol edilmemektedir. Periyodik tazeleme eğitimleri ve yetkinlik testleri yapılmamaktadır. Bu durum, işçilerin yeterli bilgi ve beceriye sahip olmadan tehlikeli işlerde çalışmasına yol açmaktadır. Eğitim, güvenlik kültürünün temel taşlarından biridir ve işçilerin tehlikeleri tanıması, riskleri anlaması ve güvenli çalışma yöntemlerini uygulaması için kritik öneme sahiptir. Sistematik eğitim programının olmaması, organizasyonun güvenlik performansını ciddi şekilde olumsuz etkilemektedir.</div>
+                    
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <ul class="bullet-list">
+<li contenteditable="true">İşçilerin yeterli bilgi ve beceriye sahip olmadan tehlikeli işlerde çalışması, kaza ve yaralanma riskini önemli ölçüde artırmaktadır. Yüksekte çalışma prosedürlerini bilmeyen işçiler, hayati güvenlik önlemlerini almamaktadır.</li>
+<li contenteditable="true">Eğitim ihtiyaçlarının belirlenmemesi, eğitim kaynaklarının verimsiz kullanılmasına ve gerçek ihtiyaçların karşılanmamasına yol açmaktadır.</li>
+<li contenteditable="true">Eğitim kayıtlarının tutulmaması, işçilerin yetkinliklerinin doğrulanamamasına ve yasal uyumluluk sorunlarına neden olmaktadır. Denetim ve teftiş durumlarında ciddi yaptırımlarla karşılaşılabilir.</li>
+<li contenteditable="true">Eğitim etkinliğinin değerlendirilmemesi, eğitimlerin davranış değişikliği yaratıp yaratmadığının bilinmemesine ve sürekli iyileştirme fırsatlarının kaçırılmasına yol açmaktadır.</li>
+
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">7. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Şantiye yönetimi ile işçiler arasında güvenlik konularında etkili iletişim kurulamamaktadır. Güvenlik beklentileri, prosedür değişiklikleri ve risk bilgileri işçilere net olarak iletilmemektedir. Vardiya devir-teslim toplantılarında güvenlik konuları yeterince ele alınmamaktadır. İşçilerin güvenlik endişelerini dile getirmeleri için açık bir iletişim kanalı bulunmamaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">İşçilere yüksekte çalışma, iskele güvenliği, emniyet kemeri kullanımı, acil durum prosedürleri konularında yeterli ve sistematik eğitim verilmemektedir. Eğitimler teorik düzeyde kalmakta, uygulamalı eğitimler yapılmamaktadır. Yeni işe başlayan işçiler, deneyimli işçilerden yeterli mentorluk almamaktadır. Periyodik tazeleme eğitimleri yapılmamakta, işçilerin bilgileri güncel tutulmamaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yorgunluk/Stres</td>
+                        <td contenteditable="true">Şantiyede uzun çalışma saatleri ve yoğun iş temposu nedeniyle işçiler yorgun ve stresli çalışmaktadır. Proje teslim tarihi baskısı, işçilerin hızlı çalışma ve kestirme yollar kullanma eğilimini artırmaktadır. Dinlenme molaları yeterli değildir. İşçilerin fiziksel ve zihinsel yorgunluğu, dikkat eksikliğine ve hatalara yol açmaktadır. Stres yönetimi ve iş-yaşam dengesi konularında destek sağlanmamaktadır.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman Bakım Eksikliği</td>
+                        <td contenteditable="true">İskele ekipmanlarının düzenli bakımı ve kontrolü yapılmamaktadır. Hasarlı veya aşınmış ekipmanlar tespit edilememekte ve kullanımdan çekilmemektedir. Emniyet kemerleri ve bağlantı ekipmanlarının periyodik testleri yapılmamaktadır. Ekipman envanteri tutulmamakta, hangi ekipmanların nerede kullanıldığı takip edilmemektedir. Bakım kayıtları sistematik olarak tutulmamaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Uyumsuzluğu</td>
+                        <td contenteditable="true">Yüksekte çalışma prosedürleri yazılı olarak mevcut olsa bile, işçiler tarafından uygulanmamaktadır. Prosedürler karmaşık ve anlaşılması zor yazılmıştır. Prosedürlerin güncel olup olmadığı kontrol edilmemektedir. İşçiler, prosedürlere uymadıklarında herhangi bir yaptırımla karşılaşmamaktadır. Prosedür ihlalleri kayıt altına alınmamakta ve analiz edilmemektedir.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yönetim Denetim Eksikliği</td>
+                        <td contenteditable="true">Üst yönetim, şantiye güvenlik performansını düzenli olarak gözden geçirmemektedir. Güvenlik denetimleri ve teftiş sonuçları üst yönetime raporlanmamaktadır. Güvenlik hedefleri ve performans göstergeleri belirlenmemiştir. Yönetim, güvenlik konularına yeterli kaynak ayırmamakta ve öncelik vermemektedir. Güvenlik kültürü, üst yönetim tarafından desteklenmemekte ve teşvik edilmemektedir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Çevresel Koşullar</td>
+                        <td contenteditable="true">Olay günü hava koşulları normal olmasına rağmen, şantiye alanının genel düzeni ve organizasyonu yetersizdir. Malzeme depolama alanları düzensizdir ve yürüme yollarını engellemektedir. Şantiye alanında trafik yönetimi planı yoktur. Acil durum çıkış yolları net olarak işaretlenmemiştir. Gürültü seviyesi yüksektir ve işçiler arasında iletişimi zorlaştırmaktadır.</td>
+                        <td class="impact-low" contenteditable="true">Düşük</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">8. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Yüksekte çalışma için kapsamlı iş izin sistemi prosedürü geliştirilmesi ve uygulanması. İş izni formları, kontrol listeleri ve onay süreçlerinin oluşturulması. Tüm yüksekte çalışmaların iş izni alınmadan başlatılmaması kuralının getirilmesi. İş izni veren yetkililerin belirlenmesi ve eğitilmesi. İş izni sisteminin etkinliğinin haftalık olarak gözden geçirilmesi.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">İş izni sistemi prosedürünün onaylanması ve uygulamaya alınması. Tüm yüksekte çalışmaların %100 iş izni ile yapılması.</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Tüm iskele yapılarının acil güvenlik denetiminin yapılması. Eksik korkulukların tamamlanması, güvenlik ağlarının gerilmesi ve tüm düşme önleyici sistemlerin kurulması. Güvenli olmayan iskelelerin kullanımdan çekilmesi ve kırmızı etiketle işaretlenmesi. İskele güvenlik kontrol listesinin oluşturulması ve her vardiya başında uygulanması.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Şantiye Müdürü - Mustafa Çelik</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm iskelelerin güvenlik denetiminden geçirilmesi. %100 iskele uygunluk oranı.</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Yüksekte çalışma gözetim ve denetim planının oluşturulması. Gözetim personelinin atanması ve yetkilendirilmesi. Günlük denetim rotalarının belirlenmesi ve denetim kontrol listelerinin hazırlanması. Denetim sonuçlarının kayıt altına alınması ve takip sisteminin kurulması. Uygunsuzlukların derhal düzeltilmesi ve tekrarının önlenmesi için mekanizmaların oluşturulması.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Görevlisi</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Gözetim planının oluşturulması ve uygulanması. Günlük denetim kayıtlarının tutulması. Tespit edilen uygunsuzlukların %100 düzeltilmesi.</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Yüksekte çalışma eğitim ihtiyaç analizinin yapılması. Tüm işçilerin mevcut yetkinliklerinin değerlendirilmesi. Yüksekte çalışma zorunlu eğitim matrisinin oluşturulması. Teorik ve uygulamalı yüksekte çalışma eğitim programının geliştirilmesi. Tüm yüksekte çalışacak işçilere acil eğitim verilmesi ve yetkinlik testlerinin yapılması.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İnsan Kaynakları Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim ihtiyaç analizinin tamamlanması. Eğitim matrisinin oluşturulması. Tüm yüksekte çalışan işçilerin %100 eğitilmesi ve yetkinlik testinden geçmesi.</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Emniyet kemeri kullanımı zorunluluğunun güçlendirilmesi. Tüm yüksekte çalışma alanlarına emniyet kemeri bağlantı noktalarının kurulması. Emniyet kemeri kullanmayanlar için disiplin prosedürünün oluşturulması ve uygulanması. Emniyet kemeri kullanımının günlük olarak denetlenmesi. Emniyet kemeri kullanım oranının görsel panolarda paylaşılması.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Şantiye Şefi</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Tüm yüksekte çalışma alanlarına bağlantı noktalarının kurulması. Emniyet kemeri kullanım oranının %100'e çıkarılması.</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">İskele montaj ve demontaj prosedürlerinin gözden geçirilmesi ve güncellenmesi. İskele montaj kontrol listesinin oluşturulması. İskele montajının tamamlanması ve güvenlik kontrollerinin yapılması için onay sisteminin kurulması. İskele montaj ekiplerinin eğitilmesi ve yetkilendirilmesi. Montaj kalitesinin bağımsız denetiminin yapılması.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İskele Montaj Ustası - Mehmet Kara</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">İskele prosedürlerinin güncellenmesi. Tüm iskelelerin montaj kontrol listesi ile onaylanması. %100 iskele montaj kalitesi.</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Güvenlik kültürü geliştirme programının başlatılması. Üst yönetimin güvenlik taahhüdünün yazılı olarak açıklanması ve tüm çalışanlarla paylaşılması. Aylık güvenlik toplantılarının düzenlenmesi. Güvenlik öneri sisteminin kurulması ve işçilerin katılımının teşvik edilmesi. Güvenli davranışların ödüllendirilmesi programının oluşturulması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Genel Müdür</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Üst yönetim güvenlik taahhüdünün yayınlanması. Aylık güvenlik toplantılarının yapılması. Güvenlik öneri sayısının artması.</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Acil durum müdahale planının gözden geçirilmesi ve güncellenmesi. İlk yardım ekipmanlarının tüm çalışma alanlarına yerleştirilmesi. İlk yardımcı sayısının artırılması ve eğitilmesi. Acil durum tatbikatlarının düzenli olarak yapılması. Acil servis ile koordinasyon protokolünün oluşturulması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Acil durum planının güncellenmesi. İlk yardımcı sayısının artırılması. Üç ayda bir acil durum tatbikatının yapılması.</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Kişisel koruyucu ekipman (KKE) yönetim sisteminin oluşturulması. KKE ihtiyaç analizinin yapılması ve uygun ekipmanların temin edilmesi. KKE dağıtım, kullanım ve bakım prosedürlerinin oluşturulması. KKE kullanım eğitimlerinin verilmesi. KKE kullanımının düzenli olarak denetlenmesi ve kayıt altına alınması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Görevlisi</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">KKE yönetim prosedürünün oluşturulması. Tüm işçilere uygun KKE'nin sağlanması. KKE kullanım oranının %100'e çıkarılması.</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Risk değerlendirme sisteminin gözden geçirilmesi ve iyileştirilmesi. Tüm yüksekte çalışma aktiviteleri için detaylı risk değerlendirmelerinin yapılması. Risk kontrol hiyerarşisinin uygulanması ve kontrol önlemlerinin etkinliğinin doğrulanması. Risk değerlendirmelerinin işçilerle paylaşılması ve geri bildirim alınması. Risk değerlendirmelerinin yıllık olarak gözden geçirilmesi.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Tüm yüksekte çalışma aktiviteleri için risk değerlendirmelerinin tamamlanması. Risk kontrol önlemlerinin %100 uygulanması.</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Güvenlik performans göstergelerinin (KPI) belirlenmesi ve izleme sisteminin kurulması. Öncü ve ardıl göstergelerin tanımlanması. Aylık güvenlik performans raporlarının hazırlanması ve üst yönetime sunulması. Güvenlik hedeflerinin belirlenmesi ve performansın hedeflerle karşılaştırılması. Sürekli iyileştirme fırsatlarının belirlenmesi ve eylem planlarının oluşturulması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Güvenlik KPI'larının belirlenmesi. Aylık güvenlik performans raporlarının hazırlanması. Güvenlik hedeflerine ulaşılması.</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Yüklenici ve taşeron yönetim sisteminin geliştirilmesi. Yüklenici seçim kriterlerinde güvenlik performansının değerlendirilmesi. Yüklenici güvenlik oryantasyon programının oluşturulması. Yüklenici çalışanlarının yetkinliklerinin doğrulanması. Yüklenici güvenlik performansının düzenli olarak izlenmesi ve değerlendirilmesi. Düşük performans gösteren yüklenicilerle sözleşmelerin sonlandırılması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Satın Alma Müdürü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Yüklenici yönetim prosedürünün oluşturulması. Tüm yüklenicilerin güvenlik oryantasyonundan geçirilmesi. Yüklenici güvenlik performansının iyileştirilmesi.</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">9. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Ders 1 - Yüksekte çalışma için iş izin sistemi mutlaka uygulanmalıdır: Yüksekte çalışma gibi yüksek riskli işler için iş izin sistemi, kritik güvenlik bariyerlerinin tamamlanmasını sağlayan ve işin güvenli bir şekilde başlatılmasını onaylayan temel bir yönetim aracıdır. İş izni olmadan hiçbir yüksekte çalışma başlatılmamalıdır. İş izni, iskele güvenlik kontrollerinin yapılmasını, korkuluk ve güvenlik ağlarının yerinde olduğunu, emniyet kemeri bağlantı noktalarının kurulduğunu ve tüm işçilerin eğitimli ve yetkilendirilmiş olduğunu doğrulamalıdır.
+• Ders 2 - Gözetim ve denetim sistemi olmadan güvenlik prosedürlerinin uygulanması sağlanamaz: Prosedürlerin yazılı olarak mevcut olması yeterli değildir. İşçilerin prosedürlere uyup uymadığının düzenli olarak kontrol edilmesi, uygunsuzlukların tespit edilmesi ve derhal düzeltilmesi gerekmektedir. Etkili bir gözetim sistemi, net sorumluluklar, düzenli denetim planları, kayıt sistemleri ve uygunsuzlukları düzeltme mekanizmalarını içermelidir. Gözetim personeli yeterli sayıda olmalı, eğitimli olmalı ve yetkilendirilmiş olmalıdır.
+• Ders 3 - Eğitim ihtiyaç analizi yapılmadan işçiler tehlikeli işlere başlatılmamalıdır: Her işçinin hangi konularda eğitime ihtiyaç duyduğu belirlenmeli, zorunlu eğitimler tamamlanmadan tehlikeli işlere atanmamalıdır. Yüksekte çalışma gibi kritik işler için zorunlu eğitim matrisi oluşturulmalı, teorik ve uygulamalı eğitimler verilmeli, yetkinlik testleri yapılmalı ve periyodik tazeleme eğitimleri sağlanmalıdır. Eğitim kayıtları sistematik olarak tutulmalı ve eğitim etkinliği değerlendirilmelidir.
+• Ders 4 - Güvenlik kültürü üst yönetimin taahhüdü ile başlar: Güvenlik, sadece HSE departmanının sorumluluğu değildir. Üst yönetim, güvenliğe öncelik verdiğini açıkça göstermeli, güvenlik hedefleri belirlemeli, yeterli kaynakları ayırmalı ve güvenlik performansını düzenli olarak gözden geçirmelidir. Güvenlik, tüm yönetim kararlarında dikkate alınmalı ve güvenli davranışlar teşvik edilip ödüllendirilmelidir. Güvenlik kültürü, herkesin sorumluluğudur ve üst yönetimin liderliği ile gelişir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Uzun vadeli çözüm 1 - Entegre güvenlik yönetim sisteminin kurulması: ISO 45001 İş Sağlığı ve Güvenliği Yönetim Sistemi standardına uygun kapsamlı bir güvenlik yönetim sistemi kurulmalıdır. Bu sistem, risk değerlendirme, iş izinleri, eğitim yönetimi, gözetim ve denetim, olay araştırma, düzeltici eylemler, performans izleme ve sürekli iyileştirme süreçlerini içermelidir. Sistem, tüm organizasyonel seviyelerde entegre edilmeli ve düzenli olarak gözden geçirilmelidir.
+• Uzun vadeli çözüm 2 - Güvenlik kültürü dönüşüm programının uygulanması: Reaktif güvenlik yaklaşımından proaktif güvenlik kültürüne geçiş için kapsamlı bir dönüşüm programı başlatılmalıdır. Bu program, liderlik eğitimleri, davranışsal güvenlik gözlemleri, güvenlik iletişim kampanyaları, çalışan katılım programları, güvenlik ödüllendirme sistemleri ve sürekli iyileştirme mekanizmalarını içermelidir. Güvenlik kültürü olgunluk seviyesi düzenli olarak değerlendirilmeli ve iyileştirme fırsatları belirlenmeli.
+• Uzun vadeli çözüm 3 - Teknoloji destekli güvenlik izleme sistemlerinin kurulması: Yüksekte çalışma alanlarında kamera sistemleri, sensörler ve akıllı emniyet kemerleri kullanılarak gerçek zamanlı güvenlik izlemesi yapılmalıdır. Emniyet kemeri kullanımı, iskele güvenlik durumu ve tehlikeli davranışlar otomatik olarak tespit edilmeli ve uyarılar verilmelidir. Dijital iş izin sistemi, mobil denetim uygulamaları ve güvenlik performans gösterge panoları kullanılarak güvenlik yönetimi dijitalleştirilmelidir.
+• Uzun vadeli çözüm 4 - Sürekli iyileştirme ve öğrenen organizasyon kültürünün oluşturulması: Tüm olaylar, ramak kala olaylar ve güvenlik gözlemleri sistematik olarak analiz edilmeli, kök nedenler belirlenmeli ve öğrenilen dersler tüm organizasyonla paylaşılmalıdır. Benzer olayların tekrarını önlemek için düzeltici eylemler geliştirilmeli ve etkinliği doğrulanmalıdır. Güvenlik performans verileri düzenli olarak analiz edilmeli, trendler belirlenmeli ve proaktif iyileştirmeler yapılmalıdır. Sektördeki en iyi uygulamalar araştırılmalı ve organizasyona uyarlanmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• İletişim planı 1 - Olay bilgilerinin tüm şantiye çalışanlarıyla paylaşılması: Bu olayın detayları, kök nedenleri ve alınan dersler, tüm şantiye çalışanlarına güvenlik toplantılarında anlatılmalıdır. Olay fotoğrafları (gizlilik kurallarına uygun şekilde) ve analiz sonuçları görsel panolarda paylaşılmalıdır. İşçilerin benzer durumlarla karşılaşmamaları için farkındalık yaratılmalı ve güvenli çalışma yöntemleri vurgulanmalıdır. İşçilerin soruları yanıtlanmalı ve endişeleri dinlenmelidir.
+• İletişim planı 2 - Diğer şantiyelere ve yüklenicilere bilgilendirme yapılması: Bu olaydan öğrenilen dersler, şirketin diğer şantiyelerine ve çalıştığı yüklenicilere iletilmelidir. Benzer risklerin bulunduğu tüm lokasyonlarda acil güvenlik kontrolleri yapılmalı ve gerekli düzeltici eylemler alınmalıdır. Sektör dernekleri ve güvenlik forumları aracılığıyla olay bilgileri (gizlilik kurallarına uygun şekilde) paylaşılmalı ve sektörün genel güvenlik seviyesinin yükseltilmesine katkı sağlanmalıdır.
+• İletişim planı 3 - Yaralanan işçi ve ailesi ile düzenli iletişim kurulması: Yaralanan işçi Hasan Yıldız ve ailesi ile düzenli iletişim kurulmalı, tedavi süreci takip edilmeli ve gerekli destek sağlanmalıdır. İşçinin iyileşme durumu hakkında bilgi alınmalı ve işe dönüş planı yapılmalıdır. Psikolojik destek ihtiyacı değerlendirilmeli ve gerekirse profesyonel yardım sağlanmalıdır. Şirketin yaralanan işçiye ve ailesine verdiği destek, tüm çalışanlara güvenlik taahhüdünün somut bir göstergesi olarak iletilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Eğitim programı 1 - Yüksekte çalışma kapsamlı eğitim programı: Tüm yüksekte çalışacak işçiler için teorik ve uygulamalı kapsamlı eğitim programı geliştirilmelidir. Eğitim, yüksekte çalışma tehlikeleri, risk değerlendirmesi, iskele güvenliği, korkuluk ve güvenlik ağı sistemleri, emniyet kemeri seçimi ve kullanımı, düşme önleme teknikleri, acil durum prosedürleri ve yasal gereksinimler konularını içermelidir. Eğitim sonunda yetkinlik testi yapılmalı ve başarılı olanlara sertifika verilmelidir. Eğitim her yıl tazelenmelidir.
+• Eğitim programı 2 - İş izin sistemi eğitimi: İş izni verecek yetkililer, şantiye şefleri, ustabaşılar ve HSE personeli için iş izin sistemi eğitimi verilmelidir. Eğitim, iş izni prosedürleri, risk değerlendirme teknikleri, kontrol önlemlerinin doğrulanması, iş izni formlarının doldurulması, onay süreçleri ve kayıt yönetimi konularını içermelidir. Eğitim, vaka çalışmaları ve uygulamalı alıştırmalarla desteklenmelidir. İş izni verme yetkisi, eğitim tamamlandıktan ve yetkinlik doğrulandıktan sonra verilmelidir.
+• Eğitim programı 3 - Gözetim ve denetim eğitimi: Şantiye şefleri, ustabaşılar ve gözetim personeli için etkili gözetim ve denetim teknikleri eğitimi verilmelidir. Eğitim, güvenlik liderliği, etkili iletişim, davranışsal güvenlik gözlemleri, denetim kontrol listelerinin kullanımı, uygunsuzlukların tespiti ve düzeltilmesi, yapıcı geri bildirim verme ve disiplin yönetimi konularını içermelidir. Gözetim personelinin yetki ve sorumlulukları net olarak tanımlanmalı ve desteklenmelidir.
+• Eğitim programı 4 - Güvenlik kültürü ve liderlik eğitimi: Tüm yönetim kademeleri için güvenlik kültürü ve liderlik eğitimi verilmelidir. Eğitim, güvenlik kültürünün önemi, liderlik davranışlarının güvenlik performansına etkisi, güvenlik vizyonu ve hedeflerinin belirlenmesi, çalışan katılımının sağlanması, güvenli davranışların teşvik edilmesi ve güvenlik performansının izlenmesi konularını içermelidir. Üst yönetimin güvenlik taahhüdü güçlendirilmeli ve tüm organizasyona yayılmalıdır.</div>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">18 Şubat 2026 tarihinde meydana gelen yüksekten düşme olayı, organizasyonun güvenlik yönetim sistemindeki ciddi eksiklikleri ortaya çıkarmıştır. İskele montaj işçisi Hasan Yıldız'ın 6 metre yükseklikten düşerek ağır yaralanması, birden fazla güvenlik bariyerinin aynı anda başarısız olmasının sonucudur. HSG245 metodolojisi kullanılarak yapılan kök neden analizi, olayın yüzeysel nedenlerinin ötesine geçerek, üç temel organizasyonel kök nedeni belirlemiştir: yetersiz gözetim ve denetim sistemi, iş izin sisteminin olmaması ve eğitim ihtiyaçlarının belirlenmemesi.
+
+Bu kök nedenler, birbirini destekleyen ve güçlendiren sistemik eksikliklerdir. Gözetim sisteminin olmaması, işçilerin güvenlik kurallarını ihlal etmesine olanak tanımıştır. İş izin sisteminin olmaması, kritik güvenlik bariyerlerinin eksik kalmasına yol açmıştır. Eğitim sisteminin yetersizliği, işçilerin tehlikeleri tanımamasına ve güvenli çalışma yöntemlerini uygulamamasına neden olmuştur. Bu üç kök neden birlikte, olayın meydana gelmesi için uygun koşulları yaratmıştır.
+
+Olayın ciddiyeti, sadece yaralanan işçinin sağlık durumu ile sınırlı değildir. Bu olay, organizasyonun güvenlik kültürünün zayıflığını, risk yönetimi kapasitesinin yetersizliğini ve yasal uyumluluk sorunlarını göstermektedir. RIDDOR kapsamında raporlanması gereken bu majör yaralanma, şirketin itibarını olumsuz etkilemiş, yasal yaptırım riskini artırmış ve sigorta primlerinin yükselmesine neden olabilir. Ayrıca, tüm şantiye çalışanlarının moralini ve güvenlik algısını olumsuz etkilemiştir.
+
+Ancak bu olay, aynı zamanda organizasyon için önemli bir öğrenme ve iyileştirme fırsatıdır. Kapsamlı kök neden analizi, sorunların gerçek kaynaklarını ortaya çıkarmış ve etkili düzeltici eylemlerin geliştirilmesine olanak sağlamıştır. Bu raporda önerilen 12 düzeltici eylem, kısa vadede acil riskleri azaltacak ve uzun vadede güvenlik yönetim sistemini güçlendirecektir. Bu eylemlerin kararlılıkla uygulanması ve etkinliğinin izlenmesi, benzer olayların tekrarını önleyecek ve organizasyonun güvenlik performansını önemli ölçüde iyileştirecektir.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kısa vade önlem 1 (1 hafta): Yüksekte çalışma için iş izin sistemi prosedürü acilen geliştirilmeli ve uygulanmalıdır. Tüm yüksekte çalışmalar, iş izni alınmadan başlatılmamalıdır. İş izni formları ve kontrol listeleri hazırlanmalı, iş izni veren yetkililer belirlenmeli ve eğitilmelidir. İş izni sisteminin etkinliği günlük olarak izlenmeli ve uygunsuzluklar derhal düzeltilmelidir. Bu önlem, kritik güvenlik bariyerlerinin tamamlanmasını sağlayacak ve benzer olayların tekrarını önleyecektir.</li>
+<li contenteditable="true">Kısa vade önlem 2 (1 hafta): Tüm iskele yapılarının acil güvenlik denetimi yapılmalı, eksik korkuluklar tamamlanmalı, güvenlik ağları gerilmeli ve tüm düşme önleyici sistemler kurulmalıdır. Güvenli olmayan iskeleler kullanımdan çekilmeli ve kırmızı etiketle işaretlenmelidir. İskele güvenlik kontrol listesi oluşturulmalı ve her vardiya başında uygulanmalıdır. Bu önlem, mevcut fiziksel tehlikeleri ortadan kaldıracak ve işçilerin güvenli ortamlarda çalışmasını sağlayacaktır.</li>
+<li contenteditable="true">Kısa vade önlem 3 (2 hafta): Yüksekte çalışma gözetim ve denetim planı oluşturulmalı, gözetim personeli atanmalı ve yetkilendirilmelidir. Günlük denetim rotaları belirlenmeli ve denetim kontrol listeleri hazırlanmalıdır. Denetim sonuçları kayıt altına alınmalı ve tespit edilen uygunsuzluklar derhal düzeltilmelidir. Emniyet kemeri kullanımı günlük olarak denetlenmeli ve kullanmayanlar için disiplin prosedürü uygulanmalıdır. Bu önlem, güvenlik kurallarına uyumun sağlanmasını ve sürdürülmesini garanti edecektir.</li>
+<li contenteditable="true">Kısa vade önlem 4 (1 ay): Tüm yüksekte çalışacak işçilere acil yüksekte çalışma eğitimi verilmeli ve yetkinlik testleri yapılmalıdır. Eğitim, teorik ve uygulamalı olmalı, emniyet kemeri kullanımı, iskele güvenliği ve acil durum prosedürlerini içermelidir. Eğitim almayan ve yetkinlik testinden geçmeyen işçiler yüksekte çalışmalara başlatılmamalıdır. Eğitim kayıtları sistematik olarak tutulmalı ve takip edilmelidir. Bu önlem, işçilerin bilgi ve beceri seviyesini artıracak ve güvenli çalışma davranışlarını geliştirecektir.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Uzun vade iyileştirme 1 (3-6 ay): ISO 45001 İş Sağlığı ve Güvenliği Yönetim Sistemi standardına uygun entegre güvenlik yönetim sistemi kurulmalıdır. Bu sistem, risk değerlendirme, iş izinleri, eğitim yönetimi, gözetim ve denetim, olay araştırma, düzeltici eylemler, performans izleme ve sürekli iyileştirme süreçlerini içermelidir. Sistem dokümante edilmeli, tüm çalışanlara eğitimi verilmeli ve düzenli olarak gözden geçirilmelidir. Dış denetim ve sertifikasyon süreci başlatılmalıdır.</li>
+<li contenteditable="true">Uzun vade iyileştirme 2 (6-12 ay): Güvenlik kültürü dönüşüm programı uygulanmalıdır. Reaktif güvenlik yaklaşımından proaktif güvenlik kültürüne geçiş için kapsamlı bir program başlatılmalıdır. Bu program, liderlik eğitimleri, davranışsal güvenlik gözlemleri, güvenlik iletişim kampanyaları, çalışan katılım programları, güvenlik ödüllendirme sistemleri ve sürekli iyileştirme mekanizmalarını içermelidir. Güvenlik kültürü olgunluk seviyesi yıllık olarak değerlendirilmeli ve iyileştirme fırsatları belirlenmeli.</li>
+<li contenteditable="true">Uzun vade iyileştirme 3 (6-12 ay): Teknoloji destekli güvenlik izleme sistemleri kurulmalıdır. Yüksekte çalışma alanlarında kamera sistemleri, sensörler ve akıllı emniyet kemerleri kullanılarak gerçek zamanlı güvenlik izlemesi yapılmalıdır. Dijital iş izin sistemi, mobil denetim uygulamaları ve güvenlik performans gösterge panoları kullanılarak güvenlik yönetimi dijitalleştirilmelidir. Veri analitiği kullanılarak proaktif risk yönetimi yapılmalı ve öncü göstergeler izlenmelidir.</li>
+<li contenteditable="true">Uzun vade iyileştirme 4 (12 ay): Sürekli iyileştirme ve öğrenen organizasyon kültürü oluşturulmalıdır. Tüm olaylar, ramak kala olaylar ve güvenlik gözlemleri sistematik olarak analiz edilmeli, kök nedenler belirlenmeli ve öğrenilen dersler paylaşılmalıdır. Güvenlik performans verileri düzenli olarak analiz edilmeli, trendler belirlenmeli ve proaktif iyileştirmeler yapılmalıdır. Sektördeki en iyi uygulamalar araştırılmalı ve organizasyona uyarlanmalıdır. Yıllık güvenlik performans değerlendirmesi yapılmalı ve stratejik iyileştirme planları geliştirilmelidir.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Seviyesi (Yüksekten Düşme)</td>
+                        <td class="current" contenteditable="true">Yüksek - Kontrol Eksikliği</td>
+                        <td class="target" contenteditable="true">Düşük - Çoklu Bariyerlerle Kontrol Altında</td>
+                    </tr>
+
+                    <tr>
+                        <td>İş İzin Sistemi Uygulaması</td>
+                        <td class="current" contenteditable="true">%0 - Sistem Yok</td>
+                        <td class="target" contenteditable="true">%100 - Tüm Yüksekte Çalışmalarda Uygulanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Gözetim ve Denetim Kapsamı</td>
+                        <td class="current" contenteditable="true">Rastgele - Plansız</td>
+                        <td class="target" contenteditable="true">Sistematik - Günlük Planlı Denetimler</td>
+                    </tr>
+
+                    <tr>
+                        <td>Yüksekte Çalışma Eğitim Oranı</td>
+                        <td class="current" contenteditable="true">%30 - Temel Eğitim</td>
+                        <td class="target" contenteditable="true">%100 - Kapsamlı Teorik ve Uygulamalı Eğitim</td>
+                    </tr>
+
+                    <tr>
+                        <td>Emniyet Kemeri Kullanım Oranı</td>
+                        <td class="current" contenteditable="true">%60 - Düşük Uyum</td>
+                        <td class="target" contenteditable="true">%100 - Tam Uyum ve Sürekli Denetim</td>
+                    </tr>
+
+                    <tr>
+                        <td>İskele Güvenlik Uygunluk Oranı</td>
+                        <td class="current" contenteditable="true">%40 - Eksik Korkuluk/Ağ</td>
+                        <td class="target" contenteditable="true">%100 - Tüm Güvenlik Sistemleri Tamamlanmış</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Kültürü Olgunluk Seviyesi</td>
+                        <td class="current" contenteditable="true">Seviye 2 - Reaktif</td>
+                        <td class="target" contenteditable="true">Seviye 4 - Proaktif</td>
+                    </tr>
+
+                    <tr>
+                        <td>Olay Araştırma Kalitesi</td>
+                        <td class="current" contenteditable="true">Yüzeysel - Kök Neden Yok</td>
+                        <td class="target" contenteditable="true">Kapsamlı - HSG245 Metodolojisi ile Kök Neden Analizi</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    
+    <script>
+        // Otomatik kaydetme için localStorage kullan
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                localStorage.setItem('hse_report_backup_' + Date.now(), document.body.innerHTML);
+            }
+        });
+        
+        // Print fonksiyonu
+        function printReport() {
+            window.print();
+        }
+        
+        // Export to PDF hint
+        console.log('💡 Bu raporu PDF olarak kaydetmek için tarayıcınızın yazdır (Ctrl+P) fonksiyonunu kullanın ve "PDF olarak kaydet" seçeneğini seçin.');
+    </script>
+</body>
+</html>
