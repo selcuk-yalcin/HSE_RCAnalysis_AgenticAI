@@ -9,7 +9,7 @@ OLAY TANIMI:
   kapıldı. Elektrik sistemi enerjili haldeyken çalışıldı, kilitlama prosedürü
   (LOTO - Lockout/Tagout) uygulanmamış. Teknisyen hastaneye kaldırıldı.
 
-TEST KAPSAMI:
+TEST KAPSAMI: (Bunu bosever seninle ilgili degil hocam)
   1. Ortam ve API kontrolleri
   2. OverviewAgent - Elektrik olayı ilk değerlendirme
   3. AssessmentAgent - Şiddet ve RIDDOR sınıflandırması
@@ -35,6 +35,14 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+# ============================================
+# PATH SETUP (Proje root'u Python path'e ekle)
+# ============================================
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+# Şimdi import'lar çalışır
 from agents.overview_agent import OverviewAgent
 from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2
