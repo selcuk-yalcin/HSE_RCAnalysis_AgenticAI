@@ -167,15 +167,24 @@ class AnalysisCache:
 
 class MongoDBCache:
     """
-    Incident analiz sonuçlarını MongoDB'de cache'le.
+    Incident analiz sonuçlarını rca_database'deki analysis_cache collection'ında sakla.
+    
+    Structure:
+    ├── rca_database (existing)
+    │   ├── taxonomy (existing)
+    │   ├── vector_search (existing)
+    │   └── analysis_cache (NEW - cache collection)
+    
     Production'da (Railway) container restart'ta cache kalır.
     """
     
-    def __init__(self, db_name: str = "rca_database", collection_name: str = "analysis_cache", ttl_days: int = 30):
+    def __init__(self, ttl_days: int = 30):
         """
-        db_name: MongoDB database adı
-        collection_name: Cache collection adı
         ttl_days: Kaç gün sonra cache silinsin?
+        
+        Database ve collection auto-detect from env vars:
+        - MONGODB_RCA_DB (default: "rca_database")
+        - MONGODB_CACHE_COLLECTION (default: "analysis_cache")
         """
         if not MONGODB_AVAILABLE:
             raise ImportError("pymongo paketi yüklü değil. Kurulum: pip install pymongo")
@@ -185,11 +194,19 @@ class MongoDBCache:
         if not mongo_uri:
             raise ValueError("MONGODB_URI environment variable not set!")
         
+        # Database name: env variable'dan al, yoksa default
+        db_name = os.getenv("MONGODB_RCA_DB", "rca_database")
+        
+        # Collection name: env variable'dan al, yoksa default
+        collection_name = os.getenv("MONGODB_CACHE_COLLECTION", "analysis_cache")
+        
         try:
             self.client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
             # Bağlantı testı
             self.client.admin.command('ping')
-            print("✅ MongoDB bağlantısı başarılı (Cache)")
+            print(f"✅ MongoDB bağlantısı başarılı (Cache)")
+            print(f"   📦 Database: {db_name}")
+            print(f"   📋 Collection: {collection_name}")
         except Exception as e:
             raise ConnectionError(f"MongoDB bağlantı hatası: {e}")
         
