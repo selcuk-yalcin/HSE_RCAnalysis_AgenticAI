@@ -56,9 +56,9 @@ class MongoVectorRetriever:
     
     def _connect_to_db(self):
         """MongoDB'ye bağlanır."""
-        mongo_uri = os.getenv("MONGO_URI")
+        mongo_uri = os.getenv("MONGODB_URI")
         if not mongo_uri:
-            raise ValueError("MONGO_URI ortam değişkeni bulunamadı.")
+            raise ValueError("MONGODB_URI ortam değişkeni bulunamadı.")
         
         try:
             self.client = MongoClient(mongo_uri, server_api=ServerApi('1'))

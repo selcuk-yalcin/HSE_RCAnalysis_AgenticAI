@@ -26,9 +26,9 @@ load_dotenv()
 
 def create_vector_search_index():
     """MongoDB Atlas Search index'ini oluşturur."""
-    mongo_uri = os.getenv("MONGO_URI")
+    mongo_uri = os.getenv("MONGODB_URI")
     if not mongo_uri:
-        raise ValueError("MONGO_URI ortam değişkeni bulunamadı.")
+        raise ValueError("MONGODB_URI ortam değişkeni bulunamadı.")
     
     print("=" * 70)
     print("🔍 MongoDB Atlas Vector Search Index Oluşturucu")

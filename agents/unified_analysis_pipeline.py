@@ -194,6 +194,12 @@ class MongoDBCache:
         if not mongo_uri:
             raise ValueError("MONGODB_URI environment variable not set!")
         
+        # .env dosyasında tırnak içinde olabilir - kaldır
+        if mongo_uri.startswith('"') and mongo_uri.endswith('"'):
+            mongo_uri = mongo_uri[1:-1]
+        if mongo_uri.startswith("'") and mongo_uri.endswith("'"):
+            mongo_uri = mongo_uri[1:-1]
+        
         # Database name: env variable'dan al, yoksa default
         db_name = os.getenv("MONGODB_RCA_DB", "rca_database")
         
