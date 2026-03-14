@@ -23,6 +23,7 @@ from agents.overview_agent import OverviewAgent
 from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.skillbased_docx_agent import SkillBasedDocxAgent
+from agents.unified_analysis_pipeline import MongoDBCache, AnalysisCache
 
 
 def main():
@@ -243,6 +244,58 @@ gerçekleştirilen kontrolde cihazın iç aksamında yanma meydana geldiği tesp
     print("  📄 HTML tam rapor oluşturuldu")
     print("  📄 DOCX tam rapor oluşturuldu")
     print("="*100 + "\n")
+    
+    # ============================================================
+    # CACHE'E KAYDET (MongoDB veya Disk)
+    # ============================================================
+    print("\n" + "="*100)
+    print("💾 CACHE'E KAYIT")
+    print("="*100 + "\n")
+    
+    try:
+        # MongoDB cache'e yaz
+        print("🔍 MongoDB cache'e yazılıyor...")
+        cache = MongoDBCache()
+        
+        analysis_result = {
+            "source": "oil_fire_test",
+            "timestamp": datetime.now().isoformat(),
+            "incident_ref": incident_data.get("ref_no"),
+            "overview": overview_result,
+            "assessment": assessment_result,
+            "root_cause_analysis": root_cause_result
+        }
+        
+        cache.set(incident_data, analysis_result)
+        print("✅ MongoDB cache'e başarıyla yazıldı!")
+        
+        stats = cache.get_stats()
+        print(f"   📊 Cache Stats:")
+        print(f"      Hits: {stats['hits']}")
+        print(f"      Misses: {stats['misses']}")
+        print(f"      Money Saved: ${stats['saved_cost']:.2f}")
+        
+    except Exception as e:
+        print(f"⚠️  MongoDB cache yazma hatası: {e}")
+        print("   Disk cache'e yazılıyor...")
+        
+        try:
+            cache = AnalysisCache()
+            analysis_result = {
+                "source": "oil_fire_test",
+                "timestamp": datetime.now().isoformat(),
+                "incident_ref": incident_data.get("ref_no"),
+                "overview": overview_result,
+                "assessment": assessment_result,
+                "root_cause_analysis": root_cause_result
+            }
+            
+            cache.set(incident_data, analysis_result)
+            print("✅ Disk cache'e başarıyla yazıldı!")
+        except Exception as e2:
+            print(f"❌ Cache yazma hatası: {e2}")
+    
+    print("\n" + "="*100 + "\n")
 
 
 if __name__ == "__main__":
