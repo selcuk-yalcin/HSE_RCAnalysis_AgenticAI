@@ -25,6 +25,7 @@ from .overview_agent import OverviewAgent
 from .assessment_agent import AssessmentAgent
 from .rootcause_agent_v2 import RootCauseAgentV2
 from .skillbased_docx_agent import SkillBasedDocxAgent
+from .mongodb_cache_utils import CacheKeyManager, CacheKeyDebugger, CacheEntryMetadata
 
 # MongoDB for cache storage
 try:
@@ -62,20 +63,14 @@ class AnalysisCache:
     
     def get_cache_key(self, incident_data: dict) -> str:
         """
-        Incident'ın unique hash'ini oluştur.
-        Aynı description = Aynı hash = Aynı sonuç
+        Incident'ın unique hash'ini oluştur - SADECE KRİTİK ALANLARA DAYANSSIN.
+        Böylece aynı equipment, aynı injury type = aynı cache, description farklı olsa da.
+        
+        Benzer Olaylar = Aynı Cache = Para Tasarrufu!
+        
+        Uses CacheKeyManager for consistent key generation.
         """
-        # Description'ı al
-        description = incident_data.get("description", "")
-        ref_no = incident_data.get("ref_no", "")
-        
-        # Boşlukları temizle (normalizasyon)
-        normalized = f"{ref_no}:{description}".strip().lower()
-        normalized = " ".join(normalized.split())
-        
-        # MD5 hash oluştur (kısa ve hızlı)
-        hash_obj = hashlib.md5(normalized.encode())
-        return hash_obj.hexdigest()
+        return CacheKeyManager.generate_cache_key("incident", incident_data)
     
     def get(self, incident_data: dict) -> Optional[dict]:
         """
@@ -207,7 +202,12 @@ class MongoDBCache:
         collection_name = os.getenv("MONGODB_CACHE_COLLECTION", "analysis_cache")
         
         try:
-            self.client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+            from pymongo.server_api import ServerApi
+            self.client = MongoClient(
+                mongo_uri, 
+                server_api=ServerApi('1'),
+                serverSelectionTimeoutMS=10000
+            )
             # Bağlantı testı
             self.client.admin.command('ping')
             print(f"✅ MongoDB bağlantısı başarılı (Cache)")
@@ -239,19 +239,17 @@ class MongoDBCache:
     
     def get_cache_key(self, incident_data: dict) -> str:
         """
-        Incident'ın unique hash'ini oluştur.
-        Aynı description = Aynı hash = Aynı sonuç
+        Incident'ın unique hash'ini oluştur - SADECE KRİTİK ALANLARA DAYANSSIN.
+        Böylece aynı equipment, aynı injury type = aynı cache, description farklı olsa da.
+        
+        Örnek:
+        - Incident 1: "Oil fire incident - detailed description"
+        - Incident 2: "Oil fire incident - another description"
+        → Her ikisi de AYNI cache'e erişir (tasarruf!)
+        
+        Uses CacheKeyManager for consistent key generation.
         """
-        description = incident_data.get("description", "")
-        ref_no = incident_data.get("ref_no", "")
-        
-        # Normalizasyon
-        normalized = f"{ref_no}:{description}".strip().lower()
-        normalized = " ".join(normalized.split())
-        
-        # MD5 hash
-        hash_obj = hashlib.md5(normalized.encode())
-        return hash_obj.hexdigest()
+        return CacheKeyManager.generate_cache_key("incident", incident_data)
     
     def get(self, incident_data: dict) -> Optional[dict]:
         """
@@ -578,7 +576,7 @@ class UnifiedAnalysisPipeline:
             results.append(result)
         
         # ============================================================
-        # BATCH ÖZETI
+        # BATCH ÖZETİ
         # ============================================================
         print(f"\n\n{'='*100}")
         print(f"📊 BATCH SUMMARY")
