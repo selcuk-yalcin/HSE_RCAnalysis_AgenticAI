@@ -232,7 +232,7 @@ def test_mongodb_cache_demo():
             print(f"  ✅ {file.name} ({size} bytes)")
     
     print_section("MongoDB Cache Configuration")
-    print(f"""
+    print("""
     Database: rca_database
     Collection: analysis_cache
     TTL: 30 days (automatic cleanup)
