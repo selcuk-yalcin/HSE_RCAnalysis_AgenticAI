@@ -22,7 +22,7 @@ from agents.overview_agent import OverviewAgent
 from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2 as RootCauseAgent
 from agents.actionplan_agent import ActionPlanAgent
-from agents.pdf_report_agent import PDFReportAgent
+from agents.claude_skill_pdf_agent import ClaudeSkillPDFAgent as PDFReportAgent
 
 app = FastAPI(
     title="HSE Investigation API",

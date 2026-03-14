@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260225-151636";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 Kritik Faktörler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260225-151636</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">20 Şubat 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Üretim Tesisi - Ana Elektrik Panosu (MDB-02)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Ağır Yaralanma (Major Injury)</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">20 Şubat 2026 tarihinde saat 15:20'de üretim tesisindeki ana elektrik panosunda (MDB-02) bakım çalışması sırasında elektrik teknisyeni yüksek voltaj elektrik çarpması sonucu kalp durması yaşadı. Teknisyen elektrik izolasyonlu eldiven kullanmadan ve LOTO prosedürü uygulanmadan enerjili panoda çalışma yapmıştır.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">20 Şubat 2026 tarihinde saat 15:20'de üretim tesisinde görevli elektrik bakım teknisyeni, ana elektrik panosunda (MDB-02) bakım çalışması sırasında 380V yüksek voltaj elektrik çarpmasına maruz kalmıştır. Teknisyen, elektrik izolasyonlu eldiven kullanmadan ve enerji izolasyonu (LOTO) prosedürü uygulanmadan enerjili pano üzerinde çalışma yapmıştır.
+
+Olay sonucunda teknisyen kalp durması yaşamış, 2. derece yanıklar oluşmuş ve yoğun bakım ünitesine kaldırılmıştır. Acil müdahale ekipleri hızla olay yerine intikal etmiş ve ilk yardım uygulanmıştır. Olay RIDDOR kapsamında raporlanmış ve yüksek seviyeli kök neden analizi başlatılmıştır.</div>
+<div class="paragraph" contenteditable="true">Üretim Tesisi - Ana Elektrik Panosu (MDB-02)</div>
+<div class="paragraph" contenteditable="true">Elektrik bakım teknisyeni (kalp durması, 2. derece yanıklar, yoğun bakım)</div>
+<div class="paragraph" contenteditable="true">Acil servis çağrılmış, ilk yardım uygulanmış, teknisyen yoğun bakıma kaldırılmış, alan güvenli hale getirilmiş ve RIDDOR bildirimi yapılmıştır.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yönetim, KKD kullanımı ve LOTO prosedürü ihlallerine sistematik olarak tolerans göstermiş</li>
+<li contenteditable="true">Üretim sürekliliği baskısı güvenlik prosedürlerinin önüne geçmiş</li>
+<li contenteditable="true">Güvensiz uygulamalar zaman içinde kanıksanmış ve normalleşmiş</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Kritik Kök Nedenler</div>
+
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Yönetimin Bilinen Sapmalara Tolerans Göstermesi</div>
+                <div class="box-content" contenteditable="true">[D1.9 / Organizasyonel]
+                
+Elektrik teknisyeninin izolasyonlu eldiven kullanmadan enerjili panoda çalışması, tek seferlik bir bireysel hata değil, sistemik bir organizasyonel sapmanın sonucudur. Analiz, yönetimin yüksek riskli elektrik işlerinde KKD kullanımı ihlallerini bilmesine rağmen düzeltici aksiyon almadığını ortaya ko...</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Üretim Baskısının Güvenliğin Önüne Geçmesi</div>
+                <div class="box-content" contenteditable="true">[D1.4 / Organizasyonel]
+                
+Tesis yönetimi, üretim hattının durmaması için enerjili pano üzerinde bakım çalışmasına bilinçli olarak izin vermiştir. Enerji izolasyonu (LOTO) prosedürü, üretim sürekliliği gerekçesiyle yönetici talimatıyla atlanmış ve bu kritik güvenlik prosedürünün ihlali onaylanmıştır.
+
+Sahada etkin bir iş durd...</div>
+            </div>
+
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Sapmaların Normalleşmesi (Kanıksama)</div>
+                <div class="box-content" contenteditable="true">[D1.5 / Organizasyonel]
+                
+Elektrik bakım çalışmalarında LOTO prosedürünün uygulanmaması, tek seferlik bir olay değil, zaman içinde tekrarlanan ve normalleşen bir sapma olarak tespit edilmiştir. Gözetim mekanizmaları bu kritik sapmaları tespit edememiş veya tespit etmesine rağmen müdahale etmemiştir.
+
+Daha önce de LOTO prosed...</div>
+            </div>
+
+            <div class="subsection-header">1.4 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Tüm elektrik panolarına acil LOTO kilitleri takılması</td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm elektrik bakım personeline acil LOTO eğitimi</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260225-151636</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">20 Şubat 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">15:20</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Üretim Tesisi - Ana Elektrik Panosu (MDB-02)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Elektrik Bakım</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Elektrik Bakım Teknisyeni</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Ana Elektrik Panosu (MDB-02) - 380V</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Yüksek Voltaj Elektrik (380V)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Normal</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Yeterli</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Elektrik izolasyonlu eldiven kullanılmadı</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Kaza (Accident)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Kalp durması, 2. derece yanıklar</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Seviye 1 - Ölümcül veya Ağır Yaralanma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Evet</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Elektrik Bakım Sorumlusu - İbrahim Aydın</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Yoğun Bakım Ünitesine Yatış</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:00</div>
+                    <div class="timeline-event" contenteditable="true">Bakım teknisyeni elektrik panosuna bakım talimatı aldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:15</div>
+                    <div class="timeline-event" contenteditable="true">Teknisyen LOTO prosedürü uygulamadan panoya yaklaştı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:20</div>
+                    <div class="timeline-event" contenteditable="true">Enerjili panoda çalışma sırasında 380V elektrik çarpması</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:21</div>
+                    <div class="timeline-event" contenteditable="true">Teknisyen kalp durması yaşadı, tanık acil servis çağırdı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:25</div>
+                    <div class="timeline-event" contenteditable="true">İlk yardım uygulandı, CPR başlatıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:40</div>
+                    <div class="timeline-event" contenteditable="true">Acil servis geldi, teknisyen yoğun bakıma kaldırıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:00</div>
+                    <div class="timeline-event" contenteditable="true">HSE ekibi bilgilendirildi, alan güvenli hale getirildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:30</div>
+                    <div class="timeline-event" contenteditable="true">RIDDOR bildirimi yapıldı, kök neden analizi başlatıldı</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ</div>
+            
+            <div class="subsection-header">3.1 Metodoloji</div>
+            <div class="paragraph" contenteditable="true">Bu kök neden analizinde HSG245 Hiyerarşik 5-Why metodolojisi uygulanmıştır. Metodoloji, olayın doğrudan nedenlerinden başlayarak sistematik olarak 'Neden?' sorusunu beş kez sorarak organizasyonel kök nedenlere ulaşmayı hedefler. Analiz, davranışsal (A) ve koşulsal (B) doğrudan nedenlerden başlayarak organizasyonel (D) kök nedenlere doğru ilerler.
+
+Bu olayda üç ayrı analiz dalı oluşturulmuştur: KKD kullanılmaması, enerjili sistemde çalışma ve LOTO prosedürü ihlali. Her dal sistematik olarak incelenmiş ve organizasyonel kök nedenlere ulaşılmıştır. Analiz ekibi, HSE uzmanları, üretim yöneticileri, bakım mühendisleri ve elektrik güvenliği uzmanlarından oluşmuştur.</div>
+            
+            <div class="subsection-header">3.2 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why tekniği, her doğrudan neden için 'Neden bu oldu?' sorusunu beş kez sorarak kök nedene ulaşmayı sağlar. İlk 'Neden' sorusu davranışsal veya koşulsal nedenleri ortaya çıkarırken, sonraki sorular sistematik olarak organizasyonel ve yönetimsel faktörlere odaklanır. Bu olayda her dal için beş seviyeli sorgulama yapılmış ve üç temel organizasyonel kök neden tespit edilmiştir: yönetimin sapmalara toleransı, üretim baskısının güvenliğin önüne geçmesi ve sapmaların normalleşmesi.</div>
+            
+            <div class="subsection-header">3.3 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışsal Faktör</td>
+                        <td contenteditable="true">Bireysel kural ihlali, KKD kullanmama, prosedür ihlali gibi çalışan davranışları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktör</td>
+                        <td contenteditable="true">Enerjili sistemler, ekipman durumu, fiziksel çevre koşulları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Ekipman tasarımı, iş yükü, ergonomi, teknik faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Yönetim kararları, güvenlik kültürü, prosedür eksiklikleri, liderlik faktörleri</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.4 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Kıdemli HSE Yöneticisi</td>
+                        <td contenteditable="true">Baş Araştırmacı</td>
+                        <td contenteditable="true">25.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Elektrik Güvenliği Uzmanı</td>
+                        <td contenteditable="true">Teknik Uzman</td>
+                        <td contenteditable="true">25.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Departman Temsilcisi</td>
+                        <td contenteditable="true">25.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Üretim Müdürü</td>
+                        <td contenteditable="true">Operasyonel Temsilcisi</td>
+                        <td contenteditable="true">25.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İş Sağlığı Hekimi</td>
+                        <td contenteditable="true">Tıbbi Danışman</td>
+                        <td contenteditable="true">25.02.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - KKD Kullanılmaması</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Elektrik teknisyeni, 380V yüksek voltaj taşıyan ana elektrik panosunda bakım çalışması sırasında zorunlu elektrik izolasyonlu eldiven kullanmamıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Teknisyen işin acil olduğunu düşünerek KKD'sini giymeden doğrudan müdahale etti.</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden teknisyen KKD kullanmadan çalıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ İşin acil olduğunu düşünerek KKD kontrolü yapılmadı</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden KKD kontrolü yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Gözetim sorumlusu KKD ve iş izni doğrulaması yapmıyordu</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden gözetim doğrulaması yapılmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim saha gözetim standartlarını tanımlamamış ve takip etmemişti</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden gözetim standartları tanımlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Güvenlik liderliği zayıftı, sapmalar kanıksanmış ve tolere edilmişti</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden sapmalar tolere edilmişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Liderlik taahhüdü yetersizdi, güvensiz uygulamalara müdahale edilmemişti</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Yönetimin Bilinen Sapmalara Tolerans Göstermesi</div>
+                <div class="box-content" contenteditable="true">[D1.9 / Organizasyonel]
+
+Yönetim, KKD kullanımı ihlallerini bilmesine rağmen düzeltici aksiyon almamış ve güvensiz uygulamaların normalleşmesine zemin hazırlamıştır.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Güvenlik liderliği taahhüdü yetersiz ve etkin değil</li>
+<li contenteditable="true">Saha gözetim mekanizması tanımsız ve işlevsiz</li>
+<li contenteditable="true">Bilinen güvensiz uygulamalara sistematik müdahale eksikliği</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - Enerjili Sistemde Çalışma</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Ana elektrik panosu (MDB-02) 380V enerjili durumdayken bakım çalışması yapılmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">LOTO prosedürü uygulanmadan enerjili panoda çalışmaya başlandı.</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden LOTO uygulanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Üretim hattının durmaması için yönetici talimatıyla enerjili çalışma yapıldı</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden üretim baskısı öncelik aldı?</div>
+                    <div class="why-answer" contenteditable="true">→ Etkin iş durdurma yetkisi mekanizması bulunmuyordu</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden iş durdurma yetkisi yoktu?</div>
+                    <div class="why-answer" contenteditable="true">→ Benzer sapmalar daha önce de tolere edilmiş ve normalleşmişti</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden sapmalar normalleşmişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim üretim sürekliliğini güvenliğin önünde tutuyordu</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden güvenlik öncelik değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Güvenlik liderliği taahhüdü ve hesap verebilirlik mekanizması yetersizdi</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Üretim Baskısının Güvenliğin Önüne Geçmesi</div>
+                <div class="box-content" contenteditable="true">[D1.4 / Organizasyonel]
+
+Tesis yönetimi üretim sürekliliğini önceliklendirerek LOTO prosedürünün atlanmasına izin vermiş ve bu sapma normalleşmiştir.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Üretim hedefleri güvenlik prosedürlerinin önünde tutulmuş</li>
+<li contenteditable="true">İş durdurma yetkisi mekanizması tanımsız ve desteklenmemiş</li>
+<li contenteditable="true">Güvenlik-üretim dengesi yönetim tarafından kurulamamış</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Güvenlik prosedürlerinin önemi ve zorunluluğu çalışanlara etkin şekilde iletilmemiş</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">LOTO prosedürü ve elektrik güvenliği eğitimleri yetersiz ve etkin değil</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim Eksikliği</td>
+                        <td contenteditable="true">Saha gözetim ve denetim mekanizması tanımsız ve işlevsiz</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kültürel Faktörler</td>
+                        <td contenteditable="true">Üretim öncelikli kültür, güvenlik sapmaların tolere edilmesi</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            1
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Tüm elektrik panolarına LOTO kilitleri takılması ve prosedürün zorunlu hale getirilmesi
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #C0392B; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ACİL
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Bakım Müdürü
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            1 hafta
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            LOTO uygulama oranı %100
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            2
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Tüm elektrik bakım personeline kapsamlı LOTO ve elektrik güvenliği eğitimi
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #C0392B; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ACİL
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Yöneticisi
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            2 hafta
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Eğitim tamamlanma %100
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            3
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Enerjili çalışma öncesi zorunlu KKD ve iş izni kontrol sistemi kurulması
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #E67E22; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            YÜKSEK
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Yöneticisi
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            1 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Kontrol uyum oranı %100
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            4
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Saha gözetim ve denetim programı oluşturulması, haftalık denetimler
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #E67E22; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            YÜKSEK
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Üretim Müdürü
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            1 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Haftalık denetim sayısı
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            5
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            İş durdurma yetkisi mekanizması tanımlanması ve çalışanlara eğitim
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #E67E22; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            YÜKSEK
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Yöneticisi
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            2 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Yetki kullanım farkındalığı
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• LOTO prosedürü her koşulda zorunlu uygulanmalı, istisna kabul edilmemeli
+• Elektrik izolasyonlu eldiven kullanımı enerjili çalışmalarda mutlaka kontrol edilmeli
+• Üretim baskısı asla güvenlik prosedürlerinin önüne geçmemeli</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Güvenlik liderliği taahhüdü güçlendirilmeli ve görünür hale getirilmeli
+• Sapmaların tolere edilmediği güvenlik kültürü oluşturulmalı
+• Hesap verebilirlik mekanizması tüm seviyelerde kurulmalı</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Kaza detayları ve öğrenilen dersler tüm çalışanlara paylaşılmalı
+• Güvenlik bültenleri ve toolbox toplantıları düzenli yapılmalı</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• LOTO prosedürü eğitimi tüm bakım personeline zorunlu hale getirilmeli
+• Elektrik güvenliği ve KKD kullanımı eğitimleri periyodik tekrarlanmalı
+• İş durdurma yetkisi ve güvenli çalışma reddi eğitimi verilmeli</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">9. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">9.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">20 Şubat 2026 tarihinde meydana gelen elektrik çarpması kazası, bireysel bir hata değil, sistemik organizasyonel faktörlerin sonucudur. Kök neden analizi, yönetimin bilinen sapmalara tolerans göstermesi, üretim baskısının güvenliğin önüne geçmesi ve sapmaların normalleşmesi olmak üzere üç temel organizasyonel kök neden tespit etmiştir.
+
+Bu kaza, güvenlik liderliği taahhüdünün yetersizliği, saha gözetim mekanizmalarının işlevsizliği ve güvenlik kültürünün zayıflığının doğrudan sonucudur. Acil ve uzun vadeli düzeltici aksiyonlar alınmadığı takdirde benzer kazaların tekrarlanma riski yüksektir.</div>
+            
+            <div class="subsection-header">9.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">LOTO prosedürü zorunlu hale getirilmeli ve tüm panolara kilitler takılmalı</li>
+<li contenteditable="true">Acil LOTO ve elektrik güvenliği eğitimleri tamamlanmalı</li>
+<li contenteditable="true">Enerjili çalışma öncesi KKD ve iş izni kontrol sistemi kurulmalı</li>
+
+            </ul>
+            
+            <div class="subsection-header">9.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Güvenlik liderliği taahhüdü güçlendirilmeli ve görünür kılınmalı</li>
+<li contenteditable="true">Sapmaların tolere edilmediği güvenlik kültürü oluşturulmalı</li>
+<li contenteditable="true">Hesap verebilirlik ve saha gözetim mekanizmaları etkinleştirilmeli</li>
+
+            </ul>
+            
+            <div class="subsection-header">9.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Seviyesi</td>
+                        <td class="current" contenteditable="true">Kritik - Ölümcül</td>
+                        <td class="target" contenteditable="true">Düşük - Kontrollü</td>
+                    </tr>
+
+                    <tr>
+                        <td>LOTO Uyum Oranı</td>
+                        <td class="current" contenteditable="true">%0 - Uygulanmıyor</td>
+                        <td class="target" contenteditable="true">%100 - Zorunlu</td>
+                    </tr>
+
+                    <tr>
+                        <td>KKD Kullanım Kontrolü</td>
+                        <td class="current" contenteditable="true">Yok</td>
+                        <td class="target" contenteditable="true">Her çalışma öncesi zorunlu</td>
+                    </tr>
+
+                    <tr>
+                        <td>Saha Gözetim Sıklığı</td>
+                        <td class="current" contenteditable="true">Yok</td>
+                        <td class="target" contenteditable="true">Haftalık düzenli denetim</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Kültürü</td>
+                        <td class="current" contenteditable="true">Zayıf - Sapmalar tolere ediliyor</td>
+                        <td class="target" contenteditable="true">Güçlü - Sıfır tolerans</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">10. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

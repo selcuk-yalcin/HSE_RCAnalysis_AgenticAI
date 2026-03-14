@@ -1,0 +1,586 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "language": "english",
+    "total_chunks": 137,
+    "categories": ["A", "B", "C", "D"],
+    "created_date": "2026-03-06",
+    "purpose": "MongoDB vector search chunks for HSG245 taxonomy"
+  },
+  "chunks": [
+    {
+      "chunk_id": "A1.1",
+      "category": "A",
+      "subcategory": "A1",
+      "code": "A1.1",
+      "title": "Individual Rule Violation",
+      "description": "Person knowingly chose to violate established rule",
+      "selection_criteria": "Worker knew the rule, was trained, rule was accessible, violation was deliberate",
+      "typical_examples": [
+        "Bypassing LOTO procedure despite training",
+        "Removing machine guard to speed work",
+        "Skipping required PPE knowingly"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Didn't know rule exists",
+          "redirect_to": "D3.1",
+          "redirect_title": "Training Not Provided"
+        },
+        {
+          "condition": "Rule unclear or confusing",
+          "redirect_to": "A1.4",
+          "redirect_title": "Procedure Unclear"
+        },
+        {
+          "condition": "Entire team violating",
+          "redirect_to": "A1.2",
+          "redirect_title": "Group Violation"
+        }
+      ],
+      "root_cause_likely": ["D1.5", "D1.9", "D9.5"],
+      "embeddings_keywords": [
+        "rule violation",
+        "deliberate bypass",
+        "LOTO skip",
+        "PPE removal",
+        "guard bypass",
+        "intentional violation",
+        "knew rule"
+      ]
+    },
+    {
+      "chunk_id": "A1.2",
+      "category": "A",
+      "subcategory": "A1",
+      "code": "A1.2",
+      "title": "Group Violation",
+      "description": "Multiple people acting together, collective decision",
+      "selection_criteria": "Team decision, not individual; signals cultural/peer pressure issue",
+      "typical_examples": [
+        "Entire shift skipping required steps",
+        "Team consensus to bypass safety",
+        "Peer pressure to work faster"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Only one person violated",
+          "redirect_to": "A1.1",
+          "redirect_title": "Individual Violation"
+        }
+      ],
+      "root_cause_likely": ["D1.5", "D1.2"],
+      "embeddings_keywords": [
+        "group violation",
+        "team bypass",
+        "collective decision",
+        "peer pressure",
+        "entire shift",
+        "cultural issue"
+      ]
+    },
+    {
+      "chunk_id": "A1.3",
+      "category": "A",
+      "subcategory": "A1",
+      "code": "A1.3",
+      "title": "Leadership-Directed Violation",
+      "description": "Supervisor or manager ordered/encouraged rule violation",
+      "selection_criteria": "Leadership directly violated or ordered violation",
+      "typical_examples": [
+        "Supervisor told worker to skip LOTO",
+        "Manager pressured to finish without permit",
+        "Foreman ordered guard removal"
+      ],
+      "not_this_if": [],
+      "root_cause_likely": ["D1.1", "D1.4", "D1.9"],
+      "embeddings_keywords": [
+        "supervisor ordered",
+        "manager pressure",
+        "leadership directed",
+        "foreman told",
+        "boss instructed",
+        "production pressure"
+      ]
+    },
+    {
+      "chunk_id": "A1.4",
+      "category": "A",
+      "subcategory": "A1",
+      "code": "A1.4",
+      "title": "Procedure Unclear or Ambiguous",
+      "description": "Worker couldn't understand what was required",
+      "selection_criteria": "Procedure exists but worker couldn't comprehend it",
+      "typical_examples": [
+        "Vague wording in procedure",
+        "Technical jargon not understood",
+        "Steps logically confusing"
+      ],
+      "not_this_if": [
+        {
+          "condition": "No procedure exists",
+          "redirect_to": "D9.1",
+          "redirect_title": "No SPP for Task"
+        },
+        {
+          "condition": "Understood but violated",
+          "redirect_to": "A1.1",
+          "redirect_title": "Individual Violation"
+        }
+      ],
+      "root_cause_likely": ["D9.2", "D3.2"],
+      "embeddings_keywords": [
+        "unclear procedure",
+        "confusing steps",
+        "ambiguous instruction",
+        "couldn't understand",
+        "vague wording"
+      ]
+    },
+    {
+      "chunk_id": "A1.5",
+      "category": "A",
+      "subcategory": "A1",
+      "code": "A1.5",
+      "title": "Procedure Physically Impractical",
+      "description": "Worker tried to follow but couldn't due to design flaws",
+      "selection_criteria": "Worker tried to follow but couldn't due to design flaws",
+      "typical_examples": [
+        "Valve location makes LOTO impossible",
+        "Required 3 hands to execute safely",
+        "Clearance too small for required tool"
+      ],
+      "not_this_if": [],
+      "root_cause_likely": ["D9.4", "D5.3"],
+      "embeddings_keywords": [
+        "impractical procedure",
+        "physically impossible",
+        "can't reach",
+        "design flaw",
+        "ergonomic issue"
+      ]
+    },
+    {
+      "chunk_id": "D1.5",
+      "category": "D",
+      "subcategory": "D1",
+      "code": "D1.5",
+      "title": "Normalization of Deviance",
+      "description": "Rule-breaking became normal through long-term, widespread repetition",
+      "critical_warning": "USE VERY CAREFULLY - ALL 5 CRITERIA MUST BE TRUE",
+      "mandatory_criteria": [
+        "Same violation repeated MANY times (not once/twice)",
+        "MULTIPLE people doing it (not individual)",
+        "Extended time period (weeks/months, not days)",
+        "No incident happened YET (if incident occurred → immediate cause applies)",
+        "Gradual cultural acceptance (not sudden decision)"
+      ],
+      "selection_criteria": "Long-term, widespread, repeated normalization of specific violation",
+      "typical_examples": [
+        "Entire department bypassing LOTO for years, everyone doing it",
+        "Facility-wide acceptance of skipping required steps",
+        "Cultural norm of violation over extended period"
+      ],
+      "not_this_if": [
+        {
+          "condition": "First occurrence",
+          "redirect_to": "A1.1",
+          "redirect_title": "Individual Violation"
+        },
+        {
+          "condition": "Known to management",
+          "redirect_to": "D1.9",
+          "redirect_title": "Management Tolerates"
+        },
+        {
+          "condition": "Maintenance delayed",
+          "redirect_to": "D6.6",
+          "redirect_title": "Deferred Maintenance"
+        },
+        {
+          "condition": "LOTO skipped once/twice",
+          "redirect_to": "D9.5",
+          "redirect_title": "Monitoring Inadequate"
+        },
+        {
+          "condition": "Lack of procedure",
+          "redirect_to": "D9.1",
+          "redirect_title": "No SPP"
+        },
+        {
+          "condition": "Unclear accountability",
+          "redirect_to": "D1.3",
+          "redirect_title": "Lack of Accountability"
+        },
+        {
+          "condition": "Supervisor unaware",
+          "redirect_to": "D1.2",
+          "redirect_title": "Inadequate Supervision"
+        }
+      ],
+      "strong_redirects": [
+        "If delayed maintenance: USE D6.6, NOT D1.5",
+        "If LOTO skipped: USE D9.5 or D1.9, NOT D1.5",
+        "If manager knew: USE D1.9, NOT D1.5"
+      ],
+      "embeddings_keywords": [
+        "normalization of deviance",
+        "cultural acceptance",
+        "widespread violation",
+        "long-term pattern",
+        "everyone does it",
+        "accepted practice",
+        "systemic violation"
+      ]
+    },
+    {
+      "chunk_id": "D6.6",
+      "category": "D",
+      "subcategory": "D6",
+      "code": "D6.6",
+      "title": "Deferred Maintenance Normalization",
+      "description": "Maintenance DELAYED/BACKLOGGED and accepted as normal state",
+      "critical_warning": "SPECIFIC to maintenance delays - NOT general normalization",
+      "selection_criteria": "Maintenance DELAYED/BACKLOGGED and accepted as normal",
+      "typical_examples": [
+        "Safety valve 6 months overdue, management aware, accepted",
+        "Preventive maintenance backlog growing, no action",
+        "Deferred PM accepted as normal operating condition"
+      ],
+      "not_this_if": [
+        {
+          "condition": "No maintenance plan",
+          "redirect_to": "D6.1",
+          "redirect_title": "Strategy Inadequate"
+        },
+        {
+          "condition": "Wrong maintenance done",
+          "redirect_to": "D6.2",
+          "redirect_title": "Execution Inadequate"
+        },
+        {
+          "condition": "Inspection skipped",
+          "redirect_to": "D6.3",
+          "redirect_title": "Inspection Inadequate"
+        },
+        {
+          "condition": "Same failure recurring",
+          "redirect_to": "D6.5",
+          "redirect_title": "RCA Gap"
+        }
+      ],
+      "difference_from_d15": [
+        "D6.6 = SPECIFIC to maintenance delays/backlogs",
+        "D1.5 = GENERAL cultural normalization (rare, multi-criteria)"
+      ],
+      "use_for": [
+        "Delayed maintenance",
+        "Deferred PM",
+        "Backlog accepted",
+        "Overdue inspection"
+      ],
+      "embeddings_keywords": [
+        "delayed maintenance",
+        "deferred maintenance",
+        "maintenance backlog",
+        "overdue inspection",
+        "PM delayed",
+        "safety valve overdue",
+        "maintenance normalization"
+      ]
+    },
+    {
+      "chunk_id": "D9.5",
+      "category": "D",
+      "subcategory": "D9",
+      "code": "D9.5",
+      "title": "Monitoring/Audit Inadequate",
+      "description": "Procedure exists but NO verification of compliance",
+      "critical_warning": "SPECIFIC lack of monitoring system - NOT cultural issue",
+      "selection_criteria": "Procedure exists but NO verification of compliance",
+      "typical_examples": [
+        "LOTO procedure documented but never audited",
+        "Permit system on paper but no one checks if followed",
+        "Safety rules exist but no enforcement"
+      ],
+      "not_this_if": [
+        {
+          "condition": "No procedure exists",
+          "redirect_to": "D9.1",
+          "redirect_title": "No SPP"
+        },
+        {
+          "condition": "Procedure unclear",
+          "redirect_to": "D9.2",
+          "redirect_title": "SPP Development Ineffective"
+        },
+        {
+          "condition": "Manager KNEW violation happening",
+          "redirect_to": "D1.9",
+          "redirect_title": "Management Tolerance"
+        },
+        {
+          "condition": "Cultural normalization (all 5 criteria)",
+          "redirect_to": "D1.5",
+          "redirect_title": "Normalization of Deviance"
+        }
+      ],
+      "difference_from_others": [
+        "D9.5 = SPECIFIC lack of monitoring/audit system",
+        "D1.5 = GENERAL cultural normalization (rare)",
+        "D1.9 = Manager KNEW but tolerated"
+      ],
+      "use_for": [
+        "LOTO skipped",
+        "Permit not followed",
+        "No audits",
+        "No compliance checks"
+      ],
+      "embeddings_keywords": [
+        "no monitoring",
+        "no audit",
+        "LOTO skipped",
+        "permit not checked",
+        "compliance not verified",
+        "no enforcement",
+        "monitoring inadequate"
+      ]
+    },
+    {
+      "chunk_id": "D1.9",
+      "category": "D",
+      "subcategory": "D1",
+      "code": "D1.9",
+      "title": "Management Tolerance of Known Deviations",
+      "description": "Manager KNEW violation happening, did nothing",
+      "selection_criteria": "Manager KNEW violation happening, did nothing",
+      "typical_examples": [
+        "Manager sees bypassed guards daily, ignores",
+        "Supervisor aware of LOTO skips, tolerates",
+        "Leadership knows violations occur, no action"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Manager unaware",
+          "redirect_to": "D1.2",
+          "redirect_title": "Inadequate Supervision"
+        },
+        {
+          "condition": "Cultural norm",
+          "redirect_to": "D1.5",
+          "redirect_title": "Normalization of Deviance"
+        }
+      ],
+      "difference_from_d15": "This is ACTIVE tolerance by specific manager, D1.5 is systemic cultural norm",
+      "embeddings_keywords": [
+        "manager knew",
+        "supervisor tolerated",
+        "leadership ignored",
+        "aware but no action",
+        "management tolerance",
+        "known deviation"
+      ]
+    },
+    {
+      "chunk_id": "D1.1",
+      "category": "D",
+      "subcategory": "D1",
+      "code": "D1.1",
+      "title": "Weak Leadership Commitment",
+      "description": "Safety deprioritized in budget/resource decisions",
+      "selection_criteria": "Safety deprioritized in budget/resource decisions",
+      "typical_examples": [
+        "Safety projects delayed",
+        "Training budget cut",
+        "Safety resources not allocated"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Field-level supervision issue",
+          "redirect_to": "D1.2",
+          "redirect_title": "Inadequate Supervision"
+        }
+      ],
+      "embeddings_keywords": [
+        "leadership commitment",
+        "budget cut",
+        "resources denied",
+        "safety deprioritized",
+        "management support"
+      ]
+    },
+    {
+      "chunk_id": "D1.2",
+      "category": "D",
+      "subcategory": "D1",
+      "code": "D1.2",
+      "title": "Inadequate Supervision",
+      "description": "Frontline managers NOT present/engaged in field",
+      "selection_criteria": "Frontline managers NOT present/engaged in field",
+      "typical_examples": [
+        "Supervisor unaware of daily hazards",
+        "Reactive only, no proactive presence",
+        "Manager not visiting work areas"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Manager KNEW but tolerated",
+          "redirect_to": "D1.9",
+          "redirect_title": "Management Tolerance"
+        }
+      ],
+      "embeddings_keywords": [
+        "inadequate supervision",
+        "supervisor absent",
+        "no oversight",
+        "manager unaware",
+        "lack of presence"
+      ]
+    },
+    {
+      "chunk_id": "D1.3",
+      "category": "D",
+      "subcategory": "D1",
+      "code": "D1.3",
+      "title": "Lack of Accountability",
+      "description": "Deviations detected but NO consequences applied",
+      "selection_criteria": "Deviations detected but NO consequences applied",
+      "typical_examples": [
+        "Violations reported but no corrective action",
+        "No follow-up on safety issues",
+        "Accountability not enforced"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Manager unaware",
+          "redirect_to": "D1.2",
+          "redirect_title": "Inadequate Supervision"
+        },
+        {
+          "condition": "Cultural norm",
+          "redirect_to": "D1.5",
+          "redirect_title": "Normalization"
+        }
+      ],
+      "embeddings_keywords": [
+        "no accountability",
+        "no consequences",
+        "violations ignored",
+        "no follow-up",
+        "lack of enforcement"
+      ]
+    },
+    {
+      "chunk_id": "D4.1",
+      "category": "D",
+      "subcategory": "D4",
+      "code": "D4.1",
+      "title": "Risk Assessment Inadequate",
+      "description": "Hazards NOT identified or risk miscalculated",
+      "selection_criteria": "Hazards NOT identified or risk miscalculated",
+      "typical_examples": [
+        "JHA missed critical hazard",
+        "Risk underestimated",
+        "Hazard not recognized"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Identified but controls not implemented",
+          "redirect_to": "D4.2",
+          "redirect_title": "Controls Not Implemented"
+        }
+      ],
+      "embeddings_keywords": [
+        "risk assessment",
+        "JHA inadequate",
+        "hazard not identified",
+        "risk miscalculated",
+        "JSA missing"
+      ]
+    },
+    {
+      "chunk_id": "D4.4",
+      "category": "D",
+      "subcategory": "D4",
+      "code": "D4.4",
+      "title": "Work Permit System (PTW) Failure",
+      "description": "Required permit not obtained or ineffective",
+      "selection_criteria": "Required permit not obtained or ineffective",
+      "typical_examples": [
+        "Hot work without fire watch",
+        "Confined space no permit",
+        "Permit system bypassed"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Permit issued but LOTO skipped",
+          "redirect_to": "D9.5",
+          "redirect_title": "Monitoring Inadequate"
+        }
+      ],
+      "embeddings_keywords": [
+        "work permit",
+        "PTW failure",
+        "permit not obtained",
+        "hot work permit",
+        "confined space permit"
+      ]
+    },
+    {
+      "chunk_id": "D3.1",
+      "category": "D",
+      "subcategory": "D3",
+      "code": "D3.1",
+      "title": "Training Not Provided",
+      "description": "NO training given on specific job risks",
+      "selection_criteria": "NO training given on specific job risks",
+      "typical_examples": [
+        "New equipment installed, no training",
+        "Task assigned without instruction",
+        "No safety training for hazard"
+      ],
+      "not_this_if": [
+        {
+          "condition": "Training given but ineffective",
+          "redirect_to": "D3.2",
+          "redirect_title": "Training Design Ineffective"
+        }
+      ],
+      "embeddings_keywords": [
+        "no training",
+        "training not provided",
+        "not trained",
+        "no instruction",
+        "lack of training"
+      ]
+    },
+    {
+      "chunk_id": "D3.2",
+      "category": "D",
+      "subcategory": "D3",
+      "code": "D3.2",
+      "title": "Training Design Ineffective",
+      "description": "Training scope didn't match real job risks",
+      "selection_criteria": "Training scope didn't match real job risks",
+      "typical_examples": [
+        "Generic safety training, not task-specific",
+        "Theory only, no practical",
+        "Wrong content covered"
+      ],
+      "not_this_if": [
+        {
+          "condition": "No training given",
+          "redirect_to": "D3.1",
+          "redirect_title": "Training Not Provided"
+        }
+      ],
+      "embeddings_keywords": [
+        "training ineffective",
+        "wrong training",
+        "generic training",
+        "not task-specific",
+        "training design"
+      ]
+    }
+  ]
+}

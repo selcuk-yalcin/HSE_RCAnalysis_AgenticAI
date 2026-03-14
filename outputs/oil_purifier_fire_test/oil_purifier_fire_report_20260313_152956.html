@@ -1,0 +1,2143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /* ── OLAY FOTOĞRAFLARI ─────────────────────────────────── */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - OIL-2026-002-FIRE";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')">📷 Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">HSG245 Metodolojisi ile Hazırlanmıştır</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">OIL-2026-002-FIRE</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">13.03.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Yağ Tasfiye Cihazı Çalışma Alanı</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Ekipman Hasarı - Yangın</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Yağ tasfiye cihazı, hat vanası açılmadan devreye alınması sonucu yağ akışı olmadan ısıtma başlatılmış ve cihazın iç aksamında yanma meydana gelmiştir. Olay sırasında personel yaralanması olmamış, ancak ekipman ciddi hasar görmüştür.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">15:20'de görevli yağcı, yağ tasfiye cihazını devreye alırken standart prosedürü takip etmeyerek önce hat vanasını açmadan cihazı 'ON' konumuna almıştır. Yağ akışı sağlanmadan başlayan ısıtma işlemi, 15-20 dakika sonra cihazın iç aksamında yanmaya neden olmuştur. Vardiya değişiminde göreve başlayan yeni yağcı, cihazdan çıkan dumanı fark ederek durumu bildirmiş ve cihaz derhal kapatılmıştır.</div>
+<div class="paragraph" contenteditable="true">Yağ tasfiye cihazı çalışma alanı, üretim tesisi</div>
+<div class="paragraph" contenteditable="true">Doğrudan yaralanma olmamış, ancak 4 yıl kıdemli yağcı hatalı işlem gerçekleştirmiş, ikinci vardiya yağcısı olayı tespit etmiştir</div>
+<div class="paragraph" contenteditable="true">Dumanın fark edilmesinin ardından ilgili yöneticiler ve teknik ekip derhal bilgilendirilmiştir. Cihaz acil olarak kapatılmış ve güvenli müdahale için soğumaya bırakılmıştır. Yaklaşık 12 saat sonra cihaz sökülerek detaylı teknik inceleme yapılmış ve iç aksamda yanma hasarı tespit edilmiştir. Alan güvenliği sağlanmış ve benzer cihazlarda acil kontroller başlatılmıştır.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yağ tasfiye cihazının güvenli devreye alma sırasını tanımlayan yazılı iş talimatı, kontrol listesi veya uyarı levhası hiçbir zaman hazırlanmamıştır</li>
+<li contenteditable="true">Bu cihazda yağ akışı olmadan ısıtmayı engelleyecek emniyet sensörü veya interlock sistemi bulunmamaktadır; tesisteki diğer iki benzer cihazda bu sistemler mevcuttur</li>
+<li contenteditable="true">Cihaz için kritik operasyonel senaryoları kapsayan teknik risk analizi (HAZOP/LOPA) yapılmamış, kuru çalışma riski tanımlanmamıştır</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Hasarlı yağ tasfiye cihazı devre dışı bırakıldı ve güvenlik bariyerleri kuruldu</td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tesisteki diğer iki yağ tasfiye cihazının interlock ve sensör sistemleri kontrol edildi</td>
+                        <td contenteditable="true">Teknik Uzman</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm yağcı personeline acil güvenlik brifingi verildi ve doğru devreye alma sırası hatırlatıldı</td>
+                        <td contenteditable="true">Vardiya Amiri</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Geçici uyarı levhaları tüm yağ tasfiye cihazlarına asıldı</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">OIL-2026-002-FIRE</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">13.03.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">15:20 (devreye alma) / 15:35-15:40 (duman tespiti)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Yağ Tasfiye Cihazı Çalışma Alanı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Yağ İşleme Ünitesi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">İlk Vardiya Yağcısı (4 yıl kıdem)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası / Vardiya Değişim Saati</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Yağ Tasfiye Cihazı (Interlock/Sensör Eksik Model)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Endüstriyel yağ</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Normal iç mekan koşulları</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Yeterli</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart KKD kullanımda</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Ekipman Hasarı - Yangın/Yanma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Personel yaralanması yok, ekipman iç aksamında ciddi yanma hasarı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">0 (yaralanma yok)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Yüksek - Ekipman iç aksamı kullanılamaz durumda</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Hayır</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">İkinci Vardiya Yağcısı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Hayır</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Uygulanamaz</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:20</div>
+                    <div class="timeline-event" contenteditable="true">Görevli yağcı yağ tasfiye cihazını 'ON' konumuna aldı (hat vanası açılmadan)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:20</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan hat vanasını açmadan alandan ayrıldı; cihaz yağ akışı olmadan ısıtmaya başladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:35-15:40</div>
+                    <div class="timeline-event" contenteditable="true">Vardiya değişimi gerçekleşti; ilk yağcı vardiyadan ayrıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:35-15:40</div>
+                    <div class="timeline-event" contenteditable="true">Yeni yağcı göreve başladı ve cihazdan duman çıktığını fark etti</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:40</div>
+                    <div class="timeline-event" contenteditable="true">Durum derhal ilgili yöneticilere ve teknik ekibe bildirildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:45</div>
+                    <div class="timeline-event" contenteditable="true">Cihaz acil olarak kapatıldı ve güvenli müdahale için soğumaya bırakıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">+12 saat</div>
+                    <div class="timeline-event" contenteditable="true">Cihaz söküldü, iç kısım detaylı incelendi; iç aksamda yanma hasarı tespit edildi</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why (5 Neden) tekniği, bir olayın kök nedenine ulaşmak için 'Neden?' sorusunu art arda beş kez (veya kök nedene ulaşılana kadar) soran sistematik bir sorgulama yöntemidir. Bu teknik, Toyota Üretim Sistemi'nden kaynaklanır ve yüzeysel nedenlerin ötesine geçerek derin organizasyonel ve sistemik nedenleri ortaya çıkarmayı amaçlar. Her 'Neden?' sorusu, bir önceki yanıtın altında yatan nedeni araştırır ve böylece neden-sonuç zinciri boyunca ilerler.
+
+Bu olayda 5-Why tekniği üç ayrı dalda uygulanmıştır. Birinci dalda: 'Yağcı neden hat vanasını açmadan cihazı çalıştırdı?' sorusuyla başlanmış, 'Yazılı talimat yoktu' yanıtına ulaşılmış; ardından 'Neden yazılı talimat yoktu?' sorusu sorulmuş ve 'Çalışma alanında uyarı levhası da yoktu' yanıtına ulaşılmış; bu şekilde devam edilerek 'Neden prosedür hiç oluşturulmamıştı?' sorusuna 'Çünkü ne mühendislik bariyeri ne de prosedürel bariyer tanımlanmamıştı' yanıtı alınmış ve kök neden olan 'Görev için standart/uygulama/prosedür mevcut değil' (D9.1) tespit edilmiştir. İkinci ve üçüncü dallarda da benzer şekilde, her 'Neden?' sorusu bir önceki yanıtın altında yatan organizasyonel eksikliği ortaya çıkarmış ve sırasıyla 'Teknik risk analizlerinin eksikliği' (D5.7) ve 'Bariyer yönetimi yetersizliği' (D4.10) kök nedenlerine ulaşılmıştır. 5-Why tekniği, olayın sadece operatör hatası olmadığını, arkasında üç farklı organizasyonel sistem eksikliğinin bulunduğunu net bir şekilde göstermiştir.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışsal Faktör</td>
+                        <td contenteditable="true">Çalışanların bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk, prosedüre uymama gibi bireysel davranışlarından kaynaklanan faktörler. Örnek: A2.8 - Proses kontrol hataları, operatör yanlış işlemi.</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktör</td>
+                        <td contenteditable="true">Ekipman arızası, tasarım hatası, uyarı sistemi eksikliği, yetersiz aydınlatma, ergonomi sorunları gibi fiziksel çalışma koşullarından kaynaklanan faktörler. Örnek: B1.5 - Uyarı/alarm sistemleri arızalı veya eksik; B4.6 - Zayıf/okunamaz etiketleme/işaretleme.</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">İşin doğası, görev karmaşıklığı, zaman baskısı, iş yükü, çoklu görev gibi işin kendisinden kaynaklanan faktörler. Bu olayda C kategorisi kök neden olarak tespit edilmemiştir.</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Yönetim kararları, politika yetersizlikleri, prosedür eksikliği, eğitim yetersizliği, risk değerlendirmesi eksikliği, iletişim bozukluğu gibi organizasyonel sistemlerden kaynaklanan faktörler. Örnek: D9.1 - Görev için standart/uygulama/prosedür mevcut değil; D5.7 - Teknik risk analizlerinin eksikliği; D4.10 - Bariyer yönetimi yetersizliği.</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Mehmet Yılmaz</td>
+                        <td contenteditable="true">HSE Uzmanı - Baş Araştırmacı</td>
+                        <td contenteditable="true">13.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ayşe Demir</td>
+                        <td contenteditable="true">Bakım Müdürü - Teknik Uzman</td>
+                        <td contenteditable="true">13.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ali Kaya</td>
+                        <td contenteditable="true">Vardiya Amiri - Operasyonel Tanık</td>
+                        <td contenteditable="true">13.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Fatma Şahin</td>
+                        <td contenteditable="true">Üretim Müdürü - Departman Temsilcisi</td>
+                        <td contenteditable="true">14.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ahmet Çelik</td>
+                        <td contenteditable="true">Elektrik/Mekanik Teknik Uzman</td>
+                        <td contenteditable="true">14.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Zeynep Arslan</td>
+                        <td contenteditable="true">Eğitim Koordinatörü</td>
+                        <td contenteditable="true">14.03.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - DAVRANIŞSAL NEDEN: OPERATÖR YANLIŞI İŞLEM</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Görevli yağcı, yağ tasfiye cihazını devreye alırken standart güvenli çalışma sırasını takip etmemiştir. Normal prosedüre göre önce hat vanasının açılarak yağ akışının sağlanması, ardından cihazın 'ON' konumuna alınması gerekmektedir. Ancak çalışan, 4 yıllık tecrübesine rağmen bu kritik adımı atlamış, hat vanasını açmadan doğrudan cihazı çalıştırmış ve yağ akışı olmadan ısıtma işleminin başlamasına neden olmuştur. Bu hatalı işlem, cihazın iç aksamında kuru çalışma koşulları oluşturarak yanmaya yol açmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Yağcı, yağ tasfiye cihazını devreye alırken doğru sırayı takip etmedi; cihazı açmadan önce hat vanasını açması gerekirken, vanayı açmadan cihazı 'ON' konumuna aldı ve yağ akışı olmadan ısıtma başladı</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Yağcı neden hat vanasını açmadan cihazı 'ON' konumuna aldı?</div>
+                    <div class="why-answer" contenteditable="true">→ Yağ tasfiye cihazının güvenli devreye alma sırasını belirten yazılı bir iş talimatı bulunmuyordu; çalışan doğru sırayı hafızasına dayanarak uygulamaya çalıştı ve kritik adımı (hat vanasını açma) atladı. Raporda açıkça 'yazılı çalışma talimatı VERİLMEMİŞ' ifadesi yer almaktadır. Tecrübeli personel bile hafıza hatası yapabilir ve yazılı prosedür olmadan adım sırası karışabilir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden çalışan doğru sırayı hafızasına dayanarak uygulamak zorunda kaldı?</div>
+                    <div class="why-answer" contenteditable="true">→ Cihazın devreye alma prosedürüne ilişkin yazılı talimat, kontrol listesi veya çalışma alanında uyarıcı/bilgilendirici levha mevcut değildi; 4 yıllık tecrübeli personel bile olsa adım sırasını hatırlamayı tamamen kişisel hafızasına bırakmak zorunda kaldı. Çalışma alanında 'ÖNCE VANAYI AÇ, SONRA CİHAZI ÇALIŞTIR' gibi basit bir uyarı levhası bile yoktu. Bu durum, insan faktörüne dayalı hata riskini önemli ölçüde artırmıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden yağ tasfiye cihazının devreye alma prosedürüne ilişkin yazılı talimat veya kontrol listesi hazırlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kuruluş, bu cihaz için güvenli devreye alma sırasını tanımlayan standart bir çalışma prosedürü (SOP) oluşturmamıştı; raporda açıkça 'güvenli devreye alma sırasına dair yazılı talimat YOK' ve 'doğru devreye alma sırası ile hatalı kullanım riskleriyle ilgili çalışma alanında levha YOK' bulgusu yer almaktadır. Yönetim, bu kritik ekipman için prosedür geliştirme ihtiyacını hiçbir zaman belirlememişti.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden kuruluş, hat vanası açılmadan cihazın çalıştırılmasının yanmaya yol açacağı bilinen bir ekipman için yazılı prosedür geliştirmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Tesisteki diğer iki benzer cihazda yağ akışı sağlanmadan ısıtmayı engelleyen emniyet sensörleri/interlock sistemi mevcut olmasına rağmen, bu cihazda böyle bir koruma bulunmuyordu ve bu eksikliği telafi edecek yazılı prosedür de hiçbir zaman oluşturulmamıştı; yani ne mühendislik bariyeri ne de prosedürel bariyer mevcuttu. Yönetim, bu cihazın diğerlerinden farklı olarak ek koruma ihtiyacı duyduğunu fark etmemişti.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden bu cihazın diğerlerinden farklı olarak ek koruma ihtiyacı duyduğu fark edilmemişti ve prosedürel bariyer oluşturulmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Çünkü yağ tasfiye cihazının güvenli devreye alma sırasını tanımlayan, adım adım kontrol listesi içeren ve hatalı kullanım risklerini açıklayan bir standart çalışma prosedürü hiçbir zaman hazırlanmamıştı. Organizasyon, kritik ekipmanlar için prosedür geliştirme ve dokümantasyon sürecini sistematik olarak yürütmüyordu. Bu, kök neden olan 'Görev için standart/uygulama/prosedür mevcut değil' (D9.1) durumunu göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Görev İçin Standart/Uygulama/Prosedür Mevcut Değil</div>
+                <div class="box-content" contenteditable="true">[D9.1 / Organizasyonel]
+
+Yağ tasfiye cihazının güvenli devreye alma sırasını (önce hat vanasının açılması, ardından cihazın 'ON' konumuna alınması) tanımlayan yazılı iş talimatı, kontrol listesi veya çalışma alanı uyarı levhası hiçbir zaman hazırlanmamıştı. Bu cihazda interlock/emniyet sensörü de bulunmadığından, operatör hatasını önleyecek tek bariyer olan prosedürel kontrol tamamen eksikti. Organizasyon, kritik ekipmanlar için standart çalışma prosedürleri geliştirme ve dokümante etme sürecini sistematik olarak yürütmüyordu. Tesisteki diğer iki benzer cihazda mühendislik bariyerleri (interlock/sensör) bulunmasına rağmen, bu cihazda ne mühendislik bariyeri ne de prosedürel bariyer mevcuttu ve bu durum hiçbir zaman tespit edilip giderilmemişti.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kritik ekipmanlar için standart çalışma prosedürü (SOP) geliştirme ve dokümantasyon süreci sistematik olarak yürütülmüyordu</li>
+<li contenteditable="true">Yağ tasfiye cihazının güvenli devreye alma sırası hiçbir zaman yazılı hale getirilmemiş ve çalışanlara resmi olarak iletilmemişti</li>
+<li contenteditable="true">Çalışma alanında görsel uyarı levhaları, adım adım talimatlar veya kontrol listeleri bulunmuyordu; çalışanlar tamamen hafızalarına güvenmek zorunda kalıyordu</li>
+<li contenteditable="true">Mühendislik bariyeri (interlock/sensör) olmayan ekipmanlarda prosedürel bariyerlerin oluşturulması gerekliliği yönetim tarafından belirlenmemişti</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - KOŞULSAL NEDEN: UYARI/ALARM SİSTEMLERİ EKSİK</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Yağ tasfiye cihazında, yağ akışı sağlanmadan ısıtmanın başlamasını otomatik olarak engelleyecek bir emniyet sensörü veya interlock sistemi bulunmamaktaydı. Tesisteki diğer iki benzer yağ tasfiye cihazında bu tür koruma sistemleri mevcutken, bu spesifik cihazda yoktu. Bu durum, operatör hatalı işlem yaptığında sistemin otomatik olarak devre dışı kalmamasına ve kuru çalışma koşullarında yanmanın başlamasına neden olmuştur. Mühendislik bariyerinin eksikliği, olayın meydana gelmesinde kritik rol oynamıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Yağ tasfiye cihazında yağ akışı sağlanmadan ısıtmanın başlamasını engelleyecek emniyet sensörü veya interlock sistemi bulunmamaktaydı; bu nedenle hatalı devreye alma sırasında sistem otomatik olarak devre dışı kalmadı</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Yağ tasfiye cihazında yağ akışı sağlanmadan ısıtmayı engelleyecek emniyet sensörü veya interlock sistemi neden bulunmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Bu spesifik yağ tasfiye cihazı, tesisteki diğer iki benzer cihazdan farklı olarak emniyet sensörü veya interlock sistemi olmadan hizmete alınmış ve bu eksiklik giderilmemişti. Raporda açıkça 'Yağ akışı sağlanmadan ısıtmayı devre dışı bırakacak sensör: YOK (bu cihazda)' ve 'İnterlock sistemi: YOK (bu cihazda)' ifadeleri yer almaktadır. Cihaz, güvenlik donanımı eksik olarak işletmeye alınmıştı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Tesisteki diğer iki benzer cihazda bu koruma mevcutken, bu cihazın sensör/interlock eksikliği neden tespit edilip giderilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Üç benzer cihaz arasında emniyet donanımı açısından bir tutarsızlık bulunmasına rağmen, bu farkı tespit edecek ve eşitlemeyi sağlayacak sistematik bir teknik risk analizi veya karşılaştırmalı güvenlik değerlendirmesi yapılmamıştı. Yönetim, aynı işlevi gören cihazların farklı güvenlik seviyelerinde çalıştığını fark etmemişti. Bu durum, ekipman envanteri ve güvenlik standartlarının sistematik olarak gözden geçirilmediğini göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Aynı işlevi gören cihazlar arasındaki emniyet donanımı tutarsızlığını tespit edecek teknik risk analizi neden yapılmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Yağ tasfiye cihazlarının devreye alma sürecinde yağ akışı olmadan ısıtma başlatılması senaryosu (kuru çalışma riski) bir tehlike olarak tanımlanmamış ve bu cihaz özelinde güvenlik bariyeri ihtiyacı değerlendirilmemişti. Kritik operasyonel senaryolar analiz edilmediği için, hangi cihazlarda hangi koruma sistemlerinin gerekli olduğu belirlenmemişti. Bu, proaktif risk yönetimi eksikliğini göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Yağ tasfiye cihazının kuru çalışma riskini ve interlock ihtiyacını belirleyecek bir HAZOP veya teknik güvenlik analizi neden gerçekleştirilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Bu cihaz için hatalı devreye alma sırası gibi kritik operasyonel senaryoları kapsayan bir teknik risk analizi (HAZOP/LOPA) hiç yapılmamıştı; dolayısıyla yağ akışı olmadan ısıtma başlatılması tehlikesi ve gerekli emniyet bariyerleri belirlenmemişti. Organizasyon, yeni veya mevcut ekipmanlar için sistematik tehlike tanımlama ve risk analizi süreci yürütmüyordu. Bu, kök neden olan 'Teknik risk analizlerinin eksikliği' (D5.7) durumunu göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Teknik Risk Analizlerinin (HAZOP/LOPA) Eksikliği</div>
+                <div class="box-content" contenteditable="true">[D5.7 / Organizasyonel]
+
+Yağ tasfiye cihazı için hatalı devreye alma sırasını (yağ akışı sağlanmadan ısıtma başlatılması) kapsayan bir teknik risk analizi (HAZOP/LOPA) yapılmamıştı; bu nedenle kuru çalışma senaryosu tehlike olarak tanımlanamadı ve diğer iki benzer cihazda mevcut olan emniyet sensörü/interlock bariyerinin bu cihazda da bulunması gerektiği tespit edilemedi. Organizasyon, kritik ekipmanlar için sistematik tehlike tanımlama ve operasyonel risk analizi süreci yürütmüyordu. HAZOP (Hazard and Operability Study) veya LOPA (Layer of Protection Analysis) gibi yapılandırılmış risk analizi metodolojileri kullanılmadığı için, 'yağ akışı olmadan ısıtma başlatılması' gibi kritik sapma senaryoları hiçbir zaman değerlendirilmemişti. Sonuç olarak, tesisteki üç benzer cihazdan ikisinde interlock bulunmasına rağmen, üçüncü cihazda bu kritik güvenlik bariyerinin eksik olduğu fark edilmemiş ve giderilmemişti.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yağ tasfiye cihazları için HAZOP (Hazard and Operability Study) veya benzeri yapılandırılmış tehlike tanımlama çalışması hiç yapılmamıştı</li>
+<li contenteditable="true">Kritik operasyonel senaryolar (yağ akışı olmadan ısıtma başlatılması gibi) analiz edilmemiş ve risk değerlendirmesi yapılmamıştı</li>
+<li contenteditable="true">Tesisteki benzer ekipmanlar arasında güvenlik donanımı tutarsızlıkları sistematik olarak tespit edilip giderilmiyordu</li>
+<li contenteditable="true">LOPA (Layer of Protection Analysis) gibi bariyer yeterliliği analizi yapılmadığı için, hangi cihazlarda hangi koruma katmanlarının gerekli olduğu belirlenmemişti</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - KOŞULSAL NEDEN: ZAYIF/OKUNAMAZ ETİKETLEME/İŞARETLEME</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Yağ tasfiye cihazının bulunduğu çalışma alanında, cihazın doğru devreye alma sırası ve hatalı kullanım risklerini bildiren uyarıcı veya bilgilendirici levha bulunmamaktaydı. Çalışanlar, kritik güvenlik adımlarını hatırlamak için herhangi bir görsel desteğe sahip değildi. 'ÖNCE VANAYI AÇ, SONRA CİHAZI ÇALIŞTIR' veya 'DİKKAT: VANA AÇILMADAN CİHAZ ÇALIŞTIRILMASI YANMAYA NEDEN OLABİLİR' gibi basit uyarılar bile yoktu. Bu durum, özellikle mühendislik bariyeri (interlock/sensör) olmayan bir cihazda, idari kontrollerin de eksik olduğunu göstermektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Yağ tasfiye cihazının bulunduğu çalışma alanında, cihazın doğru devreye alma sırası ve hatalı kullanım risklerini bildiren uyarıcı veya bilgilendirici levha bulunmamaktaydı</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden yağ tasfiye cihazının çalışma alanında doğru devreye alma sırası ve hatalı kullanım risklerini bildiren uyarıcı/bilgilendirici levha bulunmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Yağ tasfiye cihazının devreye alma prosedürüne ilişkin görsel uyarı ve bilgilendirme ihtiyacı hiçbir zaman belirlenmemiş ve bu cihaz için levha hazırlanması planlanmamıştı. Raporda açıkça 'Uyarıcı/bilgilendirici levha: Cihazın doğru devreye alma sırası ve hatalı kullanım riskleriyle ilgili çalışma alanında levha YOK' ifadesi yer almaktadır. Yönetim, bu cihaz için görsel güvenlik iletişimi ihtiyacını hiç değerlendirmemişti.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden bu cihaz için görsel uyarı ve bilgilendirme levhası ihtiyacı belirlenmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Tesisteki diğer iki benzer cihazda interlock/emniyet sensörü bulunmasına rağmen, bu spesifik cihazda interlock ve akış sensörünün bulunmadığı ve dolayısıyla operatör hatasına karşı ek koruma katmanlarına (levha, uyarı vb.) ihtiyaç duyulduğu fark edilmemişti. Mühendislik bariyeri eksikliğinin idari kontrollerle telafi edilmesi gerektiği anlaşılmamıştı. Bu, bariyer hiyerarşisi anlayışının eksikliğini göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden bu cihazın diğer iki benzer cihazdan farklı olarak interlock/sensör eksikliği taşıdığı ve bunun ek idari kontrol gerektirdiği fark edilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Yağ tasfiye cihazının mevcut güvenlik donanımı açısından tesisteki diğer benzer cihazlarla karşılaştırmalı bir risk değerlendirmesi yapılmamıştı; cihazlar arası emniyet seviyesi farklılıkları sistematik olarak analiz edilmemişti. Organizasyon, benzer ekipmanların güvenlik standartlarını karşılaştırmalı olarak gözden geçirmiyor ve tutarsızlıkları tespit etmiyordu. Bu, ekipman güvenlik envanteri ve standartlaşma eksikliğini göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden bu cihazın emniyet donanımı eksikliği tesisteki diğer benzer cihazlarla karşılaştırmalı olarak değerlendirilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Mevcut ekipmanlar üzerinde interlock, sensör ve mühendislik kontrolleri gibi kritik güvenlik bariyerlerinin varlığını veya yokluğunu sistematik olarak tespit edecek ve eksiklikleri telafi edici idari kontrollere (levha, talimat vb.) yönlendirecek bir bariyer yönetim süreci bulunmuyordu. Organizasyon, güvenlik bariyerlerini katman katman izlemiyor ve eksik bariyer durumunda telafi edici önlemler almıyordu. Bu, kök neden olan 'Bariyer yönetimi yetersizliği' (D4.10) durumunu göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Bariyer Yönetimi Yetersizliği</div>
+                <div class="box-content" contenteditable="true">[D4.10 / Organizasyonel]
+
+Tesiste aynı işlevi gören üç yağ tasfiye cihazından ikisinde interlock/emniyet sensörü bulunmasına rağmen, üçüncü cihazda bu mühendislik bariyerlerinin eksik olduğu sistematik bir bariyer envanteri veya bariyer yönetim süreci ile tespit edilmemiş ve eksik mühendislik bariyerini telafi edecek idari kontroller (uyarı levhası, görsel devreye alma sırası bilgilendirmesi) tanımlanmamıştır. Organizasyon, kritik ekipmanlarda güvenlik bariyerlerini (mühendislik bariyerleri, idari kontroller, KKD vb.) sistematik olarak tanımlamıyor, envanter oluşturmuyor ve eksiklikleri telafi etmiyordu. Bariyer yönetimi, her bir tehlikeye karşı hangi koruma katmanlarının mevcut olduğunu ve hangilerinin eksik olduğunu belirlemeyi ve eksik bariyerleri tamamlamayı gerektirir. Bu olayda, mühendislik bariyeri (interlock/sensör) olmayan cihazda idari kontrollerin (prosedür, levha) de bulunmaması, bariyer yönetimi sürecinin tamamen eksik olduğunu göstermektedir.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kritik ekipmanlar için güvenlik bariyerleri (mühendislik, idari, KKD) sistematik olarak tanımlanmıyor ve envanter oluşturulmuyordu</li>
+<li contenteditable="true">Tesisteki benzer cihazlar arasında güvenlik bariyeri farklılıkları tespit edilmiyor ve standartlaştırma yapılmıyordu</li>
+<li contenteditable="true">Mühendislik bariyeri (interlock/sensör) eksik olan ekipmanlarda telafi edici idari kontroller (prosedür, levha, eğitim) otomatik olarak devreye alınmıyordu</li>
+<li contenteditable="true">Bariyer yeterliliği ve etkinliği periyodik olarak gözden geçirilmiyor, eksiklikler kapatılmıyordu</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Dokümantasyon Eksikliği</td>
+                        <td contenteditable="true">Kritik ekipmanlar için standart çalışma prosedürleri (SOP) hazırlama, onaylama, dağıtma ve güncel tutma süreci tanımlı değildir. Yağ tasfiye cihazının güvenli devreye alma sırası hiçbir zaman yazılı hale getirilmemiş ve çalışanlara resmi olarak iletilmemiştir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Görsel Güvenlik İletişimi Yetersizliği</td>
+                        <td contenteditable="true">Çalışma alanlarında kritik güvenlik adımlarını hatırlatan görsel uyarı levhaları, adım adım talimatlar veya kontrol listeleri bulunmamaktadır. Çalışanlar, güvenlik prosedürlerini tamamen hafızalarına güvenerek uygulamak zorunda kalmaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Teknik Risk Analizi Eksikliği</td>
+                        <td contenteditable="true">Yağ tasfiye cihazları için HAZOP veya LOPA gibi yapılandırılmış tehlike tanımlama ve risk analizi çalışması yapılmamıştır. Kritik operasyonel senaryolar (yağ akışı olmadan ısıtma başlatılması gibi) analiz edilmemiş ve gerekli emniyet bariyerleri belirlenmemiştir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Bariyer Yönetimi Sistemik Eksikliği</td>
+                        <td contenteditable="true">Kritik ekipmanlarda güvenlik bariyerlerini (mühendislik, idari, KKD) sistematik olarak tanımlama, envanter oluşturma ve eksiklikleri telafi etme süreci bulunmamaktadır. Benzer cihazlar arasında güvenlik bariyeri farklılıkları tespit edilmiyor ve standartlaştırma yapılmıyordu.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman Güvenlik Standartları Tutarsızlığı</td>
+                        <td contenteditable="true">Tesisteki üç benzer yağ tasfiye cihazından ikisinde interlock/emniyet sensörü bulunmasına rağmen, üçüncü cihazda bu koruma sistemleri eksikti. Bu tutarsızlık hiçbir zaman tespit edilip giderilmemişti.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Proaktif Risk Yönetimi Eksikliği</td>
+                        <td contenteditable="true">Organizasyon, olası tehlikeleri ve riskleri önceden tanımlama ve önleme yerine, reaktif (olay sonrası) yaklaşım benimsemektedir. Kritik senaryolar ancak olay meydana geldikten sonra fark edilmektedir.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Vardiya Devir Teslim Süreci Zayıflığı</td>
+                        <td contenteditable="true">Vardiya değişiminde, ilk yağcının hatalı devreye alma işlemini yeni yağcıya bildirmemesi veya yeni yağcının durumu kontrol etmemesi, olayın gecikmeli tespitine neden olmuştur. Vardiya devir teslim prosedürü ve kontrol listesi eksikliği katkıda bulunmuştur.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Yağ tasfiye cihazı için detaylı standart çalışma prosedürü (SOP) hazırlanması, onaylanması ve tüm ilgili çalışanlara eğitimle iletilmesi. Prosedür, adım adım devreye alma sırası, kontrol listesi ve hatalı kullanım risklerini içermelidir.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Üretim Müdürü / HSE Uzmanı</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">SOP tamamlanma ve eğitim oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Tüm yağ tasfiye cihazlarının bulunduğu çalışma alanlarına görsel uyarı levhaları ve adım adım devreye alma talimatları asılması. Levhalar Türkçe ve görsel olarak net olmalıdır.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Uzmanı / Bakım Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Levha kurulum tamamlama %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Hasarlı yağ tasfiye cihazına yağ akışı olmadan ısıtmayı engelleyen interlock/emniyet sensörü sistemi kurulması. Tesisteki diğer iki cihazla aynı güvenlik seviyesine getirilmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Bakım Müdürü / Elektrik Uzmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Interlock sistemi kurulum ve test %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Tüm yağ tasfiye cihazları için HAZOP (Hazard and Operability Study) çalışması yapılması. Kritik operasyonel senaryolar, sapma durumları ve gerekli emniyet bariyerleri belirlenmeli.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Mühendislik Müdürü / HSE Uzmanı</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">HAZOP çalışması tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Tesisteki tüm kritik ekipmanlar için bariyer envanteri oluşturulması. Her ekipmanda hangi güvenlik bariyerlerinin (mühendislik, idari, KKD) mevcut olduğu ve hangilerinin eksik olduğu belirlenmeli.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Yöneticisi / Mühendislik Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Bariyer envanteri tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Benzer ekipmanlar arasında güvenlik standartları tutarsızlıklarının tespit edilmesi ve standartlaştırma planının hazırlanması. Tüm benzer cihazlar aynı güvenlik seviyesine getirilmeli.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Teknik Direktör / Bakım Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Standartlaştırma planı tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Kritik ekipmanlar için standart çalışma prosedürü (SOP) geliştirme, onaylama, dağıtma ve güncel tutma sürecinin tanımlanması ve uygulanması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Üretim Müdürü / Kalite Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">SOP yönetim süreci dokümantasyonu %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Vardiya devir teslim prosedürünün güncellenmesi ve kontrol listesi oluşturulması. Kritik ekipman durumları, devam eden işlemler ve anormallikler mutlaka bildirilmeli.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Vardiya Amiri / Üretim Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Vardiya devir teslim uyum oranı %95</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Tüm yağcı personeline yağ tasfiye cihazlarının güvenli kullanımı, devreye alma prosedürü ve hatalı kullanım riskleri konularında kapsamlı eğitim verilmesi.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Eğitim Koordinatörü / HSE Uzmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama ve sınav başarı oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Bariyer yönetim sistemi kurulması. Kritik ekipmanlarda güvenlik bariyerlerinin tanımlanması, envanteri, etkinlik izleme ve eksiklikleri telafi etme süreci oluşturulmalı.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Yöneticisi / Üst Yönetim</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Bariyer yönetim sistemi kurulum %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Yeni veya mevcut ekipmanlar için HAZOP/LOPA gibi yapılandırılmış risk analizi metodolojilerinin zorunlu hale getirilmesi ve uygulama prosedürünün oluşturulması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Mühendislik Direktörü / HSE Yöneticisi</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Risk analizi prosedürü onay ve uygulama %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Proaktif risk yönetimi kültürünün güçlendirilmesi için liderlik eğitimleri ve güvenlik performans göstergelerinin (KPI) oluşturulması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Üst Yönetim / İK Müdürü</td>
+                        <td contenteditable="true">12 ay</td>
+                        <td contenteditable="true">Liderlik eğitim tamamlama ve KPI izleme %100</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Kritik ekipmanlar için mutlaka yazılı standart çalışma prosedürleri (SOP) hazırlanmalı ve çalışanlara eğitimle iletilmelidir. Prosedürler, adım adım talimatlar, kontrol listeleri ve hatalı kullanım risklerini içermelidir. Çalışanların hafızalarına güvenmek yerine, yazılı ve görsel destekler sağlanmalıdır.
+• Mühendislik bariyeri (interlock, sensör, alarm) olmayan ekipmanlarda mutlaka telafi edici idari kontroller (prosedür, levha, eğitim, denetim) devreye alınmalıdır. Çok katmanlı koruma (defense in depth) ilkesi uygulanmalı ve tek bir bariyere güvenilmemelidir.
+• Benzer ekipmanlar arasında güvenlik standartları tutarlı olmalıdır. Tesiste aynı işlevi gören cihazların farklı güvenlik seviyelerinde çalışması kabul edilmemelidir. Periyodik karşılaştırmalı değerlendirme yapılmalı ve standartlaştırma sağlanmalıdır.
+• Yeni veya mevcut ekipmanlar için HAZOP/LOPA gibi yapılandırılmış risk analizi metodolojileri mutlaka uygulanmalıdır. Kritik operasyonel senaryolar önceden tanımlanmalı ve gerekli emniyet bariyerleri belirlenmelidir. Reaktif değil, proaktif risk yönetimi yaklaşımı benimsenmelidir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Bariyer yönetim sistemi kurulmalı ve sürekli iyileştirilmelidir. Kritik ekipmanlarda hangi güvenlik bariyerlerinin mevcut olduğu, hangilerinin eksik olduğu ve bariyerlerin etkinliği sistematik olarak izlenmelidir. Bariyer envanteri oluşturulmalı ve periyodik olarak güncellenmelidir.
+• Prosedür yönetim sistemi güçlendirilmelidir. Kritik ekipmanlar ve işlemler için hangi prosedürlerin gerekli olduğu belirlenmeli, prosedürler hazırlanmalı, onaylanmalı, dağıtılmalı ve güncel tutulmalıdır. Prosedür uyumu düzenli olarak denetlenmeli ve sapmalara müdahale edilmelidir.
+• Teknik risk analizi kültürü organizasyona yerleştirilmelidir. HAZOP, LOPA, FMEA gibi metodolojiler rutin olarak uygulanmalı ve risk analizi sonuçları tasarım, işletme ve bakım kararlarına entegre edilmelidir. Risk analizi sadece yeni projeler için değil, mevcut ekipmanlar için de periyodik olarak yapılmalıdır.
+• Proaktif güvenlik kültürü geliştirilmelidir. Çalışanlar ve yöneticiler, olaylar meydana gelmeden önce potansiyel tehlikeleri tanımlamaya ve önlemeye teşvik edilmelidir. Near-miss (ramak kala) raporlama sistemi kurulmalı ve proaktif güvenlik davranışları ödüllendirilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Bu olay ve kök neden analizi sonuçları, tüm tesiste benzer ekipmanlarla çalışan personele iletilmelidir. Güvenlik brifingleri, toolbox toplantıları ve eğitimler aracılığıyla öğrenilen dersler paylaşılmalıdır.
+• Yağ tasfiye cihazlarının güvenli kullanımı konusunda farkındalık kampanyası düzenlenmelidir. Çalışma alanlarına posterler asılmalı, güvenlik bültenleri dağıtılmalı ve düzenli hatırlatmalar yapılmalıdır.
+• Benzer olayların tekrarlanmaması için diğer departmanlar ve tesislerle bilgi paylaşımı yapılmalıdır. Lessons learned (öğrenilen dersler) veritabanı oluşturulmalı ve erişilebilir hale getirilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm yağcı personeline yağ tasfiye cihazlarının güvenli kullanımı, devreye alma prosedürü ve hatalı kullanım riskleri konularında kapsamlı eğitim verilmelidir. Eğitim, teorik bilginin yanı sıra pratik uygulama ve simülasyon içermelidir.
+• Yöneticiler ve mühendisler için HAZOP, LOPA ve bariyer yönetimi konularında teknik eğitimler düzenlenmelidir. Risk analizi metodolojilerinin doğru uygulanması için yetkinlik geliştirilmelidir.
+• Vardiya amirleri ve operatörler için prosedür yazma, kontrol listesi hazırlama ve görsel güvenlik iletişimi konularında eğitim verilmelidir. Çalışanlar, kendi iş alanlarında güvenlik prosedürlerini geliştirmeye katkıda bulunabilmelidir.
+• Tüm personel için proaktif güvenlik kültürü ve near-miss raporlama konularında farkındalık eğitimleri düzenlenmelidir. Çalışanlar, potansiyel tehlikeleri tanımlamaya ve bildirmeye teşvik edilmelidir.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">Yağ tasfiye cihazı yangını olayının kök neden analizi, olayın yalnızca operatör hatası olmadığını, arkasında üç farklı organizasyonel sistem eksikliğinin bulunduğunu ortaya koymuştur. HSG245 metodolojisi ve 5-Why tekniği kullanılarak yapılan detaylı araştırma, olayın temel nedenlerini şu şekilde belirlemiştir: (1) Görev için standart/uygulama/prosedür mevcut değil (D9.1), (2) Teknik risk analizlerinin (HAZOP/LOPA) eksikliği (D5.7), ve (3) Bariyer yönetimi yetersizliği (D4.10).
+
+Bu üç kök neden, organizasyonun güvenlik yönetim sistemindeki derin ve sistemik zayıflıkları yansıtmaktadır. Kritik ekipmanlar için yazılı prosedürlerin bulunmaması, yapılandırılmış risk analizlerinin yapılmaması ve güvenlik bariyerlerinin sistematik olarak yönetilmemesi, benzer olayların tekrarlanma riskini önemli ölçüde artırmaktadır. Tesisteki üç benzer yağ tasfiye cihazından ikisinde interlock/emniyet sensörü bulunmasına rağmen, üçüncü cihazda ne mühendislik bariyeri ne de prosedürel bariyer mevcuttu ve bu durum hiçbir zaman tespit edilip giderilmemişti.
+
+Olayın potansiyel sonuçları çok daha ciddi olabilirdi. Erken tespit ve müdahale sayesinde personel yaralanması olmamış, ancak ekipman ciddi hasar görmüştür. Olayın gecikmeli tespiti veya müdahalenin gecikmesi durumunda, açık alev, yangın yayılımı ve personel yaralanması riski bulunmaktaydı. Bu nedenle, belirlenen kök nedenlere yönelik kapsamlı ve kalıcı düzeltici önlemlerin acilen alınması kritik önem taşımaktadır.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm yağ tasfiye cihazları için acil güvenlik brifingi verilmesi ve doğru devreye alma sırasının tüm çalışanlara hatırlatılması (1 hafta içinde tamamlanmalı)</li>
+<li contenteditable="true">Geçici uyarı levhalarının tüm yağ tasfiye cihazlarına asılması ve görsel devreye alma talimatlarının hazırlanması (1 hafta içinde tamamlanmalı)</li>
+<li contenteditable="true">Hasarlı cihaza interlock/emniyet sensörü sistemi kurulması ve tesisteki tüm benzer cihazların güvenlik donanımlarının kontrol edilmesi (1 ay içinde tamamlanmalı)</li>
+<li contenteditable="true">Yağ tasfiye cihazı için detaylı standart çalışma prosedürü (SOP) hazırlanması, onaylanması ve tüm ilgili çalışanlara eğitimle iletilmesi (2 hafta içinde tamamlanmalı)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm kritik ekipmanlar için HAZOP (Hazard and Operability Study) çalışması yapılması ve kritik operasyonel senaryoların belirlenmesi (3-6 ay içinde tamamlanmalı)</li>
+<li contenteditable="true">Bariyer yönetim sisteminin kurulması ve kritik ekipmanlarda güvenlik bariyerlerinin sistematik olarak tanımlanması, envanterinin oluşturulması ve etkinliğinin izlenmesi (6 ay içinde tamamlanmalı)</li>
+<li contenteditable="true">Prosedür yönetim sisteminin güçlendirilmesi ve kritik ekipmanlar için standart çalışma prosedürlerinin geliştirilmesi, onaylanması, dağıtılması ve güncel tutulması sürecinin tanımlanması (3-6 ay içinde tamamlanmalı)</li>
+<li contenteditable="true">Proaktif güvenlik kültürünün geliştirilmesi için liderlik eğitimleri, near-miss raporlama sistemi ve güvenlik performans göstergelerinin (KPI) oluşturulması (6-12 ay içinde tamamlanmalı)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Yazılı Prosedür Varlığı</td>
+                        <td class="current" contenteditable="true">Yok - Çalışanlar hafızalarına güveniyor</td>
+                        <td class="target" contenteditable="true">Var - Tüm kritik ekipmanlar için SOP mevcut</td>
+                    </tr>
+
+                    <tr>
+                        <td>Görsel Güvenlik İletişimi</td>
+                        <td class="current" contenteditable="true">Yok - Uyarı levhası ve talimat yok</td>
+                        <td class="target" contenteditable="true">Var - Tüm cihazlarda görsel talimat mevcut</td>
+                    </tr>
+
+                    <tr>
+                        <td>Mühendislik Bariyeri (Interlock/Sensör)</td>
+                        <td class="current" contenteditable="true">Eksik - Bu cihazda yok (diğer 2'sinde var)</td>
+                        <td class="target" contenteditable="true">Var - Tüm benzer cihazlarda standart</td>
+                    </tr>
+
+                    <tr>
+                        <td>Teknik Risk Analizi (HAZOP/LOPA)</td>
+                        <td class="current" contenteditable="true">Yapılmamış - Kritik senaryolar tanımsız</td>
+                        <td class="target" contenteditable="true">Yapılmış - Tüm kritik ekipmanlar analiz edilmiş</td>
+                    </tr>
+
+                    <tr>
+                        <td>Bariyer Yönetim Sistemi</td>
+                        <td class="current" contenteditable="true">Yok - Bariyer envanteri ve izleme yok</td>
+                        <td class="target" contenteditable="true">Var - Sistematik bariyer yönetimi mevcut</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Standartları Tutarlılığı</td>
+                        <td class="current" contenteditable="true">Tutarsız - Benzer cihazlar farklı seviyede</td>
+                        <td class="target" contenteditable="true">Tutarlı - Tüm benzer cihazlar aynı seviyede</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Yönetimi Yaklaşımı</td>
+                        <td class="current" contenteditable="true">Reaktif - Olay sonrası müdahale</td>
+                        <td class="target" contenteditable="true">Proaktif - Önceden tanımlama ve önleme</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header">📷 OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /* ── OLAY FOTOĞRAFLARI JS ─────────────────────────────── */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

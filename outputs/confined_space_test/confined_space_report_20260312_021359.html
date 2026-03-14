@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /* ── OLAY FOTOĞRAFLARI ─────────────────────────────────── */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - CS-2026-002-OXYGEN";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')">📷 Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">HSG245 Metodolojisi ile Hazırlanmıştır</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">CS-2026-002-OXYGEN</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">18.03.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">DEF Atıksu Arıtma Tesisi, Çamur Depolama Tankı #3</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Ağır Yaralanma - Kapalı Alan Oksijen Yetersizliği</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Bakım teknisyeni atmosfer testi ve izin olmadan çamur tankına girmiş, oksijen yetersizliği nedeniyle bayılmıştır. Ardından iki çalışan eğitimsiz kurtarma girişiminde bulunmuş, üç kişi de hipoksi yaşamıştır. İtfaiye ekipleri tüm kazazedeleri kurtarmıştır.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">18 Mart 2026 tarihinde DEF Atıksu Arıtma Tesisi'nde çamur depolama tankı içinde pompa arızası kontrolü sırasında bakım teknisyeni Ahmet Çelik, confined space giriş izni almadan ve atmosfer testi yapmadan tank içine girmiş, %11 oksijen seviyesi ve 45 ppm H2S gazı nedeniyle 3 metre derinlikte bayılmıştır. Vardiya amiri Hasan Öztürk ve operatör Kemal Aydın solunum koruyucu ekipman olmadan kurtarma girişiminde bulunmuş, her ikisi de oksijen yetersizliği nedeniyle etkilenmiştir. İtfaiye ekipleri SCBA ile müdahale ederek üç kazazedeyi de kurtarmıştır.</div>
+<div class="paragraph" contenteditable="true">DEF Çevre Teknolojileri A.Ş., DEF Atıksu Arıtma Tesisi, Çamur Depolama Tankı #3 (5m çap, 8m derinlik)</div>
+<div class="paragraph" contenteditable="true">Ahmet Çelik (29, Bakım Teknisyeni) - kritik durum, beyin hasarı riski; Hasan Öztürk (42, Vardiya Amiri) - ağır durum, hipoksi ve baş travması; Kemal Aydın (35, Operatör) - orta durum, hafif hipoksi</div>
+<div class="paragraph" contenteditable="true">Olay sonrası acil servis (112) ve itfaiye derhal çağrılmış, tesis acil durum bildirimi yapılmıştır. İtfaiye ekipleri SCBA ile tank içine girerek 10:55-11:05 arasında üç kazazedeyi de çıkarmış, CPR uygulanmış ve tüm kazazedeler ambulansla hastaneye sevk edilmiştir. Olay sonrası atmosfer testi yapılarak tehlikeli gaz seviyeleri tespit edilmiştir.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Confined space giriş izin sistemi kağıt üzerinde mevcut ancak fiilen uygulanmıyor, sözlü onay kültürü yerleşmiş</li>
+<li contenteditable="true">Atmosfer test cihazı kilitli dolapta erişilemez durumda, kurtarma ekipmanları (SCBA, tripod) tesiste bulunmuyor</li>
+<li contenteditable="true">Kapalı alan kurtarma planı hiç hazırlanmamış, acil durum tatbikatı 3 yıldır yapılmamış</li>
+<li contenteditable="true">Prosedür uygulamalarını denetleyen sistematik izleme mekanizması yok, güvenlik adımlarını atlama davranışı hız kazancı olarak ödüllendiriliyor</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Tüm kapalı alan girişleri durduruldu, acil permit sistemi devreye alındı</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Atmosfer test cihazı saha ofisine taşındı, 7/24 erişilebilir hale getirildi</td>
+                        <td contenteditable="true">İSG Uzmanı</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">SCBA ve kurtarma ekipmanları acil tedarik edildi, itfaiye ile protokol imzalandı</td>
+                        <td contenteditable="true">Satın Alma Müdürü</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm personele kapalı alan tehlikeleri ve eğitimsiz kurtarma riskleri acil eğitimi verildi</td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">CS-2026-002-OXYGEN</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">18.03.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">10:25 (giriş) - 11:20 (hastaneye sevk)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">DEF Atıksu Arıtma Tesisi, Çamur Depolama Tankı #3</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Atıksu Arıtma - Çamur İşleme Ünitesi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Ahmet Çelik (Bakım Teknisyeni), Hasan Öztürk (Vardiya Amiri), Kemal Aydın (Operatör)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz vardiyası (07:00-15:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Çamur Depolama Tankı #3 (5m çap, 8m derinlik), çamur pompası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Atıksu çamuru, H2S gazı, metan gazı, karbon monoksit</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Normal, kapalı alan (tank içi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Tank içi karanlık, el feneri kullanılmamış</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart iş kıyafeti (SCBA, emniyet kemeri, tripod kullanılmamış)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Kapalı Alan Kazası - Oksijen Yetersizliği ve Zehirli Gaz Maruziyeti</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">3 kişi hipoksi (oksijen yetersizliği), 1 kişi beyin hasarı riski, 1 kişi baş travması</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">3 kişi (1 kritik, 1 ağır, 1 orta)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Ağır Yaralanma - Potansiyel Kalıcı Hasar</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Evet (12.03.2026 tarihinde bildirildi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Vardiya çalışanları (10:30'da seslenme yanıtsız kaldı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet (10:37'de 112 ve itfaiye çağrıldı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Ahmet Çelik yoğun bakımda, Hasan Öztürk hastanede, Kemal Aydın gözlem altında</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">07:00</div>
+                    <div class="timeline-event" contenteditable="true">Vardiya başlangıcı, normal operasyon devam ediyor</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:30</div>
+                    <div class="timeline-event" contenteditable="true">Tank #3 çamur pompası tıkanma alarmı verdi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:45</div>
+                    <div class="timeline-event" contenteditable="true">Ahmet Çelik arızayı incelemeye gitti, dış gözlem yaptı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:15</div>
+                    <div class="timeline-event" contenteditable="true">Ahmet ekip liderinden sözlü onay istedi, 'dikkatli ol' yanıtı aldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:20</div>
+                    <div class="timeline-event" contenteditable="true">Ahmet tek başına tank kapağını açtı (atmosfer testi yapılmadı)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:25</div>
+                    <div class="timeline-event" contenteditable="true">Ahmet merdivenden aşağı inmeye başladı (gözcü yok, permit yok)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:28</div>
+                    <div class="timeline-event" contenteditable="true">Ahmet 3 metre derinlikte bayıldı, merdivenden düştü</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:30</div>
+                    <div class="timeline-event" contenteditable="true">İş arkadaşları seslendi, yanıt alamadı, endişelendi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:32</div>
+                    <div class="timeline-event" contenteditable="true">Vardiya amiri Hasan Öztürk tank başına geldi, Ahmet'i gördü</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:33</div>
+                    <div class="timeline-event" contenteditable="true">Hasan kurtarmak için KKD olmadan tank içine atladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:34</div>
+                    <div class="timeline-event" contenteditable="true">Hasan da bayıldı, tank dibine düştü</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:36</div>
+                    <div class="timeline-event" contenteditable="true">Operatör Kemal Aydın yardıma koştu, yarı yolda bayıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:37</div>
+                    <div class="timeline-event" contenteditable="true">Diğer çalışanlar 112 ve itfaiyeyi aradı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:40</div>
+                    <div class="timeline-event" contenteditable="true">Tesiste acil durum bildirimi yapıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:55</div>
+                    <div class="timeline-event" contenteditable="true">İtfaiye SCBA ile tank içine girdi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:00</div>
+                    <div class="timeline-event" contenteditable="true">İlk iki kişi çıkarıldı (Ahmet ve Hasan)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:05</div>
+                    <div class="timeline-event" contenteditable="true">Üçüncü kişi çıkarıldı (Kemal)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:10</div>
+                    <div class="timeline-event" contenteditable="true">Üçüne de CPR uygulandı, ambulanslar geldi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:20</div>
+                    <div class="timeline-event" contenteditable="true">Üç kazazede de hastaneye sevk edildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:45</div>
+                    <div class="timeline-event" contenteditable="true">Atmosfer testi yapıldı: O2 %11, H2S 45ppm tespit edildi</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why (5 Neden) tekniği, bir olayın kök nedenine ulaşmak için 'Neden?' sorusunu art arda beş kez soran sistematik sorgulama yöntemidir. Bu olayda her dal için 5-Why zinciri uygulanmıştır. Birinci dalda 'Neden oksijen yetersiz atmosfer oluştu?' sorusundan başlanarak atmosfer testinin yapılmaması, test cihazının erişilemezliği, permit sisteminin uygulanmaması ve nihayetinde prosedür uygulamalarını denetleyen sistematik mekanizmanın yokluğu tespit edilmiştir. İkinci dalda 'Neden izinsiz girildi?' sorusundan başlanarak sözlü onay kültürü, permit atlamanın zaman kazandırması ve güvensiz davranışın hız kazancı olarak ödüllendirilmesi ortaya çıkarılmıştır. Üçüncü dalda 'Neden KKD kullanılmadan kurtarma girişiminde bulunuldu?' sorusundan başlanarak eğitimsiz kurtarma refleksi, kurtarma planının yokluğu ve tatbikat yapılmaması tespit edilmiştir. Her Why seviyesinde önceki yanıtın nedeni sorgulanarak yüzeysel nedenlerden derin organizasyonel nedenlere inilmiştir. 5-Why tekniği sayesinde bireysel hataların arkasındaki sistemik zayıflıklar görünür hale gelmiştir.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışsal Faktör</td>
+                        <td contenteditable="true">Bireysel hatalar, kural ihlalleri, prosedür uygunsuzlukları, dikkatsizlik, yorgunluk gibi çalışan davranışlarından kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktör</td>
+                        <td contenteditable="true">Fiziksel tehlikeler, ekipman arızası, tehlikeli atmosfer, tasarım hatası, ergonomi sorunları gibi iş ortamı koşullarından kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Kişisel Faktör</td>
+                        <td contenteditable="true">Yetkinlik eksikliği, eğitim yetersizliği, motivasyon sorunları, iletişim bozukluğu, yanlış davranışın ödüllendirilmesi gibi bireysel yetenek ve tutumlardan kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Yönetim sistemleri yetersizliği, prosedür eksikliği, denetim zayıflığı, kaynak yetersizliği, güvenlik kültürü sorunları, politika eksiklikleri gibi organizasyonel yapıdan kaynaklanan faktörler</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Kıdemli İSG Araştırma Lideri</td>
+                        <td contenteditable="true">Baş Araştırmacı</td>
+                        <td contenteditable="true">18.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Kapalı Alan Teknik Uzmanı</td>
+                        <td contenteditable="true">Teknik Danışman</td>
+                        <td contenteditable="true">18.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Endüstriyel Hijyen Uzmanı (Atmosferik Tehlikeler)</td>
+                        <td contenteditable="true">Atmosfer Analiz Uzmanı</td>
+                        <td contenteditable="true">19.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Acil Müdahale Uzmanı</td>
+                        <td contenteditable="true">Kurtarma Prosedürleri Danışmanı</td>
+                        <td contenteditable="true">19.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Atıksu Arıtma Proses Mühendisi</td>
+                        <td contenteditable="true">Proses Uzmanı</td>
+                        <td contenteditable="true">20.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İnsan Faktörleri Uzmanı</td>
+                        <td contenteditable="true">Davranış Analizi Uzmanı</td>
+                        <td contenteditable="true">20.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tıbbi Danışman (Hipoksi/Toksikoloji)</td>
+                        <td contenteditable="true">Sağlık Etkileri Uzmanı</td>
+                        <td contenteditable="true">21.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Yönetim Temsilcisi</td>
+                        <td contenteditable="true">18.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Eğitim ve Yetkinlik Uzmanı</td>
+                        <td contenteditable="true">Eğitim Sistemi Değerlendirmecisi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İzin Sistemi Uzmanı</td>
+                        <td contenteditable="true">Permit-to-Work Sistem Denetçisi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Çalışan Temsilcisi</td>
+                        <td contenteditable="true">Personel Görüşleri Temsilcisi</td>
+                        <td contenteditable="true">23.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Düzenleyici İlişkiler Uzmanı</td>
+                        <td contenteditable="true">RIDDOR ve Yasal Uyum Uzmanı</td>
+                        <td contenteditable="true">23.03.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - OKSİJEN YETERSİZ ATMOSFER KOŞULU</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">DEF Atıksu Arıtma Tesisi Çamur Depolama Tankı #3 içinde oksijen seviyesi %11'e düşmüş (normal atmosferde %20.9 olmalıdır) ve aynı zamanda 45 ppm seviyesinde hidrojen sülfür (H2S) gazı birikmiştir. Bu atmosfer koşulu insan yaşamı için son derece tehlikelidir; %19.5'in altındaki oksijen seviyeleri hipoksiye (oksijen yetersizliği) neden olur ve bilinç kaybına yol açar. 45 ppm H2S ise zehirli gaz maruziyeti sınırının (10 ppm) çok üzerindedir ve solunum sistemi hasarına neden olabilir. Tank içindeki bu ölümcül atmosfer koşulu, çamur fermantasyonu sırasında oluşan biyolojik gazların (metan, H2S, CO2) oksijeni yer değiştirmesi ve tankın kapalı alan özelliği nedeniyle havalandırılmaması sonucu oluşmuştur. Ahmet Çelik bu atmosfere farkında olmadan girdiğinde 3 metre derinlikte aniden bayılmış, ardından kurtarmaya giren Hasan Öztürk ve Kemal Aydın da aynı tehlikeli atmosfere maruz kalmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Çamur depolama tankı içinde oksijen seviyesi %11'e düşmüş ve 45 ppm H2S gazı bulunmaktadır (Kod: B3.6 - Oksijen Yetersiz Atmosfer)</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Çamur depolama tankı #3 içinde oksijen seviyesi neden %11'e düşmüş ve 45 ppm H2S gazı neden birikmiş durumda tespit edildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Tank içine giriş öncesinde atmosfer testi yapılmadığı için tehlikeli atmosfer koşulları (düşük O2, yüksek H2S) tespit edilemedi ve personel bu ölümcül ortama farkında olmadan girdi. Atmosfer testi yapılsaydı tehlikeli seviyeler tespit edilecek, giriş engellenecek ve önce havalandırma yapılacaktı. Ancak test yapılmadığı için tehlike görünmez kaldı ve personel risk altına girdi.</div>
+                    <span class="why-code">C - Kişisel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Atmosfer testi neden yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Atmosfer test cihazı tesiste mevcut olmasına rağmen İSG uzmanının kilitli dolabında tutuluyordu ve anahtarı sadece İSG uzmanında bulunuyordu. Ahmet Çelik cihaza erişemedi, erişim için de girişimde bulunmadan doğrudan tanka girdi. Test cihazının kilitli ve erişilemez durumda olması, acil durumlarda kullanımını imkansız hale getirmiştir. Zeynep Arslan (İSG Uzmanı) ifadesinde 'Atmosfer test cihazını kilitli tutuyorum çünkü daha önce kaybolmuştu' demiştir; bu durum ekipman yönetiminin yanlış yapıldığını göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Atmosfer test cihazı neden kilitli dolapta erişilemez durumda tutuluyordu ve confined space giriş izin sistemi neden bu girişi engellemedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Confined space giriş izin (permit) sistemi kağıt üzerinde mevcut olmasına rağmen fiilen uygulanmıyordu. Ekip lideri Fatih Yılmaz sözlü onay verip permit doldurmadı, atmosfer testi ve gözcü atanması gibi zorunlu adımlar atlandı. Cihazın kilitli tutulması da permit sürecinin işletilmemesiyle birleşince hiçbir güvenlik bariyeri devreye girmedi. Fatih Yılmaz ifadesinde 'Sözlü onay verdim ama permit doldurmadık, işi hızlı bitirmek istedik' demiştir; bu durum prosedürün bilinçli olarak atlandığını göstermektedir. Permit sistemi işleseydi atmosfer testi zorunlu adım olarak kontrol edilecek, cihaza erişim sağlanacak ve test yapılmadan giriş engellenecekti.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Confined space giriş izin sistemi neden kağıt üzerinde kalıp fiilen uygulanmıyordu ve bu durumu kimse neden denetlemiyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Tesiste confined space giriş izin prosedürünün sahada uygulanıp uygulanmadığını sistematik olarak denetleyen, izleyen veya doğrulayan herhangi bir mekanizma (düzenli denetim, uygunluk takip sistemi, saha doğrulama süreci) bulunmuyordu. 3 yıldır acil durum tatbikatı yapılmamış, risk değerlendirmesinde confined space riski tespit edilmiş ancak kontrollerin uygulanması hiç takip edilmemişti. Prosedürler yazılmış ancak uygulanıp uygulanmadığını kontrol eden hiçbir mekanizma kurulmamıştır. Saha denetimleri yapılmamış, permit kayıtları incelenmemiş, atmosfer test cihazı kullanım logları tutulmamış, çalışanların prosedüre uyup uymadığı gözlemlenmemiştir. Bu sistemik denetim boşluğu, prosedürlerin kağıt üzerinde kalmasına ve fiili uygulamada göz ardı edilmesine neden olmuştur.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: İzleme ve Denetim Mekanizması Yetersizliği</div>
+                <div class="box-content" contenteditable="true">[D9.5 / Organizasyonel]
+
+DEF Atıksu Arıtma Tesisi'nde confined space giriş izin (permit) sistemi, atmosfer test protokolü ve kurtarma planı prosedür olarak kağıt üzerinde mevcuttu ancak bu prosedürlerin sahada uygulanıp uygulanmadığını sistematik olarak doğrulayan hiçbir denetim, izleme veya uygunluk takip mekanizması kurulmamıştı. Düzenli saha denetimleri yapılmamış, permit kayıtları incelenmemiş, atmosfer test cihazı kullanım logları tutulmamış, çalışanların prosedüre uyup uymadığı gözlemlenmemiş, sapmaların tespit edilip düzeltildiği bir geri bildirim döngüsü oluşturulmamıştır. Bu nedenle permit sistemi şekilsel kaldı, atmosfer test cihazı erişilemez biçimde kilitli tutuldu, havalandırma fanı 6 aydır arızalı bekledi ve sözlü onay kültürü yerleşti; tüm bu sapmalar hiçbir denetim mekanizması tarafından tespit edilemedi ve düzeltilemedi.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Prosedür uygulamalarını doğrulayan sistematik saha denetim programı bulunmamaktadır; yöneticiler ve İSG uzmanları sahada prosedürlere uyulup uyulmadığını düzenli olarak kontrol etmemektedir</li>
+<li contenteditable="true">Confined space giriş izin (permit) kayıtları tutulmamakta veya incelenmemektedir; permit atlandığında bunu tespit edecek kontrol mekanizması yoktur</li>
+<li contenteditable="true">Atmosfer test cihazı kullanım logları tutulmamakta, cihazın ne zaman, kim tarafından, hangi amaçla kullanıldığı kayıt altına alınmamaktadır; bu durum test yapılmayan girişlerin tespit edilememesine neden olmaktadır</li>
+<li contenteditable="true">Risk değerlendirmesinde tespit edilen kontrol önlemlerinin (permit sistemi, atmosfer testi, gözcü atanması) uygulanıp uygulanmadığını takip eden bir sistem yoktur; risk değerlendirmesi yapılmış ancak kontrollerin etkinliği hiç doğrulanmamıştır</li>
+<li contenteditable="true">3 yıldır acil durum tatbikatı yapılmaması ve havalandırma fanının 6 aydır arızalı beklemesi gibi kritik sapmaları tespit edip düzeltecek yönetim gözden geçirme süreci bulunmamaktadır</li>
+<li contenteditable="true">Çalışanların güvensiz davranışlarını (permit atlama, sözlü onay ile yetinme) gözlemleyip düzeltecek davranışsal güvenlik denetimi yapılmamaktadır; güvensiz davranışlar normalleşmiş ve kimse müdahale etmemiştir</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - BİREYSEL KURAL İHLALİ VE PROSEDÜR ATLAMA</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bakım teknisyeni Ahmet Çelik, tesiste mevcut olan confined space giriş izin sistemi (permit) prosedürüne rağmen atmosfer testi yapmadan, gözcü atamadan ve yazılı izin almadan tek başına çamur depolama tankı içine girmiştir. Confined space giriş izin prosedürü, kapalı alan girişlerinde zorunlu güvenlik adımlarını (atmosfer testi, gözcü atanması, kurtarma ekipmanı hazırlığı, yazılı izin) tanımlamaktadır ve bu prosedür tesiste kağıt üzerinde mevcuttur. Ancak Ahmet bu prosedürü tamamen atlayarak doğrudan tanka girmiştir. Ekip lideri Fatih Yılmaz'dan sadece sözlü onay almış ('dikkatli ol' yanıtı), permit formu doldurmamış, atmosfer test cihazına erişmemiş, gözcü atamamış ve kurtarma ekipmanı hazırlamamıştır. Bu davranış, bireysel bir kural ihlali olarak görünse de arkasında daha derin organizasyonel ve kültürel nedenler bulunmaktadır. Ahmet'in 'hemen hallederim' tavrına iş arkadaşları itiraz etmemiş, ekip lideri permit doldurmadan onay vermiştir; bu durum prosedür atlamanın tesiste normalleştiğini göstermektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Ahmet Çelik, confined space giriş izin sistemi (permit) olmasına rağmen atmosfer testi yapmadan, gözcü olmadan ve yazılı izin almadan tek başına tank içine girmiştir (Kod: A1.1 - Bireysel Kural İhlali)</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Ahmet Çelik neden atmosfer testi yapmadan, gözcü olmadan ve yazılı izin almadan tek başına tanka girdi?</div>
+                    <div class="why-answer" contenteditable="true">→ Ekip lideri Fatih Yılmaz'dan sözlü onay aldı ve bu onayı yeterli gördü; permit doldurmayı ve atmosfer testini atlayarak 'hemen hallederim' yaklaşımıyla işi hızlıca bitirmek istedi. Ahmet'in davranışı bireysel bir tercih gibi görünse de, sözlü onayın yeterli olduğu algısı tesiste yaygındır. Mehmet Kara (Operatör) ifadesinde 'Ahmet hemen hallederim dedi, biz de itiraz etmedik' demiştir; bu durum prosedür atlamanın normal karşılandığını göstermektedir.</div>
+                    <span class="why-code">C - Kişisel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Ekip lideri neden sözlü onayı yeterli gördü ve confined space giriş izin prosedürünü (permit) uygulatmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Ekip lideri Fatih Yılmaz kendi ifadesinde 'permit doldurmadık, işi hızlı bitirmek istedik' demiştir; tesiste confined space permit sistemi kağıt üzerinde var olmasına rağmen fiilen uygulanmıyor ve sözlü izin kültürü yerleşmiş durumda. Fatih, permit doldurmanın zaman kaybı olduğunu düşünmüş ve 'dikkatli ol' diyerek sözlü onay vermeyi yeterli görmüştür. Bu davranış, permit sisteminin gereksiz bürokrasi olarak algılandığını ve hızlı iş bitirmenin öncelik olduğunu göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Confined space permit sistemi neden kağıt üzerinde kalıp fiilen uygulanmıyor ve sözlü izin kültürü neden yerleşmiş?</div>
+                    <div class="why-answer" contenteditable="true">→ Permit atlamak ve sözlü onay vermek zaman kazandırdığı için bu davranış sürekli tekrarlanmış, yönetim bu duruma müdahale etmemiş ve güvenlik adımlarını atlayan çalışanlar hızlı iş bitirdikleri için ödüllendirilmiştir; prosedüre uyan çalışanlar ise 'yavaş' olarak algılanmıştır. Tesiste üretim ve hız kültürü güvenlik prosedürlerinin önüne geçmiş, permit dolduran çalışanlar 'gereksiz zaman harcıyor' olarak görülmüş, permit atlayan çalışanlar ise 'işini hızlı bitiriyor' diye takdir edilmiştir. Bu durum, güvenli davranışın cezalandırılması ve güvensiz davranışın ödüllendirilmesi anlamına gelmektedir.</div>
+                    <span class="why-code">C - Kişisel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Güvenlik prosedürlerini atlayan çalışanlar neden hız nedeniyle ödüllendirilmiş ve prosedüre uyanlar neden 'yavaş' olarak algılanmıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Tesiste güvenlik adımlarını atlayarak hızlı iş bitirmek olumlu karşılanmış (Ahmet'in 'hemen hallederim' tavrına kimse itiraz etmemiş, ekip lideri 'dikkatli ol' diyerek onaylamış), doğru davranış olan permit doldurma ve atmosfer testi yapma hiçbir zaman takdir edilmemiş veya teşvik edilmemiştir; bu durum güvenli davranışın değersizleşmesine yol açmıştır. Yöneticiler hızlı iş bitirmeyi övmüş, prosedüre uyan çalışanları eleştirmiş veya görmezden gelmiştir. Güvenlik toplantılarında 'işi zamanında bitirin' mesajı verilmiş ancak 'prosedüre uyarak bitirin' mesajı verilmemiştir. Bu durum, çalışanların güvenlik prosedürlerini gereksiz engel olarak algılamasına ve atlamanın kabul edilebilir olduğunu düşünmesine neden olmuştur.</div>
+                    <span class="why-code">C - Kişisel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Güvensiz Davranışın Hız Kazancı Olarak Ödüllendirilmesi</div>
+                <div class="box-content" contenteditable="true">[C3.5 / Kişisel]
+
+DEF Atıksu Arıtma Tesisinde confined space giriş izin prosedürünü, atmosfer testini ve gözcü atamayı atlayarak doğrudan tanka girmek gibi güvensiz davranışlar, işin hızlı bitirilmesi olarak olumlu karşılanmış ve sistematik olarak pekiştirilmiştir. Ahmet'in 'hemen hallederim' tavrına iş arkadaşları itiraz etmemiş, ekip lideri permit doldurmadan sözlü onay vererek bu davranışı onaylamıştır. Güvenlik adımlarını atlama davranışı zaman kazancı sağladığı için ödüllendirilmiş, prosedüre uyan çalışanlar ise 'yavaş' ve 'verimsiz' olarak algılanmıştır. Yönetim, hızlı iş bitirmeyi övmüş ancak prosedüre uyarak iş bitirmeyi teşvik etmemiştir. Güvenlik toplantılarında 'zamanında bitirin' mesajı verilmiş ancak 'güvenli şekilde bitirin' mesajı verilmemiştir. Bu durum, çalışanların güvenlik prosedürlerini gereksiz bürokrasi olarak algılamasına, atlamanın kabul edilebilir olduğunu düşünmesine ve güvensiz kısayolların normalleşmesine neden olmuştur. Doğru davranış (permit doldurma, atmosfer testi yapma) hiçbir zaman takdir edilmemiş, yanlış davranış (permit atlama, sözlü onay ile yetinme) ise hız kazancı nedeniyle onaylanmıştır.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yönetim, hızlı iş bitirmeyi övmüş ve ödüllendirmiş ancak prosedüre uyarak iş bitirmeyi teşvik etmemiştir; performans değerlendirmelerinde hız ön planda tutulmuş, güvenlik uyumu ikinci planda kalmıştır</li>
+<li contenteditable="true">Güvenlik toplantılarında ve vardiya brifinglerinde 'işi zamanında bitirin' mesajı verilmiş ancak 'prosedüre uyarak güvenli şekilde bitirin' mesajı verilmemiştir; bu durum çalışanlara hızın güvenlikten önemli olduğu mesajını vermiştir</li>
+<li contenteditable="true">Permit dolduran ve atmosfer testi yapan çalışanlar 'yavaş' ve 'gereksiz zaman harcıyor' olarak algılanmış, permit atlayan çalışanlar ise 'işini hızlı bitiriyor' diye takdir edilmiştir; bu algı güvenli davranışın cezalandırılması anlamına gelmektedir</li>
+<li contenteditable="true">Güvenlik prosedürlerini atlayan çalışanlara hiçbir yaptırım uygulanmamış, bu davranış görmezden gelinmiş veya 'bu sefer geçti ama dikkatli ol' şeklinde hafif uyarılarla geçiştirilmiştir; bu durum prosedür atlamanın kabul edilebilir olduğu mesajını vermiştir</li>
+<li contenteditable="true">Doğru davranış (permit doldurma, atmosfer testi yapma) hiçbir zaman görünür şekilde takdir edilmemiş, ödüllendirilmemiş veya örnek gösterilmemiştir; güvenli davranış sergileyen çalışanlar tanınmamış ve teşvik edilmemiştir</li>
+<li contenteditable="true">Üretim hedefleri ve zaman baskısı güvenlik hedeflerinin önüne geçmiş, çalışanlar 'önce işi bitir, sonra prosedürü düşün' mesajı almıştır; bu durum güvenlik prosedürlerinin isteğe bağlı olduğu algısını yaratmıştır</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - EĞİTİMSİZ KURTARMA GİRİŞİMİ VE KKD KULLANILMAMASI</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Vardiya amiri Hasan Öztürk ve operatör Kemal Aydın, tank içinde bayılan iş arkadaşlarını gördüklerinde solunum cihazı (SCBA) veya herhangi bir kişisel koruyucu donanım kullanmadan oksijen yetersiz atmosfere girmişlerdir. Hasan, Ahmet'i tank içinde bayılmış halde görünce 'adamımı kurtarmalıyım' refleksiyle hiçbir koruyucu ekipman giymeden doğrudan tank içine atlamıştır. Kemal de Hasan'ın da bayıldığını görünce yardıma koşmuş ve yarı yolda bayılmıştır. Her iki çalışan da kapalı alan kurtarma eğitimi almamış, SCBA kullanmayı bilmemekte ve oksijen yetersiz atmosferde eğitimsiz kurtarma girişiminin ölümcül sonuçlarından habersizdir. Bu davranış, iyi niyetli bir kahramanlık refleksi olsa da kapalı alan kazalarında en yaygın ölüm nedenlerinden biridir; istatistikler kapalı alan kazalarında ölenlerin %60'ının kurtarmaya giren kişiler olduğunu göstermektedir. Tesiste kapalı alan kurtarma planı hiç hazırlanmamış, kurtarma senaryoları tanımlanmamış ve 'dışarıda kal, profesyonel ekip çağır' prosedürü öğretilmemiştir. SCBA ve tripod gibi kurtarma ekipmanları tesiste bulunmamaktadır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Hasan Öztürk ve Kemal Aydın, kurtarma girişimi sırasında solunum cihazı (SCBA) veya herhangi bir kişisel koruyucu donanım kullanmadan oksijen yetersiz atmosfere girmişlerdir (Kod: A3.2 - Gerekli KKD/Yöntemlerin Kullanılmaması)</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Hasan Öztürk ve Kemal Aydın neden SCBA veya herhangi bir solunum koruyucu donanım kullanmadan oksijen yetersiz tankın içine girdiler?</div>
+                    <div class="why-answer" contenteditable="true">→ Her iki çalışan da oksijen yetersiz atmosferde kurtarma girişimi için SCBA kullanılması gerektiğini bilmiyorlardı; Hasan'ın SCBA kullanım bilgisi yoktu, Kemal ise kapalı alan tehlikelerinden habersizdi. Ayrıca tesiste zaten SCBA bulunmuyordu. Hasan'ın 'adamımı kurtarmalıyım' refleksi, eğitim eksikliği ve ekipman yokluğuyla birleşince ölümcül sonuç doğurmuştur. Çalışanlar, kapalı alan kazalarında kurtarmaya girenlerin de ölme riskinin çok yüksek olduğunu bilmiyorlardı.</div>
+                    <span class="why-code">C - Kişisel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Hasan Öztürk ve Kemal Aydın neden kapalı alanda eğitimsiz kurtarma girişiminde bulunmak yerine dışarıda kalıp profesyonel ekip çağırma refleksi gösteremediler?</div>
+                    <div class="why-answer" contenteditable="true">→ Tesiste kapalı alan kurtarma planı hiç hazırlanmamıştı; kurtarma senaryosunda kimin ne yapacağı, dışarıda kalma zorunluluğu ve profesyonel ekip çağırma adımları tanımlanmamıştı. Çalışanlar 'içeri girmeden kurtarma' prosedürünü hiç öğrenmemişlerdi. Kapalı alan eğitimlerinde 'eğer biri bayılırsa asla içeri girme, 112 ve itfaiyeyi çağır, dışarıda bekle' mesajı verilmemişti. Hasan ve Kemal, doğal insan refleksi olan 'yardıma koş' davranışını sergilemiş ancak bu davranışın kapalı alanlarda ölümcül olduğunu bilmiyorlardı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Tesiste neden kapalı alan kurtarma planı hazırlanmamış ve kurtarma senaryoları tanımlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Raporda açıkça belirtildiği üzere kurtarma planı hiç hazırlanmamış ve acil durum tatbikatı 3 yıldır yapılmamıştı. Kapalı alan girişi için olası kurtarma senaryoları (oksijen yetersizliği, zehirli gaz maruziyeti) hiçbir zaman planlanıp prova edilmemişti. Yönetim, kapalı alan acil durum hazırlığını ihmal etmiş, 'bizde kaza olmaz' yaklaşımıyla kurtarma planlaması yapmamıştır. Risk değerlendirmesinde kapalı alan riski tespit edilmiş ancak kurtarma planı hazırlama eylemi hiç gerçekleştirilmemiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Kapalı alan kurtarma planı ve tatbikatları neden 3 yıldır hiç yapılmadı ve kurtarma ekipmanları (SCBA, tripod) neden temin edilmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Tesis müdürü Selim Demir'in ifadesine göre bütçe kısıtı nedeniyle SCBA ve tripod için onay alınamamış; acil durum tatbikatları 3 yıldır yapılmamış ve kurtarma planı hiç oluşturulmamıştı. Yönetim, kapalı alan acil durum hazırlığı için gerekli kaynakları ve planlamayı sağlamamıştı. Üst yönetim, SCBA ve tripod talebini 'maliyetli' bulmuş ve onaylamamış, tatbikat planlamasını 'zaman kaybı' olarak görmüş ve ertelemiştir. Bu durum, acil durum hazırlığının öncelik olmadığını ve 'kaza olana kadar bekleyelim' yaklaşımının hakim olduğunu göstermektedir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Acil Durum Planları ve Tatbikatları Yetersizliği</div>
+                <div class="box-content" contenteditable="true">[D10.1 / Organizasyonel]
+
+DEF Atıksu Arıtma Tesisinde kapalı alan kurtarma planı hiç hazırlanmamış, kurtarma senaryoları (oksijen yetersiz atmosferde müdahale, zehirli gaz maruziyeti, bilinç kaybı durumu) tanımlanmamış ve acil durum tatbikatı 3 yıldır yapılmamıştır. Kurtarma planı olmadığı için çalışanlar kapalı alan kazasında kimin ne yapacağını, dışarıda kalma zorunluluğunu, profesyonel ekip (112, itfaiye) çağırma adımlarını ve eğitimsiz kurtarma girişiminin ölümcül sonuçlarını bilmemektedir. Tatbikat yapılmadığı için 'içeri girmeden kurtarma' prosedürü hiç prova edilmemiş, çalışanlar acil durumda nasıl davranacaklarını öğrenmemiştir. Bu nedenle Hasan Öztürk ve Kemal Aydın, bayılan iş arkadaşlarını gördüklerinde doğal insan refleksi olan 'yardıma koş' davranışını sergilemiş ancak bu davranışın kapalı alanlarda ölümcül olduğunu bilmeden eğitimsiz ve donanımsız şekilde oksijen yetersiz tanka girmişlerdir. Eğer kurtarma planı hazırlanmış ve tatbikatlarla prova edilmiş olsaydı, çalışanlar kapalı alana eğitimsiz ve donanımsız girmenin ölümcül sonuçlarını bilecek, dışarıda kalarak 112/itfaiye çağırma prosedürünü uygulayacak ve ikinci ve üçüncü kazazedelerin oluşması engellenecekti.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kapalı alan kurtarma planı hiç hazırlanmamış, kurtarma senaryoları (oksijen yetersizliği, zehirli gaz maruziyeti, bilinç kaybı) tanımlanmamış ve kurtarma prosedürleri (dışarıda kal, 112 çağır, profesyonel ekip bekle) oluşturulmamıştır</li>
+<li contenteditable="true">Acil durum tatbikatı 3 yıldır yapılmamış, çalışanlar kapalı alan kazası senaryosunu hiç prova etmemiş ve 'içeri girmeden kurtarma' davranışını öğrenmemiştir; tatbikat eksikliği, acil durumda panik ve yanlış reflekslere neden olmuştur</li>
+<li contenteditable="true">Kurtarma ekipmanları (SCBA, tripod, emniyet kemeri, halat) bütçe kısıtı nedeniyle temin edilmemiş, mevcut ekipmanlar (emniyet kemeri, halat) depoda saklanmış ve kimse bilmemektedir; ekipman yokluğu, kurtarma girişimini imkansız hale getirmiştir</li>
+<li contenteditable="true">Kapalı alan eğitimlerinde 'eğer biri bayılırsa asla içeri girme, 112 ve itfaiyeyi çağır, dışarıda bekle' mesajı verilmemiş, eğitimsiz kurtarma girişiminin ölümcül sonuçları öğretilmemiştir; eğitim eksikliği, kahramanlık refleksinin ölümcül sonuçlar doğurmasına neden olmuştur</li>
+<li contenteditable="true">İtfaiye ile acil müdahale protokolü oluşturulmamış, itfaiyenin tesis planlarına ve kapalı alan lokasyonlarına erişimi sağlanmamış, ortak tatbikat yapılmamıştır; bu durum itfaiye müdahale süresini uzatmış ve kazazedelerin daha uzun süre tehlikeli atmosferde kalmasına neden olmuştur</li>
+<li contenteditable="true">Yönetim, acil durum hazırlığını öncelik olarak görmemiş, SCBA ve tripod talebini 'maliyetli' bularak onaylamamış, tatbikat planlamasını 'zaman kaybı' olarak görerek ertelemiştir; bu durum acil durum hazırlığının ihmal edildiğini ve 'kaza olana kadar bekleyelim' yaklaşımının hakim olduğunu göstermektedir</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Uygulanmaması</td>
+                        <td contenteditable="true">Confined space giriş izin (permit) sistemi kağıt üzerinde mevcut ancak fiilen uygulanmıyor, sözlü onay kültürü yerleşmiş, atmosfer testi ve gözcü atanması gibi zorunlu adımlar atlanıyor</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman Erişilemezliği</td>
+                        <td contenteditable="true">Atmosfer test cihazı kilitli dolapta erişilemez durumda, SCBA ve tripod gibi kurtarma ekipmanları tesiste bulunmuyor, mevcut ekipmanlar depoda saklanmış ve kimse bilmiyor</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Denetim Mekanizması Yokluğu</td>
+                        <td contenteditable="true">Prosedür uygulamalarını doğrulayan sistematik saha denetim programı yok, permit kayıtları incelenmiyor, atmosfer test cihazı kullanım logları tutulmuyor, güvensiz davranışlar tespit edilemiyor</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yanlış Davranış Ödüllendirmesi</td>
+                        <td contenteditable="true">Güvenlik adımlarını atlama davranışı hız kazancı olarak ödüllendiriliyor, prosedüre uyan çalışanlar 'yavaş' olarak algılanıyor, hızlı iş bitirme kültürü güvenlik kültürünün önüne geçiyor</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Acil Durum Hazırlığı Yetersizliği</td>
+                        <td contenteditable="true">Kapalı alan kurtarma planı hiç hazırlanmamış, acil durum tatbikatı 3 yıldır yapılmamış, çalışanlar eğitimsiz kurtarma girişiminin ölümcül sonuçlarını bilmiyor</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Eksikliği</td>
+                        <td contenteditable="true">Confined space eğitimi yetersiz, atmosfer test cihazı kullanımı öğretilmemiş, 'içeri girmeden kurtarma' prosedürü hiç prova edilmemiş, SCBA kullanımı bilinmiyor</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Bütçe Kısıtı</td>
+                        <td contenteditable="true">SCBA ve tripod talebine bütçe kısıtı nedeniyle onay verilmemiş, havalandırma fanı 6 aydır arızalı bekliyor, acil durum ekipmanları temin edilemiyor</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yönetim Taahhüdü Zayıflığı</td>
+                        <td contenteditable="true">Üst yönetim acil durum hazırlığını öncelik olarak görmüyor, tatbikat planlamasını 'zaman kaybı' olarak görüyor, güvenlik yatırımlarını 'maliyetli' bularak erteliyor</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Tüm kapalı alan girişlerinde atmosfer testi ve permit sistemi zorunlu hale getirilmesi, atmosfer test cihazının saha ofisine taşınarak 7/24 erişilebilir kılınması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">İSG Yöneticisi</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Permit uygulanma oranı %100, atmosfer testi yapılma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">SCBA, tripod, emniyet kemeri ve kurtarma ekipmanlarının acil tedarik edilmesi, saha ofisinde hazır bulundurulması ve kullanım eğitimi verilmesi</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Satın Alma Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Ekipman tedarik tamamlanma %100, kullanım eğitimi tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Kapalı alan kurtarma planının hazırlanması, kurtarma senaryolarının tanımlanması ve 'dışarıda kal, profesyonel ekip çağır' prosedürünün oluşturulması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">İSG Uzmanı</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Kurtarma planı hazırlanma %100, senaryolar tanımlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Tüm personele kapalı alan tehlikeleri, eğitimsiz kurtarma riskleri ve 'içeri girmeden kurtarma' prosedürü acil eğitimi verilmesi</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama %100, sınav başarı oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Haftalık saha denetim programının oluşturulması, permit kayıtlarının incelenmesi, atmosfer test cihazı kullanım loglarının tutulması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Denetim frekansı haftalık, permit kayıt inceleme %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">İtfaiye ile acil müdahale protokolü imzalanması, tesis planlarının paylaşılması ve ortak tatbikat yapılması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Acil Durum Koordinatörü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Protokol imzalanma, tatbikat yapılma</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Kapalı alan acil durum tatbikatının yapılması, kurtarma senaryolarının prova edilmesi ve çalışanların davranışlarının değerlendirilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İSG Yöneticisi</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Tatbikat tamamlanma, senaryo prova edilme %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Güvenlik prosedürlerine uyumu performans değerlendirmelerine dahil edilmesi, prosedüre uyan çalışanların takdir edilmesi ve ödüllendirilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Performans değerlendirme güncelleme %100, takdir sistemi kurulma</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Havalandırma fanının onarılması, bakım programının oluşturulması ve arızaların hızlı giderilmesi için yedek parça stoklanması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Fan onarım tamamlanma, bakım programı oluşturulma</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Güvenlik kültürü geliştirme programının başlatılması, 'güvenlik önce' mesajının yaygınlaştırılması ve hız yerine güvenlik vurgusu yapılması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Genel Müdür</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Kültür programı başlatılma, çalışan algı anketi skoru artışı</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Prosedür atlayan çalışanlara disiplin prosedürünün uygulanması, güvensiz davranışların tolere edilmemesi ve yaptırım sistemi kurulması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Disiplin prosedürü uygulanma, yaptırım sistemi kurulma</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Yönetim gözden geçirme sürecinin kurulması, acil durum hazırlığının düzenli değerlendirilmesi ve iyileştirme eylemlerinin takip edilmesi</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Üst Yönetim</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Gözden geçirme sıklığı üç aylık, eylem takip oranı %100</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Kapalı alan girişlerinde atmosfer testi ve permit sistemi ASLA atlanmamalı, sözlü onay yeterli görülmemelidir. Her giriş öncesinde oksijen, H2S, metan ve CO seviyeleri ölçülmeli, sonuçlar kayıt altına alınmalı ve güvenli seviyeler teyit edilmeden giriş yapılmamalıdır. Atmosfer test cihazı 7/24 erişilebilir durumda bulundurulmalı, kilitli dolapta saklanmamalıdır.
+• Kapalı alan kazalarında eğitimsiz kurtarma girişimi ASLA yapılmamalı, 'dışarıda kal, profesyonel ekip çağır' prosedürü uygulanmalıdır. Çalışanlar, bayılan iş arkadaşlarını gördüklerinde içeri girmek yerine derhal 112 ve itfaiyeyi çağırmalı, dışarıda kalarak profesyonel ekibi beklemeli ve olay yerini güvence altına almalıdır. Kahramanlık refleksi ölümcül sonuçlar doğurabilir.
+• Prosedürlerin kağıt üzerinde kalmaması için sistematik denetim mekanizması kurulmalı, saha denetimleri düzenli yapılmalı, permit kayıtları incelenmeli ve prosedüre uyulup uyulmadığı doğrulanmalıdır. Prosedür uygulamalarını izleyen KPI'lar tanımlanmalı, sapmalar tespit edilip düzeltilmeli ve geri bildirim döngüsü oluşturulmalıdır.
+• Güvenlik prosedürlerine uyum performans değerlendirmelerine dahil edilmeli, prosedüre uyan çalışanlar takdir edilip ödüllendirilmeli, prosedür atlayan çalışanlara disiplin prosedürü uygulanmalıdır. Hızlı iş bitirme yerine güvenli iş bitirme kültürü teşvik edilmeli, 'güvenlik önce' mesajı yaygınlaştırılmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Kapalı alan kurtarma planı hazırlanmalı, kurtarma senaryoları tanımlanmalı ve düzenli tatbikatlarla prova edilmelidir. Çalışanlar, kapalı alan kazasında kimin ne yapacağını, dışarıda kalma zorunluluğunu ve profesyonel ekip çağırma adımlarını öğrenmelidir. Tatbikatlar yılda en az iki kez yapılmalı, farklı senaryolar (oksijen yetersizliği, zehirli gaz maruziyeti, bilinç kaybı) prova edilmelidir.
+• SCBA, tripod, emniyet kemeri ve kurtarma ekipmanları temin edilmeli, saha ofisinde hazır bulundurulmalı ve tüm çalışanlara kullanım eğitimi verilmelidir. Ekipmanların bakımı düzenli yapılmalı, arızalar hızlı giderilmeli ve yedek parça stoklanmalıdır. İtfaiye ile acil müdahale protokolü imzalanmalı, tesis planları paylaşılmalı ve ortak tatbikatlar yapılmalıdır.
+• Güvenlik kültürü geliştirme programı başlatılmalı, 'güvenlik önce' mesajı yaygınlaştırılmalı ve hız yerine güvenlik vurgusu yapılmalıdır. Yönetim, güvenlik taahhüdünü görünür şekilde göstermeli, güvenlik yatırımlarını öncelik olarak ele almalı ve tatbikat planlamasını desteklemelidir. Güvenlik toplantılarında 'prosedüre uyarak güvenli şekilde bitirin' mesajı verilmelidir.
+• Yönetim gözden geçirme süreci kurulmalı, acil durum hazırlığı düzenli değerlendirilmeli ve iyileştirme eylemleri takip edilmelidir. Risk değerlendirmesinde tespit edilen kontrol önlemlerinin uygulanıp uygulanmadığı doğrulanmalı, sapmalar tespit edilip düzeltilmeli ve geri bildirim döngüsü oluşturulmalıdır. Üst yönetim, güvenlik performansını düzenli gözden geçirmeli ve iyileştirme hedefleri belirlemelidir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Olay tüm tesislerde paylaşılmalı, kapalı alan tehlikeleri ve eğitimsiz kurtarma riskleri anlatılmalıdır. Diğer tesislerde de benzer riskler olup olmadığı değerlendirilmeli, prosedür uygulamaları gözden geçirilmeli ve denetim mekanizmaları kurulmalıdır.
+• Kazazedeler ve aileleri ile düzenli iletişim kurulmalı, tedavi süreci takip edilmeli ve psikolojik destek sağlanmalıdır. Diğer çalışanlara da psikolojik destek sunulmalı, travma yönetimi yapılmalı ve güven ortamı oluşturulmalıdır.
+• Düzenleyici kurumlara (RIDDOR) tam ve zamanında bildirim yapılmalı, araştırma bulguları paylaşılmalı ve düzeltici eylemler raporlanmalıdır. Sektör ile bilgi paylaşımı yapılmalı, benzer kazaların önlenmesi için deneyimler aktarılmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm personele kapalı alan tehlikeleri, atmosfer testi, permit sistemi ve 'içeri girmeden kurtarma' prosedürü eğitimi verilmelidir. Eğitimler teorik ve pratik olmalı, atmosfer test cihazı kullanımı uygulamalı öğretilmeli ve SCBA kullanımı prova edilmelidir.
+• Yöneticilere prosedür denetimi, davranışsal güvenlik gözlemi ve güvensiz davranışlara müdahale eğitimi verilmelidir. Yöneticiler, saha denetimlerinde nelere dikkat edeceklerini, prosedür uygulamalarını nasıl doğrulayacaklarını ve güvensiz davranışları nasıl düzelteceklerini öğrenmelidir.
+• Ekip liderlerine permit sistemi uygulama, sözlü onay yerine yazılı prosedür kullanma ve güvenlik liderliği eğitimi verilmelidir. Ekip liderleri, permit formunu nasıl dolduracaklarını, atmosfer testi sonuçlarını nasıl değerlendireceklerini ve güvensiz davranışlara nasıl itiraz edeceklerini öğrenmelidir.
+• Acil durum ekiplerine SCBA kullanımı, tripod kurulumu, kurtarma teknikleri ve ilk yardım eğitimi verilmelidir. Acil durum ekipleri, kapalı alan kurtarma senaryolarını düzenli olarak prova etmeli, farklı durumlar için hazırlıklı olmalıdır.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">18 Mart 2026 tarihinde DEF Atıksu Arıtma Tesisi'nde meydana gelen kapalı alan kazası, üç kişinin ağır yaralanmasına ve birinin beyin hasarı riski ile karşı karşıya kalmasına neden olmuştur. Kök neden analizi, bu olayın bireysel hatalardan ziyade derin organizasyonel ve kültürel zayıflıklardan kaynaklandığını ortaya koymuştur. Tesiste confined space giriş izin sistemi, atmosfer test protokolü ve kurtarma planı kağıt üzerinde mevcuttu ancak bu prosedürlerin sahada uygulanıp uygulanmadığını doğrulayan sistematik bir denetim mekanizması kurulmamıştı. Bu durum, prosedürlerin şekilsel kalmasına, atmosfer test cihazının erişilemez durumda tutulmasına, havalandırma fanının 6 aydır arızalı beklemesine ve sözlü onay kültürünün yerleşmesine neden olmuştur. Ayrıca, güvenlik adımlarını atlama davranışı hız kazancı olarak ödüllendirilmiş, prosedüre uyan çalışanlar 'yavaş' olarak algılanmış ve hızlı iş bitirme kültürü güvenlik kültürünün önüne geçmiştir. Kapalı alan kurtarma planı hiç hazırlanmamış, acil durum tatbikatı 3 yıldır yapılmamış ve çalışanlar eğitimsiz kurtarma girişiminin ölümcül sonuçlarını bilmemiştir. Bu sistemik zayıflıklar, bir kazazedenin üç kazazedeye dönüşmesine neden olmuştur. Olayın önlenmesi için acil ve uzun vadeli kapsamlı düzeltici eylemler gereklidir. Acil eylemler (atmosfer testi ve permit zorunluluğu, SCBA tedariki, kurtarma planı hazırlama, acil eğitim) derhal uygulanmalı, uzun vadeli iyileştirmeler (denetim mekanizması kurma, güvenlik kültürü geliştirme, tatbikat programı, yönetim gözden geçirme) sistematik olarak hayata geçirilmelidir.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm kapalı alan girişlerinde atmosfer testi ve permit sistemi zorunlu hale getirilmeli, atmosfer test cihazı saha ofisine taşınarak 7/24 erişilebilir kılınmalı, permit uygulanma oranı %100'e çıkarılmalıdır (1 hafta içinde tamamlanmalı)</li>
+<li contenteditable="true">SCBA, tripod, emniyet kemeri ve kurtarma ekipmanları acil tedarik edilmeli, saha ofisinde hazır bulundurulmalı ve tüm personele kullanım eğitimi verilmelidir (2 hafta içinde tamamlanmalı)</li>
+<li contenteditable="true">Kapalı alan kurtarma planı hazırlanmalı, kurtarma senaryoları tanımlanmalı ve 'dışarıda kal, profesyonel ekip çağır' prosedürü oluşturulmalıdır (2 hafta içinde tamamlanmalı)</li>
+<li contenteditable="true">Tüm personele kapalı alan tehlikeleri, eğitimsiz kurtarma riskleri ve 'içeri girmeden kurtarma' prosedürü acil eğitimi verilmeli, eğitim tamamlanma oranı %100'e ulaşmalıdır (1 ay içinde tamamlanmalı)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Haftalık saha denetim programı oluşturulmalı, permit kayıtları incelenmeli, atmosfer test cihazı kullanım logları tutulmalı ve prosedüre uyulup uyulmadığı sistematik olarak doğrulanmalıdır (1 ay içinde başlatılmalı, sürekli uygulanmalı)</li>
+<li contenteditable="true">Güvenlik kültürü geliştirme programı başlatılmalı, 'güvenlik önce' mesajı yaygınlaştırılmalı, prosedüre uyan çalışanlar takdir edilip ödüllendirilmeli ve hız yerine güvenlik vurgusu yapılmalıdır (3 ay içinde başlatılmalı, 12 ay sürmeli)</li>
+<li contenteditable="true">Kapalı alan acil durum tatbikatı düzenli yapılmalı (yılda en az iki kez), kurtarma senaryoları prova edilmeli ve çalışanların davranışları değerlendirilmelidir (ilk tatbikat 2 ay içinde, sonraki tatbikatlar 6 ayda bir)</li>
+<li contenteditable="true">Yönetim gözden geçirme süreci kurulmalı, acil durum hazırlığı düzenli değerlendirilmeli, iyileştirme eylemleri takip edilmeli ve güvenlik performansı üç ayda bir gözden geçirilmelidir (6 ay içinde kurulmalı, sürekli uygulanmalı)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Permit Uygulanma Oranı</td>
+                        <td class="current" contenteditable="true">%0 (sözlü onay)</td>
+                        <td class="target" contenteditable="true">%100 (yazılı permit)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Atmosfer Testi Yapılma Oranı</td>
+                        <td class="current" contenteditable="true">%0 (test yapılmıyor)</td>
+                        <td class="target" contenteditable="true">%100 (her giriş öncesi)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Kurtarma Ekipmanı Hazırlığı</td>
+                        <td class="current" contenteditable="true">Yok (SCBA, tripod yok)</td>
+                        <td class="target" contenteditable="true">Tam (saha ofisinde hazır)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Acil Durum Tatbikatı Sıklığı</td>
+                        <td class="current" contenteditable="true">3 yıldır yapılmamış</td>
+                        <td class="target" contenteditable="true">Yılda 2 kez</td>
+                    </tr>
+
+                    <tr>
+                        <td>Saha Denetim Sıklığı</td>
+                        <td class="current" contenteditable="true">Yok (denetim yapılmıyor)</td>
+                        <td class="target" contenteditable="true">Haftalık</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Atlama Toleransı</td>
+                        <td class="current" contenteditable="true">Yüksek (ödüllendiriliyor)</td>
+                        <td class="target" contenteditable="true">Sıfır (disiplin prosedürü)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Kültürü Skoru</td>
+                        <td class="current" contenteditable="true">Düşük (hız öncelikli)</td>
+                        <td class="target" contenteditable="true">Yüksek (güvenlik öncelikli)</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header">📷 OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /* ── OLAY FOTOĞRAFLARI JS ─────────────────────────────── */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

@@ -16,6 +16,7 @@ Kullanım:
 
 import json
 import hashlib
+import os
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
@@ -24,6 +25,13 @@ from .overview_agent import OverviewAgent
 from .assessment_agent import AssessmentAgent
 from .rootcause_agent_v2 import RootCauseAgentV2
 from .skillbased_docx_agent import SkillBasedDocxAgent
+
+# MongoDB for cache storage
+try:
+    from pymongo import MongoClient
+    MONGODB_AVAILABLE = True
+except ImportError:
+    MONGODB_AVAILABLE = False
 
 
 # ============================================================================
@@ -154,6 +162,165 @@ class AnalysisCache:
 
 
 # ============================================================================
+# MONGODB CACHE MANAGER (Railway Production'a uygun)
+# ============================================================================
+
+class MongoDBCache:
+    """
+    Incident analiz sonuçlarını MongoDB'de cache'le.
+    Production'da (Railway) container restart'ta cache kalır.
+    """
+    
+    def __init__(self, db_name: str = "rca_database", collection_name: str = "analysis_cache", ttl_days: int = 30):
+        """
+        db_name: MongoDB database adı
+        collection_name: Cache collection adı
+        ttl_days: Kaç gün sonra cache silinsin?
+        """
+        if not MONGODB_AVAILABLE:
+            raise ImportError("pymongo paketi yüklü değil. Kurulum: pip install pymongo")
+        
+        # MongoDB URI'ı .env'den al
+        mongo_uri = os.getenv("MONGODB_URI")
+        if not mongo_uri:
+            raise ValueError("MONGODB_URI environment variable not set!")
+        
+        try:
+            self.client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+            # Bağlantı testı
+            self.client.admin.command('ping')
+            print("✅ MongoDB bağlantısı başarılı (Cache)")
+        except Exception as e:
+            raise ConnectionError(f"MongoDB bağlantı hatası: {e}")
+        
+        self.db = self.client[db_name]
+        self.collection = self.db[collection_name]
+        self.ttl_days = ttl_days
+        
+        # İstatistikler
+        self.stats = {
+            "hits": 0,
+            "misses": 0,
+            "saved_cost": 0.0
+        }
+        
+        # TTL index oluştur (otomatik silme)
+        try:
+            self.collection.create_index(
+                "expires_at",
+                expireAfterSeconds=0
+            )
+            print("✅ MongoDB TTL index oluşturuldu")
+        except Exception as e:
+            print(f"⚠️  TTL index hatası: {e}")
+    
+    def get_cache_key(self, incident_data: dict) -> str:
+        """
+        Incident'ın unique hash'ini oluştur.
+        Aynı description = Aynı hash = Aynı sonuç
+        """
+        description = incident_data.get("description", "")
+        ref_no = incident_data.get("ref_no", "")
+        
+        # Normalizasyon
+        normalized = f"{ref_no}:{description}".strip().lower()
+        normalized = " ".join(normalized.split())
+        
+        # MD5 hash
+        hash_obj = hashlib.md5(normalized.encode())
+        return hash_obj.hexdigest()
+    
+    def get(self, incident_data: dict) -> Optional[dict]:
+        """
+        MongoDB'den cache getir.
+        Varsa → Döndür
+        Yoksa → None döndür
+        """
+        key = self.get_cache_key(incident_data)
+        
+        try:
+            # Cache ara
+            cached = self.collection.find_one({
+                "cache_key": key,
+                "expires_at": {"$gt": datetime.now()}
+            })
+            
+            if cached:
+                self.stats["hits"] += 1
+                self.stats["saved_cost"] += 0.3144
+                
+                print(f"   ✅ MONGODB CACHE HIT!")
+                print(f"      💰 Tasarruf: $0.31")
+                print(f"      ⏰ Cached: {cached.get('created_at', 'N/A')}")
+                
+                return {
+                    "timestamp": cached.get("created_at", "").isoformat() if hasattr(cached.get("created_at"), 'isoformat') else str(cached.get("created_at")),
+                    "analysis_result": cached.get("analysis_result")
+                }
+            else:
+                self.stats["misses"] += 1
+                return None
+        
+        except Exception as e:
+            print(f"   ⚠️ MongoDB okuma hatası: {e}")
+            self.stats["misses"] += 1
+            return None
+    
+    def set(self, incident_data: dict, result: dict) -> bool:
+        """
+        Analiz sonucunu MongoDB'ye kaydet.
+        """
+        key = self.get_cache_key(incident_data)
+        expires_at = datetime.now() + timedelta(days=self.ttl_days)
+        
+        try:
+            self.collection.update_one(
+                {"cache_key": key},
+                {
+                    "$set": {
+                        "cache_key": key,
+                        "incident_ref": incident_data.get("ref_no", "UNKNOWN"),
+                        "analysis_result": result,
+                        "created_at": datetime.now(),
+                        "expires_at": expires_at
+                    }
+                },
+                upsert=True  # Varsa güncelle, yoksa ekle
+            )
+            
+            return True
+        
+        except Exception as e:
+            print(f"   ⚠️ MongoDB yazma hatası: {e}")
+            return False
+    
+    def get_stats(self) -> dict:
+        """
+        Cache istatistiklerini döndür.
+        """
+        total = self.stats["hits"] + self.stats["misses"]
+        hit_rate = (self.stats["hits"] / total * 100) if total > 0 else 0
+        
+        return {
+            "total_requests": total,
+            "cache_hits": self.stats["hits"],
+            "cache_misses": self.stats["misses"],
+            "hit_rate": f"{hit_rate:.1f}%",
+            "money_saved": f"${self.stats['saved_cost']:.2f}"
+        }
+    
+    def clear(self):
+        """
+        Tüm cache'i sil.
+        """
+        try:
+            self.collection.delete_many({})
+            print("🗑️ MongoDB cache temizlendi")
+        except Exception as e:
+            print(f"❌ Cache temizleme hatası: {e}")
+
+
+# ============================================================================
 # UNIFIED ANALYSIS PIPELINE
 # ============================================================================
 
@@ -163,10 +330,13 @@ class UnifiedAnalysisPipeline:
     Cache, RCA, Rapor - hepsi burada!
     """
     
-    def __init__(self, use_rag: bool = True, use_cache: bool = True):
+    def __init__(self, use_rag: bool = True, use_cache: bool = True, use_mongodb_cache: bool = None):
         """
         use_rag: MongoDB vector search kullan mı?
         use_cache: Cache mekanizması kullan mı?
+        use_mongodb_cache: 
+            - None/False: Disk cache (local development)
+            - True: MongoDB cache (Railway production)
         """
         print("🚀 Pipeline başlatılıyor...")
         
@@ -176,7 +346,25 @@ class UnifiedAnalysisPipeline:
         self.docx_agent = SkillBasedDocxAgent()
         
         self.use_cache = use_cache
-        self.cache = AnalysisCache() if use_cache else None
+        
+        # Auto-detect: Railway production'da MongoDB cache, local'da disk cache
+        if use_mongodb_cache is None:
+            use_mongodb_cache = os.getenv("RAILWAY_ENVIRONMENT") == "production"
+        
+        if use_cache:
+            if use_mongodb_cache and MONGODB_AVAILABLE:
+                print("📦 Using MongoDB Cache (Railway compatible)")
+                try:
+                    self.cache = MongoDBCache()
+                except Exception as e:
+                    print(f"⚠️ MongoDB cache initialization failed: {e}")
+                    print("   Falling back to disk cache...")
+                    self.cache = AnalysisCache()
+            else:
+                print("💾 Using Disk Cache (Local development)")
+                self.cache = AnalysisCache()
+        else:
+            self.cache = None
         
         self.output_dir = Path("outputs/unified_pipeline")
         self.output_dir.mkdir(parents=True, exist_ok=True)

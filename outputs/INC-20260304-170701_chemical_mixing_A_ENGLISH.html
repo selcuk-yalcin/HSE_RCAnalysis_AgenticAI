@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOT CAUSE ANALYSIS REPORT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /* ── OLAY FOTOĞRAFLARI ─────────────────────────────────── */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+
+        .btn-pdf {
+            background: #C0392B;
+            color: white;
+        }
+
+        .btn-word {
+            background: #2980B9;
+            color: white;
+        }
+
+        /* Font boyutu slider */
+        .font-size-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.82em;
+            color: #444;
+        }
+
+        .font-size-control label {
+            white-space: nowrap;
+            font-weight: 600;
+            color: #1B3A5C;
+        }
+
+        .font-size-control input[type=range] {
+            width: 90px;
+            accent-color: #1B3A5C;
+            cursor: pointer;
+        }
+
+        .font-size-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+            color: #1B3A5C;
+        }
+
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260304-170701";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')">📷 Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <div class="font-size-control" title="Yazı boyutunu ayarlayın">
+            <label>🔤 Yazı:</label>
+            <input type="range" id="fontSizeSlider" min="70" max="140" value="100"
+                   oninput="changeFontSize(this.value)">
+            <span class="font-size-value" id="fontSizeValue">100%</span>
+        </div>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-pdf" onclick="downloadPDF()" title="PDF Olarak İndir">
+            📄 PDF İndir
+        </button>
+        <button class="toolbar-btn btn-word" onclick="downloadWord()" title="Word (DOCX) Olarak İndir">
+            📝 Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">ROOT CAUSE ANALYSIS REPORT</h1>
+            <div class="subtitle" contenteditable="true">Prepared Using HSG245 Methodology</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                CONFIDENTIAL - AUTHORIZED PERSONNEL ACCESS ONLY
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260304-170701</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">19 February 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Brentford Industrial Cleaning Supplies Ltd — Building 2, Bottle Washing Line 3, Chemical Dosing Station DS-3B</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Major Injury — Chemical Exposure</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">During a routine drum changeover at chemical dosing station DS-3B, an experienced process operative connected a sodium hypochlorite drum to a caustic soda line without verifying the label, relying solely on positional memory. The incompatible chemicals mixed in the dosing pipe, generating chlorine gas that caused one hospitalization and two minor injuries.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">On 19 February 2026 at 14:35, process operative Terry Hobbs performed a routine drum changeover at Dosing Station DS-3B on Bottle Washing Line 3. He connected a sodium hypochlorite drum to the caustic soda dosing line without checking the label, relying on his 11-year positional memory of drum locations. Earlier that day, another operative had reorganized the chemical store after a delivery, placing hypochlorite drums in the caustic soda position without notification. When the dosing pump activated, the two incompatible chemicals mixed, generating chlorine gas (Cl₂) at 4.8 ppm concentration.</div>
+<div class="paragraph" contenteditable="true">Brentford Industrial Cleaning Supplies Ltd, Building 2, Bottle Washing Line 3, Chemical Dosing Station DS-3B, United Kingdom</div>
+<div class="paragraph" contenteditable="true">Terry Hobbs (49, Process Operative, 11 years service) suffered moderate chlorine inhalation requiring 48-hour hospitalization with potential long-term airway sensitivity. Two additional workers in the adjacent area experienced mild eye and throat irritation treated on site.</div>
+<div class="paragraph" contenteditable="true">Gas detector CL-03 alarmed at 14:35 detecting 1.2 ppm Cl₂, but the shift chemist delayed response for 3 minutes due to 9 previous false alarms in 30 days. A colleague at DS-3A attempted to shout a warning but Hobbs could not hear over 92 dB(A) machine noise and hearing protection. Emergency evacuation was activated at 14:39, Hobbs was evacuated at 14:40, and emergency services were called at 14:52. The area was ventilated and made safe by 16:00.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Drum changeover procedure did not require label verification before connection; relied on operative's positional memory which was invalidated by uncontrolled store reorganization</li>
+<li contenteditable="true">No visual alarm system installed in 92 dB(A) noise environment where hearing protection is mandatory, rendering audio alarms and verbal warnings ineffective</li>
+<li contenteditable="true">Chemical store lacked physical segregation between incompatible chemicals; drum labels frequently obscured by condensation and chemical residue with no re-labeling schedule</li>
+<li contenteditable="true">Gas detector CL-03 calibration overdue since January 2026; 9 false alarms in 30 days eroded confidence in alarm response protocol</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">DS-3B dosing station isolated; chemical store locked pending investigation</td>
+                        <td contenteditable="true">Production Supervisor</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">All drums in chemical store re-labeled and physically separated by type</td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Drum changeover procedure updated: mandatory label + cap color check added</td>
+                        <td contenteditable="true">Process Engineering Manager</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">CL-03 gas detector recalibrated; maintenance schedule reviewed</td>
+                        <td contenteditable="true">Maintenance Manager</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Incident Reference No</td>
+                    <td contenteditable="true">INC-20260304-170701 / BICS-2026-0219-CH</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Date</td>
+                    <td contenteditable="true">19 February 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Time</td>
+                    <td contenteditable="true">14:35</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Location</td>
+                    <td contenteditable="true">Building 2, Bottle Washing Line 3, Chemical Dosing Station DS-3B</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Department/Line</td>
+                    <td contenteditable="true">Bottle Washing Line 3</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operator/Worker</td>
+                    <td contenteditable="true">Terry Hobbs (Process Operative, 11 years service)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Shift</td>
+                    <td contenteditable="true">Day shift</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Equipment</td>
+                    <td contenteditable="true">Chemical dosing pump DS-3B, 200-litre HDPE drums</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Material/Substance</td>
+                    <td contenteditable="true">Sodium hypochlorite (12% NaOCl) mixed with residual caustic soda (32% NaOH) generating chlorine gas (Cl₂)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Weather Conditions</td>
+                    <td contenteditable="true">Indoor facility - not applicable</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lighting</td>
+                    <td contenteditable="true">Adequate industrial lighting</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Personal Protective Equipment</td>
+                    <td contenteditable="true">Mandatory hearing protection (ear defenders) worn; chemical-resistant gloves and safety footwear worn</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Incident Type</td>
+                    <td contenteditable="true">Major Injury — Chemical Exposure (Chlorine Gas Inhalation)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Injury/Damage Status</td>
+                    <td contenteditable="true">1 serious injury (48-hour hospitalization), 2 minor injuries (on-site treatment)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Number of Affected Persons</td>
+                    <td contenteditable="true">3 persons</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Damage Level</td>
+                    <td contenteditable="true">Level 2 - Serious: Hospitalization with moderate chlorine inhalation and potential long-term effects</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Reportable</td>
+                    <td contenteditable="true">Yes - reported 04.03.26</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">First Witness</td>
+                    <td contenteditable="true">Colleague at adjacent dosing station DS-3A</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Emergency Services Called</td>
+                    <td contenteditable="true">Yes - 14:52</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Admission/Discharge</td>
+                    <td contenteditable="true">Terry Hobbs admitted 19 Feb 2026, discharged after 48 hours with potential long-term airway sensitivity</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:00</div>
+                    <div class="timeline-event" contenteditable="true">Chemical delivery received. Mark Dean reorganizes chemical store after delivery, placing sodium hypochlorite drums in caustic soda position without supervisor check or notification</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:20</div>
+                    <div class="timeline-event" contenteditable="true">Supervisor Craig Watson assigns Terry Hobbs to changeover DS-3B (caustic soda). Verbal instruction only, no written task card or drum identification check required</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:28</div>
+                    <div class="timeline-event" contenteditable="true">Hobbs enters chemical store, selects drum from position he associates with caustic soda. Does not read drum label (obscured by condensation) or check color-coded cap</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:30</div>
+                    <div class="timeline-event" contenteditable="true">Hobbs connects sodium hypochlorite drum to DS-3B dosing pump</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:33</div>
+                    <div class="timeline-event" contenteditable="true">DS-3B dosing pump activates automatically on line restart. NaOCl enters residual NaOH in dosing line — Cl₂ generation begins</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:35</div>
+                    <div class="timeline-event" contenteditable="true">Gas detector CL-03 alarms (1.2 ppm Cl₂ detected). Shift chemist acknowledges alarm on handheld, decides to wait (9th false alarm in 30 days)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:38</div>
+                    <div class="timeline-event" contenteditable="true">Hobbs begins feeling throat irritation. Colleague at DS-3A notices yellow-green discoloration in air, attempts to shout warning — inaudible over 92 dB machine noise and Hobbs's hearing protection</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:39</div>
+                    <div class="timeline-event" contenteditable="true">Shift chemist arrives at DS-3B area, confirms release, activates emergency evacuation</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:40</div>
+                    <div class="timeline-event" contenteditable="true">Hobbs evacuated. Concentration at DS-3B measured: 4.8 ppm Cl₂</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:52</div>
+                    <div class="timeline-event" contenteditable="true">Emergency services called. Hobbs transported to hospital</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:00</div>
+                    <div class="timeline-event" contenteditable="true">Area ventilated and made safe. Investigation commenced</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">The 5-Why technique was applied rigorously to each of the three investigation branches. For Branch 1 (Behavioral), the questioning began with 'Why did Hobbs connect the wrong drum without checking the label?' and progressed through his 11-year reliance on positional memory, the absence of verification steps in procedures, management's acceptance of this shortcut as adequate, and the failure to assess incompatible chemical mixing risk, ultimately reaching the root cause of normalized deviation. For Branch 2 (Condition - Alarm System), questioning started with 'Why was there no visual alarm in the 92 dB(A) environment?' and traced through alarm system design assumptions, emergency plan gaps regarding noise-induced communication failure, inadequate drill scenarios, and failure to review plans against actual site conditions, reaching the root cause of inadequate emergency planning. For Branch 3 (Condition - Labeling/Storage), questioning began with 'Why were drum labels illegible and store layout uncontrolled?' and progressed through lack of physical segregation, absence of verification in procedures, perception of drum changeover as non-hazardous routine task, and failure to assess operational changes like store reorganization, reaching the root cause of ineffective management of change. Each 'Why' level was supported by direct evidence from witness statements, procedural documentation, and site observations documented in the incident report.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Human Factor</td>
+                        <td contenteditable="true">Individual factors such as lack of knowledge, insufficient skill, inattention, fatigue, routine automaticity, and cognitive shortcuts developed through experience</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Condition Factor</td>
+                        <td contenteditable="true">Physical workplace conditions including equipment failure, design defects, physical workload, ergonomic issues, environmental hazards, and inadequate safety systems</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Job/Task Factor</td>
+                        <td contenteditable="true">Work organization and task design issues including unclear procedures, inadequate task planning, time pressure, conflicting priorities, and routine task perception</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizational Factor</td>
+                        <td contenteditable="true">Management system failures including inadequate risk assessment, ineffective change management, poor safety culture, normalized deviation, insufficient emergency planning, and systemic policy deficiencies</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">Lead Investigator</td>
+                        <td contenteditable="true">04.03.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Chemical Safety Specialist</td>
+                        <td contenteditable="true">Technical Expert - Chemical Hazards</td>
+                        <td contenteditable="true">04.03.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Process Engineering Manager</td>
+                        <td contenteditable="true">Technical Expert - Process Systems</td>
+                        <td contenteditable="true">04.03.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Occupational Hygienist</td>
+                        <td contenteditable="true">Exposure Assessment Specialist</td>
+                        <td contenteditable="true">04.03.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Maintenance Manager</td>
+                        <td contenteditable="true">Equipment and Instrumentation Expert</td>
+                        <td contenteditable="true">04.03.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Human Factors Specialist</td>
+                        <td contenteditable="true">Behavioral Analysis Expert</td>
+                        <td contenteditable="true">05.03.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Craig Watson (Production Supervisor)</td>
+                        <td contenteditable="true">Line Management Representative</td>
+                        <td contenteditable="true">04.03.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Employee Representative</td>
+                        <td contenteditable="true">Workforce Representative</td>
+                        <td contenteditable="true">04.03.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Occupational Health Physician</td>
+                        <td contenteditable="true">Medical Advisor</td>
+                        <td contenteditable="true">05.03.26</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. CRITICAL FACTOR 1 - BEHAVIORAL CAUSE: Routine Automaticity and Normalized Deviation</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Terry Hobbs, a highly experienced process operative with 11 years of service, had performed drum changeovers hundreds of times without incident. Over this extended period, he developed a cognitive shortcut: instead of reading drum labels each time, he relied on positional memory of where each drum type was stored in the chemical store. This shortcut had always worked successfully because drum positions had remained consistent. On 19 February 2026, this long-established routine behavior encountered a critical change: earlier that morning, another operative (Mark Dean) had reorganized the chemical store after a delivery, placing sodium hypochlorite drums in the position Hobbs associated with caustic soda. Hobbs was unaware of this reorganization. When assigned to changeover DS-3B (caustic soda), he entered the store, selected a drum from the 'caustic position' without reading the label (which was obscured by condensation), and connected it to the caustic dosing line. The drum was actually sodium hypochlorite. This behavioral pathway reveals how experienced workers' reliance on routine automaticity, when combined with uncontrolled operational changes, can bypass critical verification steps.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Experienced operative connected wrong chemical drum (sodium hypochlorite instead of caustic soda) to dosing line DS-3B without verifying label, relying solely on positional memory of drum locations in chemical store</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did Terry Hobbs connect the wrong drum to the caustic soda line without checking the label?</div>
+                    <div class="why-answer" contenteditable="true">→ Hobbs had performed the same task hundreds of times over 11 years and had memorized the positions of drums in the chemical store. Each time he had selected the correct drum from its position without incident. This long period of error-free repetition made the label-reading step seem unnecessary, and positional memory-based selection became an established habit and cognitive shortcut.</div>
+                    <span class="why-code">A - Human Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why did Hobbs's shortcut behavior of relying on positional memory instead of checking labels continue uncorrected for 11 years?</div>
+                    <div class="why-answer" contenteditable="true">→ The drum changeover procedure did not include a label verification step. Supervisor Craig Watson stated he had never considered drum changeovers a risk and did not know what the color-coded cap system meant. Management accepted the experienced operative's position-based selection as adequate verification, and this shortcut behavior was never challenged through observation, supervision, or feedback.</div>
+                    <span class="why-code">B - Organizational Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why did management accept the operative's position-based drum selection without label checking as adequate verification and never question this behavior?</div>
+                    <div class="why-answer" contenteditable="true">→ Two chemically incompatible drum types (sodium hypochlorite and caustic soda) were stored in the same room, side by side, without physical separation, color-coded floor zones, or rack labeling. There was no requirement to notify supervisors or update position records after delivery reorganization. Under these conditions, the risk of position-based selection failing was never assessed; that is, the hazard of wrong drum connection was either not subjected to risk analysis or the existing analysis did not cover this scenario.</div>
+                    <span class="why-code">B - Organizational Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why was the risk of mixing incompatible chemicals never assessed, or why did existing risk controls not address this scenario?</div>
+                    <div class="why-answer" contenteditable="true">→ The report reveals that the drum changeover procedure did not include a label verification step, the chemical store had no physical segregation, there was no control mechanism for post-delivery reorganization, and the color-coded cap system was not referenced in procedures or training materials. All of this indicates that the scenario of mixing incompatible chemicals during routine drum changeover was systematically never subjected to risk assessment, or the assessment conducted did not cover this critical failure mode.</div>
+                    <span class="why-code">D - Organizational Factor</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Normalization of Deviation (Normalized Deviance)</div>
+                <div class="box-content" contenteditable="true">[D1.5 / Organizational Factor]
+
+The experienced operative's practice of selecting drums based on positional memory without checking labels was a normalized deviation that was known to management for 11 years but never corrected, and was even accepted as adequate verification. The supervisor explicitly stated he had never considered this task a risk and did not know what the color-coded cap system meant. There was no label verification step in the procedure, no physical segregation in the store, and post-delivery reorganization was uncontrolled. All these deficiencies were visible to management but were not perceived as problems because years of accident-free operation had normalized these unsafe practices. The 5-Why chain traces from the immediate cause (wrong drum connection) through the operative's 11-year shortcut behavior, management's failure to question this behavior, the lack of assessment of incompatible chemical mixing risk, and ultimately to the acceptance of all these deficiencies as normal due to prolonged incident-free operation. Codes like D4.1 (lack of risk analysis) or D3.1 (lack of training) explain only one dimension of this incident. But the root cause is deeper: the supervisor's statement 'I never considered drum changeovers a risk,' the operative's 'I don't need to read labels' habit, and the fact that even 9 false alarms from sensor CL-03 did not trigger a change in alarm response protocol — all demonstrate that unsafe practices normalized across all organizational levels due to years of successful operation without incidents. This is the classic 'normalization of deviance' phenomenon where deviations from safe practice gradually become accepted as normal when they do not immediately result in accidents.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Drum changeover procedure lacked mandatory label verification step, relying instead on operative's positional memory which was treated as adequate despite being vulnerable to store reorganization</li>
+<li contenteditable="true">Supervisor and management perceived routine drum changeover as non-hazardous task for 11 years, never conducting risk assessment for incompatible chemical mixing scenario despite storing hypochlorite and caustic soda side by side</li>
+<li contenteditable="true">Color-coded cap system existed but was not integrated into procedures or training materials; supervisor admitted not knowing what cap colors meant, indicating systemic failure to utilize existing safety controls</li>
+<li contenteditable="true">Culture of accepting experienced workers' shortcuts as adequate practice without questioning whether these shortcuts bypass critical safety barriers, leading to normalization of deviation from safe verification procedures over extended period</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. CRITICAL FACTOR 2 - CONDITION CAUSE: Absence of Visual Alarm System in High-Noise Environment</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bottle Washing Line 3 operates at approximately 92 dB(A) noise level during production, which exceeds the Upper Exposure Action Value of 85 dB(A) under the UK Control of Noise at Work Regulations 2005. As a result, all operatives working in this area are required to wear mandatory hearing protection (ear defenders). The emergency alarm system for Line 3 was designed with only audio alarms; no visual alarm system (strobe lights or flashing beacons) was installed. When gas detector CL-03 alarmed at 14:35 upon detecting 1.2 ppm chlorine gas, the audio alarm was inaudible to Terry Hobbs who was wearing hearing protection and standing next to operating machinery. Similarly, when a colleague at adjacent dosing station DS-3A noticed the yellow-green chlorine gas cloud forming and attempted to shout a warning, Hobbs could not hear him over the 92 dB machine noise and through his ear defenders. This condition pathway reveals how the absence of visual alarms in a high-noise environment where hearing protection is mandatory created a critical communication failure during an emergency, delaying Hobbs's awareness of the hazard and his evacuation.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">No visual alarm system (strobe lights/flashing beacons) installed in 92 dB(A) noise environment where hearing protection is mandatory, rendering chlorine gas alarm inaudible to affected operative and preventing verbal warning from colleague</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why was there no visual alarm system (strobe/flashing lights) in the Line 3 production area with 92 dB(A) noise level?</div>
+                    <div class="why-answer" contenteditable="true">→ The emergency warning system design for the Line 3 area included only audio alarms. The scenario that operatives wearing hearing protection in a high-noise environment would be unable to hear audio alarms was not considered, and visual warning devices were never planned.</div>
+                    <span class="why-code">C - Job/Task Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was the scenario of high noise and mandatory hearing protection rendering audio alarms ineffective not considered when designing the emergency warning system?</div>
+                    <div class="why-answer" contenteditable="true">→ Although Line 3's 92 dB(A) noise level and mandatory ear defender use were known, the emergency response plan never addressed the possibility of communication failure under these conditions. The plan contained no provisions for how warnings would be delivered in noisy environments.</div>
+                    <span class="why-code">B - Organizational Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why did the emergency response plan not cover the communication failure scenario in high-noise production areas?</div>
+                    <div class="why-answer" contenteditable="true">→ Emergency plans and drills had not tested how operatives would receive warnings during incidents like gas releases at chemical dosing stations while wearing hearing protection. Existing drills were inadequate for this specific scenario, and this gap in the plan was never detected.</div>
+                    <span class="why-code">D - Organizational Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why were emergency plans and drills not developed to cover chemical gas release scenarios in noisy environments?</div>
+                    <div class="why-answer" contenteditable="true">→ Existing emergency plans had not been reviewed to reflect actual working conditions on Line 3 (92 dB noise, mandatory hearing protection, incompatible chemicals stored side by side, and mixing risk in dosing lines). The plans did not include realistic emergency scenarios that could be encountered in the field.</div>
+                    <span class="why-code">D - Organizational Factor</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Inadequate Emergency Plans and Drills</div>
+                <div class="box-content" contenteditable="true">[D8.1 / Organizational Factor]
+
+Brentford facility's emergency plans and drills did not address how emergency warnings would be communicated to operatives wearing mandatory hearing protection in Line 3's 92 dB(A) noise environment. The scenario where audio alarms and verbal warnings would be inadequate during a gas release was neither anticipated in the plan nor tested in drills, so the need for visual alarms was never identified. The 5-Why chain reveals that the absence of visual alarms stems not from a singular design oversight but from emergency planning's failure to account for actual site conditions (high noise + mandatory hearing protection + chemical gas risk). The report explicitly states that the emergency response plan contained no provisions for communication failure in noise conditions, drills did not cover this scenario, and even the verbal warning from the colleague at DS-3A could not reach Hobbs. Code D8.1 specifically addresses the failure of plans and drills to reflect real field hazards. This root cause is distinct from equipment design failure (B1.5) because the fundamental issue is not the absence of a device but the systematic failure of emergency planning to identify the need for that device through proper scenario analysis and realistic drill testing under actual operational conditions including noise, hearing protection, and chemical hazards.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Emergency response plan for Line 3 did not include provisions for warning communication in 92 dB(A) noise environment where hearing protection is mandatory, failing to recognize that audio alarms would be ineffective</li>
+<li contenteditable="true">Emergency drills and exercises never tested gas release scenarios in high-noise areas to verify whether operatives wearing hearing protection could receive and respond to warnings, leaving this critical gap undetected</li>
+<li contenteditable="true">Emergency planning process did not systematically review actual site working conditions (noise levels, mandatory PPE, chemical hazards, process interactions) to ensure plans covered realistic worst-case scenarios</li>
+<li contenteditable="true">No requirement for emergency plan validation against site-specific conditions such as noise-induced communication barriers, resulting in plans that appeared adequate on paper but failed under real operational circumstances</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. CRITICAL FACTOR 3 - CONDITION CAUSE: Illegible Drum Labeling and Uncontrolled Store Reorganization</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Chemical drums at Brentford facility are stored in a room adjacent to Line 3. Sodium hypochlorite (12% NaOCl) and caustic soda (32% NaOH) drums are visually similar — both are white 200-litre HDPE drums with blue banding. The only differences are the COSHH-compliant labels and small color-coded caps (blue for caustic, yellow for hypochlorite). However, drum labels are frequently obscured by condensation and chemical residue from the washing process, and there is no re-labeling or cleaning schedule in place. The two incompatible chemical types are stored in the same room, side by side, with no physical separation, no color-coded floor zones, and no rack labeling. On the morning of 19 February 2026, operative Mark Dean reorganized the chemical store after a delivery, placing sodium hypochlorite drums in the area normally reserved for caustic soda drums. There was no requirement to notify supervisors, update a drum position register, or obtain approval after this reorganization. This condition pathway reveals how illegible labeling combined with uncontrolled operational changes to store layout created the physical conditions for wrong drum selection.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Chemical drum labels illegible due to condensation and chemical residue obscuring them; store layout lacked physical segregation or color-coded floor zones; morning store reorganization changed drum positions without notification or position record update</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why were chemical drum labels illegible and why did the store layout lack physical segregation?</div>
+                    <div class="why-answer" contenteditable="true">→ Sodium hypochlorite and caustic soda drums were stored in the same room, side by side, without physical barriers or color-coded floor zones. Labels were continuously covered by condensation and chemical residue from the washing line, but there was no program in place for re-labeling or cleaning labels.</div>
+                    <span class="why-code">C - Job/Task Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was storing incompatible chemicals in the same area without physical segregation and ensuring label legibility not addressed as a problem?</div>
+                    <div class="why-answer" contenteditable="true">→ The drum changeover procedure did not include a label verification step before connection. It was assumed that operatives would select the correct drum based on positional memory of drum locations in the store. Although a color-coded cap system existed, it was not referenced in procedures or training materials.</div>
+                    <span class="why-code">B - Organizational Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why did the drum changeover procedure not include a positive identification verification step, and why was the existing color-coded cap system not integrated into the procedure?</div>
+                    <div class="why-answer" contenteditable="true">→ Drum changeover was considered a 'completely routine' task performed hundreds of times by operatives with 11 years of experience. According to Supervisor Craig Watson's statement, drum changeovers were never thought of as a risk, and he did not even know what the cap color meant. Therefore, the procedure was not designed to include barriers against human error.</div>
+                    <span class="why-code">B - Organizational Factor</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why was routine drum changeover not assessed as a risk and why did the procedure not include protection against human error?</div>
+                    <div class="why-answer" contenteditable="true">→ The risk of mixing incompatible chemicals (sodium hypochlorite and caustic soda) was not assessed through adequate risk analysis or HAZOP study at the facility. Operational changes such as morning store reorganization and how they could increase the risk of drum mixing were never analyzed. The management of change process did not cover such store layout changes.</div>
+                    <span class="why-code">D - Organizational Factor</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Ineffective or Bypassed Management of Change</div>
+                <div class="box-content" contenteditable="true">[D4.3 / Organizational Factor]
+
+The reorganization of drum positions in the chemical store (Mark Dean's reorganization after the morning delivery) was not recognized as an operational change and was not subjected to any management of change process. There was no requirement for supervisor approval, notification mechanism, or drum position record update after store layout changes. This systemic deficiency allowed a critical change that invalidated the experienced operative's positional memory-based drum selection to occur uncontrolled, directly setting the stage for incompatible chemicals to be mixed. The 5-Why chain traces from label illegibility and lack of physical segregation through the absence of verification steps in procedures, to the task not being assessed as a risk, and ultimately to store reorganization being performed without a management of change process. The report explicitly states: Mark Dean reorganized drums after delivery, no supervisor check was performed, no notification requirement existed, and position records were not updated. In Dean's own words, 'he did not know there was a rule about positions; nobody told him.' This is a classic management of change failure — an operational change (store layout) was made without a formal process and invalidated existing safety barriers (positional memory-based drum selection). Code D4.3 specifically reflects the failure to bring store reorganization under management of change control, which is specific to this incident. This root cause is distinct from lack of risk assessment (D4.1) because the fundamental issue is not the absence of initial hazard identification but the failure to control operational changes that alter the risk profile and invalidate existing controls.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">No management of change process existed for chemical store layout modifications; operative Mark Dean reorganized drum positions after delivery without supervisor approval, notification, or position record update, treating it as routine housekeeping rather than a safety-critical change</li>
+<li contenteditable="true">Store reorganization that invalidated operatives' positional memory-based drum selection (a known informal practice) was not recognized as a change requiring risk assessment or communication to affected workers</li>
+<li contenteditable="true">Absence of physical controls (segregation barriers, color-coded floor zones, rack labeling) meant that store layout changes could directly impact drum selection safety without triggering any formal review or approval process</li>
+<li contenteditable="true">Management of change procedures, if they existed, did not define 'change' broadly enough to include operational modifications like chemical storage reorganization, focusing only on major process or equipment changes and missing critical day-to-day operational changes that can invalidate existing safety barriers</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Alarm System Reliability</td>
+                        <td contenteditable="true">Gas detector CL-03 had generated 9 false alarms in the 30 days prior to the incident due to calibration drift that had been identified in January 2026 but not corrected due to technician availability. This history of false alarms eroded confidence in the alarm system and created a 'wait and confirm' culture where alarms were not treated as requiring immediate response.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Procedure Adequacy</td>
+                        <td contenteditable="true">Drum changeover procedure did not require label verification before connection, did not reference the color-coded cap system, and relied on operatives' positional memory of drum locations. Procedure did not include human error barriers such as independent verification or positive identification steps.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Chemical Storage Design</td>
+                        <td contenteditable="true">Incompatible chemicals (sodium hypochlorite and caustic soda) stored in same room without physical segregation, color-coded floor zones, or rack labeling. Store design relied entirely on operatives reading labels, with no engineered controls to prevent mixing.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Label Legibility</td>
+                        <td contenteditable="true">Drum labels frequently obscured by condensation and chemical residue from washing process. No re-labeling or label cleaning schedule in place. Color-coded caps existed but were not integrated into procedures or training.</td>
+                        <td class="impact-medium" contenteditable="true">Medium</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Task Perception</td>
+                        <td contenteditable="true">Drum changeover perceived by supervisor and operatives as routine, low-risk task despite involving incompatible chemicals. This perception led to complacency and acceptance of shortcuts such as not reading labels.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Experience and Routine</td>
+                        <td contenteditable="true">Terry Hobbs's 11 years of experience and hundreds of successful drum changeovers created strong cognitive shortcuts and automaticity. Routine task performance without conscious attention to each step made him vulnerable to changes in conditions (store reorganization).</td>
+                        <td class="impact-medium" contenteditable="true">Medium</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Supervision and Oversight</td>
+                        <td contenteditable="true">Supervisor Craig Watson did not observe drum changeover tasks to verify compliance with safe practices, did not know what color-coded caps meant, and had never considered the task a risk requiring close supervision or verification.</td>
+                        <td class="impact-medium" contenteditable="true">Medium</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Training Content</td>
+                        <td contenteditable="true">Training materials did not emphasize the critical importance of label verification before drum connection, did not explain the color-coded cap system, and did not cover the hazards of mixing sodium hypochlorite and caustic soda.</td>
+                        <td class="impact-medium" contenteditable="true">Medium</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Install visual alarm systems (strobe lights/flashing beacons) in all high-noise production areas (≥85 dB(A)) where hearing protection is mandatory, integrated with existing gas detection and fire alarm systems</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">Facilities Manager</td>
+                        <td contenteditable="true">2 weeks</td>
+                        <td contenteditable="true">Visual alarm installation completion 100%; alarm visibility testing in all high-noise zones 100%</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Implement physical segregation in chemical store: install barriers separating incompatible chemical types; establish color-coded floor zones (e.g., yellow for hypochlorite, blue for caustic); install rack labeling with large, durable signs</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">Operations Manager</td>
+                        <td contenteditable="true">2 weeks</td>
+                        <td contenteditable="true">Physical segregation completion 100%; incompatible chemicals separated by minimum 2-meter barrier</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Revise drum changeover procedure to require mandatory three-point verification before connection: (1) read drum label and confirm chemical name matches work order; (2) check color-coded cap matches required chemical; (3) independent verification by second person or supervisor sign-off</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">Process Engineering Manager</td>
+                        <td contenteditable="true">1 week</td>
+                        <td contenteditable="true">Procedure revision completion; three-point verification compliance 100% (verified by supervision spot checks)</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Establish drum label legibility maintenance program: weekly inspection of all drum labels; immediate re-labeling if label is obscured, damaged, or illegible; use of laminated, chemical-resistant labels; cleaning of labels as part of routine housekeeping</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Operations Supervisor</td>
+                        <td contenteditable="true">2 weeks</td>
+                        <td contenteditable="true">Label legibility inspection completion 100% weekly; re-labeling within 24 hours of identification</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Implement formal Management of Change procedure for chemical store: any reorganization of drum positions, changes to storage layout, or introduction of new chemical types requires supervisor approval, risk assessment, notification to all affected operatives, and update of store layout diagram before implementation</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">3 weeks</td>
+                        <td contenteditable="true">Management of Change procedure documented and communicated; 100% compliance with approval and notification requirements (verified by audit)</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Recalibrate all gas detection sensors immediately; establish safety-critical instrument calibration tracking system with automatic escalation for overdue calibrations; define maximum acceptable false alarm rate and trigger investigation/corrective action if exceeded</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">Maintenance Manager</td>
+                        <td contenteditable="true">1 week</td>
+                        <td contenteditable="true">All gas detectors calibrated and within specification; calibration tracking system operational; false alarm rate <2 per sensor per month</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Revise alarm response protocol: eliminate 'wait and confirm' approach; require immediate response to all gas detector alarms; automatic evacuation at ≥2 ppm chlorine detection; shift chemist must attend alarm location within 2 minutes; investigate and document all alarms including false alarms to identify sensor issues</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">1 week</td>
+                        <td contenteditable="true">Alarm response protocol revised and communicated; response time ≤2 minutes for 100% of alarms (verified by alarm log review)</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Conduct comprehensive risk assessment (HAZOP) of all chemical dosing systems: identify all scenarios where incompatible chemicals could mix; assess adequacy of existing controls; implement additional barriers (interlocks, color-coding, physical separation, verification steps) as needed</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Chemical Safety Specialist</td>
+                        <td contenteditable="true">6 weeks</td>
+                        <td contenteditable="true">HAZOP completion for all dosing systems; risk assessment documentation; implementation of additional controls for all identified high-risk scenarios</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Develop and deliver mandatory training on: (1) hazards of mixing sodium hypochlorite and caustic soda; (2) three-point drum verification procedure; (3) color-coded cap system; (4) emergency response to gas alarms; (5) management of change requirements for store reorganization. Include practical exercises and competency assessment.</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Training Manager</td>
+                        <td contenteditable="true">4 weeks</td>
+                        <td contenteditable="true">Training completion 100% for all operatives, supervisors, and shift chemists; competency assessment pass rate 100%</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Revise emergency response plan to address site-specific conditions: include provisions for communication in high-noise areas; require visual alarms where hearing protection is mandatory; develop realistic drill scenarios (gas release during production with noise and hearing protection); conduct drills quarterly and document lessons learned</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">4 weeks</td>
+                        <td contenteditable="true">Emergency plan revision completion; realistic drill conducted quarterly; drill participation 100%; corrective actions from drills implemented within 2 weeks</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Implement behavioral safety observation program: supervisors conduct weekly observations of drum changeover tasks; provide immediate feedback on compliance with three-point verification; document observations and trends; recognize safe behaviors and coach unsafe behaviors</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Operations Manager</td>
+                        <td contenteditable="true">6 weeks</td>
+                        <td contenteditable="true">Observation program established; minimum 4 observations per supervisor per month; three-point verification compliance trend increasing to ≥95%</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Conduct facility-wide review of all 'routine' tasks involving hazardous chemicals: identify tasks where experience and routine may have led to normalization of deviation; assess whether procedures include adequate verification steps and human error barriers; implement improvements as needed</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">8 weeks</td>
+                        <td contenteditable="true">Review completion for all routine chemical handling tasks; procedure improvements implemented for all tasks lacking adequate verification steps</td>
+                    </tr>
+
+                    <tr>
+                        <td>13</td>
+                        <td contenteditable="true">Establish safety culture improvement initiative: senior management visible commitment to safety over production; 'stop work' authority for all employees if unsafe conditions observed; reporting and investigation of near-misses and deviations without blame; regular safety leadership walks by senior management</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">General Manager</td>
+                        <td contenteditable="true">12 weeks</td>
+                        <td contenteditable="true">Senior management safety walks minimum twice per month; near-miss reporting rate increasing; employee safety perception survey score improvement</td>
+                    </tr>
+
+                    <tr>
+                        <td>14</td>
+                        <td contenteditable="true">Implement chemical store access control: restrict access to trained and authorized personnel only; require sign-in/sign-out log; supervisor approval for any store reorganization or layout changes; maintain up-to-date store layout diagram at store entrance</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Operations Manager</td>
+                        <td contenteditable="true">4 weeks</td>
+                        <td contenteditable="true">Access control system operational; unauthorized access incidents zero; store layout diagram updated within 24 hours of any approved change</td>
+                    </tr>
+
+                    <tr>
+                        <td>15</td>
+                        <td contenteditable="true">Establish Key Performance Indicators (KPIs) for process safety: track and report monthly on: gas detector calibration status, alarm response times, drum changeover verification compliance, label legibility inspection completion, near-miss reporting rate, and corrective action closure rate. Review KPIs in monthly management meetings.</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">6 weeks</td>
+                        <td contenteditable="true">KPI dashboard established and operational; monthly KPI review in management meetings; adverse trends trigger investigation and corrective action</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Always verify chemical identity through multiple independent methods before connection or use: read label, check color-coding, confirm with work order, and obtain independent verification. Never rely solely on positional memory, container appearance, or routine familiarity. Treat every drum changeover as a critical task requiring conscious attention and verification, regardless of experience level or how many times the task has been performed successfully.
+• Design emergency warning systems to match actual site conditions: in high-noise areas where hearing protection is mandatory, audio alarms alone are inadequate. Install visual alarms (strobe lights, flashing beacons) and consider other methods such as vibrating personal alarm devices. Test emergency communication methods under realistic conditions (noise, hearing protection, multiple workers) to ensure effectiveness.
+• Implement robust Management of Change procedures that cover all operational modifications, not just major process or equipment changes: store reorganization, procedure revisions, temporary arrangements, and personnel changes can all impact safety and must be controlled. Require risk assessment, approval, notification to affected workers, and documentation for all changes. Train all employees to recognize what constitutes a 'change' requiring formal control.
+• Recognize and actively counter normalization of deviation: when unsafe practices or deviations from procedures occur without immediate negative consequences, there is a strong tendency for them to become accepted as normal over time. Conduct regular audits and observations to identify deviations; investigate why deviations occur and implement corrective actions; reinforce the importance of following procedures even when shortcuts seem to work; and create a culture where questioning and reporting deviations is encouraged and valued.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Develop and sustain a strong process safety culture where safety is genuinely prioritized over production, where all employees feel empowered to stop work if they observe unsafe conditions, where near-misses and deviations are reported and investigated without blame, and where senior management demonstrates visible commitment to safety through regular site presence, safety leadership walks, and resource allocation for safety improvements. Culture change requires sustained effort over years, not one-time initiatives.
+• Implement comprehensive process safety management systems covering all elements: hazard identification and risk assessment (including HAZOP for chemical processes), management of change, operating procedures with human error barriers, training and competency assurance, mechanical integrity and preventive maintenance, emergency planning and response, incident investigation and corrective action, and management review and continuous improvement. Ensure systems are not just documented but are actively used and regularly audited for effectiveness.
+• Design facilities and processes with inherent safety principles: eliminate hazards where possible (e.g., substitute less hazardous chemicals), minimize hazards (e.g., reduce inventory of hazardous materials), use passive engineered controls (e.g., physical segregation, color-coding, interlocks) rather than relying on procedures and human vigilance, and design for human factors (e.g., make correct actions easy and incorrect actions difficult or impossible). Inherently safer design is more reliable than procedural controls.
+• Establish robust learning systems that capture and act on lessons from incidents, near-misses, audits, and industry events: conduct thorough investigations using systematic methods (HSG245, 5-Why, root cause analysis); identify and implement corrective actions that address root causes, not just symptoms; share lessons learned across the organization and with industry peers; track effectiveness of corrective actions through leading and lagging indicators; and create feedback loops to continuously improve safety management systems based on operational experience.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Communicate this incident and its lessons learned to all employees at Brentford facility through: toolbox talks led by supervisors emphasizing the three root causes (normalization of deviation, inadequate emergency planning, ineffective management of change); display of incident summary and key lessons on safety notice boards; inclusion in safety training programs; and discussion in team meetings to encourage questions and dialogue about how similar incidents could be prevented in employees' own work areas.
+• Share incident details and lessons learned with other facilities within the company group: distribute formal incident investigation report to all site H&S managers; conduct cross-site safety leadership meeting to discuss systemic issues identified (normalization of deviation, emergency planning gaps, management of change weaknesses); benchmark corrective actions across sites and implement improvements at all locations where similar hazards exist; and establish mechanism for ongoing sharing of safety lessons and best practices across the company.
+• Report incident to industry bodies and participate in industry-wide learning: submit detailed incident report to UK Chemical Industries Association (CIA) or relevant trade association for inclusion in industry safety alerts; participate in industry safety forums and conferences to share lessons learned; review and learn from similar incidents reported by other companies in chemical manufacturing and processing sectors; and contribute to development of industry best practices and guidance documents on topics such as chemical storage, drum handling, and emergency communication in high-noise environments.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Develop and deliver comprehensive chemical safety training program covering: chemical hazard identification (understanding COSHH labels, Safety Data Sheets, hazard symbols); incompatible chemical hazards (specific focus on sodium hypochlorite/caustic soda reaction and chlorine gas generation); drum handling and changeover procedures (three-point verification, color-coded cap system, label legibility checks); emergency response (recognizing gas release symptoms, alarm response, evacuation procedures, first aid for chemical exposure); and human factors (understanding how experience and routine can lead to complacency, importance of conscious verification even for familiar tasks). Include practical exercises, realistic scenarios, and competency assessment. Provide initial training for all new employees and refresher training annually for all chemical handling personnel.
+• Implement supervisor and management training on: recognizing and countering normalization of deviation (how to identify when unsafe practices have become accepted as normal, techniques for reinforcing procedure compliance, importance of observation and feedback); conducting effective safety observations and providing constructive feedback; understanding and applying Management of Change principles (what constitutes a change, how to assess safety implications, communication and approval requirements); emergency planning and drill design (how to develop realistic scenarios, how to test plans under actual site conditions, how to capture and act on lessons from drills); and safety leadership (visible commitment, empowering employees to raise concerns, balancing production and safety priorities). Provide initial training for all supervisors and managers and refresher training every two years.
+• Develop specialized training for specific roles: shift chemists and emergency response team members on gas detection systems (how detectors work, calibration requirements, interpreting alarms, response protocols, investigation of false alarms); maintenance personnel on safety-critical instrument calibration and maintenance (calibration procedures, documentation requirements, escalation for overdue calibrations, impact of deferred maintenance on safety); and process engineers and technical staff on HAZOP and risk assessment methodologies (how to systematically identify hazard scenarios, assess risk, design and verify effectiveness of controls). Provide role-specific training upon assignment to role and refresher training as needed based on competency assessment and changes to systems or procedures.
+• Establish ongoing safety awareness and engagement programs: monthly safety topics for toolbox talks (rotate through key themes such as chemical hazards, procedure compliance, emergency response, reporting near-misses, stop work authority); quarterly safety stand-downs where production is paused for facility-wide safety meetings and discussions; annual safety awareness campaigns on specific topics (e.g., 'Chemical Safety Month' with focus on drum handling, labeling, and incompatible chemical hazards); recognition programs for employees who demonstrate exemplary safety behaviors or identify and report hazards; and mechanisms for employee input into safety improvements (safety suggestion program, employee representation on safety committees, regular safety surveys to gather feedback on safety culture and system effectiveness).</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">The 19 February 2026 chlorine gas release incident at Brentford Industrial Cleaning Supplies was a serious event that resulted in one major injury (48-hour hospitalization with potential long-term health effects) and two minor injuries. The incident was entirely preventable and resulted from the convergence of multiple organizational failures rather than a single error or equipment malfunction. The HSG245 root cause analysis identified three distinct root causes, all at the organizational level: (1) Normalization of Deviation — experienced operative's practice of selecting drums based on positional memory without checking labels was a known deviation from safe practice that was accepted as normal by management for 11 years because it had never resulted in an incident; (2) Inadequate Emergency Plans and Drills — emergency response plans and drill programs failed to address site-specific conditions (92 dB(A) noise, mandatory hearing protection) and did not test realistic scenarios, so the need for visual alarms was never identified; and (3) Ineffective Management of Change — chemical store reorganization that invalidated operatives' positional memory-based drum selection was performed without any formal control, risk assessment, or notification to affected workers. These root causes reveal systemic weaknesses in Brentford facility's safety management systems across multiple areas: risk assessment and hazard identification, procedure development and human factors engineering, training and competency assurance, supervision and behavioral safety, management of change, emergency planning and preparedness, and safety culture and leadership. The incident also revealed several contributing factors including gas detector reliability issues (9 false alarms in 30 days due to overdue calibration), inadequate chemical storage design (no physical segregation of incompatible chemicals), poor label legibility (labels obscured by condensation and residue with no maintenance program), and task perception issues (routine task seen as low-risk despite involving incompatible chemicals). Immediate corrective actions have been implemented including installation of visual alarms, physical segregation in chemical store, revision of drum changeover procedure to require three-point verification, recalibration of gas detectors, and revision of alarm response protocol. However, sustained improvement requires long-term commitment to: strengthening process safety management systems, developing a robust safety culture where deviations are recognized and corrected rather than normalized, implementing inherent safety design principles, and establishing effective learning systems to capture and act on lessons from incidents and near-misses.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Complete installation of visual alarm systems (strobe lights) in all high-noise production areas within 2 weeks; test alarm visibility and operatives' ability to see alarms while wearing hearing protection and working at all normal work positions; integrate visual alarms with existing gas detection and fire alarm systems; and train all operatives on visual alarm recognition and response. (Responsible: Facilities Manager; Target: 100% completion by 5 March 2026)</li>
+<li contenteditable="true">Implement physical segregation in chemical store within 2 weeks: install barriers creating separate zones for hypochlorite and caustic soda drums (minimum 2-meter separation); establish color-coded floor zones (yellow for hypochlorite, blue for caustic); install large, durable rack labeling signs; inspect and re-label all drums; and establish drum label legibility inspection and maintenance program (weekly inspections, immediate re-labeling if illegible). (Responsible: Operations Manager; Target: 100% completion by 5 March 2026)</li>
+<li contenteditable="true">Revise drum changeover procedure within 1 week to require mandatory three-point verification: (1) read drum label and confirm chemical name matches work order, (2) check color-coded cap matches required chemical, (3) obtain independent verification by second person or supervisor sign-off before connection; communicate revised procedure to all operatives through toolbox talks; provide hands-on training and competency assessment; and implement supervisor spot checks to verify compliance. (Responsible: Process Engineering Manager; Target: Procedure revision by 26 February 2026; training completion and 100% compliance by 12 March 2026)</li>
+<li contenteditable="true">Establish formal Management of Change procedure for chemical store within 3 weeks: define what constitutes a 'change' requiring control (any reorganization of drum positions, changes to storage layout, introduction of new chemical types); require supervisor approval, simple risk assessment, and notification to all affected operatives before implementation; require update of store layout diagram within 24 hours of any approved change; communicate procedure to all operatives and supervisors; and audit compliance monthly. (Responsible: H&S Manager; Target: Procedure documented and communicated by 12 March 2026; 100% compliance verified by audit)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Conduct comprehensive HAZOP (Hazard and Operability Study) of all chemical dosing systems within 6 weeks: systematically identify all scenarios where incompatible chemicals could mix; assess adequacy of existing controls (procedures, labeling, physical separation, interlocks); identify gaps and implement additional barriers as needed (e.g., physical interlocks preventing wrong drum connection, automated chemical identification systems, enhanced color-coding); document risk assessment and control measures; and review HAZOP findings with operations and maintenance teams. (Responsible: Chemical Safety Specialist; Target: HAZOP completion by 2 April 2026; additional controls implemented by 30 April 2026)</li>
+<li contenteditable="true">Develop and implement comprehensive process safety management system within 12 months covering all key elements: hazard identification and risk assessment (including HAZOP for all chemical processes), management of change (covering equipment, procedures, materials, organization, and operational changes like store reorganization), operating procedures with human error barriers (verification steps, independent checks, interlocks), training and competency assurance (initial and refresher training, competency assessment, role-specific training), mechanical integrity and preventive maintenance (safety-critical instrument calibration tracking, preventive maintenance schedules, defect escalation), emergency planning and response (realistic scenarios, site-specific conditions, regular drills, lessons learned), incident investigation and corrective action (systematic investigation methods, root cause analysis, corrective action tracking), audit and assurance (regular audits of all PSM elements, management review, continuous improvement), and contractor safety management. Assign ownership for each element; develop procedures and tools; train personnel; implement systems; and establish metrics to track effectiveness. (Responsible: H&S Manager with support from senior management; Target: PSM system fully operational by February 2027)</li>
+<li contenteditable="true">Implement behavioral safety observation and coaching program within 6 weeks: train all supervisors on conducting effective safety observations (what to observe, how to provide constructive feedback, how to recognize and reinforce safe behaviors, how to coach unsafe behaviors without blame); require minimum 4 observations per supervisor per month focusing on critical tasks (drum changeovers, chemical handling, emergency response); document observations and trends in safety database; review trends monthly in management meetings; recognize supervisors and teams with high compliance rates; and investigate and address systemic issues revealed by observation trends (e.g., if multiple operatives are observed skipping verification steps, investigate why and address root causes such as time pressure, inadequate training, or procedure design issues). (Responsible: Operations Manager; Target: Program operational by 2 April 2026; observation target achievement ≥90% by June 2026)</li>
+<li contenteditable="true">Develop and sustain strong safety culture through long-term initiatives (ongoing, 12-24 months): senior management visible commitment to safety (regular site safety walks, participation in incident investigations, safety as first agenda item in all management meetings, resource allocation for safety improvements); employee empowerment (stop work authority for all employees, reporting of near-misses and deviations encouraged and acted upon without blame, employee participation in hazard identification and risk assessment, safety suggestion program with timely feedback and recognition); safety leadership development (training for all supervisors and managers on safety leadership, coaching, and culture building; leadership competency assessment and development plans); communication and engagement (regular safety communications from senior management, toolbox talks on lessons learned, safety stand-downs for facility-wide discussions, annual safety culture surveys with action plans for improvement areas); and learning and improvement (systematic investigation of all incidents and high-potential near-misses, sharing of lessons learned across organization and with industry, benchmarking against industry best practices, continuous improvement of safety management systems based on operational experience and leading indicators). (Responsible: General Manager with support from all senior managers; Target: Culture survey score improvement from baseline by 20% within 12 months, 40% within 24 months; leading indicators such as near-miss reporting rate, safety observation completion rate, and corrective action closure rate all showing positive trends)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Drum Changeover Verification</td>
+                        <td class="current" contenteditable="true">No mandatory verification; reliance on positional memory</td>
+                        <td class="target" contenteditable="true">Three-point verification (label, cap color, independent check) 100% compliance</td>
+                    </tr>
+
+                    <tr>
+                        <td>Chemical Store Segregation</td>
+                        <td class="current" contenteditable="true">No physical separation; incompatible chemicals side by side</td>
+                        <td class="target" contenteditable="true">Physical barriers; minimum 2-meter separation; color-coded zones</td>
+                    </tr>
+
+                    <tr>
+                        <td>Emergency Alarm System (High-Noise Areas)</td>
+                        <td class="current" contenteditable="true">Audio alarms only; inaudible with hearing protection</td>
+                        <td class="target" contenteditable="true">Visual alarms (strobes) installed; 100% visibility from all work positions</td>
+                    </tr>
+
+                    <tr>
+                        <td>Gas Detector Calibration Status</td>
+                        <td class="current" contenteditable="true">Overdue since January 2026; 9 false alarms in 30 days</td>
+                        <td class="target" contenteditable="true">All detectors calibrated and within specification; false alarm rate <2/month</td>
+                    </tr>
+
+                    <tr>
+                        <td>Management of Change (Store Reorganization)</td>
+                        <td class="current" contenteditable="true">No formal process; changes uncontrolled</td>
+                        <td class="target" contenteditable="true">Formal MOC procedure; 100% compliance with approval and notification</td>
+                    </tr>
+
+                    <tr>
+                        <td>Alarm Response Protocol</td>
+                        <td class="current" contenteditable="true">'Wait and confirm' culture; 3-minute delay</td>
+                        <td class="target" contenteditable="true">Immediate response; attendance at alarm location within 2 minutes</td>
+                    </tr>
+
+                    <tr>
+                        <td>Drum Label Legibility</td>
+                        <td class="current" contenteditable="true">Frequently obscured; no maintenance program</td>
+                        <td class="target" contenteditable="true">Weekly inspections; re-labeling within 24 hours if illegible</td>
+                    </tr>
+
+                    <tr>
+                        <td>Emergency Drill Realism</td>
+                        <td class="current" contenteditable="true">Generic scenarios; not tested under site conditions</td>
+                        <td class="target" contenteditable="true">Realistic scenarios (noise, hearing protection, gas release); quarterly drills</td>
+                    </tr>
+
+                    <tr>
+                        <td>Safety Culture (Deviation Acceptance)</td>
+                        <td class="current" contenteditable="true">Normalization of deviation; shortcuts accepted as normal</td>
+                        <td class="target" contenteditable="true">Deviations recognized and corrected; procedure compliance reinforced</td>
+                    </tr>
+
+                    <tr>
+                        <td>Process Safety Management System</td>
+                        <td class="current" contenteditable="true">Fragmented; key elements missing or ineffective</td>
+                        <td class="target" contenteditable="true">Comprehensive PSM system; all elements operational and audited</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header">📷 OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /* ── OLAY FOTOĞRAFLARI JS ─────────────────────────────── */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+
+        // PDF olarak indir (tarayıcı print → Save as PDF)
+        function downloadPDF() {
+            if (editMode) toggleEditMode();
+            showNotification('📄 PDF için: Yazdır ekranında "PDF olarak kaydet" seçeneğini kullanın', 'info');
+            const originalTitle = document.title;
+            document.title = 'HSE_Report_' + new Date().getTime();
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => { document.title = originalTitle; }, 2000);
+            }, 600);
+        }
+
+        // Word (DOCX) olarak indir — HTML-to-Word yöntemi
+        function downloadWord() {
+            showNotification('📝 Word dosyası hazırlanıyor...', 'info');
+            var header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+                'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+                'xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><meta charset="utf-8">' +
+                '<meta name=ProgId content=Word.Document>' +
+                '<style>body{{font-family:Calibri,sans-serif;font-size:11pt;}}' +
+                'table{{border-collapse:collapse;width:100%;}}' +
+                'td,th{{border:1px solid #ccc;padding:6pt;}}' +
+                '.section-header{{background:#1B3A5C;color:white;padding:8pt;font-weight:bold;}}' +
+                '.edit-toolbar,.nav-menu,.nav-toggle,.scroll-top{{display:none!important;}}' +
+                '</style></head>';
+            var container = document.querySelector('.container');
+            var body = container ? container.innerHTML : document.body.innerHTML;
+            var wordHtml = header + '<body>' + body + '</body></html>';
+            var blob = new Blob([wordHtml], {{
+                type: 'application/msword'
+            }});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'HSE_Report_' + new Date().getTime() + '.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📝 Word dosyası indiriliyor...', 'success');
+        }
+
+        // Yazı boyutunu değiştir
+        function changeFontSize(value) {
+            document.getElementById('fontSizeValue').textContent = value + '%';
+            document.querySelector('.container').style.fontSize = value + '%';
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

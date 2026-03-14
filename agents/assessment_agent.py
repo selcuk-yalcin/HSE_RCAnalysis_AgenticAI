@@ -304,6 +304,7 @@ Return ONLY valid JSON."""
                 model="anthropic/claude-sonnet-4.5", # 
                 #model="openai/gpt-4o-mini",  #test model 
             temperature=0.2,
+            max_tokens=500,
             messages=[
                 {
                     "role": "system",

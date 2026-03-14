@@ -1,0 +1,2345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOT CAUSE ANALYSIS REPORT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /* ── OLAY FOTOĞRAFLARI ─────────────────────────────────── */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+
+        .btn-pdf {
+            background: #C0392B;
+            color: white;
+        }
+
+        .btn-word {
+            background: #2980B9;
+            color: white;
+        }
+
+        /* Font boyutu slider */
+        .font-size-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.82em;
+            color: #444;
+        }
+
+        .font-size-control label {
+            white-space: nowrap;
+            font-weight: 600;
+            color: #1B3A5C;
+        }
+
+        .font-size-control input[type=range] {
+            width: 90px;
+            accent-color: #1B3A5C;
+            cursor: pointer;
+        }
+
+        .font-size-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+            color: #1B3A5C;
+        }
+
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260304-011842";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')">📷 Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <div class="font-size-control" title="Yazı boyutunu ayarlayın">
+            <label>🔤 Yazı:</label>
+            <input type="range" id="fontSizeSlider" min="70" max="140" value="100"
+                   oninput="changeFontSize(this.value)">
+            <span class="font-size-value" id="fontSizeValue">100%</span>
+        </div>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-pdf" onclick="downloadPDF()" title="PDF Olarak İndir">
+            📄 PDF İndir
+        </button>
+        <button class="toolbar-btn btn-word" onclick="downloadWord()" title="Word (DOCX) Olarak İndir">
+            📝 Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">ROOT CAUSE ANALYSIS REPORT</h1>
+            <div class="subtitle" contenteditable="true">Prepared Using HSG245 Methodology</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                CONFIDENTIAL - ACCESS RESTRICTED TO AUTHORISED PERSONNEL ONLY
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260304-011842</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">12 January 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Greenfield Refinery Ltd — Unit 4, Crude Distillation Unit (CDU), Heat Exchanger Train E-401A/B/C, Bay 7, United Kingdom</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">FATAL — Process Safety Event (Tier 1) — Major Injury</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">During scheduled maintenance isolation of heat exchanger E-401B, a process technician opened a bypass valve without confirming upstream block valve closure. Hot crude oil at 220°C and 14 bar was released, ignited by adjacent hot work, resulting in a flash fire that killed two workers and seriously injured four others.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">On 12 January 2026 at 09:47, process technician James Cooper opened a 4-inch bypass equalisation valve on heat exchanger E-401B while the upstream block valve XV-4012 was only 40% closed due to a known actuator fault. This released crude oil fraction at 220°C and 14 bar, creating a vapour cloud that drifted 8 metres to an adjacent welding team performing hot work without proper area clearance. The vapour ignited, causing a flash fire and explosion that engulfed a 20-metre radius.</div>
+<div class="paragraph" contenteditable="true">Greenfield Refinery Ltd, Unit 4 Crude Distillation Unit, Heat Exchanger Bay 7, United Kingdom</div>
+<div class="paragraph" contenteditable="true">Two fatalities: James Cooper (41, process technician) and Ryan Mills (29, contract welder). Four workers sustained serious burns and blast injuries requiring ICU admission. Two workers self-evacuated with minor injuries.</div>
+<div class="paragraph" contenteditable="true">Emergency alarm was manually activated at 09:48. On-site fire brigade arrived within 5 minutes and commenced fire suppression. Both fatalities were confirmed by 10:15. Four critically injured workers were evacuated to hospital by 10:30. Site emergency was declared at 11:00, and HSE Executive and police were notified immediately. Full site shutdown was implemented, all active permits were cancelled, and external independent investigation team was engaged.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Isolation checklist was only 6 of 12 steps completed; physical valve verification was not performed before opening pressurised line</li>
+<li contenteditable="true">Critical isolation valve XV-4012 had a known actuator fault for 3 months, achieving only 40% closure, with no interim risk assessment or compensatory measures</li>
+<li contenteditable="true">All three gas detectors in Bay 7 were offline for 6 weeks prior to incident; no temporary gas monitoring or area restrictions were implemented</li>
+<li contenteditable="true">Two conflicting permits (cold work PTW-1847 and hot work HWP-0392) were raised independently with no SIMOPS conflict check performed</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Full site shutdown and all process units placed in safe state</td>
+                        <td contenteditable="true">Operations Manager</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">All active Permits to Work cancelled and SIMOPS review commenced</td>
+                        <td contenteditable="true">PTW Coordinator</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Site-wide gas detector inspection completed; 9 additional faults identified and escalated</td>
+                        <td contenteditable="true">Instrumentation Manager</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">HSE Executive and Police notified (RIDDOR fatal); formal investigation commenced</td>
+                        <td contenteditable="true">HSE Manager</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">All 140+ maintenance backlog items escalated to board level; 12 safety-critical defects prioritised</td>
+                        <td contenteditable="true">Maintenance Manager</td>
+                        <td contenteditable="true">In Progress</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Mandatory stop-work authority training scheduled for all site personnel</td>
+                        <td contenteditable="true">Training Manager</td>
+                        <td contenteditable="true">Planned</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Incident Reference No</td>
+                    <td contenteditable="true">GFR-2026-0112-PSE</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Date</td>
+                    <td contenteditable="true">12 January 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Time</td>
+                    <td contenteditable="true">09:47 local time</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Location</td>
+                    <td contenteditable="true">Greenfield Refinery Ltd, Unit 4, CDU Bay 7</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Department/Line</td>
+                    <td contenteditable="true">Crude Distillation Unit — Heat Exchanger Train E-401A/B/C</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operator/Worker</td>
+                    <td contenteditable="true">James Cooper (Process Technician, 41 years, 14 years service)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Shift</td>
+                    <td contenteditable="true">Day shift (07:00-15:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Equipment</td>
+                    <td contenteditable="true">Heat Exchanger E-401B, Block Valve XV-4012 (actuator fault), 4-inch bypass equalisation valve</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Material/Substance</td>
+                    <td contenteditable="true">Crude oil fraction at 220°C and 14 bar(g)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Weather Conditions</td>
+                    <td contenteditable="true">Not specified in report</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lighting</td>
+                    <td contenteditable="true">Daylight (09:47 AM)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Personal Protective Equipment</td>
+                    <td contenteditable="true">Standard PPE worn; not flame-resistant clothing for hot work area proximity</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Incident Type</td>
+                    <td contenteditable="true">Fatal Process Safety Event (Tier 1) — Flash Fire/Explosion</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Injury/Damage Status</td>
+                    <td contenteditable="true">2 fatalities, 4 serious injuries (ICU), 2 minor injuries</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Number of Persons Affected</td>
+                    <td contenteditable="true">8 workers directly affected; entire site workforce (shutdown)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Damage Level</td>
+                    <td contenteditable="true">Catastrophic — Loss of life, major process safety failure, regulatory investigation</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Reportable</td>
+                    <td contenteditable="true">Yes — Fatal injury, reported 04.03.26</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">First Witness</td>
+                    <td contenteditable="true">Tom Brady (Process Technician, working with James Cooper)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Emergency Services Called</td>
+                    <td contenteditable="true">Yes — On-site fire brigade responded within 5 minutes; hospital ambulance for casualties</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hospitalisation/Discharge</td>
+                    <td contenteditable="true">2 fatalities confirmed at scene and hospital; 4 workers admitted to ICU with critical burns; 2 self-evacuated</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">06:00</div>
+                    <div class="timeline-event" contenteditable="true">Night shift handover; planned maintenance communicated verbally only with no written shift transfer notes</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">07:15</div>
+                    <div class="timeline-event" contenteditable="true">Permit to Work PTW-1847 raised for E-401B isolation (Cold Work); Hot Work Permit HWP-0392 raised separately for adjacent naphtha line — no SIMOPS conflict check performed</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">07:45</div>
+                    <div class="timeline-event" contenteditable="true">Area gas test performed once by shift chemist; result 0% LEL; no continuous gas monitoring requirement defined in PTW</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:00</div>
+                    <div class="timeline-event" contenteditable="true">James Cooper and Tom Brady begin isolation of E-401B per PTW-1847; isolation checklist partially completed (6 of 12 items signed off)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:20</div>
+                    <div class="timeline-event" contenteditable="true">Ryan Mills and welding team begin grinding on naphtha line (HWP-0392), approximately 8 metres from heat exchanger</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:30</div>
+                    <div class="timeline-event" contenteditable="true">James Cooper reports to control room that 'isolation looks complete'; control room operator does not verify valve position physically</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:40</div>
+                    <div class="timeline-event" contenteditable="true">James Cooper opens 4-inch bypass equalisation valve without confirming XV-4012 closed position; XV-4012 was only 40% closed due to known actuator fault (logged 3 months prior, not repaired)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:43</div>
+                    <div class="timeline-event" contenteditable="true">Large hydrocarbon release begins; no automatic gas detector alarm — all sensors in Bay 7 offline (fault logged 6 weeks ago, not repaired)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:45</div>
+                    <div class="timeline-event" contenteditable="true">Vapour cloud drifts to welding area; Ryan Mills notices smell but continues work — no stop-work authority training received</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:47</div>
+                    <div class="timeline-event" contenteditable="true">IGNITION — Flash fire and explosion (0.3 bar overpressure); James Cooper and Ryan Mills engulfed in flames</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:48</div>
+                    <div class="timeline-event" contenteditable="true">Emergency alarm activated manually by bystander</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:52</div>
+                    <div class="timeline-event" contenteditable="true">On-site fire brigade arrives and commences fire suppression</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:15</div>
+                    <div class="timeline-event" contenteditable="true">James Cooper and Ryan Mills confirmed fatally injured</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:30</div>
+                    <div class="timeline-event" contenteditable="true">Four casualties with critical burns evacuated to hospital</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:00</div>
+                    <div class="timeline-event" contenteditable="true">Site emergency declared; HSE Executive and police notified; full site shutdown initiated</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">The 5-Why technique was applied rigorously to each causal branch to prevent superficial conclusions and ensure true root causes were identified. For each immediate cause, the investigation team asked 'Why did this happen?' iteratively, using documentary evidence and witness testimony to validate each answer. The technique was stopped when answers pointed to management decisions or systemic organisational factors beyond the control of frontline workers. For example, Branch 1 traced incomplete isolation checklists through four 'Why' levels to reveal normalisation of deviance as the root cause. Branch 2 traced a defective valve through budget deferrals to reveal deferred maintenance as an accepted norm. Branch 3 traced offline gas detectors to production-priority decision-making. Each chain was cross-validated against multiple evidence sources (maintenance logs, witness statements, management meeting minutes, KPI data) to ensure robustness and avoid investigator bias.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Individual/Behavioural Factor</td>
+                        <td contenteditable="true">Individual rule/procedure violations, lack of knowledge or skill, inattention, fatigue, and other personal factors directly contributing to unsafe acts</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Job/Condition Factor</td>
+                        <td contenteditable="true">Equipment failure, design defects, physical workload, ergonomic issues, defective warning/alarm systems, and unsafe physical conditions</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Workplace Factor</td>
+                        <td contenteditable="true">Inadequate supervision, poor communication, unclear work instructions, insufficient resources at workplace level, and local management deficiencies</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organisational Factor</td>
+                        <td contenteditable="true">Procedure deficiencies, communication breakdowns, management decisions, policy inadequacies, resource allocation failures, and systemic organisational culture issues</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Senior Investigation Lead (Independent)</td>
+                        <td contenteditable="true">Lead Investigator</td>
+                        <td contenteditable="true">Appointed 12 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Process Safety Expert</td>
+                        <td contenteditable="true">Technical Specialist — Process Hazards</td>
+                        <td contenteditable="true">Appointed 12 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">HSE Regulatory Specialist</td>
+                        <td contenteditable="true">RIDDOR/COMAH Compliance</td>
+                        <td contenteditable="true">Appointed 12 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Mechanical/Instrumentation Engineer</td>
+                        <td contenteditable="true">Equipment Failure Analysis</td>
+                        <td contenteditable="true">Appointed 13 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Operations Manager — David Hartley</td>
+                        <td contenteditable="true">Operational Context and Witness</td>
+                        <td contenteditable="true">Interviewed 12 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Maintenance Manager</td>
+                        <td contenteditable="true">Maintenance Systems Review</td>
+                        <td contenteditable="true">Interviewed 13 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Permit to Work System Expert</td>
+                        <td contenteditable="true">PTW System Analysis</td>
+                        <td contenteditable="true">Appointed 14 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Human Factors Specialist</td>
+                        <td contenteditable="true">Behavioural and Cultural Analysis</td>
+                        <td contenteditable="true">Appointed 15 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Legal Counsel</td>
+                        <td contenteditable="true">Legal and Regulatory Liaison</td>
+                        <td contenteditable="true">Appointed 12 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Occupational Health Physician</td>
+                        <td contenteditable="true">Casualty Medical Assessment</td>
+                        <td contenteditable="true">Appointed 12 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">HSE Executive Liaison</td>
+                        <td contenteditable="true">Regulatory Investigation Coordination</td>
+                        <td contenteditable="true">Appointed 12 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Police Liaison (Fatal Incident)</td>
+                        <td contenteditable="true">Criminal Investigation Coordination</td>
+                        <td contenteditable="true">Appointed 12 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Contractor Management Specialist</td>
+                        <td contenteditable="true">Contractor Safety Systems Review</td>
+                        <td contenteditable="true">Appointed 16 January 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Emergency Response Coordinator</td>
+                        <td contenteditable="true">Emergency Response Effectiveness Review</td>
+                        <td contenteditable="true">Appointed 13 January 2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. CRITICAL FACTOR 1 — BEHAVIOURAL CAUSE: INCOMPLETE ISOLATION PROCEDURE</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Process technician James Cooper, with 14 years of service and extensive experience in heat exchanger isolations, was assigned to isolate heat exchanger E-401B for scheduled maintenance under Permit to Work PTW-1847. The isolation procedure required completion of a 12-step checklist, including physical verification of all block valve positions before opening any bypass or drain valves. Cooper had performed this task dozens of times previously without incident. On the morning of 12 January 2026, Cooper and colleague Tom Brady commenced the isolation at 08:00. By 09:30, Cooper reported to the control room that the isolation 'looked complete,' but the isolation checklist showed only 6 of 12 steps signed off. Critically, the step requiring physical verification of upstream block valve XV-4012 closure was not completed. At 09:40, Cooper opened the 4-inch bypass equalisation valve, believing the upstream line to be isolated based on verbal confirmation from the control room operator who stated the valve 'should be closed.' No physical verification was performed.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Individual rule/procedure violation: Cooper opened the bypass valve without completing the isolation checklist and without physically verifying that the upstream block valve XV-4012 was fully closed</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did James Cooper open the bypass equalisation valve without physically verifying that upstream block valve XV-4012 was closed?</div>
+                    <div class="why-answer" contenteditable="true">→ When Cooper called the control room, the operator stated the valve 'should be closed,' and Cooper accepted this verbal confirmation as sufficient. He did not perform physical verification. Additionally, he had completed only 6 of 12 steps on the isolation checklist, meaning he had skipped the valve position verification step entirely.</div>
+                    <span class="why-code">A - Individual/Behavioural</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was Cooper able to proceed with the work using an incomplete checklist and without physical verification?</div>
+                    <div class="why-answer" contenteditable="true">→ Incomplete checklists were routinely accepted on site. According to witness Tom Brady's statement, 'supervisors never rejected a job for incomplete paperwork.' They had performed this job dozens of times before without issues, and procedural violations had become normalised practice.</div>
+                    <span class="why-code">C - Workplace</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why were incomplete isolation checklists and procedural shortcuts consistently accepted by supervisors without correction?</div>
+                    <div class="why-answer" contenteditable="true">→ Deviations had become normalised across the facility (normalisation of deviance). As documented in the report, management tolerated known deviations; facility KPIs focused on production uptime, and safety was tracked only through lagging indicators. Supervisors routinely approved incomplete checklists.</div>
+                    <span class="why-code">D - Organisational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why did management not intervene to enforce procedural compliance before these deviations became normalised?</div>
+                    <div class="why-answer" contenteditable="true">→ The facility-level safety culture was production-focused. The last process safety audit was conducted 18 months ago (exceeding the company standard of 12 months). The safety-critical maintenance backlog contained over 140 open work orders, including 12 critical defects, that had been pending for over 6 months, and senior management had deferred budget approvals. Management systematically tolerated known deviations.</div>
+                    <span class="why-code">D - Organisational</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Normalisation of Deviance in Isolation Procedures</div>
+                <div class="box-content" contenteditable="true">[D1.5 / Organisational]
+
+At Greenfield Refinery, incomplete isolation checklists, commencement of work without physical valve verification, and skipping of safety-critical procedural steps had been systematically accepted and normalised by supervisors and management. According to Tom Brady's witness statement, 'supervisors never rejected a job for incomplete paperwork,' and this work had been performed 'dozens of times without issues.' In this normalised deviance environment, Cooper opened the bypass valve without physical verification despite the known actuator fault in XV-4012. This root cause reflects a deep organisational culture failure where procedural compliance was not enforced, deviations were tolerated as routine, and production priorities consistently overrode safety discipline.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Facility KPIs were focused on production uptime; safety was measured only through lagging indicators, creating implicit pressure to prioritise production over procedural compliance</li>
+<li contenteditable="true">The last process safety audit was conducted 18 months prior to the incident, exceeding the company standard of 12 months, indicating inadequate oversight of safety management systems</li>
+<li contenteditable="true">Supervisors routinely approved incomplete isolation checklists without challenge or correction, signalling to workers that procedural shortcuts were acceptable</li>
+<li contenteditable="true">Management was aware of the 140+ item maintenance backlog (including 12 safety-critical defects) and deferred budget approvals for over 6 months, demonstrating systemic tolerance of known safety risks</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. CRITICAL FACTOR 2 — CONDITION CAUSE: DEFECTIVE CRITICAL ISOLATION VALVE</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Block valve XV-4012 was designated as a CRITICAL isolation valve on the site Piping & Instrumentation Diagram (P&ID) for heat exchanger E-401B. This valve was the primary barrier preventing crude oil fraction at 220°C and 14 bar from entering the bypass line during maintenance isolation. On 14 October 2025, three months before the incident, an actuator fault was identified and logged in the maintenance system. The fault caused the valve to achieve only 40% closure instead of full closure. Despite being classified as a safety-critical component, the fault was simply added to the maintenance backlog with no interim risk assessment, no temporary compensatory measures (such as installation of a line blind), and no restriction on continued operation. The valve remained in this defective state for three months. When Cooper opened the bypass equalisation valve on 12 January 2026, the defective XV-4012 allowed high-pressure, high-temperature crude oil to flow into the bypass line, creating the hydrocarbon release that led to the fatal flash fire.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Equipment/facility failure: Critical isolation valve XV-4012 actuator fault allowed only 40% closure, permitting crude oil fraction at 220°C and 14 bar to be released through the bypass line</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why was the critical isolation valve XV-4012 actuator fault left unrepaired for 3 months?</div>
+                    <div class="why-answer" contenteditable="true">→ The XV-4012 actuator fault was logged in the maintenance system on 14 October 2025 but was only added to the maintenance backlog. No interim risk assessment was conducted for the fault, and no temporary compensatory measures (such as installation of a line blind) were implemented.</div>
+                    <span class="why-code">C - Workplace</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was the fault in XV-4012, designated as a CRITICAL isolation valve on the P&ID, not prioritised as a safety-critical maintenance item?</div>
+                    <div class="why-answer" contenteditable="true">→ The facility had accumulated over 140 open maintenance items, of which 12 were safety-critical defects. Budget approval for instrument repairs had been deferred by senior management for over 6 months and postponed to Q2 2026. As a result, even safety-critical equipment faults were queued in the routine maintenance backlog.</div>
+                    <span class="why-code">D - Organisational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why was the budget required for safety-critical equipment repairs deferred for over 6 months?</div>
+                    <div class="why-answer" contenteditable="true">→ Senior management had set facility KPIs focused on production uptime, and safety indicators consisted only of lagging metrics. Despite Safety Manager Ian Pearce reporting the gas detector faults and maintenance backlog to senior management in November 2025, budget approval was not granted.</div>
+                    <span class="why-code">D - Organisational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why did senior management not allocate budget and intervene despite knowing the size and risk of the safety-critical maintenance backlog?</div>
+                    <div class="why-answer" contenteditable="true">→ Facility management had made the deferral of safety-critical equipment repairs a known and accepted practice. The process safety audit had not been conducted for 18 months (exceeding the company standard of 12 months), the risk created by deferring safety-critical maintenance items was not addressed at board level, and these deferrals were systematically tolerated.</div>
+                    <span class="why-code">D - Organisational</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Deferred Maintenance Accepted as Organisational Norm</div>
+                <div class="box-content" contenteditable="true">[D6.6 / Organisational]
+
+Greenfield Refinery senior management deferred 12 safety-critical maintenance items, including the actuator fault in critical isolation valve XV-4012 (as designated on the P&ID), within a backlog of over 140 open maintenance items for more than 6 months. Instrument repair budget was postponed to Q2 2026. During this deferral period, no interim risk assessment or compensatory measures (such as line blinds or area restrictions) were required. This situation resulted in the operation of safety-critical equipment in a defective state becoming an institutionally accepted norm. The root cause reflects a systemic failure in asset integrity management where financial and production priorities consistently overrode the imperative to maintain safety-critical barriers in functional condition.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Senior management deferred instrument repair budget for over 6 months despite being informed by the Safety Manager of the growing backlog and specific safety-critical defects</li>
+<li contenteditable="true">The 140+ item maintenance backlog, including 12 safety-critical defects, was known to senior management but not escalated to board level for risk assessment and resource allocation</li>
+<li contenteditable="true">No interim risk assessment or compensatory measures were mandated for safety-critical equipment operating in a defective state, indicating absence of a formal Management of Change (MOC) process for degraded safety barriers</li>
+<li contenteditable="true">Process safety audits were overdue by 6 months (18 months since last audit vs. 12-month company standard), demonstrating inadequate governance oversight of asset integrity and maintenance management systems</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. CRITICAL FACTOR 3 — CONDITION CAUSE: FAILED GAS DETECTION SYSTEM</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Bay 7 of the Crude Distillation Unit was equipped with three fixed gas detectors (HD-407, HD-408, HD-409) designed to provide automatic detection and alarm for hydrocarbon vapour releases. These detectors were safety-critical instruments forming part of the facility's process safety barriers. On 29 November 2025, six weeks before the incident, all three gas detectors in Bay 7 were found to be faulty and went offline. The faults were logged in the maintenance system. However, no repairs were carried out, and the detectors remained offline. Critically, no temporary compensatory measures were implemented during this period — no portable gas monitors were deployed, no continuous manual gas testing was required, and no access restrictions were placed on Bay 7. When the hydrocarbon vapour cloud was released at 09:43 on 12 January 2026, there was no automatic detection or alarm. Workers in the area, including welder Ryan Mills, had no early warning of the hazardous atmosphere. Mills noticed the smell of hydrocarbons at 09:45 but continued working, having received no stop-work authority training. The vapour ignited two minutes later.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Defective or absent warning/alarm systems: All gas detectors in Bay 7 (HD-407, HD-408, HD-409) were faulty and offline, preventing detection of the hydrocarbon vapour cloud and generation of automatic alarm</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why were the gas detectors in Bay 7 (HD-407, HD-408, HD-409) offline and unable to detect the hydrocarbon vapour cloud?</div>
+                    <div class="why-answer" contenteditable="true">→ The gas detector faults were logged in the maintenance system on 29 November 2025 (6 weeks before the incident), but repairs were not carried out and the detectors remained offline.</div>
+                    <span class="why-code">B - Job/Condition</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why were the gas detectors not repaired despite the fault being logged 6 weeks earlier?</div>
+                    <div class="why-answer" contenteditable="true">→ Budget approval for instrument repairs had been deferred by senior management to the second quarter of 2026. According to Safety Manager Ian Pearce's statement, the gas detector fault was reported in November, but budget approval was not granted.</div>
+                    <span class="why-code">D - Organisational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why were no temporary compensatory measures (portable gas monitors, area restrictions, continuous gas testing) implemented while the gas detectors were offline?</div>
+                    <div class="why-answer" contenteditable="true">→ As explicitly stated in the report, despite the gas detectors being offline, no temporary compensatory measures were implemented and no access restrictions were imposed on the area. No interim risk assessment was conducted for the defective safety-critical equipment.</div>
+                    <span class="why-code">D - Organisational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why was no interim risk assessment conducted and no compensatory measure requirement triggered while safety-critical gas detectors were offline?</div>
+                    <div class="why-answer" contenteditable="true">→ The facility had over 140 open maintenance items, including 12 safety-critical defects. Despite senior management being aware of this situation, no budget was allocated and repair of safety-critical instrument faults was deferred. Facility KPIs focused on production uptime, and safety indicators were tracked only through lagging metrics.</div>
+                    <span class="why-code">D - Organisational</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Production Pressure Overriding Safety-Critical Expenditure</div>
+                <div class="box-content" contenteditable="true">[D1.4 / Organisational]
+
+Senior management deferred budget approval for safety-critical instrument repairs (including gas detectors) for over 6 months in favour of production continuity, focused facility KPIs on production uptime, and knowingly did not fund a maintenance backlog of over 140 items including 12 safety-critical defects. This situation directly led to the gas detectors in Bay 7 remaining offline and unrepaired for 6 weeks, with no compensatory measures implemented. The root cause reflects a conscious management prioritisation decision where financial and production objectives systematically overrode investment in safety-critical systems, rather than a generic resource shortage.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Senior management deferred instrument repair budget to Q2 2026 despite being informed of safety-critical gas detector failures, demonstrating a conscious decision to prioritise financial targets over safety barrier integrity</li>
+<li contenteditable="true">Facility KPIs were explicitly focused on production uptime, with safety measured only through lagging indicators, creating systemic pressure to avoid production interruptions for safety repairs</li>
+<li contenteditable="true">No Management of Change (MOC) process was triggered when safety-critical gas detectors went offline, indicating absence of a formal system to assess and mitigate degraded safety barriers</li>
+<li contenteditable="true">Senior management was aware of the 140+ item maintenance backlog (including 12 safety-critical defects) but did not escalate to board level or allocate emergency funding, demonstrating institutional tolerance of degraded safety-critical systems</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Simultaneous Operations (SIMOPS) Management Failure</td>
+                        <td contenteditable="true">Two conflicting permits (cold work PTW-1847 for heat exchanger isolation and hot work HWP-0392 for welding on adjacent naphtha line) were raised independently by different supervisors with no conflict check performed. The facility had no enforced SIMOPS policy, and the SIMOPS coordination board was empty. This allowed ignition sources to be present in an area where hydrocarbon release was possible, creating the conditions for the flash fire.</td>
+                        <td class="impact-low" contenteditable="true">Critical</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Inadequate Permit to Work (PTW) System</td>
+                        <td contenteditable="true">The PTW system allowed concurrent conflicting permits to be issued without automated or manual conflict checking. The isolation checklist for PTW-1847 was incomplete (6 of 12 steps), yet the permit was not suspended or challenged. No requirement for continuous gas monitoring was specified in either permit despite the proximity of hot work to hydrocarbon systems. Physical valve verification was not enforced as a mandatory hold point before opening pressurised lines.</td>
+                        <td class="impact-low" contenteditable="true">Critical</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Absence of Stop-Work Authority and Empowerment</td>
+                        <td contenteditable="true">Welder Ryan Mills noticed the smell of hydrocarbons at 09:45 but continued working, having received no training on stop-work authority or empowerment to halt unsafe operations. Workers across the site had not been trained to recognise that they had the right and responsibility to stop work in the presence of uncontrolled hazards. This absence of stop-work culture was a direct contributing factor to the fatalities.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Inadequate Contractor Management</td>
+                        <td contenteditable="true">Contract welder Ryan Mills had received only a 1-day site induction with no process safety awareness training specific to hydrocarbon release hazards, SIMOPS risks, or emergency response procedures. Contractor competency verification and site-specific hazard training were inadequate. The contractor management system did not ensure that contractors working in high-hazard areas received equivalent safety training to direct employees.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Communication and Shift Handover Failures</td>
+                        <td contenteditable="true">The planned maintenance activity and the known fault in valve XV-4012 were communicated verbally only during the night shift handover at 06:00, with no written shift transfer notes. Critical information about the defective valve and the need for enhanced verification was not transferred to the day shift. The control room operator who told Cooper that XV-4012 'should be closed' was unaware of the actuator fault and assumed a compensatory line blind had been installed.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Inadequate Emergency Preparedness</td>
+                        <td contenteditable="true">The emergency alarm was activated manually by a bystander at 09:48, one minute after ignition, rather than automatically by the gas detection system (which was offline). There was no emergency muster or evacuation procedure specific to hydrocarbon release in Bay 7. On-site fire brigade response was effective (5 minutes), but the absence of automatic detection and alarm meant that workers had no early warning to evacuate before ignition.</td>
+                        <td class="impact-medium" contenteditable="true">Medium</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Inadequate Human Factors and Ergonomics</td>
+                        <td contenteditable="true">The isolation checklist was a paper-based form that could be partially completed and submitted without triggering any system alert or supervisory review. There was no forcing function (such as a digital checklist with mandatory hold points) to prevent work proceeding with incomplete isolation verification. The design of the work process did not account for human error or intentional non-compliance.</td>
+                        <td class="impact-medium" contenteditable="true">Medium</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Inadequate Process Safety Culture</td>
+                        <td contenteditable="true">The facility exhibited multiple indicators of weak process safety culture: production-focused KPIs, tolerance of procedural non-compliance, deferred safety-critical maintenance, overdue process safety audits, and absence of stop-work authority. Workers and supervisors had learned that 'getting the job done' was more valued than procedural compliance, and that raising safety concerns would not result in meaningful action.</td>
+                        <td class="impact-low" contenteditable="true">Critical</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Immediate repair of all 12 safety-critical maintenance backlog items, including valve XV-4012 actuator and all gas detectors. Emergency budget approval mandated at board level. No further deferrals permitted for safety-critical equipment.</td>
+                        <td><span class="priority-low">IMMEDIATE</span></td>
+                        <td contenteditable="true">Maintenance Manager / Senior Management</td>
+                        <td contenteditable="true">Completed before restart (within 2 weeks)</td>
+                        <td contenteditable="true">100% of safety-critical backlog cleared; zero safety-critical defects at restart</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Implement automated SIMOPS conflict checking in the Permit to Work system. No permit shall be issued without automated check against all active permits. Manual override requires senior management approval with documented risk assessment.</td>
+                        <td><span class="priority-low">IMMEDIATE</span></td>
+                        <td contenteditable="true">PTW System Owner / IT Department</td>
+                        <td contenteditable="true">Completed before restart (within 2 weeks)</td>
+                        <td contenteditable="true">100% of permits subject to automated SIMOPS check; zero manual overrides without risk assessment</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Mandate physical valve verification as a mandatory hold point in all isolation procedures. Work shall not proceed until physical verification is completed and signed off by a second competent person (independent verification). Implement digital checklist system with forcing functions to prevent incomplete submissions.</td>
+                        <td><span class="priority-low">IMMEDIATE</span></td>
+                        <td contenteditable="true">Operations Manager / HSE Manager</td>
+                        <td contenteditable="true">Completed before restart (within 2 weeks)</td>
+                        <td contenteditable="true">100% of isolations subject to independent physical verification; zero incomplete checklists accepted</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Implement temporary compensatory measures for any safety-critical equipment operating in a defective state. Mandatory interim risk assessment within 24 hours of fault identification. Compensatory measures (line blinds, area restrictions, enhanced monitoring) to be implemented immediately. No defective safety-critical equipment to operate without board-level risk acceptance.</td>
+                        <td><span class="priority-low">IMMEDIATE</span></td>
+                        <td contenteditable="true">HSE Manager / Senior Management</td>
+                        <td contenteditable="true">Policy implemented before restart (within 2 weeks)</td>
+                        <td contenteditable="true">100% of safety-critical defects subject to interim risk assessment within 24 hours; 100% compensatory measures implemented</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Mandatory stop-work authority training for all site personnel (employees and contractors). Training to include recognition of uncontrolled hazards, right and responsibility to stop work, and protection from retaliation. Refresher training annually. Stop-work authority to be tested through drills and near-miss scenarios.</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Training Manager / HSE Manager</td>
+                        <td contenteditable="true">100% personnel trained within 1 month</td>
+                        <td contenteditable="true">100% personnel trained and competency verified; stop-work authority exercised in drills without retaliation</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Revise facility KPIs to include leading indicators of process safety culture and barrier integrity. KPIs to include: procedural compliance rate, safety-critical maintenance backlog (target: zero items >30 days), process safety audit schedule compliance, near-miss reporting rate, and stop-work authority exercise rate. Safety KPIs to be weighted equally with production KPIs in management performance evaluation.</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Senior Management / Corporate HSE</td>
+                        <td contenteditable="true">KPIs revised and implemented within 1 month</td>
+                        <td contenteditable="true">Balanced scorecard implemented; safety KPIs reviewed weekly at management meetings</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Conduct independent process safety culture assessment by external specialist. Assessment to include workforce surveys, focus groups, leadership interviews, and observation of safety-critical work. Findings to be reported to board level with action plan for culture improvement. Repeat assessment annually.</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Corporate HSE / Board of Directors</td>
+                        <td contenteditable="true">Assessment completed within 2 months; action plan within 3 months</td>
+                        <td contenteditable="true">Culture assessment completed; action plan implemented; year-on-year improvement in culture survey scores</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Implement enhanced contractor management system. All contractors working in high-hazard areas to receive site-specific process safety training (minimum 2 days) covering hydrocarbon hazards, SIMOPS, emergency response, and stop-work authority. Contractor competency to be verified before permit issuance. Contractor safety performance to be monitored and reported monthly.</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Contractor Management Specialist / HSE Manager</td>
+                        <td contenteditable="true">System implemented within 2 months; all active contractors retrained within 3 months</td>
+                        <td contenteditable="true">100% contractors in high-hazard areas trained and competency verified; contractor incident rate monitored</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Implement written shift handover procedure with mandatory documentation of safety-critical information (ongoing maintenance, equipment defects, permit status, SIMOPS conflicts). Shift handover to include face-to-face briefing and written log review. Handover quality to be audited weekly by shift managers.</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Operations Manager</td>
+                        <td contenteditable="true">Procedure implemented within 3 months</td>
+                        <td contenteditable="true">100% shift handovers documented; audit findings <5% non-compliance</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Install additional gas detectors in Bay 7 and all high-hazard areas to provide redundancy. Implement continuous gas monitoring requirement for all hot work and maintenance activities in hydrocarbon areas. Gas detector availability to be monitored in real-time with automatic work suspension if detectors go offline.</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Instrumentation Manager / HSE Manager</td>
+                        <td contenteditable="true">Additional detectors installed within 3 months; continuous monitoring policy implemented immediately</td>
+                        <td contenteditable="true">Gas detector availability >98%; zero hot work permits issued in areas with offline detectors</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Conduct process safety audit to company standard (12-month frequency). Audit to be performed by independent external auditors with process safety expertise. Audit findings to be reported to board level with mandatory action plan and closure tracking. Overdue audits to trigger automatic work suspension.</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Corporate HSE / Board of Directors</td>
+                        <td contenteditable="true">Audit completed within 3 months; action plan within 4 months</td>
+                        <td contenteditable="true">Process safety audits conducted to 12-month frequency; 100% audit actions closed within agreed timescales</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Establish board-level Process Safety Committee with quarterly meetings to review major accident risk, safety-critical equipment status, process safety KPIs, and audit findings. Committee to have authority to mandate expenditure for safety-critical repairs and to suspend operations if major accident risk is unacceptable.</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Board of Directors / Corporate HSE</td>
+                        <td contenteditable="true">Committee established within 6 months; first meeting within 7 months</td>
+                        <td contenteditable="true">Committee meetings held quarterly; major accident risk reviewed; safety-critical expenditure decisions documented</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Always perform physical verification of valve positions before opening any pressurised line, regardless of verbal confirmation from control room or previous experience. Physical verification must be an independent check performed by a second competent person and documented as a mandatory hold point in the isolation checklist.
+• Never accept incomplete isolation checklists or procedural shortcuts, even if the work has been performed successfully many times before. Procedural compliance is not optional — it is the primary defence against low-probability, high-consequence events. Supervisors must reject incomplete work and reinforce the message that safety-critical steps cannot be skipped.
+• Always check for conflicting permits and simultaneous operations (SIMOPS) before commencing work. If you are performing maintenance or isolation work, verify that no hot work or other ignition sources are present in the area. If you are performing hot work, verify that no hydrocarbon release is possible in the area. SIMOPS conflicts must be identified and resolved before work starts.
+• Exercise stop-work authority immediately if you observe an uncontrolled hazard, even if you are not directly involved in the work. If you smell hydrocarbons, see a vapour cloud, or observe any unsafe condition, stop work, evacuate the area, and raise the alarm. You have the right and responsibility to stop work, and you will be protected from retaliation.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Develop and sustain a process safety culture where procedural compliance is valued and reinforced, and where production pressure never overrides safety-critical decision-making. This requires visible leadership commitment, balanced KPIs that measure safety culture health, and consistent consequences for non-compliance at all levels of the organisation.
+• Implement a robust asset integrity management system where safety-critical equipment is maintained in functional condition, defects are repaired promptly, and interim risk assessments and compensatory measures are mandatory for any degraded safety barrier. Safety-critical maintenance must be ring-fenced from budget deferrals and production pressures.
+• Establish independent governance oversight of process safety through regular audits, board-level process safety committees, and external expert review. Major accident risk must be visible to senior management and the board, and decisions to accept residual risk must be made at an appropriate level with full understanding of consequences.
+• Invest in human factors and error prevention through digital work management systems, forcing functions in critical procedures, independent verification of safety-critical tasks, and continuous improvement based on near-miss learning. The work system must be designed to prevent human error, not to rely on perfect human performance.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Communicate the findings of this investigation to all site personnel through face-to-face briefings, ensuring that every worker understands the causal factors, the root causes, and the lessons learned. The communication must be honest and transparent, acknowledging organisational failures and leadership accountability, not blaming frontline workers.
+• Share this incident report and lessons learned across all company facilities and with industry peers through process safety networks and forums. The systemic failures identified in this investigation (normalisation of deviance, deferred maintenance, production pressure) are common across the industry, and sharing lessons can prevent similar tragedies elsewhere.
+• Establish a regular communication cadence for process safety performance, including safety-critical equipment status, maintenance backlog, near-miss trends, and culture survey results. This information must be communicated to the workforce, to site leadership, and to the board on a monthly basis to maintain visibility and accountability.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Develop and deliver comprehensive process safety awareness training for all personnel (employees and contractors) working in high-hazard areas. Training must cover hydrocarbon release hazards, ignition sources, SIMOPS risks, emergency response, stop-work authority, and the consequences of procedural non-compliance. Training must be scenario-based and include realistic case studies such as this incident.
+• Implement competency-based training and verification for all safety-critical tasks, including isolation procedures, permit issuance, SIMOPS coordination, and physical valve verification. Competency must be assessed through practical demonstration, not just classroom attendance, and must be refreshed annually.
+• Deliver leadership training for all supervisors and managers on process safety culture, visible safety leadership, and the importance of challenging non-compliance. Leaders must understand that their actions and decisions set the tone for the organisation, and that tolerating procedural shortcuts or deferring safety-critical expenditure sends a powerful message that safety is not genuinely valued.
+• Provide human factors training for engineers and designers to ensure that future work processes, procedures, and systems are designed to prevent human error through forcing functions, independent verification, and error-tolerant design, rather than relying on perfect human performance.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">The fatal flash fire and explosion at Greenfield Refinery on 12 January 2026 was not an unforeseeable accident or an isolated human error. It was the inevitable consequence of systemic organisational failures that had developed and been tolerated over an extended period. The investigation identified three distinct but interconnected root causes, all at the organisational level: normalisation of deviance in isolation procedures (D1.5), deferred maintenance accepted as an organisational norm (D6.6), and production pressure overriding safety-critical expenditure (D1.4). These root causes reflect a fundamental failure of leadership, governance, and process safety culture. The immediate causes — an incomplete isolation checklist, a defective critical isolation valve, and offline gas detectors — were symptoms of these deeper organisational failures, not independent events. The investigation found clear evidence that procedural non-compliance was routinely accepted by supervisors, that safety-critical equipment defects were knowingly deferred for months without interim risk assessment or compensatory measures, and that senior management prioritised production and financial targets over investment in safety-critical systems. The facility's KPI structure, overdue process safety audits, and absence of board-level oversight of major accident risk created an environment where these failures could develop unchecked. The human cost of these failures was catastrophic: two workers lost their lives, four sustained life-threatening injuries, and families and communities were devastated. This incident was preventable. Every causal factor identified in this investigation was known to the organisation before the incident occurred, and every corrective action recommended in this report could have been implemented proactively to prevent the tragedy. The investigation team concludes that Greenfield Refinery was operating with an unacceptable level of major accident risk, and that this risk was not visible to or understood by senior management and the board. The corrective actions recommended in this report are comprehensive and address all identified root causes and contributing factors. However, the investigation team emphasises that sustainable improvement will require a fundamental change in organisational culture and leadership commitment. Process safety must be recognised as a core business value, not a compliance burden. Safety-critical systems must be maintained in functional condition, and production must never override safety-critical decision-making. Workers must be empowered to stop work in the presence of uncontrolled hazards, and leaders must be held accountable for process safety performance. The investigation team recommends that this incident be treated as a sentinel event for the entire organisation, and that the lessons learned be applied across all company facilities to prevent recurrence.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Complete repair of all 12 safety-critical maintenance backlog items within 2 weeks, with emergency budget approval mandated at board level. Implement mandatory interim risk assessment and compensatory measures for any future safety-critical defects within 24 hours of identification. (Responsible: Maintenance Manager / Senior Management; Deadline: 2 weeks)</li>
+<li contenteditable="true">Implement automated SIMOPS conflict checking in the Permit to Work system before restart. Mandate physical valve verification as a mandatory hold point with independent verification for all isolation procedures. Implement digital checklist system with forcing functions to prevent incomplete submissions. (Responsible: PTW System Owner / Operations Manager; Deadline: 2 weeks)</li>
+<li contenteditable="true">Conduct mandatory stop-work authority training for 100% of site personnel (employees and contractors) within 1 month. Training to include recognition of uncontrolled hazards, right and responsibility to stop work, and protection from retaliation. Stop-work authority to be tested through drills. (Responsible: Training Manager / HSE Manager; Deadline: 1 month)</li>
+<li contenteditable="true">Revise facility KPIs to include leading indicators of process safety culture and barrier integrity within 1 month. KPIs to include procedural compliance rate, safety-critical maintenance backlog (target: zero items >30 days), and near-miss reporting rate. Safety KPIs to be weighted equally with production KPIs in management performance evaluation. (Responsible: Senior Management / Corporate HSE; Deadline: 1 month)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Conduct independent process safety culture assessment by external specialist within 2 months, with findings reported to board level and action plan for culture improvement within 3 months. Repeat assessment annually to track progress. (Responsible: Corporate HSE / Board of Directors; Deadline: 2-3 months)</li>
+<li contenteditable="true">Implement enhanced contractor management system within 2 months, requiring all contractors in high-hazard areas to receive site-specific process safety training (minimum 2 days) and competency verification before permit issuance. (Responsible: Contractor Management Specialist / HSE Manager; Deadline: 2-3 months)</li>
+<li contenteditable="true">Conduct process safety audit to company standard (12-month frequency) within 3 months, performed by independent external auditors. Audit findings to be reported to board level with mandatory action plan and closure tracking. (Responsible: Corporate HSE / Board of Directors; Deadline: 3-4 months)</li>
+<li contenteditable="true">Establish board-level Process Safety Committee within 6 months with quarterly meetings to review major accident risk, safety-critical equipment status, process safety KPIs, and audit findings. Committee to have authority to mandate expenditure for safety-critical repairs and to suspend operations if major accident risk is unacceptable. (Responsible: Board of Directors / Corporate HSE; Deadline: 6-7 months)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Safety-Critical Maintenance Backlog</td>
+                        <td class="current" contenteditable="true">140+ open items, 12 safety-critical defects, deferred >6 months</td>
+                        <td class="target" contenteditable="true">Zero safety-critical defects >30 days; all items risk-assessed and compensated</td>
+                    </tr>
+
+                    <tr>
+                        <td>Procedural Compliance (Isolation Checklists)</td>
+                        <td class="current" contenteditable="true">Incomplete checklists routinely accepted (6/12 steps in this incident)</td>
+                        <td class="target" contenteditable="true">100% checklists complete; independent verification mandatory; digital forcing functions</td>
+                    </tr>
+
+                    <tr>
+                        <td>SIMOPS Conflict Management</td>
+                        <td class="current" contenteditable="true">No SIMOPS policy; conflicting permits issued without check</td>
+                        <td class="target" contenteditable="true">Automated SIMOPS conflict checking; 100% permits checked; zero conflicts</td>
+                    </tr>
+
+                    <tr>
+                        <td>Gas Detector Availability (Bay 7)</td>
+                        <td class="current" contenteditable="true">0% (all 3 detectors offline for 6 weeks)</td>
+                        <td class="target" contenteditable="true">>98% availability; automatic work suspension if offline; redundancy installed</td>
+                    </tr>
+
+                    <tr>
+                        <td>Process Safety Audit Frequency</td>
+                        <td class="current" contenteditable="true">18 months since last audit (6 months overdue)</td>
+                        <td class="target" contenteditable="true">12-month frequency maintained; independent external auditors; board reporting</td>
+                    </tr>
+
+                    <tr>
+                        <td>Stop-Work Authority Training</td>
+                        <td class="current" contenteditable="true">0% (Ryan Mills had no training; continued work despite hydrocarbon smell)</td>
+                        <td class="target" contenteditable="true">100% personnel trained annually; stop-work authority exercised in drills</td>
+                    </tr>
+
+                    <tr>
+                        <td>Safety KPIs in Management Performance</td>
+                        <td class="current" contenteditable="true">Production uptime focus; safety measured by lagging indicators only</td>
+                        <td class="target" contenteditable="true">Balanced scorecard; leading indicators (compliance, backlog, culture); equal weighting</td>
+                    </tr>
+
+                    <tr>
+                        <td>Board-Level Process Safety Oversight</td>
+                        <td class="current" contenteditable="true">No board-level process safety committee; major accident risk not visible</td>
+                        <td class="target" contenteditable="true">Quarterly Process Safety Committee; major accident risk reviewed; expenditure authority</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header">📷 OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /* ── OLAY FOTOĞRAFLARI JS ─────────────────────────────── */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+
+        // PDF olarak indir (tarayıcı print → Save as PDF)
+        function downloadPDF() {
+            if (editMode) toggleEditMode();
+            showNotification('📄 PDF için: Yazdır ekranında "PDF olarak kaydet" seçeneğini kullanın', 'info');
+            const originalTitle = document.title;
+            document.title = 'HSE_Report_' + new Date().getTime();
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => { document.title = originalTitle; }, 2000);
+            }, 600);
+        }
+
+        // Word (DOCX) olarak indir — HTML-to-Word yöntemi
+        function downloadWord() {
+            showNotification('📝 Word dosyası hazırlanıyor...', 'info');
+            var header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+                'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+                'xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><meta charset="utf-8">' +
+                '<meta name=ProgId content=Word.Document>' +
+                '<style>body{{font-family:Calibri,sans-serif;font-size:11pt;}}' +
+                'table{{border-collapse:collapse;width:100%;}}' +
+                'td,th{{border:1px solid #ccc;padding:6pt;}}' +
+                '.section-header{{background:#1B3A5C;color:white;padding:8pt;font-weight:bold;}}' +
+                '.edit-toolbar,.nav-menu,.nav-toggle,.scroll-top{{display:none!important;}}' +
+                '</style></head>';
+            var container = document.querySelector('.container');
+            var body = container ? container.innerHTML : document.body.innerHTML;
+            var wordHtml = header + '<body>' + body + '</body></html>';
+            var blob = new Blob([wordHtml], {{
+                type: 'application/msword'
+            }});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'HSE_Report_' + new Date().getTime() + '.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📝 Word dosyası indiriliyor...', 'success');
+        }
+
+        // Yazı boyutunu değiştir
+        function changeFontSize(value) {
+            document.getElementById('fontSizeValue').textContent = value + '%';
+            document.querySelector('.container').style.fontSize = value + '%';
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

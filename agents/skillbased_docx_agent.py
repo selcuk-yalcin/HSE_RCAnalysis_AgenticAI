@@ -40,9 +40,9 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 # RENK PALETİ
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 COLOR = {
     "dark_blue":  RGBColor(0x1B, 0x3A, 0x5C),
     "mid_blue":   RGBColor(0x2E, 0x6D, 0xA4),
@@ -64,9 +64,9 @@ ROOT_CAUSE_COLORS = [
 ]
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 # CLAUDE CONTENT PROMPT
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 CONTENT_SYSTEM_PROMPT = """Sen bir HSE (İş Sağlığı ve Güvenliği) uzmanısın.
 Sana bir kök neden analizi ham verisi gelecek.
 Bu veriyi kullanarak raporun TÜM İÇERİĞİNİ üreteceksin.
@@ -77,7 +77,7 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
 {
   "cover": {
     "title": "KÖK NEDEN ANALİZİ RAPORU",
-    "subtitle": "HSG245 Metodolojisi ile Hazırlanmıştır",
+    "subtitle": "Profesyonel Araştırma ve Analiz Raporu",
     "ref_no": "...",
     "date": "...",
     "location": "...",
@@ -122,7 +122,6 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
       "Yaralanma/Hasar Durumu": "...",
       "Etkilenen Kişi Sayısı": "...",
       "Hasar Seviyesi": "...",
-      "RIDDOR Kapsamında mı": "...",
       "İlk Tanık": "...",
       "Acil Servis Çağrıldı mı": "...",
       "Yatış/Taburculuk": "..."
@@ -138,12 +137,11 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
     "severity": {
       "actual_harm": "...",
       "potential_harm": "...",
-      "investigation_level": "...",
-      "riddor": "..."
+      "investigation_level": "..."
     }
   },
   "analysis_method": {
-    "hsg245_description": "HSG245 metodolojisi nedir ve bu olayda nasıl uygulandı - 3 paragraf",
+    "methodology_description": "Kök neden analizi yöntemi ve bu olayda nasıl uygulandı - 2 paragraf",
     "five_why_explanation": "5-Why tekniği nasıl uygulandı - 2 paragraf",
     "code_system": [
       {"code": "A", "category": "İnsan Faktörü", "description": "Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk gibi bireysel faktörler"},
@@ -174,8 +172,6 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
       ],
       "root_cause_title": "Kök Neden 1 başlığı",
       "root_cause_detail": "Kök nedenin çok detaylı açıklaması - 3-4 cümle",
-      "root_cause_code": "D1.4",
-      "root_cause_category": "Organizasyonel",
       "organizational_factors": [
         "Organizasyonel faktör 1 - detaylı",
         "Organizasyonel faktör 2 - detaylı",
@@ -187,7 +183,6 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
   "root_causes": [
     {
       "number": 1,
-      "code": "D1.4",
       "title": "Kök Neden Başlığı",
       "category": "Organizasyonel",
       "detailed_description": "3-4 paragraf çok detaylı açıklama",
@@ -265,7 +260,7 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
 }
 
 KURALLAR:
-- Tüm metin yüzde yüz TÜRKÇE
+- DİL KURALI: Ham verinin yazıldığı dili tespit et. Arapça ise ARAPÇA, İngilizce ise İNGİLİZCE, İspanyolca ise İSPANYOLCA, Fransızca ise FRANSIZCA, Türkçe ise TÜRKÇE yaz. Dilleri ASLA karıştırma. JSON key'leri İngilizce kalır, tüm VALUE'lar ham verinin dilinde olur.
 - Her alan ham veriden türetilmeli
 - Kısa cevaplar değil, DETAYLI açıklamalar
 - branches dizisi ham verideki tüm dalları içermeli
@@ -274,9 +269,9 @@ KURALLAR:
 """
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 # DOCX YARDIMCI FONKSİYONLARI
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 
 def _set_cell_bg(cell, rgb: RGBColor):
     tc = cell._tc
@@ -398,9 +393,9 @@ def _add_page_break(doc):
     doc.add_page_break()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 # RAPOR BÖLÜM FONKSİYONLARI
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 
 def _build_cover(doc, cover: dict):
     for _ in range(3):
@@ -414,7 +409,7 @@ def _build_cover(doc, cover: dict):
     doc.add_paragraph()
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p.add_run(cover.get("subtitle", "HSG245 Metodolojisi ile Hazırlanmıştır"))
+    run = p.add_run(cover.get("subtitle", "Profesyonel Araştırma ve Analiz Raporu"))
     run.font.size = Pt(14)
     run.font.color.rgb = COLOR["mid_blue"]
     run.italic = True
@@ -526,7 +521,6 @@ def _build_incident_details(doc, details: dict):
             "Gerçek Zarar": sev.get("actual_harm", ""),
             "Potansiyel Zarar": sev.get("potential_harm", ""),
             "Soruşturma Seviyesi": sev.get("investigation_level", ""),
-            "RIDDOR Kapsamı": sev.get("riddor", ""),
         })
     _add_page_break(doc)
 
@@ -535,12 +529,12 @@ def _build_analysis_method(doc, method: dict):
     _add_section_header(doc, "3", "ANALİZ YÖNTEMİ - 5 WHY")
     _add_subsection_header(doc, "3.1 5-Why Tekniği")
     _add_paragraph(doc, method.get("five_why_explanation", ""), space_after=8)
-    _add_subsection_header(doc, "3.2 Kod Sistemi")
+    _add_subsection_header(doc, "3.2 Faktör Kategorileri")
     codes = method.get("code_system", [])
     if codes:
-        table = doc.add_table(rows=len(codes) + 1, cols=3)
+        table = doc.add_table(rows=len(codes) + 1, cols=2)
         table.style = 'Table Grid'
-        for j, h in enumerate(["Kod", "Kategori", "Açıklama"]):
+        for j, h in enumerate(["Kategori", "Açıklama"]):
             c = table.rows[0].cells[j]
             _set_cell_bg(c, COLOR["dark_blue"])
             _set_cell_margins(c)
@@ -551,7 +545,7 @@ def _build_analysis_method(doc, method: dict):
         for i, code in enumerate(codes):
             row = table.rows[i + 1]
             bg = COLOR["light_grey"] if i % 2 == 0 else COLOR["white"]
-            vals = [code.get("code",""), code.get("category",""), code.get("description","")]
+            vals = [code.get("category",""), code.get("description","")]
             for j, val in enumerate(vals):
                 c = row.cells[j]
                 _set_cell_bg(c, bg)
@@ -609,9 +603,9 @@ def _build_branches(doc, branches: list):
         _add_subsection_header(doc, f"{3+bn}.2 5-Why Analiz Tablosu")
         why_chain = branch.get("why_chain", [])
         if why_chain:
-            table = doc.add_table(rows=len(why_chain) + 1, cols=4)
+            table = doc.add_table(rows=len(why_chain) + 1, cols=2)
             table.style = 'Table Grid'
-            for j, h in enumerate(["Neden #", "Soru ve Yanıt", "Kod", "Kategori"]):
+            for j, h in enumerate(["Neden #", "Soru ve Yanıt"]):
                 c = table.rows[0].cells[j]
                 _set_cell_bg(c, COLOR["dark_blue"])
                 _set_cell_margins(c)
@@ -623,7 +617,7 @@ def _build_branches(doc, branches: list):
                 row = table.rows[i + 1]
                 bg = COLOR["light_grey"] if i % 2 == 0 else COLOR["white"]
                 qa = f"NEDEN: {why.get('question','')}\nYANIT: {why.get('answer','')}"
-                vals = [f"NEDEN {why.get('number', i+1)}", qa, why.get("code",""), why.get("category","")]
+                vals = [f"NEDEN {why.get('number', i+1)}", qa]
                 for j, val in enumerate(vals):
                     c = row.cells[j]
                     _set_cell_bg(c, bg)
@@ -634,8 +628,7 @@ def _build_branches(doc, branches: list):
         doc.add_paragraph()
         _add_subsection_header(doc, f"{3+bn}.3 Kök Neden")
         rc_title = f"KOK NEDEN {bn}: {branch.get('root_cause_title','')}"
-        rc_content = (f"[{branch.get('root_cause_code','')} / {branch.get('root_cause_category','')}]\n\n"
-                      f"{branch.get('root_cause_detail','')}")
+        rc_content = f"{branch.get('root_cause_detail','')}"
         _add_colored_box(doc, rc_title, rc_content, color)
         org_factors = branch.get("organizational_factors", [])
         if org_factors:
@@ -720,7 +713,7 @@ def _build_corrective_actions(doc, actions: list):
 
 
 def _build_lessons_learned(doc, lessons: dict):
-    _add_section_header(doc, "8", "CIKARILAN DERSLER")
+    _add_section_header(doc, "9", "CIKARILAN DERSLER")
     doc.add_paragraph()
     sections = [
         ("NE YAPILMALI", lessons.get("what_to_do", []), COLOR["green"]),
@@ -809,11 +802,117 @@ def _build_signature_page(doc):
             run.bold = (j == 0)
             run.font.size = Pt(10)
             run.font.color.rgb = COLOR["dark_blue"] if j == 0 else COLOR["dark_grey"]
+    
+    # Disclaimer
+    doc.add_paragraph()
+    doc.add_paragraph()
+    disclaimer = doc.add_paragraph()
+    disclaimer.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = disclaimer.add_run("---")
+    run.font.size = Pt(10)
+    run.font.color.rgb = COLOR["dark_grey"]
+    
+    doc.add_paragraph()
+    disclaimer_text = doc.add_paragraph()
+    disclaimer_text.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = disclaimer_text.add_run("Bu rapor yapay zeka ile hazırlanmıştır.\nBir uzman tarafından kontrol edilmesi önerilir.")
+    run.font.size = Pt(10)
+    run.font.color.rgb = COLOR["dark_grey"]
+    run.italic = True
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# 
+# DİL TESPİTİ
+# 
+
+def detect_language(text: str) -> dict:
+    """
+    Ham olay metninden dili tespit eder.
+    Returns dict with: code, name, rtl, html_lang, font_hint
+    """
+    if not text:
+        return {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr", "font_hint": ""}
+
+    # Unicode blok örnekleme (ilk 500 karakter yeterli)
+    sample = text[:500]
+
+    arabic_chars  = sum(1 for c in sample if "\u0600" <= c <= "\u06FF")
+    hebrew_chars  = sum(1 for c in sample if "\u0590" <= c <= "\u05FF")
+    cyrillic_chars = sum(1 for c in sample if "\u0400" <= c <= "\u04FF")
+    cjk_chars     = sum(1 for c in sample if "\u4E00" <= c <= "\u9FFF")
+    latin_chars   = sum(1 for c in sample if c.isalpha() and ord(c) < 0x250)
+
+    total = max(len([c for c in sample if c.isalpha()]), 1)
+
+    # Arapça / Farsça / Urduca
+    if arabic_chars / total > 0.15:
+        return {"code": "ar", "name": "Arabic", "rtl": True,
+                "html_lang": "ar", "font_hint": "Arial Unicode MS"}
+
+    # İbranice
+    if hebrew_chars / total > 0.15:
+        return {"code": "he", "name": "Hebrew", "rtl": True,
+                "html_lang": "he", "font_hint": "Arial Unicode MS"}
+
+    # Kiril (Rusça/Bulgarca)
+    if cyrillic_chars / total > 0.15:
+        return {"code": "ru", "name": "Russian", "rtl": False,
+                "html_lang": "ru", "font_hint": ""}
+
+    # Çince/Japonca/Korece
+    if cjk_chars / total > 0.10:
+        return {"code": "zh", "name": "Chinese", "rtl": False,
+                "html_lang": "zh", "font_hint": ""}
+
+    # Latin alfabesi — İngilizce vs Türkçe vs İspanyolca vs Fransızca
+    if latin_chars / total > 0.50:
+        lower = sample.lower()
+        # Türkçe karakterler
+        turkish_chars = sum(1 for c in lower if c in "şğüıöçŞĞÜİÖÇ")
+        # İspanyolca karakterler
+        spanish_chars = sum(1 for c in lower if c in "áéíóúüñ¿¡")
+        # Fransızca karakterler (è, ê, î, ô, û, œ, æ, ç — İspanyolca ile çakışmayan)
+        french_chars = sum(1 for c in lower if c in "èêîôûœæàù")
+        # Portekizce
+        portuguese_chars = sum(1 for c in lower if c in "ãõàâêîôûçé")
+
+        # Yaygın İngilizce kelimeler
+        en_words = {"the", "and", "was", "not", "with", "from", "work", "site",
+                    "worker", "incident", "fall", "height", "safety", "injury"}
+        tr_words = {"bir", "ve", "bu", "ile", "için", "çalışan", "kaza", "olay",
+                    "iş", "işçi", "güvenlik"}
+        # İspanyolcaya özgü — Fransızca'da olmayan kelimeler
+        es_words = {"el", "los", "una", "del", "que", "trabajador", "accidente",
+                    "seguridad", "caída", "andamio", "herido", "altura"}
+        # Fransızcaya özgü — İspanyolca'da olmayan kelimeler
+        fr_words = {"les", "des", "dans", "sur", "avec", "un", "est",
+                    "travailleur", "accident", "sécurité", "tombé", "chute",
+                    "ouvrier", "bâtiment", "grièvement", "portait", "harnais"}
+
+        words = set(lower.split())
+        en_score = len(words & en_words)
+        tr_score = len(words & tr_words) + turkish_chars * 3
+        es_score = len(words & es_words) + spanish_chars * 3
+        fr_score = len(words & fr_words) + french_chars * 3
+
+        scores = {"en": en_score, "tr": tr_score, "es": es_score, "fr": fr_score}
+        best = max(scores, key=lambda k: scores[k])
+
+        lang_map = {
+            "en": {"code": "en", "name": "English",  "rtl": False, "html_lang": "en", "font_hint": ""},
+            "tr": {"code": "tr", "name": "Turkish",  "rtl": False, "html_lang": "tr", "font_hint": ""},
+            "es": {"code": "es", "name": "Spanish",  "rtl": False, "html_lang": "es", "font_hint": ""},
+            "fr": {"code": "fr", "name": "French",   "rtl": False, "html_lang": "fr", "font_hint": ""},
+        }
+        return lang_map.get(best, lang_map["en"])
+
+    # Fallback
+    return {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr", "font_hint": ""}
+
+
+# 
 # ANA AGENT SINIFI
-# ─────────────────────────────────────────────────────────────────────────────
+# 
 
 class SkillBasedDocxAgent:
     """
@@ -835,7 +934,7 @@ class SkillBasedDocxAgent:
         self.api_key = key
         self.model = "anthropic/claude-sonnet-4.5"
         self.api_url = "https://openrouter.ai/api/v1/chat/completions"
-        print(f"✅ SkillBasedDocxAgent V2 hazır (OpenRouter {self.model})")
+        print(f" SkillBasedDocxAgent V2 hazır (OpenRouter {self.model})")
 
     def generate_report(
         self,
@@ -855,41 +954,52 @@ class SkillBasedDocxAgent:
             Oluşturulan DOCX dosyasının tam yolu
         """
         print("\n" + "=" * 70)
-        print("📄 DOCX RAPOR ÜRETME V2 (Claude + python-docx)")
+        print(" DOCX RAPOR ÜRETME V2 (Claude + python-docx)")
         print("=" * 70)
 
         raw_data = self._build_raw_payload(investigation_data)
-        char_count = len(json.dumps(raw_data, ensure_ascii=False))
-        print(f"✅ Ham veri hazır ({char_count} karakter)")
 
-        print("\n🤖 Claude API'ye içerik isteği gönderiliyor...")
+        #  Dil tespiti 
+        source_text = (
+            raw_data.get("part3_rca", {}).get("incident_summary", "")
+            or raw_data.get("part1", {}).get("description", "")
+            or json.dumps(raw_data, ensure_ascii=False)[:800]
+        )
+        lang = detect_language(source_text)
+        print(f" Tespit edilen dil: {lang['name']} ({lang['code']}) | RTL: {lang['rtl']}")
+        # 
+
+        char_count = len(json.dumps(raw_data, ensure_ascii=False))
+        print(f" Ham veri hazır ({char_count} karakter)")
+
+        print("\n Claude API'ye içerik isteği gönderiliyor...")
         start = time.time()
-        content = self._generate_content_with_claude(raw_data)
+        content = self._generate_content_with_claude(raw_data, lang)
         elapsed = time.time() - start
         out_chars = len(json.dumps(content, ensure_ascii=False))
-        print(f"✅ İçerik alındı ({elapsed:.1f}s, {out_chars} karakter)")
+        print(f" İçerik alındı ({elapsed:.1f}s, {out_chars} karakter)")
 
-        print("\n📝 DOCX oluşturuluyor (python-docx)...")
+        print("\n DOCX oluşturuluyor (python-docx)...")
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
-        self._build_docx(content, str(output_file.resolve()))
+        self._build_docx(content, str(output_file.resolve()), lang)
 
         if not output_file.exists():
             raise RuntimeError(f"DOCX oluşturulamadı: {output_file}")
 
         size_kb = output_file.stat().st_size / 1024
-        print(f"\n✅ DOCX başarıyla oluşturuldu!")
-        print(f"📄 Dosya : {output_file.resolve()}")
-        print(f"📊 Boyut : {size_kb:.1f} KB")
+        print(f"\n DOCX başarıyla oluşturuldu!")
+        print(f" Dosya : {output_file.resolve()}")
+        print(f" Boyut : {size_kb:.1f} KB")
         
         # HTML rapor da üret
         html_path = str(output_file).replace('.docx', '.html')
-        print(f"\n📝 HTML raporu oluşturuluyor...")
-        self._build_html(content, html_path)
+        print(f"\n HTML raporu oluşturuluyor...")
+        self._build_html(content, html_path, lang)
         html_size_kb = Path(html_path).stat().st_size / 1024
-        print(f"✅ HTML başarıyla oluşturuldu!")
-        print(f"📄 Dosya : {html_path}")
-        print(f"📊 Boyut : {html_size_kb:.1f} KB")
+        print(f" HTML başarıyla oluşturuldu!")
+        print(f" Dosya : {html_path}")
+        print(f" Boyut : {html_size_kb:.1f} KB")
         
         print("=" * 70)
         return str(output_file.resolve())
@@ -905,9 +1015,17 @@ class SkillBasedDocxAgent:
             return {"part1": {}, "part2": {}, "part3_rca": data}
         return data
 
-    def _generate_content_with_claude(self, raw_data: Dict) -> Dict:
+    def _generate_content_with_claude(self, raw_data: Dict, lang: Optional[Dict] = None) -> Dict:
+        lang = lang or {"code": "tr", "name": "Turkish", "rtl": False}
+        lang_name = lang["name"]
+        lang_instruction = (
+            f"\n\nCRITICAL LANGUAGE RULE: The incident data is written in {lang_name}. "
+            f"You MUST write ALL report content ENTIRELY in {lang_name}. "
+            f"Do NOT mix languages. JSON keys stay in English but every VALUE must be in {lang_name}.\n"
+        )
         user_msg = (
-            "Aşağıdaki HSG245 kök neden analizi ham verisini kullanarak "
+            lang_instruction
+            + "Aşağıdaki kök neden analizi ham verisini kullanarak "
             "profesyonel HSE raporu içeriğini üret.\n\n"
             "Ham Veri:\n```json\n"
             + json.dumps(raw_data, ensure_ascii=False, indent=2)
@@ -962,17 +1080,17 @@ class SkillBasedDocxAgent:
                 
                 # İçeriği ekrana yazdır (debug için)
                 print(full_text[:500] + "..." if len(full_text) > 500 else full_text)
-                print(f"\n📊 Toplam karakter: {len(full_text)}")
+                print(f"\n Toplam karakter: {len(full_text)}")
                 print("-" * 50)
                 
                 return self._parse_json_response(full_text)
             else:
-                print(f"\n❌ Geçersiz API yanıtı: {result}")
+                print(f"\n Geçersiz API yanıtı: {result}")
                 print("-" * 50)
                 return {"cover": {"title": "KÖK NEDEN ANALİZİ RAPORU"}}
             
         except requests.exceptions.RequestException as e:
-            print(f"\n❌ OpenRouter API hatası: {e}")
+            print(f"\n OpenRouter API hatası: {e}")
             print("-" * 50)
             return {"cover": {"title": "KÖK NEDEN ANALİZİ RAPORU"}}
 
@@ -995,10 +1113,11 @@ class SkillBasedDocxAgent:
                 return json.loads(text[start:end + 1])
             except json.JSONDecodeError:
                 pass
-        print("⚠️  JSON parse başarısız, minimal içerik kullanılıyor...")
+        print("  JSON parse başarısız, minimal içerik kullanılıyor...")
         return {"cover": {"title": "KOK NEDEN ANALİZİ RAPORU"}}
 
-    def _build_docx(self, content: Dict, output_path: str) -> None:
+    def _build_docx(self, content: Dict, output_path: str, lang: Optional[Dict] = None) -> None:
+        lang = lang or {"code": "tr", "name": "Turkish", "rtl": False}
         doc = Document()
         section = doc.sections[0]
         section.page_width = Cm(21.59)
@@ -1021,17 +1140,47 @@ class SkillBasedDocxAgent:
         _build_conclusion(doc, content.get("conclusion", {}))
         _build_signature_page(doc)
 
-        doc.save(output_path)
-        print(f"✅ Dosya kaydedildi: {output_path}")
+        # RTL dil desteği (Arapça, İbranice vb.)
+        if lang.get("rtl"):
+            try:
+                from lxml import etree as _etree  # python-docx already depends on lxml
+                WNAMESPACE = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+                for para in doc.paragraphs:
+                    pPr = para._p.get_or_add_pPr()
+                    bidi_tag = f"{{{WNAMESPACE}}}bidi"
+                    if pPr.find(bidi_tag) is None:
+                        _etree.SubElement(pPr, bidi_tag)
+                    jc_tag = f"{{{WNAMESPACE}}}jc"
+                    existing_jc = pPr.find(jc_tag)
+                    if existing_jc is None:
+                        jc = _etree.SubElement(pPr, jc_tag)
+                        jc.set(f"{{{WNAMESPACE}}}val", "right")
+            except ImportError:
+                print("  lxml bulunamadı — RTL DOCX desteği atlandı")
 
-    def _build_html(self, content: Dict, output_path: str) -> None:
+        doc.save(output_path)
+        print(f" Dosya kaydedildi: {output_path}")
+
+    def _build_html(self, content: Dict, output_path: str, lang: Optional[Dict] = None) -> None:
         """Düzenlenebilir HTML rapor oluşturur."""
-        html = self._generate_html_template(content)
+        html = self._generate_html_template(content, lang)
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html)
 
-    def _generate_html_template(self, content: Dict) -> str:
+    def _generate_html_template(self, content: Dict, lang: Optional[Dict] = None) -> str:
         """Modern, responsive ve düzenlenebilir HTML rapor şablonu."""
+        lang = lang or {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr"}
+        html_lang = lang.get("html_lang", "tr")
+        is_rtl = lang.get("rtl", False)
+        dir_attr = ' dir="rtl"' if is_rtl else ''
+        rtl_css = """
+        body { direction: rtl; text-align: right; }
+        .container { direction: rtl; }
+        .cover { direction: rtl; }
+        th, td { text-align: right; }
+        .meta-table td:first-child { font-weight: bold; }
+        """ if is_rtl else ""
+
         cover = content.get("cover", {})
         executive_summary = content.get("executive_summary", {})
         incident_details = content.get("incident_details", {})
@@ -1045,7 +1194,7 @@ class SkillBasedDocxAgent:
 
         # HTML oluştur
         html = f"""<!DOCTYPE html>
-<html lang="tr">
+<html lang="{html_lang}"{dir_attr}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1064,7 +1213,7 @@ class SkillBasedDocxAgent:
             background: #f5f5f5;
             padding: 20px;
         }}
-        
+        {rtl_css}
         .container {{
             max-width: 1200px;
             margin: 0 auto;
@@ -1369,6 +1518,118 @@ class SkillBasedDocxAgent:
             padding-top: 10px;
             text-align: center;
         }}
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {{
+            margin: 40px 0;
+            page-break-before: always;
+        }}
+        .photo-page {{
+            page-break-after: always;
+        }}
+        .photo-page:last-child {{
+            page-break-after: auto;
+        }}
+        .photo-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }}
+        .photo-slot {{
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }}
+        .photo-slot:hover {{
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }}
+        .photo-slot.has-photo {{
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }}
+        .photo-slot img {{
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }}
+        .photo-slot .upload-hint {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }}
+        .photo-slot .upload-hint .icon {{
+            font-size: 3em;
+        }}
+        .photo-slot .upload-hint .label {{
+            font-size: 0.95em;
+            font-weight: 600;
+        }}
+        .photo-slot .upload-hint .sub {{
+            font-size: 0.78em;
+            color: #888;
+        }}
+        .photo-caption {{
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }}
+        .photo-caption::placeholder {{
+            color: #aaa;
+        }}
+        .photo-remove {{
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }}
+        .photo-slot.has-photo .photo-remove {{
+            display: flex;
+        }}
+        .photo-page-title {{
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }}
+        @media print {{
+            .photo-slot .upload-hint {{ display: none; }}
+            .photo-remove {{ display: none !important; }}
+            .photo-caption {{ border-top: 1px solid #ccc; }}
+        }}
         
         .comparison-table td:first-child {{
             background: #D6E4F0 !important;
@@ -1595,7 +1856,7 @@ class SkillBasedDocxAgent:
         }}
         
         [contenteditable="true"]:hover::after {{
-            content: "✏️ Düzenlemek için tıklayın";
+            content: " Düzenlemek için tıklayın";
             position: absolute;
             top: -25px;
             left: 0;
@@ -1655,42 +1916,49 @@ class SkillBasedDocxAgent:
 </head>
 <body>
     <!-- Navigasyon Toggle Butonu -->
-    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
     
     <!-- Navigasyon Menüsü -->
     <div class="nav-menu" id="navMenu" style="display: none;">
         <h3>İÇİNDEKİLER</h3>
         <ul>
-            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
-            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
-            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
-            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
-            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
-            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
-            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
-            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
-            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
-            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
-            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
         </ul>
     </div>
     
     <!-- Düzenleme Toolbar -->
     <div class="edit-toolbar" id="editToolbar">
         <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
-            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
         </button>
         <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
-            💾 Kaydet
+             Kaydet
         </button>
         <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
-            🖨️ Yazdır
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
         </button>
         <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
-            📥 HTML İndir
+             HTML İndir
         </button>
         <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
-            🔄 Sıfırla
+             Sıfırla
         </button>
     </div>
     
@@ -1701,7 +1969,7 @@ class SkillBasedDocxAgent:
         <!-- KAPAK SAYFASI -->
         <div class="cover" id="cover">
             <h1 contenteditable="true">{cover.get('title', 'KÖK NEDEN ANALİZİ RAPORU')}</h1>
-            <div class="subtitle" contenteditable="true">{cover.get('subtitle', 'HSG245 Metodolojisi ile Hazırlanmıştır')}</div>
+            <div class="subtitle" contenteditable="true">{cover.get('subtitle', 'Profesyonel Araştırma ve Analiz Raporu')}</div>
             
             <div class="confidential-banner" contenteditable="true">
                 {cover.get('confidentiality', 'GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR')}
@@ -1763,6 +2031,9 @@ class SkillBasedDocxAgent:
         # N+6. İMZA SAYFASI
         html += self._html_signatures()
 
+        # N+7. OLAY FOTOĞRAFLARI (2 sayfa × 4 foto)
+        html += self._html_incident_photos()
+
         html += """
         </div>
     </div>
@@ -1813,14 +2084,14 @@ class SkillBasedDocxAgent:
             
             if (editMode) {
                 editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
-                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
                 toolbar.classList.add('active');
-                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
             } else {
                 editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
-                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
                 toolbar.classList.remove('active');
-                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+                showNotification(' Düzenleme modu KAPALI', 'info');
             }
         }
         
@@ -1830,7 +2101,7 @@ class SkillBasedDocxAgent:
             const timestamp = new Date().toISOString();
             localStorage.setItem('hse_report_saved', html);
             localStorage.setItem('hse_report_saved_time', timestamp);
-            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
             console.log('Rapor kaydedildi:', timestamp);
         }
         
@@ -1841,7 +2112,7 @@ class SkillBasedDocxAgent:
                 toggleEditMode();
             }
             
-            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
             setTimeout(() => {
                 window.print();
             }, 500);
@@ -1859,14 +2130,97 @@ class SkillBasedDocxAgent:
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
         }
         
         // Orijinal haline döndür
         function resetReport() {
-            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
                 location.reload();
-                showNotification('🔄 Rapor sıfırlandı', 'info');
+                showNotification(' Rapor sıfırlandı', 'info');
             }
         }
         
@@ -1940,7 +2294,7 @@ class SkillBasedDocxAgent:
                     const html = document.documentElement.outerHTML;
                     localStorage.setItem('hse_report_autosave', html);
                     localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
-                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
                 }, 2000); // 2 saniye sonra otomatik kaydet
             }
         });
@@ -1952,10 +2306,10 @@ class SkillBasedDocxAgent:
             // Kaydedilmiş rapor var mı kontrol et
             const savedTime = localStorage.getItem('hse_report_saved_time');
             if (savedTime) {
-                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
             }
             
-            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
         });
         
         // Keyboard shortcuts
@@ -1982,12 +2336,12 @@ class SkillBasedDocxAgent:
         });
         
         // PDF hint
-        console.log('💡 KULLANIM İPUÇLARI:');
-        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
-        console.log('💾 Ctrl+S: Kaydet');
-        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
-        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
-        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
     </script>
 </body>
 </html>
@@ -2492,11 +2846,11 @@ class SkillBasedDocxAgent:
             
             <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
                 <p style="margin: 0; color: #666;">
-                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
                     Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
                 </p>
                 <p style="margin: 10px 0 0 0; color: #666;">
-                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
                     ve "PDF olarak kaydet" seçeneğini seçin.
                 </p>
             </div>
@@ -2504,22 +2858,142 @@ class SkillBasedDocxAgent:
 """
         return html
 
+    def _html_incident_photos(self) -> str:
+        """Olay fotoğrafları bölümü — 2 sayfa × 4 foto, tıkla-yükle."""
+        pages_html = ""
+        for page_no in range(1, 3):
+            slots_html = ""
+            for slot in range(1, 5):
+                uid = f"photo_p{page_no}_s{slot}"
+                slots_html += f"""
+                <div class="photo-slot" id="{uid}_slot" onclick="triggerUpload('{uid}')">
+                    <input type="file" id="{uid}_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, '{uid}')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('{uid}')"></button>
+                    <div class="upload-hint" id="{uid}_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf {slot}</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="{uid}_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="{uid}_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>"""
 
+            pages_html += f"""
+            <div class="photo-page" id="photo-page-{page_no}">
+                <div class="photo-page-title">Sayfa {page_no} / 2</div>
+                <div class="photo-grid">
+                    {slots_html}
+                </div>
+            </div>"""
+
+        return f"""
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            {pages_html}
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {{
+            document.getElementById(uid + '_input').click();
+        }}
+
+        function loadPhoto(event, uid) {{
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {{
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {{
+                    cap.value = file.name.replace(/\\.[^/.]+$/, '');
+                }}
+            }};
+            reader.readAsDataURL(file);
+        }}
+
+        function removePhoto(uid) {{
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }}
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {{
+            slot.addEventListener('dragover', function(e) {{
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            }});
+            slot.addEventListener('dragleave', function() {{
+                if (!slot.classList.contains('has-photo')) {{
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }}
+            }});
+            slot.addEventListener('drop', function(e) {{
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {{
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({{target: input}}, uid);
+                }}
+            }});
+        }});
+        </script>
+"""
 
 
 if __name__ == "__main__":
     print("=" * 70)
-    print("🧪 SkillBasedDocxAgent V2 — Standalone Test")
+    print(" SkillBasedDocxAgent V2 — Standalone Test")
     print("=" * 70)
 
     outputs = sorted(Path("outputs").glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
     if outputs:
         json_file = outputs[0]
-        print(f"�� Kullanılan veri: {json_file}")
+        print(f" Kullanılan veri: {json_file}")
         with open(json_file, encoding="utf-8") as f:
             data = json.load(f)
     else:
-        print("❌ outputs/*.json bulunamadı!")
+        print(" outputs/*.json bulunamadı!")
         sys.exit(1)
 
     agent = SkillBasedDocxAgent()
@@ -2528,9 +3002,9 @@ if __name__ == "__main__":
             investigation_data=data,
             output_path="outputs/HSE_FULL_REPORT_V2.docx",
         )
-        print(f"\n�� BAŞARILI! → {out}")
+        print(f"\n BAŞARILI! → {out}")
     except Exception as e:
         import traceback
-        print(f"\n❌ HATA: {e}")
+        print(f"\n HATA: {e}")
         traceback.print_exc()
         sys.exit(1)

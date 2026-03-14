@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSG245 Root Cause Analysis - Live Report Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header .job-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header .job-id {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .split-view {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 20px;
+            height: calc(100vh - 200px);
+        }
+
+        /* Left Panel - Progress */
+        .progress-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+
+        .progress-panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 30px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            min-width: 60px;
+        }
+
+        .progress-bar.shimmer {
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .status-badge.pending { background: #ffeaa7; color: #d63031; }
+        .status-badge.running { background: #74b9ff; color: #0984e3; }
+        .status-badge.completed { background: #55efc4; color: #00b894; }
+        .status-badge.failed { background: #ff7675; color: #d63031; }
+
+        /* Timeline */
+        .timeline {
+            margin-top: 30px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 25px;
+            bottom: -20px;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            z-index: 1;
+        }
+
+        .timeline-icon.pending {
+            background: #f0f0f0;
+            color: #999;
+        }
+
+        .timeline-icon.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-icon.completed {
+            background: #55efc4;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .timeline-content h3 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content p {
+            color: #666;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .timeline-content .timestamp {
+            color: #999;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        /* Right Panel - HTML Preview */
+        .preview-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-header h2 {
+            font-size: 18px;
+        }
+
+        .preview-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .preview-controls button {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .preview-controls button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .preview-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        /* HTML Content Styling */
+        .html-content {
+            background: white;
+            padding: 40px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .html-content h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .html-content h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .html-content h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .html-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .html-content table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .html-content table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .html-content table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Loading Placeholder */
+        .loading-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .loading-placeholder .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Typing Animation for New Content */
+        .html-content.typing {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.5; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .connection-status.connected {
+            background: #55efc4;
+            color: #00b894;
+        }
+
+        .connection-status.disconnected {
+            background: #ff7675;
+            color: white;
+        }
+
+        .connection-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .split-view {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .progress-panel {
+                margin-bottom: 20px;
+            }
+
+            .preview-panel {
+                min-height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status disconnected">
+        <span class="dot"></span>
+        <span id="statusText">Bağlanıyor...</span>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 HSG245 Root Cause Analysis - Live Report</h1>
+            <div class="job-info">
+                Job ID: <span class="job-id" id="jobId">-</span>
+            </div>
+        </div>
+
+        <!-- Split View -->
+        <div class="split-view">
+            <!-- Left Panel - Progress -->
+            <div class="progress-panel">
+                <h2>📈 Analiz İlerlemesi</h2>
+                
+                <!-- Status Badge -->
+                <div class="status-badge pending" id="statusBadge">PENDING</div>
+
+                <!-- Progress Bar -->
+                <div class="progress-bar-container">
+                    <div class="progress-bar shimmer" id="progressBar" style="width: 0%">
+                        <span id="progressText">0%</span>
+                    </div>
+                </div>
+
+                <p style="color: #666; font-size: 12px; margin-bottom: 20px;">
+                    <span id="currentStep">Sistem başlatılıyor...</span>
+                </p>
+
+                <!-- Timeline -->
+                <div class="timeline" id="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon pending">1</div>
+                        <div class="timeline-content">
+                            <h3>Immediate Causes Analysis</h3>
+                            <p>HSG245 A & B kategorileri inceleniyor...</p>
+                            <div class="timestamp" id="step1Time">-</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon pending">2</div>
+                        <div class="timeline-content">
+                            <h3>5-Why Root Cause Analysis</h3>
+                            <p>C & D kategorileri ile kök neden analizi...</p>
+                            <div class="timestamp" id="step2Time">-</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon pending">3</div>
+                        <div class="timeline-content">
+                            <h3>Results Merge & Validation</h3>
+                            <p>Sonuçlar birleştiriliyor ve doğrulanıyor...</p>
+                            <div class="timestamp" id="step3Time">-</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon pending">4</div>
+                        <div class="timeline-content">
+                            <h3>HTML Report Generation</h3>
+                            <p>Profesyonel HTML raporu oluşturuluyor...</p>
+                            <div class="timestamp" id="step4Time">-</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon pending">5</div>
+                        <div class="timeline-content">
+                            <h3>Finalization</h3>
+                            <p>Rapor tamamlandı ve kaydediliyor...</p>
+                            <div class="timestamp" id="step5Time">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - HTML Preview -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <h2>📄 Canlı Rapor Önizlemesi</h2>
+                    <div class="preview-controls">
+                        <button onclick="downloadReport()">⬇️ İndir</button>
+                        <button onclick="copyReport()">📋 Kopyala</button>
+                        <button onclick="toggleFullscreen()">⛶ Tam Ekran</button>
+                    </div>
+                </div>
+                <div class="preview-content" id="previewContent">
+                    <div class="loading-placeholder">
+                        <div class="spinner"></div>
+                        <h3>Rapor Oluşturuluyor...</h3>
+                        <p>HTML içeriği yazılmaya başladığında burada görünecek.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get job ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const jobId = urlParams.get('job_id');
+
+        if (!jobId) {
+            alert('Job ID bulunamadı! URL parametresinde job_id olmalı.');
+        }
+
+        document.getElementById('jobId').textContent = jobId || 'N/A';
+
+        // WebSocket connection
+        let ws = null;
+        let reconnectInterval = null;
+        let isConnected = false;
+
+        // Backend URL (Railway'de production'da değişecek)
+        const WS_URL = `ws://localhost:8000/ws/progress/${jobId}`;
+        const API_URL = `http://localhost:8000/api/v3/status/${jobId}`;
+
+        // Connect WebSocket
+        function connectWebSocket() {
+            console.log('WebSocket bağlantısı kuruluyor...');
+            
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                console.log('✅ WebSocket bağlandı');
+                isConnected = true;
+                updateConnectionStatus(true);
+                
+                // Clear reconnect timer
+                if (reconnectInterval) {
+                    clearInterval(reconnectInterval);
+                    reconnectInterval = null;
+                }
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('📨 Progress update:', data);
+                
+                updateProgress(data);
+            };
+
+            ws.onerror = (error) => {
+                console.error('❌ WebSocket hatası:', error);
+                updateConnectionStatus(false);
+            };
+
+            ws.onclose = () => {
+                console.log('⚠️ WebSocket bağlantısı kapandı');
+                isConnected = false;
+                updateConnectionStatus(false);
+                
+                // Reconnect after 3 seconds
+                if (!reconnectInterval) {
+                    reconnectInterval = setInterval(() => {
+                        console.log('🔄 Yeniden bağlanmaya çalışılıyor...');
+                        connectWebSocket();
+                    }, 3000);
+                }
+            };
+        }
+
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            const textEl = document.getElementById('statusText');
+            
+            if (connected) {
+                statusEl.className = 'connection-status connected';
+                textEl.textContent = 'Canlı Bağlantı';
+            } else {
+                statusEl.className = 'connection-status disconnected';
+                textEl.textContent = 'Bağlantı Kesildi';
+                
+                // Fallback to polling
+                startPolling();
+            }
+        }
+
+        // Polling fallback (WebSocket yoksa)
+        let pollingInterval = null;
+
+        function startPolling() {
+            if (pollingInterval) return; // Zaten polling yapılıyor
+            
+            console.log('📡 Polling başlatıldı (fallback)');
+            
+            pollingInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(API_URL);
+                    const data = await response.json();
+                    updateProgress(data);
+                    
+                    // Completed olunca polling durdur
+                    if (data.status === 'completed' || data.status === 'failed') {
+                        clearInterval(pollingInterval);
+                        pollingInterval = null;
+                    }
+                } catch (error) {
+                    console.error('Polling hatası:', error);
+                }
+            }, 2000); // Her 2 saniyede bir
+        }
+
+        // Update progress UI
+        function updateProgress(data) {
+            // Progress bar
+            const progress = data.progress || 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '%';
+
+            // Status badge
+            const statusBadge = document.getElementById('statusBadge');
+            statusBadge.textContent = data.status?.toUpperCase() || 'UNKNOWN';
+            statusBadge.className = `status-badge ${data.status}`;
+
+            // Current step
+            document.getElementById('currentStep').textContent = data.current_step || 'İşleniyor...';
+
+            // Timeline update
+            updateTimeline(data);
+
+            // HTML content update (CORE FEATURE!)
+            if (data.html_content) {
+                updateHTMLPreview(data.html_content);
+            }
+
+            // Completed
+            if (data.status === 'completed') {
+                document.getElementById('progressBar').classList.remove('shimmer');
+                
+                // Final HTML fetch
+                if (data.result?.html_file_url) {
+                    fetchFinalHTML(data.result.html_file_url);
+                }
+            }
+        }
+
+        // Update timeline
+        function updateTimeline(data) {
+            const steps = {
+                'Analyzing immediate causes': 1,
+                'Performing 5-why analysis': 2,
+                'Merging results': 3,
+                'Generating HTML report': 4,
+                'Analysis complete': 5
+            };
+
+            const currentStepNum = steps[data.current_step] || 0;
+
+            // Update timeline icons
+            for (let i = 1; i <= 5; i++) {
+                const icon = document.querySelector(`.timeline-item:nth-child(${i}) .timeline-icon`);
+                
+                if (i < currentStepNum) {
+                    icon.className = 'timeline-icon completed';
+                    icon.textContent = '✓';
+                } else if (i === currentStepNum) {
+                    icon.className = 'timeline-icon active';
+                    icon.textContent = i;
+                } else {
+                    icon.className = 'timeline-icon pending';
+                    icon.textContent = i;
+                }
+
+                // Timestamp
+                if (data.timestamps && data.timestamps[`step${i}`]) {
+                    const timestamp = new Date(data.timestamps[`step${i}`]);
+                    document.getElementById(`step${i}Time`).textContent = 
+                        timestamp.toLocaleTimeString('tr-TR');
+                }
+            }
+        }
+
+        // Update HTML Preview (REAL-TIME!)
+        function updateHTMLPreview(htmlContent) {
+            const previewEl = document.getElementById('previewContent');
+            
+            // Create wrapper
+            const wrapper = document.createElement('div');
+            wrapper.className = 'html-content typing';
+            wrapper.innerHTML = htmlContent;
+            
+            // Replace content
+            previewEl.innerHTML = '';
+            previewEl.appendChild(wrapper);
+        }
+
+        // Fetch final HTML
+        async function fetchFinalHTML(url) {
+            try {
+                const response = await fetch(url);
+                const html = await response.text();
+                updateHTMLPreview(html);
+            } catch (error) {
+                console.error('Final HTML fetch hatası:', error);
+            }
+        }
+
+        // Download report
+        function downloadReport() {
+            const htmlContent = document.querySelector('.html-content')?.innerHTML;
+            
+            if (!htmlContent) {
+                alert('Henüz rapor içeriği yok!');
+                return;
+            }
+
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `RCA_Report_${jobId}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Copy report
+        function copyReport() {
+            const htmlContent = document.querySelector('.html-content')?.innerHTML;
+            
+            if (!htmlContent) {
+                alert('Henüz rapor içeriği yok!');
+                return;
+            }
+
+            navigator.clipboard.writeText(htmlContent).then(() => {
+                alert('✅ Rapor panoya kopyalandı!');
+            });
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            const panel = document.querySelector('.preview-panel');
+            
+            if (!document.fullscreenElement) {
+                panel.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Initialize
+        connectWebSocket();
+    </script>
+</body>
+</html>

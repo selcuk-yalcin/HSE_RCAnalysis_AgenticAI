@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /* ── OLAY FOTOĞRAFLARI ─────────────────────────────────── */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - CHM-2026-001-BURN";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')">📷 Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">HSG245 Metodolojisi ile Hazırlanmıştır</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">CHM-2026-001-BURN</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">15.03.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">ABC Kimya Fabrikası, Asit Depolama Sahası, Tank 7 Dolum İstasyonu</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Majör Yaralanma - Kimyasal Yanık</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Sülfürik asit transferi sırasında hortum bağlantısının gevşemesi sonucu kimya teknisyeninin yüzüne ve göğsüne %98 konsantrasyonlu asit sıçramıştır. Acil durum duşunun basınç yetersizliği nedeniyle etkili yıkama yapılamamış, 2. derece kimyasal yanık ve göz irritasyonu oluşmuştur.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">34 yaşındaki kimya teknisyeni Mehmet Yılmaz, Tank 7 dolum istasyonunda %98 konsantrasyonlu sülfürik asit transferi operasyonu sırasında hortum bağlantısının beklenmedik şekilde gevşemesi sonucu yüz, boyun ve göğüs bölgesine yüksek konsantrasyonlu asit sıçraması yaşamıştır. Olay anında kullanılan kimyasal koruyucu ekipmanlar yetersiz kalmış ve acil durum duşunun basınç problemi nedeniyle ilk müdahale etkisiz olmuştur.</div>
+<div class="paragraph" contenteditable="true">ABC Kimya Fabrikası, Asit Depolama Sahası, Tank 7 Dolum İstasyonu</div>
+<div class="paragraph" contenteditable="true">Mehmet Yılmaz (34 yaş, 8 yıl kıdemli Kimya Teknisyeni) - 2. derece kimyasal yanık, bilateral göz irritasyonu, 45 gün tahmini tedavi süresi</div>
+<div class="paragraph" contenteditable="true">Olay sonrası kazazede acil durum duşuna koşmuş ancak yetersiz su basıncı nedeniyle etkili yıkama yapılamamıştır. İş arkadaşları normal musluktan yıkama yapmış, 112 acil servisi çağrılmış ve kazazede 20 dakika içinde ambulansla hastaneye sevk edilmiştir. Olay yeri derhal izole edilmiş ve asit transfer operasyonu durdurulmuştur.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Hortum bağlantısında orijinal parça yerine lokal imalat parça kullanılmış, titreşim sensörü 2 haftadır arızalı durumda</li>
+<li contenteditable="true">Acil durum duşu 14 aydır test edilmemiş, basınç yetersizliği tespit edilememiş</li>
+<li contenteditable="true">Kullanılan KKD'ler (gözlük, eldiven) %98 sülfürik aside karşı yetersiz koruma sağlamış, yüz siperi tedarik edilmemiş</li>
+<li contenteditable="true">Risk değerlendirmesi 18 aydır güncellenmemiş, kritik ekipman test programı kağıt üzerinde kalmış</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Tüm asit transfer operasyonlarının durdurulması ve ekipman kontrolü</td>
+                        <td contenteditable="true">Üretim Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Acil durum duşlarının tesis genelinde basınç testi ve onarımı</td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Lokal imalat hortum bağlantılarının orijinal parçalarla değiştirilmesi</td>
+                        <td contenteditable="true">Teknik Direktör</td>
+                        <td contenteditable="true">Planlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Asit transfer bölgesinde çalışan tüm personele acil durum prosedürü eğitimi</td>
+                        <td contenteditable="true">İSG Uzmanı</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">CHM-2026-001-BURN</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">15.03.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">14:30</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">ABC Kimya Fabrikası, Asit Depolama Sahası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Tank 7 Dolum İstasyonu</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Mehmet Yılmaz (34 yaş, Kimya Teknisyeni)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası (08:00-16:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Sülfürik asit transfer pompası, transfer hortumu, Tank 7</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Sülfürik asit %98 konsantrasyon</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Açık, sıcak (28°C)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">İyi (doğal + yapay aydınlatma)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Kimyasal gözlük (yan koruma yok), nitril eldiven, kimyasal önlük (yüz siperi YOK)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Majör Yaralanma - Kimyasal Yanık</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">2. derece kimyasal yanık (yüz, boyun, göğüs), bilateral göz irritasyonu</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 kişi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Seviye 1 - Ölümcül veya Majör</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Evet (12.03.2026 tarihinde bildirildi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Ali Kaya (Operatör)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet (14:35 - 112 arandı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Hastaneye sevk edildi, 45 gün tahmini tedavi süresi</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:00</div>
+                    <div class="timeline-event" contenteditable="true">Vardiya başlangıcı, toolbox meeting yapıldı (konu: elektrik güvenliği - asit transferi değil)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:00</div>
+                    <div class="timeline-event" contenteditable="true">Tank 7'ye asit transferi için hazırlık çalışmaları başladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:30</div>
+                    <div class="timeline-event" contenteditable="true">Transfer pompası devreye alındı, ilk kontrol yapıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:00</div>
+                    <div class="timeline-event" contenteditable="true">Çay molası</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:15</div>
+                    <div class="timeline-event" contenteditable="true">Asit transfer operasyonu devam etti</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:25</div>
+                    <div class="timeline-event" contenteditable="true">Hortumda titreşim fark edildi, operatör kontrol için yaklaştı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:30</div>
+                    <div class="timeline-event" contenteditable="true">Hortum bağlantısı gevşedi, %98 sülfürik asit sıçradı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:31</div>
+                    <div class="timeline-event" contenteditable="true">Kazazede acil durum duşuna koştu, yıkama başladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:32</div>
+                    <div class="timeline-event" contenteditable="true">Duş basıncı yetersiz olduğu tespit edildi, kazazede yardım istedi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:33</div>
+                    <div class="timeline-event" contenteditable="true">İş arkadaşları yardıma geldi, normal musluktan yıkama yapıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:35</div>
+                    <div class="timeline-event" contenteditable="true">112 acil servis arandı, ilk yardım malzemeleri getirildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:50</div>
+                    <div class="timeline-event" contenteditable="true">Ambulans geldi, kazazede hastaneye sevk edildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:00</div>
+                    <div class="timeline-event" contenteditable="true">Olay yeri izole edildi, asit transfer operasyonları durduruldu</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why (5 Neden) tekniği, bir problemin kök nedenine ulaşmak için 'Neden?' sorusunun ardışık olarak en az beş kez sorulmasını içeren basit ama etkili bir analiz yöntemidir. Bu kazada 5-Why tekniği üç farklı dal için uygulanmıştır. Birinci dalda 'Hortum bağlantısı neden gevşedi?' sorusundan başlanarak, lokal imalat parça kullanımına, maliyet odaklı tedarik kararlarına ve nihayetinde üst yönetimin güvenlik yatırımlarını sistematik olarak ertelemesine ulaşılmıştır. İkinci dalda 'Titreşim sensörü neden arızalıydı?' sorusundan hareketle, bakım programının uygulanmamasına ve izleme/denetim sisteminin yokluğuna ulaşılmıştır. Üçüncü dalda 'Acil durum duşu neden yetersiz basınçlıydı?' sorusundan başlanarak, güvenlik kritik ekipmanların tanımlanmamış olmasına ulaşılmıştır. Her bir 'Neden?' sorusu, bir önceki yanıtın altında yatan nedeni araştırmış ve böylece yüzeysel semptomlardan derin organizasyonel nedenlere doğru bir yolculuk yapılmıştır. 5-Why zincirinin her halkası, rapordaki somut bulgularla (tanık ifadeleri, ekipman kayıtları, bakım logları) desteklenmiştir.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü</td>
+                        <td contenteditable="true">Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk, motivasyon düşüklüğü gibi bireysel düzeydeki faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktör</td>
+                        <td contenteditable="true">Ekipman arızası, koruyucu sistemlerin yetersizliği, çevresel koşullar, fiziksel tehlikeler gibi iş ortamı koşulları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Görev tasarımı, iş yükü, ergonomi, prosedür karmaşıklığı, zaman baskısı gibi iş ve görev ile ilgili faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Yönetim kararları, politikalar, kaynak tahsisi, güvenlik kültürü, iletişim sistemleri, eğitim programları gibi organizasyon düzeyindeki faktörler</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Fatma Yıldız</td>
+                        <td contenteditable="true">İSG Uzmanı - Baş Araştırmacı</td>
+                        <td contenteditable="true">16.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Dr. Ahmet Kara</td>
+                        <td contenteditable="true">İş Sağlığı Hekimi</td>
+                        <td contenteditable="true">16.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ayşe Demir</td>
+                        <td contenteditable="true">Vardiya Şefi - Operasyonel Tanık</td>
+                        <td contenteditable="true">16.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Murat Özkan</td>
+                        <td contenteditable="true">Bakım Mühendisi - Teknik Uzman</td>
+                        <td contenteditable="true">17.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Zeynep Arslan</td>
+                        <td contenteditable="true">Kimyasal Güvenlik Uzmanı</td>
+                        <td contenteditable="true">17.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ali Kaya</td>
+                        <td contenteditable="true">Operatör - Görgü Tanığı</td>
+                        <td contenteditable="true">16.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hasan Yılmaz</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">18.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Elif Şahin</td>
+                        <td contenteditable="true">İnsan Kaynakları Müdürü</td>
+                        <td contenteditable="true">18.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Mehmet Demir</td>
+                        <td contenteditable="true">Dış İSG Danışmanı</td>
+                        <td contenteditable="true">19.03.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - HORTUM BAĞLANTISI ARIZA VE YEDEKLİK SORUNLARI</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Sülfürik asit transfer hattında kullanılan hortum bağlantı parçası, orijinal ekipman üreticisinin önerdiği spesifikasyonlara uygun olmayan lokal imalat bir parça ile değiştirilmişti. Bu parça, %98 konsantrasyonlu sülfürik asitin yüksek basınç altında transferi sırasında oluşan titreşim ve mekanik streslere karşı yeterli dayanıklılığa sahip değildi. Ayrıca, hortum titreşimini erken tespit etmesi gereken titreşim sensörü 2 haftadır arızalı durumda olmasına rağmen onarılmamıştı. Bu durum, operatörün titreşimi manuel olarak fark edene kadar hiçbir erken uyarı alınamamasına neden olmuştur.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Asit transfer hortumunun bağlantı noktasında orijinal parça yerine lokal imalat kullanılması nedeniyle bağlantının gevşemesi ve asit sıçraması</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Asit transfer hortumunun bağlantısı neden gevşeyerek asit sıçramasına yol açtı?</div>
+                    <div class="why-answer" contenteditable="true">→ Hortum bağlantı noktasında orijinal parça yerine lokal imalat parça kullanılmıştı; bu parça sülfürik asit transfer basıncına ve titreşime dayanıklı değildi ve titreşim altında gevşedi. Orijinal parçalar asit direnci, basınç dayanımı ve titreşim toleransı açısından test edilmiş ve sertifikalandırılmışken, lokal imalat parça bu standartları karşılamıyordu.</div>
+                    <span class="why-code">B2.7 - Koşulsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Hortum bağlantısında neden orijinal parça yerine lokal imalat parça kullanılıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Orijinal yedek parça tedarik edilmemiş, bunun yerine maliyet odaklı satın alma kararıyla lokal imalat parça tercih edilmişti. Satın alma departmanı, orijinal parçanın maliyetinin yüksek olduğunu gerekçe göstererek lokal tedarikçiden daha ucuz alternatif sipariş etmişti. Ayrıca titreşim sensörü 2 haftadır arızalıydı ve bakım beklemesine rağmen onarılmamıştı; bu nedenle hortum titreşimi otomatik olarak erken tespit edilemedi ve operatör manuel kontrole yaklaşmak zorunda kaldı.</div>
+                    <span class="why-code">D8.1 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Kritik asit transfer ekipmanında orijinal olmayan parça kullanımı ve arızalı titreşim sensörünün 2 hafta bakımsız kalması neden kabul edildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Satın alma kararlarında güvenlik yerine maliyet önceliklendiriliyordu; İSG uzmanının 3 ay önce verdiği yüz siperi alım talebi bile bütçe onayı beklemekteydi. Aynı şekilde kritik ekipman test programı kağıt üzerinde var olmasına rağmen uygulanmıyordu ve arızalı sensörün bakımı ertelenmişti. Risk değerlendirmesi 18 aydır güncellenmemişti ve hortum bağlantısı gibi kritik parçaların orijinal olması gerektiği vurgusu yapılmamıştı.</div>
+                    <span class="why-code">D1.1 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Güvenlik ekipmanı tedarik talepleri ve kritik bakım işleri neden sistematik olarak bütçe/kaynak yetersizliği gerekçesiyle erteleniyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Üst yönetim, güvenlik yatırımlarını (orijinal yedek parça, uygun KKD, sensör bakımı, acil durum duşu testi) bütçe ve kaynak tahsisinde ikinci plana atıyordu. Vardiya şefinin ifadesine göre 'zaman yok' denilerek test programları uygulanmıyor, İSG uzmanının tedarik talepleri aylardır onay bekliyor ve kritik ekipman bakımları erteleniyordu. Yönetim toplantılarında üretim hedefleri ve maliyet düşürme öncelikli gündem maddeleriyken, güvenlik yatırımları 'ertelenebilir' kategorisinde değerlendiriliyordu.</div>
+                    <span class="why-code">D1.1 - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Üst Yönetimin Güvenlik Yatırımlarını Sistematik Olarak Önceliklendirmemesi</div>
+                <div class="box-content" contenteditable="true">[D1.1 / Organizasyonel]
+
+ABC Kimya üst yönetimi, sülfürik asit transfer hattındaki orijinal yedek parça tedarikini, arızalı titreşim sensörünün bakımını, acil durum duşu periyodik testlerini, uygun KKD (yüz siperi, aside dayanıklı eldiven) alımını ve kritik ekipman test programının uygulanmasını bütçe ve kaynak tahsisinde sistematik olarak önceliklendirmemiştir. İSG uzmanının 3 ay önceki yüz siperi talebi hâlâ bütçe onayında beklemekte, kritik ekipman test programı kağıt üzerinde kalmakta ve vardiya şefinin ifadesiyle 'zaman yok' gerekçesiyle güvenlik faaliyetleri ertelenmektedir. Bu durum, güvenlik kültürünün organizasyonun en üst seviyesinde yeterince içselleştirilmediğini ve güvenlik harcamalarının üretim ve maliyet hedeflerinin gerisinde tutulduğunu göstermektedir.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Bütçe onay süreçlerinde güvenlik yatırımlarının (yüz siperi, orijinal yedek parça, sensör bakımı) sistematik olarak ertelenmesi ve 'maliyet optimizasyonu' gerekçesiyle reddedilmesi</li>
+<li contenteditable="true">Üst yönetim toplantılarında güvenlik konularının gündem önceliğinin düşük olması, üretim hedefleri ve maliyet düşürme öncelikli konuların güvenlik yatırımlarının önüne geçmesi</li>
+<li contenteditable="true">Kritik ekipman test programının kağıt üzerinde kalması ve 'zaman yok' gerekçesiyle uygulanmamasına üst yönetim tarafından müdahale edilmemesi</li>
+<li contenteditable="true">İSG uzmanının talep ve önerilerinin (yüz siperi, orijinal parça kullanımı, acil durum duşu testi) karar alma süreçlerinde yeterli ağırlığa sahip olmaması ve bütçe onaylarının aylarca bekletilmesi</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - ERKEN UYARI SİSTEMLERİ VE İZLEME/DENETİM EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Tank 7 dolum istasyonunda hortum titreşimini algılayacak ve operatörleri erken uyaracak titreşim sensörü mevcut olmasına rağmen, 2 haftadır arızalı durumda idi ve bakım beklemekteydi. Bu sensör, hortum bağlantısındaki gevşeme öncesi oluşan titreşim artışını otomatik olarak tespit edip alarm vermesi gerekirken, arızalı olması nedeniyle bu fonksiyonunu yerine getiremedi. Operatör, titreşimi manuel olarak fark edene kadar hiçbir erken uyarı alamadı ve tehlikeli bölgeye yaklaşmak zorunda kaldı. Kritik ekipman test ve bakım programı kağıt üzerinde mevcut olmasına rağmen, sahada fiilen uygulanmıyordu ve arızalı ekipmanların takibi yapılmıyordu.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Hortum titreşimini algılayacak sensörün arızalı olması nedeniyle erken uyarı alınamaması ve operatörün manuel kontrole yaklaşması</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Titreşim sensörü arızalı olmasına rağmen neden erken uyarı sistemi devreye giremedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Tank 7 dolum istasyonundaki titreşim sensörü 2 haftadır arızalıydı ve bakım beklemesine rağmen onarılmamıştı; bu nedenle hortum bağlantısındaki gevşeme öncesi oluşan titreşim artışı otomatik olarak algılanamadı. Sensör arızası bakım loglarına kaydedilmiş ancak onarım için kaynak tahsis edilmemişti.</div>
+                    <span class="why-code">B1.5 - Koşulsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Titreşim sensörü neden 2 haftadır arızalı olmasına rağmen onarılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kritik ekipman test ve bakım programı kağıt üzerinde mevcut olmasına rağmen fiilen uygulanmıyordu; vardiya şefi Ayşe Demir'in ifadesine göre 'kimse uygulamıyordu, zaman yok diyorlardı' ve arızalı sensör bakım kuyruğunda beklemeye devam etti. Bakım ekibi, üretim ekipmanlarının bakımını önceliklendiriyordu ve güvenlik ekipmanları ikinci planda kalıyordu.</div>
+                    <span class="why-code">D6.6 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Kritik ekipman bakım programı neden kağıt üzerinde kalıp fiilen uygulanmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Bakım önceliklerinin sistematik olarak takip edildiği, geciken bakımların üst yönetime raporlandığı ve aksiyon alındığı bir izleme/denetim mekanizması bulunmuyordu; acil durum duşu da 14 aydır test edilmemişti ve bu durum hiçbir denetim sürecinde tespit edilememişti. İş izin belgesi rutin imzalanıyor ama detaylı kontrol yapılmıyordu.</div>
+                    <span class="why-code">D9.5 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Kritik güvenlik ekipmanlarının bakım gecikmelerini tespit edecek sistematik bir izleme/denetim mekanizması neden yoktu?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonda prosedür uyum takibi ve periyodik denetim sistemi tasarlanmamıştı; iş izin belgesi rutin imzalanıyor ama detaylı kontrol yapılmıyordu, risk değerlendirmesi 18 aydır güncellenmemişti ve bu eksiklikleri yakalayacak sistematik bir uygunluk doğrulama süreci hiç kurulmamıştı. Denetim faaliyetleri reaktif olarak yürütülüyordu, proaktif bir izleme sistemi yoktu.</div>
+                    <span class="why-code">D9.5 - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Sistematik İzleme ve Denetim Mekanizmasının Yokluğu</div>
+                <div class="box-content" contenteditable="true">[D9.5 / Organizasyonel]
+
+ABC Kimya'da kritik güvenlik ekipmanlarının (titreşim sensörü, acil durum duşu) bakım/test zamanlamalarını, iş izin sistemi uygulamasını ve risk değerlendirmesi güncelleme takvimini sistematik olarak izleyen, sapmaları tespit eden ve düzeltici aksiyon tetikleyen bir denetim/uygunluk doğrulama sistemi bulunmuyordu. Prosedürler ve bakım programları kağıt üzerinde mevcut olmasına rağmen, bunların sahada uygulanıp uygulanmadığını doğrulayan, gecikmeleri raporlayan ve üst yönetime escalate eden bir mekanizma tasarlanmamıştı. Bu durum, acil durum duşunun 14 aydır test edilmemesi, titreşim sensörünün 2 haftadır arızalı beklemesi, iş izin belgelerinin şekilsel imzalanması ve risk değerlendirmesinin 18 aydır güncellenmemesi gibi birçok kritik eksikliğin tespit edilememesine yol açmıştır.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kritik ekipman bakım ve test zamanlamalarını takip eden, gecikmeleri otomatik olarak raporlayan bir yazılım veya manuel izleme sisteminin olmaması</li>
+<li contenteditable="true">İş izin belgelerinin şekilsel imzalanması, detaylı kontrol yapılmaması ve iş izin sistemi uygulamasının denetlenmemesi</li>
+<li contenteditable="true">Risk değerlendirmelerinin güncelleme takvimini takip eden, gecikmeleri tespit eden ve sorumluları uyaran bir mekanizmanın bulunmaması</li>
+<li contenteditable="true">Prosedür uyum denetimlerinin planlı ve sistematik olarak yapılmaması, denetim bulgularının kayıt altına alınmaması ve düzeltici aksiyonların takip edilmemesi</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - ACİL DURUM EKİPMANLARI VE GÜVENLİK KRİTİK EKIPMAN YÖNETİMİ</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Asit Depolama Sahasında bulunan acil durum duşunun su basıncı, %98 konsantrasyonlu sülfürik asit gibi yüksek tehlikeli kimyasalların etkili şekilde yıkanması için gerekli olan minimum basınç seviyesinin altındaydı. Duşun son basınç testi 14 ay önce yapılmıştı ve bu süre zarfında duşun performansı hiç kontrol edilmemişti. Olay anında kazazede acil durum duşuna koşmuş ancak yetersiz su basıncı nedeniyle asidin etkili şekilde yıkanması mümkün olmamış, bu durum yaralanmanın şiddetini artırmıştır. Kritik ekipman test programı kağıt üzerinde mevcut olmasına rağmen, acil durum duşu gibi güvenlik kritik ekipmanlar ayrı bir öncelik kategorisi olarak tanımlanmamış ve normal bakım kuyruğunda üretim ekipmanlarının gerisinde kalmıştı.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Acil durum duşunun su basıncının yetersiz olması nedeniyle asit yanığının etkili şekilde yıkanamaması ve yaralanmanın şiddetlenmesi</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Acil durum duşunun su basıncı neden yetersizdi?</div>
+                    <div class="why-answer" contenteditable="true">→ Acil durum duşunun son basınç testi 14 ay önce yapılmıştı ve bu süre zarfında duşun performansı hiç kontrol edilmemişti; dolayısıyla basınç düşüklüğü tespit edilemeden kalmıştı. Su şebekesindeki basınç dalgalanmaları veya duş başlığındaki kireçlenme gibi sorunlar periyodik testlerle tespit edilebilirdi ancak test yapılmadığı için bu sorunlar bilinmiyordu.</div>
+                    <span class="why-code">B1.1 - Koşulsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Acil durum duşunun periyodik basınç testi neden 14 aydır yapılmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kritik ekipman test programı kağıt üzerinde mevcut olmasına rağmen sahada uygulanmıyordu; vardiya şefi Ayşe Demir'in ifadesine göre 'zaman yok' denilerek test programı sürekli ertelenmişti. Bakım ekibi, acil durum duşu testini öncelikli görmüyordu çünkü 'acil durum' nadiren gerçekleşiyordu ve günlük üretim ekipmanları daha acil görülüyordu.</div>
+                    <span class="why-code">D6.6 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Kritik acil durum ekipmanlarının test programı neden kağıt üzerinde kalıp sahada uygulanmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Acil durum duşu gibi güvenlik kritik ekipmanlar, bakım öncelik sıralamasında düşük tutuluyordu; titreşim sensörünün 2 haftadır arızalı beklemesi ve yüz siperi tedarik talebinin 3 aydır bütçe onayı beklemesi de gösterdiği gibi, güvenlik ekipmanlarının bakım ve testleri sistematik olarak erteleniyordu. Bakım planlamasında 'üretim durdurucu' ekipmanlar öncelikli, 'güvenlik kritik' ekipmanlar ikincil olarak değerlendiriliyordu.</div>
+                    <span class="why-code">D6.8 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Güvenlik kritik ekipmanların (acil durum duşu, titreşim sensörü) bakım ve testleri neden sistematik olarak erteleniyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Güvenlik kritik ekipmanlar (SCE - Safety Critical Equipment) ayrı bir öncelik kategorisi olarak tanımlanmamıştı; acil durum duşu, titreşim sensörü gibi koruyucu ekipmanlar normal bakım havuzunda değerlendirildiğinden, üretim ekipmanları karşısında sürekli geri plana atılıyordu. Bakım yönetim sisteminde SCE tanımı yapılmamış, bu ekipmanlar için ayrı bir bakım stratejisi ve önceliklendirme sistemi oluşturulmamıştı.</div>
+                    <span class="why-code">D6.8 - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Güvenlik Kritik Ekipmanların Tanımlanmaması ve Önceliklendirilmemesi</div>
+                <div class="box-content" contenteditable="true">[D6.8 / Organizasyonel]
+
+ABC Kimya fabrikasında acil durum duşu, titreşim sensörü gibi güvenlik kritik ekipmanlar (SCE) ayrı bir kategori olarak tanımlanmamış ve önceliklendirilmemişti. Bu nedenle acil durum duşunun basınç testi 14 aydır yapılmamış, titreşim sensörü 2 haftadır arızalı beklemiş ve tüm bu ekipmanlar normal bakım kuyruğunda üretim ekipmanlarının gerisinde kalmıştı. Bakım yönetim sisteminde, bir ekipmanın arızalanması durumunda yaralanma veya ölüme yol açabilecek 'güvenlik kritik ekipmanlar' tanımlanmamış, bu ekipmanlar için ayrı bir bakım stratejisi, test frekansı ve önceliklendirme sistemi oluşturulmamıştır. Bu durum, güvenlik ekipmanlarının 'acil olmayan' kategorisinde değerlendirilmesine ve sistematik olarak ertelenmesine yol açmıştır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Bakım yönetim sisteminde güvenlik kritik ekipmanların (SCE) tanımlanmaması ve bu ekipmanlar için ayrı bir kategori oluşturulmaması</li>
+<li contenteditable="true">Acil durum duşu, göz yıkama istasyonu, titreşim sensörü gibi koruyucu ekipmanların normal bakım kuyruğunda üretim ekipmanlarıyla aynı öncelikte değerlendirilmesi</li>
+<li contenteditable="true">Güvenlik kritik ekipmanlar için ayrı bir bakım stratejisi, test frekansı ve performans kriterleri belirlenmemesi</li>
+<li contenteditable="true">Bakım önceliklendirme sisteminde 'üretim etkisi' kriterinin 'güvenlik etkisi' kriterinden daha ağırlıklı olması ve güvenlik ekipmanlarının sürekli ertelenmesi</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">KKD Kalite ve Uygunluk Yetersizliği</td>
+                        <td contenteditable="true">Kullanılan kimyasal koruyucu gözlük yan koruma içermiyordu ve %98 sülfürik asit sıçramasına karşı yetersiz kaldı. Nitril eldiven sadece 10 dakika koruma sağlıyordu. Risk değerlendirmesinde gerekli görülen yüz siperi 3 aydır bütçe onayı beklediği için tedarik edilmemişti.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim ve Tatbikat Eksikliği</td>
+                        <td contenteditable="true">Personel temel İSG ve kimyasal güvenlik eğitimi almış olmasına rağmen, pratik acil durum tatbikatı 2 yıl önce yapılmıştı. Asit transfer prosedürü pratik eğitimi ve acil durum duş kullanım pratiği hiç yapılmamıştı.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Risk Değerlendirmesi Güncelleme Eksikliği</td>
+                        <td contenteditable="true">Asit transfer operasyonu için yapılan risk değerlendirmesi 18 ay önce hazırlanmıştı ve güncellenmemişti. Hortum bağlantısı gibi kritik parçaların orijinal olması gerektiği, yüz siperi kullanımının zorunlu olduğu gibi kontroller risk değerlendirmesinde vurgulanmamıştı.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İş İzin Sistemi Şekilselliği</td>
+                        <td contenteditable="true">Asit transfer operasyonu için iş izin belgesi dolduruluyordu ancak rutin olarak imzalanıyordu ve detaylı kontrol yapılmıyordu. Hortum bağlantısının orijinal parça olup olmadığı, titreşim sensörünün çalışıp çalışmadığı gibi kritik kontroller iş izin sürecinde yapılmıyordu.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Toolbox Meeting İçerik Uygunsuzluğu</td>
+                        <td contenteditable="true">Olay günü yapılan toolbox meeting konusu elektrik güvenliğiydi, oysa o gün yapılacak asit transfer operasyonu ile ilgili bir güvenlik konuşması yapılmamıştı. Toolbox meeting konuları günlük iş planı ile uyumlu değildi.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Tedarik ve Satın Alma Kararlarında Güvenlik Önceliğinin Düşüklüğü</td>
+                        <td contenteditable="true">Satın alma departmanı, orijinal yedek parça yerine maliyet odaklı kararlarla lokal imalat parça sipariş etmişti. Güvenlik ekipmanı tedariklerinde (yüz siperi, aside dayanıklı eldiven) maliyet optimizasyonu güvenlik gereksinimlerinin önüne geçiyordu.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Tüm asit transfer hatlarında kullanılan hortum bağlantılarının orijinal parçalarla değiştirilmesi ve lokal imalat parça kullanımının yasaklanması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Teknik Direktör</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Orijinal parça kullanım oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Acil durum duşlarının tesis genelinde basınç testi yapılması, yetersiz olanların onarımı ve haftalık test programının başlatılması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Acil durum duşu test uyum oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Arızalı titreşim sensörünün acil onarımı ve tüm kritik sensörlerin fonksiyon testinin yapılması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Mühendisi</td>
+                        <td contenteditable="true">3 gün</td>
+                        <td contenteditable="true">Kritik sensör çalışma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Yüz siperi ve aside dayanıklı eldiven tedarikinin acil onaylanması ve tüm asit transfer personeline dağıtılması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Satın Alma Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Uygun KKD kullanım oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Güvenlik Kritik Ekipmanların (SCE) tanımlanması, envanterinin çıkarılması ve ayrı bakım stratejisi oluşturulması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Varlık Yönetimi Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">SCE tanımlama tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Kritik ekipman bakım ve test izleme sisteminin kurulması (yazılım veya manuel), gecikmelerin otomatik raporlanması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İSG Yöneticisi</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">İzleme sistemi aktif kullanım %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Asit transfer operasyonları için pratik acil durum tatbikatı yapılması ve tüm personelin eğitilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İSG Uzmanı</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Eğitim tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Risk değerlendirmelerinin güncellenmesi ve kritik kontrol noktalarının (orijinal parça, KKD, sensör) vurgulanması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İSG Uzmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Risk değerlendirmesi güncellik %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">İş izin sistemi revizyonu, kritik kontrol listelerinin eklenmesi ve şekilselliğin önlenmesi için denetim mekanizması kurulması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Operasyon Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">İş izni detaylı kontrol oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Güvenlik yatırımları için ayrı bütçe tahsisi ve hızlı onay mekanizması oluşturulması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">CFO</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Güvenlik yatırımı onay süresi <1 hafta</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Üst yönetim güvenlik taahhüdü politikasının oluşturulması ve güvenlik konularının yönetim toplantılarında önceliklendirilmesi</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">CEO</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Yönetim toplantısı güvenlik gündem oranı >%30</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Satın alma prosedürlerinin revizyonu, güvenlik kritik ekipman tedariklerinde maliyet yerine güvenlik kriterinin önceliklendirilmesi</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Satın Alma Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Güvenlik kritik tedarik uygunluk %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>13</td>
+                        <td contenteditable="true">Prosedür uyum denetim programının oluşturulması, aylık denetimler ve bulguların üst yönetime raporlanması</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Kalite Müdürü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Denetim frekansı aylık</td>
+                    </tr>
+
+                    <tr>
+                        <td>14</td>
+                        <td contenteditable="true">Toolbox meeting içeriklerinin günlük iş planı ile uyumlu hale getirilmesi ve etkinlik takibi</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Vardiya Şefleri</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Toolbox uygunluk oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>15</td>
+                        <td contenteditable="true">Güvenlik kültürü geliştirme programı başlatılması, çalışan katılımının artırılması ve güvenlik öneri sisteminin kurulması</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">12 ay</td>
+                        <td contenteditable="true">Güvenlik kültürü anket skoru artışı %20</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Kritik kimyasal transfer operasyonlarında MUTLAKA orijinal ekipman üreticisi parçaları kullanılmalı, maliyet odaklı lokal imalat parça kullanımı yasaklanmalıdır. Yedek parça tedarikinde güvenlik kriterleri maliyet kriterlerinin önünde olmalıdır.
+• Acil durum ekipmanları (duş, göz yıkama, alarm sistemleri) Güvenlik Kritik Ekipman (SCE) olarak tanımlanmalı, ayrı bir bakım stratejisi ile yönetilmeli ve haftalık/aylık test programlarına tabi tutulmalıdır. Bu ekipmanların bakımı asla ertelenmemelidir.
+• Yüksek tehlikeli kimyasallarla çalışırken KKD seçimi risk değerlendirmesine dayalı olmalı, kimyasalın konsantrasyonu ve maruz kalma süresi dikkate alınarak uygun koruma seviyesi sağlanmalıdır. Yüz siperi, aside dayanıklı eldiven gibi ek koruyucular ihmal edilmemelidir.
+• İş izin sistemi şekilsel bir prosedür olmamalı, her iş öncesi kritik kontrol noktaları (ekipman durumu, KKD uygunluğu, acil durum hazırlığı) mutlaka sahada doğrulanmalı ve kayıt altına alınmalıdır. Rutin imza yerine detaylı kontrol yapılmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Organizasyonda güvenlik yönetim sisteminin etkinliğini sürekli izleyen, prosedür uyumunu denetleyen ve sapmaları tespit eden bir 'Güvenlik Performans İzleme Sistemi' kurulmalıdır. Bu sistem, bakım gecikmeleri, risk değerlendirmesi güncellemeleri, eğitim tamamlanma oranları gibi öncül göstergeleri takip etmelidir.
+• Üst yönetim, güvenlik yatırımlarını stratejik öncelik olarak benimsemeli, güvenlik bütçesi ayrı bir kalemde korunmalı ve hızlı onay mekanizmaları oluşturulmalıdır. Güvenlik harcamaları 'maliyet' değil 'yatırım' olarak görülmelidir.
+• Bakım yönetim sistemi, Güvenlik Kritik Ekipmanları (SCE) ayrı bir kategori olarak tanımlamalı, bu ekipmanlar için özel bakım stratejileri, test frekansları ve performans kriterleri belirlemelidir. SCE'ler asla normal bakım kuyruğunda üretim ekipmanlarının gerisinde kalmamalıdır.
+• Güvenlik kültürü geliştirme programları başlatılmalı, çalışanların güvenlik öneri ve raporlama sistemlerine aktif katılımı teşvik edilmeli, 'güvenlik herkesin sorumluluğudur' anlayışı yerleştirilmelidir. Liderlik düzeyinde güvenlik taahhüdü görünür hale getirilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Bu olay ve kök neden analizi sonuçları, tüm ABC Kimya tesislerinde ve benzer kimyasal işlem yapan diğer birimlerde paylaşılmalı, 'Öğrenilen Dersler' oturumları düzenlenmeli ve benzeri risklerin varlığı kontrol edilmelidir.
+• Asit transfer operasyonlarında çalışan tüm personele, olay detayları, kök nedenler ve alınan düzeltici aksiyonlar hakkında bilgilendirme toplantıları yapılmalı, acil durum prosedürleri tekrar gözden geçirilmelidir.
+• Üst yönetime, bu olayın organizasyonel kök nedenlerini (liderlik taahhüdü, izleme/denetim, SCE yönetimi) vurgulayan bir sunum yapılmalı ve sistemik iyileştirmeler için kaynak tahsisi talep edilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm kimyasal operasyon personeline 'Yüksek Tehlikeli Kimyasallarla Güvenli Çalışma' eğitimi verilmeli, %98 sülfürik asit gibi korozif maddelerin özellikleri, maruz kalma riskleri, KKD gereksinimleri ve acil durum müdahalesi detaylı olarak anlatılmalıdır.
+• Acil durum duş ve göz yıkama istasyonlarının kullanımı için pratik eğitim ve tatbikatlar düzenlenmeli, tüm çalışanlar bu ekipmanların yerini bilmeli ve kullanım prosedürlerini uygulamalıdır. Yılda en az iki kez acil durum tatbikatı yapılmalıdır.
+• Bakım personeline 'Güvenlik Kritik Ekipman Yönetimi' eğitimi verilmeli, SCE tanımı, önceliklendirme kriterleri, test prosedürleri ve bakım stratejileri anlatılmalıdır. Bakım planlamasında güvenlik kriterlerinin önemi vurgulanmalıdır.
+• Üst yönetim ve orta kademe yöneticilere 'Güvenlik Liderliği ve Kültürü' eğitimi verilmeli, güvenlik yatırımlarının önemi, liderlik taahhüdünün çalışan davranışlarına etkisi ve güvenlik performans göstergelerinin takibi konuları işlenmelidir.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">15 Mart 2026 tarihinde ABC Kimya Fabrikası Asit Depolama Sahasında meydana gelen kimyasal yanık kazası, organizasyonun güvenlik yönetim sistemindeki derin ve sistemik eksiklikleri ortaya çıkarmıştır. HSG245 metodolojisi ile yapılan kök neden analizi, olayın sadece bir hortum bağlantısının gevşemesi gibi teknik bir arıza olmadığını, bunun altında yatan organizasyonel faktörlerin çok daha kritik olduğunu göstermiştir. Üç ana kök neden tespit edilmiştir: (1) Üst yönetimin güvenlik yatırımlarını sistematik olarak önceliklendirmemesi (D1.1), (2) Sistematik izleme ve denetim mekanizmasının yokluğu (D9.5), ve (3) Güvenlik kritik ekipmanların tanımlanmaması ve önceliklendirilmemesi (D6.8). Bu kök nedenler, birbirini besleyen ve güçlendiren bir sistemik başarısızlık zinciri oluşturmuştur. Orijinal yedek parça yerine lokal imalat parça kullanımı, yüz siperi tedarikinin 3 ay beklemeye alınması, acil durum duşunun 14 aydır test edilmemesi, titreşim sensörünün 2 haftadır arızalı kalması, risk değerlendirmesinin 18 aydır güncellenmemesi ve iş izin sisteminin şekilsel hale gelmesi, hepsi aynı organizasyonel zayıflıkların farklı tezahürleridir. Bu olay, ABC Kimya'nın güvenlik yönetim sistemini köklü bir şekilde gözden geçirmesi ve sistemik iyileştirmeler yapması gerektiğini acı bir şekilde hatırlatmıştır.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm asit transfer hatlarında acil ekipman kontrolü yapılması, lokal imalat parçaların orijinal parçalarla değiştirilmesi, arızalı sensörlerin onarımı ve acil durum duşlarının basınç testlerinin tamamlanması (1 hafta içinde)</li>
+<li contenteditable="true">Yüz siperi ve aside dayanıklı eldiven tedarikinin acil onaylanması, tüm asit transfer personeline dağıtılması ve KKD kullanım denetiminin başlatılması (2 hafta içinde)</li>
+<li contenteditable="true">Asit transfer operasyonları için pratik acil durum tatbikatı yapılması, tüm personelin acil durum prosedürlerini uygulamalı olarak öğrenmesi (2 hafta içinde)</li>
+<li contenteditable="true">Risk değerlendirmelerinin acil güncellenmesi, kritik kontrol noktalarının (orijinal parça, uygun KKD, çalışan sensörler) vurgulanması ve iş izin sistemine entegrasyonu (1 ay içinde)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Güvenlik Kritik Ekipmanların (SCE) tanımlanması, envanterinin çıkarılması, ayrı bakım stratejisi oluşturulması ve önceliklendirme sisteminin kurulması (3 ay içinde)</li>
+<li contenteditable="true">Kritik ekipman bakım ve test izleme sisteminin kurulması, gecikmelerin otomatik raporlanması ve üst yönetime escalate edilmesi mekanizmasının oluşturulması (3 ay içinde)</li>
+<li contenteditable="true">Prosedür uyum denetim programının tasarlanması, aylık denetimler yapılması, bulguların kayıt altına alınması ve düzeltici aksiyonların takip edilmesi (6 ay içinde)</li>
+<li contenteditable="true">Güvenlik yatırımları için ayrı bütçe tahsisi, hızlı onay mekanizması oluşturulması ve satın alma prosedürlerinin güvenlik kriterleri öncelikli olarak revize edilmesi (6 ay içinde)</li>
+<li contenteditable="true">Üst yönetim güvenlik taahhüdü politikasının oluşturulması, güvenlik konularının yönetim toplantılarında önceliklendirilmesi ve liderlik görünürlüğünün artırılması (12 ay içinde)</li>
+<li contenteditable="true">Güvenlik kültürü geliştirme programının başlatılması, çalışan katılımının teşvik edilmesi, güvenlik öneri sisteminin kurulması ve güvenlik performans göstergelerinin düzenli takibi (12 ay içinde)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Güvenlik Yatırımı Onay Süresi</td>
+                        <td class="current" contenteditable="true">3+ ay (yüz siperi örneği)</td>
+                        <td class="target" contenteditable="true"><1 hafta</td>
+                    </tr>
+
+                    <tr>
+                        <td>Acil Durum Duşu Test Frekansı</td>
+                        <td class="current" contenteditable="true">14+ ay (test yok)</td>
+                        <td class="target" contenteditable="true">Haftalık</td>
+                    </tr>
+
+                    <tr>
+                        <td>Kritik Ekipman Arıza Çözüm Süresi</td>
+                        <td class="current" contenteditable="true">2+ hafta (sensör örneği)</td>
+                        <td class="target" contenteditable="true"><3 gün</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Değerlendirmesi Güncelleme</td>
+                        <td class="current" contenteditable="true">18+ ay</td>
+                        <td class="target" contenteditable="true">6 ay</td>
+                    </tr>
+
+                    <tr>
+                        <td>Orijinal Yedek Parça Kullanım Oranı</td>
+                        <td class="current" contenteditable="true">%60 (lokal imalat kullanımı var)</td>
+                        <td class="target" contenteditable="true">%100</td>
+                    </tr>
+
+                    <tr>
+                        <td>İş İzni Detaylı Kontrol Oranı</td>
+                        <td class="current" contenteditable="true">%20 (şekilsel imza)</td>
+                        <td class="target" contenteditable="true">%100</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Kritik Ekipman (SCE) Tanımlama</td>
+                        <td class="current" contenteditable="true">Yok</td>
+                        <td class="target" contenteditable="true">%100 tanımlanmış</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Uyum Denetim Frekansı</td>
+                        <td class="current" contenteditable="true">Reaktif (olay sonrası)</td>
+                        <td class="target" contenteditable="true">Aylık proaktif</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header">📷 OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /* ── OLAY FOTOĞRAFLARI JS ─────────────────────────────── */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

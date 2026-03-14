@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCA Analiz - Real-Time Progress</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .progress-container {
+            padding: 40px;
+        }
+        
+        .progress-bar-wrapper {
+            background: #f0f0f0;
+            border-radius: 50px;
+            height: 30px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.3),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .current-step {
+            text-align: center;
+            color: #666;
+            font-size: 0.95em;
+            min-height: 40px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .steps-timeline {
+            margin-top: 30px;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .step-item.completed {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .step-item.active {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            transform: scale(1.02);
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        
+        .step-icon.pending {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .step-icon.active {
+            background: #ffc107;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .step-icon.completed {
+            background: #28a745;
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .result-container.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .root-cause-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .root-cause-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .root-cause-item p {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 RCA Analizi</h1>
+            <p>Kök Neden Analizi - Canlı İlerleme</p>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-text" id="progressText">0%</div>
+            
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="current-step" id="currentStep">
+                Analiz başlatılıyor...
+            </div>
+            
+            <div class="steps-timeline" id="stepsTimeline">
+                <!-- Adımlar dinamik yüklenecek -->
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            
+            <div class="result-container" id="resultContainer">
+                <h2>📊 Analiz Tamamlandı</h2>
+                <div id="resultContent"></div>
+                <button class="btn" onclick="downloadReport()">📄 Raporu İndir (HTML)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Yapılandırma
+        const API_BASE_URL = window.location.origin;  // Production'da otomatik
+        const JOB_ID = new URLSearchParams(window.location.search).get('job_id');
+        
+        // Adım tanımları
+        const STEPS = [
+            { id: 1, name: 'RCA Agent Başlatma', threshold: 10 },
+            { id: 2, name: 'Immediate Causes (A/B)', threshold: 40 },
+            { id: 3, name: 'Root Causes (C/D)', threshold: 70 },
+            { id: 4, name: 'Rapor Oluşturma', threshold: 90 },
+            { id: 5, name: 'Tamamlandı', threshold: 100 }
+        ];
+        
+        // WebSocket bağlantısı
+        let ws = null;
+        let currentProgress = 0;
+        
+        function initializeSteps() {
+            const timeline = document.getElementById('stepsTimeline');
+            timeline.innerHTML = STEPS.map(step => `
+                <div class="step-item" id="step-${step.id}">
+                    <div class="step-icon pending" id="icon-${step.id}">
+                        ${step.id}
+                    </div>
+                    <div>
+                        <strong>${step.name}</strong>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateProgress(progress, stepText) {
+            // Progress bar
+            currentProgress = progress;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${progress}%`;
+            document.getElementById('currentStep').textContent = stepText;
+            
+            // Adım durumlarını güncelle
+            STEPS.forEach((step, index) => {
+                const stepElement = document.getElementById(`step-${step.id}`);
+                const iconElement = document.getElementById(`icon-${step.id}`);
+                
+                if (progress >= step.threshold) {
+                    // Tamamlandı
+                    stepElement.classList.remove('active');
+                    stepElement.classList.add('completed');
+                    iconElement.className = 'step-icon completed';
+                    iconElement.textContent = '✓';
+                } else if (
+                    (index === 0 && progress < step.threshold) ||
+                    (index > 0 && progress >= STEPS[index - 1].threshold && progress < step.threshold)
+                ) {
+                    // Aktif
+                    stepElement.classList.add('active');
+                    iconElement.className = 'step-icon active';
+                    iconElement.textContent = '⏳';
+                } else {
+                    // Beklemede
+                    stepElement.classList.remove('active', 'completed');
+                    iconElement.className = 'step-icon pending';
+                    iconElement.textContent = step.id;
+                }
+            });
+        }
+        
+        function connectWebSocket() {
+            if (!JOB_ID) {
+                showError('Job ID bulunamadı. URL parametresinde job_id olmalı.');
+                return;
+            }
+            
+            const wsUrl = API_BASE_URL.replace('http', 'ws') + `/ws/progress/${JOB_ID}`;
+            console.log('WebSocket connecting to:', wsUrl);
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket bağlantısı kuruldu');
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+                
+                updateProgress(data.progress, data.step);
+                
+                // Tamamlandı
+                if (data.status === 'completed' && data.result) {
+                    displayResult(data.result);
+                } else if (data.status === 'failed') {
+                    showError('Analiz başarısız oldu.');
+                }
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket hatası:', error);
+                showError('WebSocket bağlantı hatası. Polling moduna geçiliyor...');
+                startPolling();
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket bağlantısı kapandı');
+            };
+        }
+        
+        function startPolling() {
+            // WebSocket başarısız olursa polling yap
+            const pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/v3/status/${JOB_ID}`);
+                    const data = await response.json();
+                    
+                    updateProgress(data.progress, data.current_step);
+                    
+                    if (data.status === 'completed') {
+                        clearInterval(pollInterval);
+                        if (data.result) {
+                            displayResult(data.result);
+                        }
+                    } else if (data.status === 'failed') {
+                        clearInterval(pollInterval);
+                        showError(data.error || 'Analiz başarısız');
+                    }
+                } catch (error) {
+                    console.error('Polling hatası:', error);
+                }
+            }, 2000);  // Her 2 saniyede bir
+        }
+        
+        function displayResult(result) {
+            const container = document.getElementById('resultContainer');
+            const content = document.getElementById('resultContent');
+            
+            // Root causes listesi
+            const rootCauses = result.final_root_causes || [];
+            const rootCausesHTML = rootCauses.map((rc, i) => `
+                <div class="root-cause-item">
+                    <strong>${i + 1}. [${rc.code}] ${rc.standard_title_tr || rc.title || ''}</strong>
+                    <p>${rc.cause_tr || rc.description || 'Açıklama yok'}</p>
+                </div>
+            `).join('');
+            
+            content.innerHTML = `
+                <h3>🎯 Bulunan Root Causes (${rootCauses.length})</h3>
+                ${rootCausesHTML || '<p>Root cause bulunamadı</p>'}
+            `;
+            
+            container.classList.add('show');
+            
+            // Raporu localStorage'a kaydet
+            localStorage.setItem(`rca_report_${JOB_ID}`, result.final_report_tr || 'Rapor bulunamadı');
+        }
+        
+        function downloadReport() {
+            const report = localStorage.getItem(`rca_report_${JOB_ID}`);
+            if (!report) {
+                alert('Rapor bulunamadı');
+                return;
+            }
+            
+            const blob = new Blob([report], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rca_report_${JOB_ID}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = '❌ ' + message;
+            errorDiv.style.display = 'block';
+        }
+        
+        // Sayfa yüklendiğinde başlat
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeSteps();
+            connectWebSocket();
+        });
+    </script>
+</body>
+</html>

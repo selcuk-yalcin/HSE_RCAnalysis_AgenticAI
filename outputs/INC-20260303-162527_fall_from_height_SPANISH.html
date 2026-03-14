@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INFORME DE ANÁLISIS DE CAUSA RAÍZ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /* ── OLAY FOTOĞRAFLARI ─────────────────────────────────── */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260303-162527";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')">📷 Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">INFORME DE ANÁLISIS DE CAUSA RAÍZ</h1>
+            <div class="subtitle" contenteditable="true">Preparado según Metodología HSG245</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                CONFIDENCIAL - ACCESO RESTRINGIDO SOLO A PERSONAL AUTORIZADO
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260303-162527</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">18 de febrero de 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Sitio de Construcción - Área de Andamios del 4º Piso</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Lesión Mayor - Caída desde Altura</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Trabajador de montaje de andamios de 32 años cayó 6 metros al suelo debido a ausencia de arnés de seguridad y barandilla incompleta, resultando en fracturas vertebrales, pélvicas y hemorragia interna. El incidente reveló fallas sistémicas en supervisión, permisos de trabajo y cultura de seguridad bajo presión de producción.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">El 18 de febrero de 2026 a las 10:35, Hasan Yıldız, trabajador de montaje de andamios con 8 meses de experiencia, sufrió una caída desde una plataforma de andamios ubicada a 6 metros de altura en el área del cuarto piso del sitio de construcción. El trabajador no portaba arnés de seguridad de cuerpo completo y la barandilla de protección del borde de trabajo estaba incompleta, con solo un lado instalado. La caída resultó en lesiones críticas múltiples que requirieron admisión inmediata en cuidados intensivos.</div>
+<div class="paragraph" contenteditable="true">Sitio de Construcción - Área de Andamios del 4º Piso, plataforma de montaje en proceso</div>
+<div class="paragraph" contenteditable="true">Hasan Yıldız (32 años, trabajador de montaje de andamios). Testigos: Ali Demir (trabajador), Mehmet Kara (capataz). Reportado por Mustafa Çelik (Gerente de Sitio)</div>
+<div class="paragraph" contenteditable="true">A las 10:37, los compañeros de trabajo activaron el servicio de emergencias 112. A las 10:42 se proporcionaron primeros auxilios en sitio, encontrando al trabajador consciente pero con lesiones graves. La ambulancia llegó a las 10:55 y transportó al paciente al hospital, donde fue admitido en cuidados intensivos a las 11:20 con diagnóstico de fractura de vértebra L2, fractura de pelvis, hemorragia interna en bazo y múltiples contusiones. Se detuvo inmediatamente todo trabajo en altura en el sitio.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">El trabajador y todo el equipo operaban sistemáticamente sin arnés de seguridad, práctica normalizada en el sitio sin intervención de supervisión</li>
+<li contenteditable="true">El trabajo en plataforma comenzó antes de completar la instalación de barandillas de protección debido a presión de cronograma de producción</li>
+<li contenteditable="true">Sistema de permisos de trabajo inefectivo: permiso de andamio existente pero desactualizado, sin mecanismo para suspender trabajo ante cambios críticos de seguridad</li>
+<li contenteditable="true">Fallas sistémicas de gestión: reuniones de seguridad suspendidas por 2 meses, evaluación de riesgos sin actualizar por 6 meses, oficial de seguridad sin realizar recorridos de sitio</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Detención total de trabajos en altura en todo el sitio hasta nueva inspección</td>
+                        <td contenteditable="true">Gerente de Sitio</td>
+                        <td contenteditable="true">Completado</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Inspección completa de todos los andamios y actualización de permisos de trabajo</td>
+                        <td contenteditable="true">Ingeniero de Seguridad</td>
+                        <td contenteditable="true">Completado</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Implementación obligatoria de uso de arnés con verificación antes de inicio de turno</td>
+                        <td contenteditable="true">Supervisor de Turno</td>
+                        <td contenteditable="true">En curso</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Sesión de seguridad de emergencia con todo el personal de montaje de andamios</td>
+                        <td contenteditable="true">Gerente HSE</td>
+                        <td contenteditable="true">Completado</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260303-162527</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">18 de febrero de 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">10:35</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Sitio de Construcción - Área de Andamios del 4º Piso</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Montaje de Andamios - Plataforma 4º Piso</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Hasan Yıldız (32 años, 8 meses experiencia)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Turno Diurno (08:00-17:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Andamio de tubo de acero, plataforma 1.2m ancho</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Componentes de andamio metálico</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Condiciones normales de día</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Luz natural diurna</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Casco: SÍ, Botas: SÍ, Arnés: NO, Guantes: SÍ</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Caída desde altura - Lesión mayor</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Fractura vértebra L2, fractura pelvis, hemorragia interna, contusiones múltiples</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 persona (lesión grave)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Crítico - Cuidados intensivos</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Sí - Reportado 03.03.26</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Ali Demir (trabajador compañero)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Sí - 112 llamado a las 10:37</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Admitido UCI 11:20 - Pronóstico grave, tratamiento largo plazo</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:00</div>
+                    <div class="timeline-event" contenteditable="true">Inicio de turno - Hasan Yıldız asignado a montaje de andamios 4º piso</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:30</div>
+                    <div class="timeline-event" contenteditable="true">Montaje de plataforma de andamios en progreso, barandilla solo instalada en un lado</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:30</div>
+                    <div class="timeline-event" contenteditable="true">Trabajador pierde equilibrio mientras trabaja en borde sin barandilla, sin arnés de seguridad</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:35</div>
+                    <div class="timeline-event" contenteditable="true">CAÍDA DESDE 6 METROS - Impacto contra el suelo</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:37</div>
+                    <div class="timeline-event" contenteditable="true">Compañeros corren a asistir, llamada al 112 servicio de emergencias</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:42</div>
+                    <div class="timeline-event" contenteditable="true">Primeros auxilios proporcionados - Trabajador consciente pero gravemente herido</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:55</div>
+                    <div class="timeline-event" contenteditable="true">Ambulancia llega al sitio, preparación para transporte</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:20</div>
+                    <div class="timeline-event" contenteditable="true">Admisión en hospital - Cuidados intensivos, diagnóstico: fracturas múltiples y hemorragia interna</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:45</div>
+                    <div class="timeline-event" contenteditable="true">Gerente de sitio notifica a dirección y detiene todos los trabajos en altura</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:00</div>
+                    <div class="timeline-event" contenteditable="true">Inicio de investigación preliminar, preservación de escena del incidente</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">La técnica 5-Why aplicada en este análisis consiste en preguntar repetidamente 'por qué' ocurrió cada nivel de causa, profundizando desde síntomas superficiales hasta causas raíz sistémicas. En la Rama 1, comenzamos con el hecho observable de que el trabajador no usaba arnés (Why 1), descubrimos que era práctica normalizada en todo el equipo (Why 2), identificamos que la supervisión toleraba esta desviación (Why 3), revelamos que la presión de producción superaba las reglas de seguridad (Why 4), y finalmente llegamos a la causa raíz: la gerencia toleraba sistemáticamente múltiples desviaciones conocidas de seguridad. Cada 'por qué' está respaldado por evidencia documental del incidente (declaraciones de testigos, registros de inspección, cronogramas de proyecto). Este proceso iterativo asegura que no nos detengamos en soluciones superficiales sino que identifiquemos los fallos sistémicos que requieren intervención organizacional para prevenir recurrencia.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Factor Humano/Conductual</td>
+                        <td contenteditable="true">Acciones u omisiones individuales o grupales: falta de conocimiento, habilidades insuficientes, violaciones de procedimientos, falta de atención, fatiga, decisiones de riesgo</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Factor de Condición/Entorno</td>
+                        <td contenteditable="true">Condiciones físicas inseguras del lugar de trabajo: equipos defectuosos, diseño inadecuado, peligros ambientales, falta de protecciones, ergonomía deficiente</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Factor de Trabajo/Tarea</td>
+                        <td contenteditable="true">Aspectos del diseño y organización del trabajo: procedimientos inadecuados, herramientas inapropiadas, carga de trabajo excesiva, comunicación deficiente en la tarea</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Factor Organizacional/Sistémico</td>
+                        <td contenteditable="true">Decisiones y sistemas de gestión: políticas inadecuadas, falta de recursos, cultura de seguridad débil, presión de producción, sistemas de control inefectivos, liderazgo deficiente</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Gerente Senior HSE</td>
+                        <td contenteditable="true">Líder de Investigación Principal</td>
+                        <td contenteditable="true">03.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Investigador Externo HSE</td>
+                        <td contenteditable="true">Auditor Independiente</td>
+                        <td contenteditable="true">03.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Especialista en Seguridad de Construcción</td>
+                        <td contenteditable="true">Experto Técnico en Trabajo en Altura</td>
+                        <td contenteditable="true">04.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Experto Técnico en Andamios</td>
+                        <td contenteditable="true">Evaluador de Equipos y Procedimientos</td>
+                        <td contenteditable="true">04.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Mustafa Çelik - Gerente de Sitio</td>
+                        <td contenteditable="true">Representante de Operaciones</td>
+                        <td contenteditable="true">03.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Representante de Recursos Humanos</td>
+                        <td contenteditable="true">Gestión de Personal y Capacitación</td>
+                        <td contenteditable="true">05.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Asesor Médico</td>
+                        <td contenteditable="true">Evaluación de Lesiones y Tratamiento</td>
+                        <td contenteditable="true">05.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Asesor Legal</td>
+                        <td contenteditable="true">Cumplimiento Regulatorio y RIDDOR</td>
+                        <td contenteditable="true">06.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Representante de Trabajadores/Sindicato</td>
+                        <td contenteditable="true">Voz de Trabajadores y Condiciones Laborales</td>
+                        <td contenteditable="true">04.03.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. FACTOR CRÍTICO 1 - AUSENCIA DE EQUIPO DE PROTECCIÓN PERSONAL</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">El trabajador Hasan Yıldız realizaba tareas de montaje de andamios a 6 metros de altura sin portar arnés de seguridad de cuerpo completo ni ningún sistema de protección contra caídas. La evidencia documental confirma que en el momento del incidente no llevaba arnés de seguridad ni arnés de cuerpo completo, aunque sí portaba casco y botas de seguridad. Esta ausencia de EPP crítico para trabajo en altura constituye una violación directa de procedimientos de seguridad establecidos y normativas de construcción, exponiendo al trabajador a riesgo inmediato de caída con consecuencias graves o fatales.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">No uso de arnés de seguridad de cuerpo completo durante trabajo en altura a 6 metros</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">¿Por qué el trabajador Hasan Yıldız trabajó a 6 metros de altura sin arnés de seguridad de cuerpo completo?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque todos los trabajadores del equipo de montaje de andamios trabajaban sin arnés de seguridad; según declaración del testigo Ali Demir 'Hasan trabajaba sin arnés, todos lo hacemos', indicando que esta práctica se había normalizado en el sitio sin que nadie la cuestionara o corrigiera</div>
+                    <span class="why-code">A - Conductual</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">¿Por qué el trabajo sin arnés de seguridad se convirtió en práctica normalizada en el sitio?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el oficial de seguridad no realizaba recorridos de sitio, no se monitoreaba el uso de arnés de seguridad, y los supervisores nunca detenían ni advertían a trabajadores que operaban sin arnés; por el contrario, el capataz Mehmet Kara toleró que se trabajara en el lado sin barandilla pidiendo que el trabajo se terminara ese día</div>
+                    <span class="why-code">B - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">¿Por qué los supervisores y personal de vigilancia toleraron la desviación de trabajo sin arnés en lugar de corregirla?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el proyecto estaba retrasado 3 semanas y había presión del cliente para 'finalización rápida'; el supervisor dio instrucción a trabajadores de 'terminar rápido' y la velocidad de producción se priorizó sobre las reglas de seguridad. Incluso el gerente de sitio desconocía que la barandilla estaba incompleta</div>
+                    <span class="why-code">B - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">¿Por qué la presión de producción llevó a la desactivación sistemática de procedimientos de seguridad?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque las reuniones de seguridad no se realizaban desde hacía 2 meses, la evaluación de riesgos no se actualizaba desde hacía 6 meses, el permiso de andamio no estaba actualizado y las inspecciones semanales eran inadecuadas; esta situación revela que la gerencia toleraba sistemáticamente desviaciones conocidas de seguridad (trabajo sin arnés, barandilla incompleta, permisos desactualizados)</div>
+                    <span class="why-code">D - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">¿Por qué la gerencia toleraba sistemáticamente múltiples desviaciones conocidas de seguridad?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque la gerencia del sitio permitió que el equipo de montaje trabajara sin arnés, que se realizara trabajo antes de completar barandillas y que los permisos de andamio no se actualizaran, siendo estas desviaciones conocidas o que debían conocerse. El oficial de seguridad no hacía recorridos, las reuniones de seguridad llevaban 2 meses suspendidas y la evaluación de riesgos 6 meses sin actualizar; el colapso simultáneo de todos estos mecanismos de supervisión demuestra que la gerencia aceptaba sistemáticamente las desviaciones de seguridad</div>
+                    <span class="why-code">D - Organizacional</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Tolerancia de la Gerencia a Desviaciones Conocidas de Seguridad</div>
+                <div class="box-content" contenteditable="true">[D1.9 / Organizacional]
+
+La cadena 5-Why revela que el trabajo sin arnés no era una violación individual aislada, sino una desviación normalizada en todo el equipo que la gerencia conocía o debía conocer pero toleraba sistemáticamente. Esta tolerancia se manifestaba en múltiples niveles: el oficial de seguridad no realizaba recorridos de sitio para detectar desviaciones, las reuniones de seguridad estaban suspendidas por 2 meses eliminando espacios de corrección, la evaluación de riesgos no se actualizaba por 6 meses perdiendo relevancia, y los permisos de andamio no se mantenían actualizados permitiendo trabajo en condiciones no autorizadas. La presión de producción (proyecto retrasado 3 semanas, demanda de cliente de finalización rápida) actuó como catalizador, pero el problema fundamental era más profundo: la gerencia había permitido que múltiples sistemas de control de seguridad colapsaran simultáneamente, creando un entorno donde las desviaciones no solo ocurrían sino que se normalizaban sin consecuencias.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Ausencia total de recorridos de seguridad en sitio por parte del oficial HSE, eliminando la detección temprana de desviaciones como trabajo sin arnés o barandillas incompletas</li>
+<li contenteditable="true">Suspensión de reuniones de seguridad por período prolongado de 2 meses, eliminando el foro donde se discuten y corrigen desviaciones observadas y se refuerzan expectativas de cumplimiento</li>
+<li contenteditable="true">Evaluación de riesgos desactualizada por 6 meses, perdiendo relevancia para condiciones actuales del sitio y fallando en identificar nuevos peligros o controles inadecuados</li>
+<li contenteditable="true">Sistema de permisos de trabajo inefectivo con permisos de andamio no actualizados según cambios de condiciones, permitiendo que trabajo continuara en configuraciones no autorizadas o inseguras</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. FACTOR CRÍTICO 2 - CONDICIÓN INSEGURA DE PLATAFORMA DE TRABAJO</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">La plataforma de andamios donde trabajaba Hasan Yıldız tenía barandilla de protección instalada solamente en un lado, mientras que el borde de trabajo donde se encontraba el trabajador carecía completamente de barandilla. Esta configuración creaba un peligro de caída desprotegido desde 6 metros de altura. Según declaración del capataz Mehmet Kara, la barandilla del lado faltante estaba programada para instalarse al día siguiente, pero el montaje de la plataforma debía completarse ese mismo día. La inspección de andamios realizada 2 días antes del incidente no registró esta deficiencia crítica de barandilla, y el permiso de andamio existente no reflejaba la condición real de protección incompleta.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Barandilla de protección ausente en el borde de trabajo de la plataforma de andamios</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">¿Por qué no había barandilla de protección en el borde de trabajo de la plataforma de andamios?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el montaje de barandilla no estaba completo; solo se había instalado barandilla en un lado, dejando el borde donde trabajaba el empleado completamente abierto. Según declaración del capataz Mehmet Kara, la barandilla se instalaría al día siguiente pero el montaje de plataforma debía terminarse ese día</div>
+                    <span class="why-code">C - Trabajo/Tarea</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">¿Por qué se comenzó a trabajar en la plataforma antes de completar el montaje de barandilla?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el supervisor, debido al retraso del proyecto, dio instrucción a los trabajadores de 'terminar rápido'. Según declaración del testigo Ali Demir, el supervisor los estaba apresurando y por eso se movieron al lado sin barandilla. La presión de producción llevó a iniciar trabajo antes de completar las medidas de seguridad</div>
+                    <span class="why-code">B - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">¿Por qué ningún mecanismo de control impidió que se iniciara trabajo con barandilla de andamio incompleta?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el sistema de permisos de trabajo no funcionaba correctamente; el permiso de andamio existía pero no estaba actualizado, y la última inspección realizada 2 días antes no registró la deficiencia de barandilla. Además, el oficial de seguridad no realizaba recorridos de sitio, por lo que la situación de trabajo con barandilla incompleta no fue detectada</div>
+                    <span class="why-code">B - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">¿Por qué el sistema de permisos de trabajo no se actualizó y por qué la inspección de andamios no registró la deficiencia de barandilla?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el proyecto estaba retrasado 3 semanas y había presión del cliente para 'finalización rápida'. En este ambiente de presión, las reuniones de seguridad no se realizaban desde hacía 2 meses y la evaluación de riesgos no se actualizaba desde hacía 6 meses. El cronograma de producción se priorizó sobre los procesos de seguridad, y tanto el sistema de permisos de trabajo como los procesos de inspección se volvieron inefectivos</div>
+                    <span class="why-code">D - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">¿Por qué la presión de producción causó que los procesos de seguridad se volvieran sistemáticamente inefectivos?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque debido al retraso de 3 semanas del proyecto y la demanda del cliente de finalización rápida, la gerencia priorizó el programa de producción sobre los procesos de seguridad. El supervisor dio instrucción de trabajar antes de completar barandilla, las reuniones de seguridad no se realizaban por 2 meses, la evaluación de riesgos no se actualizaba por 6 meses, el permiso de andamio no se mantenía actualizado y el oficial de seguridad fue retirado de los recorridos de sitio. El colapso simultáneo de todas estas funciones de seguridad demuestra que la presión de producción sistemáticamente superó a la seguridad</div>
+                    <span class="why-code">D - Organizacional</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Presión de Producción Sistemáticamente Priorizada sobre Seguridad</div>
+                <div class="box-content" contenteditable="true">[D1.4 / Organizacional]
+
+La cadena 5-Why traza el camino desde el borde sin barandilla hasta la instrucción del supervisor de apresurarse, la inefectividad de los sistemas de permisos e inspección, y finalmente la causa común de todas estas fallas: la presión de producción. Las declaraciones de testigos ('el supervisor nos apresuraba'), los factores de gestión (3 semanas de retraso, presión del cliente, 2 meses sin reuniones de seguridad) y el desconocimiento del gerente de sitio sobre la barandilla incompleta confirman que la prioridad de producción desactivó sistemáticamente los sistemas de seguridad. A diferencia de una simple violación de procedimiento, aquí vemos un patrón donde múltiples funciones de seguridad (reuniones, evaluaciones de riesgo, permisos, recorridos de inspección) fueron simultáneamente degradadas o eliminadas para acelerar la producción. El supervisor no solo toleró el riesgo sino que activamente instruyó trabajar en condiciones inseguras. Esta priorización sistemática de cronograma sobre seguridad representa una decisión organizacional que permitió que condiciones peligrosas no solo existieran sino que fueran activamente creadas bajo presión de tiempo.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Proyecto con retraso acumulado de 3 semanas generando presión intensa de cronograma que superó consideraciones de seguridad en toma de decisiones operativas</li>
+<li contenteditable="true">Demanda explícita del cliente de 'finalización rápida' creando presión externa que la gerencia transmitió a supervisores y trabajadores sin salvaguardas de seguridad</li>
+<li contenteditable="true">Instrucción directa de supervisor a trabajadores de 'terminar rápido' y trabajar en lado sin barandilla, priorizando activamente velocidad sobre protección contra caídas</li>
+<li contenteditable="true">Degradación simultánea de múltiples sistemas de seguridad (reuniones suspendidas 2 meses, evaluación de riesgos 6 meses desactualizada, permisos no actualizados, recorridos de oficial HSE eliminados) para acelerar producción</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. FACTOR CRÍTICO 3 - FALLA DEL SISTEMA DE PERMISOS DE TRABAJO</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">El equipo de montaje de andamios comenzó a trabajar en el lado de la plataforma que carecía de barandilla de protección antes de que el montaje de seguridad estuviera completo. Según declaración del testigo Ali Demir, 'Todos lo hacemos. El supervisor nos estaba apresurando, así que nos movimos al lado sin barandilla'. Los hallazgos preliminares confirman que 'se comenzó el trabajo antes de completar el montaje de barandillas'. Existía un permiso de trabajo para andamios, pero este permiso no estaba actualizado para reflejar la condición real de la plataforma. La inspección de andamios realizada 2 días antes del incidente no detectó ni registró la deficiencia crítica de barandilla incompleta, y no hubo mecanismo que suspendiera el permiso o detuviera el trabajo cuando esta condición insegura se hizo evidente.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Inicio de trabajo en plataforma con barandilla incompleta sin actualización de permiso de trabajo</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">¿Por qué el equipo comenzó a trabajar en el lado inseguro antes de completar el montaje de barandilla?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque según declaración del capataz Mehmet Kara, la barandilla se montaría al día siguiente pero el montaje de plataforma debía terminarse ese día; el supervisor dio instrucción de 'terminar rápido' y el equipo fue dirigido a trabajar en el lado sin barandilla</div>
+                    <span class="why-code">A - Conductual</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">¿Por qué el sistema de permisos de trabajo no impidió que se iniciara trabajo con barandilla faltante?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el permiso de trabajo para andamios existía pero no estaba actualizado; la deficiencia de barandilla no fue registrada en la última inspección realizada 2 días antes, y el permiso continuó vigente sin actualizarse</div>
+                    <span class="why-code">B - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">¿Por qué la deficiencia de barandilla no fue detectada y registrada en la inspección de andamios, y por qué el permiso no se actualizó?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque las inspecciones se realizaban solo una vez por semana, frecuencia inadecuada para un entorno de trabajo en constante cambio como el montaje de andamios; además, las deficiencias encontradas durante inspección no se reflejaban en el permiso</div>
+                    <span class="why-code">B - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">¿Por qué el permiso de andamio no se actualizaba según cambios de condiciones y por qué los hallazgos de inspección no se integraban al sistema de permisos?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el sistema de permisos de trabajo no estaba configurado para rastrear cambios en las etapas de montaje de andamios (como deficiencia de barandilla, estado de completitud de plataforma); una vez emitido el permiso, no existía mecanismo de reevaluación ante cambios de condiciones intermedias</div>
+                    <span class="why-code">D - Organizacional</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">¿Por qué el sistema de permisos carecía de mecanismo para rastrear cambios críticos de seguridad durante montaje?</div>
+                    <div class="why-answer" contenteditable="true">→ Porque el sistema de permisos de trabajo para andamios no fue diseñado para rastrear cambios en etapas de montaje (deficiencia de barandilla u otros elementos críticos de seguridad) ni para suspender el permiso cuando surgían estas condiciones; el permiso se emitía una vez y no tenía mecanismo para detener trabajo ante cambios intermedios de estado</div>
+                    <span class="why-code">D - Organizacional</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Sistema de Permisos de Trabajo Inefectivo para Trabajo Dinámico</div>
+                <div class="box-content" contenteditable="true">[D4.4 / Organizacional]
+
+La cadena 5-Why revela que detrás del trabajo del equipo en el lado sin barandilla estaba la presión del supervisor y la instrucción de velocidad (Why 1), pero que el sistema de permisos de trabajo que debía prevenir esta situación insegura no funcionó (Why 2). Los hallazgos de inspección no se reflejaban en el permiso (Why 3) y el sistema de permisos carecía de mecanismo de actualización ante cambios de etapa de montaje (Why 4), llevando a la causa raíz: el sistema de permisos no estaba diseñado para trabajo dinámico. Aunque existía permiso de andamio, no estaba actualizado, la deficiencia de barandilla no fue registrada, y el sistema no fue diseñado para detener trabajo ante tales cambios intermedios. Esta situación corresponde directamente a un sistema de permisos de trabajo inefectivo. El sistema trataba el permiso como documento estático emitido una vez, sin capacidad de responder a la naturaleza dinámica del montaje de andamios donde las condiciones de seguridad cambian continuamente a medida que se agregan o faltan componentes.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sistema de permisos de andamio diseñado como documento estático de emisión única, sin mecanismo de actualización continua según evolución de condiciones de montaje</li>
+<li contenteditable="true">Desconexión entre proceso de inspección y sistema de permisos: hallazgos de inspección (como barandilla incompleta) no se integraban automáticamente al permiso para suspenderlo o actualizarlo</li>
+<li contenteditable="true">Ausencia de puntos de verificación obligatorios (hold points) en etapas críticas de montaje que requirieran re-inspección y re-autorización antes de permitir trabajo</li>
+<li contenteditable="true">Falta de criterios claros de suspensión automática de permiso ante cambios de configuración de seguridad (barandilla faltante, plataforma incompleta, anclajes no instalados)</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Comunicación Deficiente de Seguridad</td>
+                        <td contenteditable="true">Reuniones de seguridad suspendidas por 2 meses eliminando foro para discutir peligros, reforzar procedimientos y corregir desviaciones observadas. Trabajadores no recibían mensaje consistente sobre importancia y obligatoriedad de procedimientos de seguridad.</td>
+                        <td class="impact-low" contenteditable="true">Alto</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Capacitación Inadecuada</td>
+                        <td contenteditable="true">Registros de capacitación incompletos e irregulares. No se proporcionó capacitación específica en trabajo en altura a Hasan Yıldız según hallazgos preliminares. Trabajadores no comprendían completamente riesgos de caída ni importancia crítica de arnés y barandillas.</td>
+                        <td class="impact-low" contenteditable="true">Alto</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Supervisión Insuficiente</td>
+                        <td contenteditable="true">Oficial de seguridad no realizaba recorridos de sitio, eliminando presencia de seguridad en campo. Supervisores no monitoreaban uso de arnés ni verificaban completitud de barandillas antes de autorizar trabajo. Gerente de sitio desconocía condiciones reales de seguridad.</td>
+                        <td class="impact-low" contenteditable="true">Alto</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Cultura de Producción sobre Seguridad</td>
+                        <td contenteditable="true">Presión de cronograma (3 semanas de retraso, demanda de cliente de finalización rápida) transmitida sin salvaguardas de seguridad. Supervisor instruyó 'terminar rápido' priorizando velocidad sobre protección. Trabajadores percibían que cumplir cronograma era más importante que cumplir procedimientos.</td>
+                        <td class="impact-low" contenteditable="true">Alto</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Evaluación de Riesgos Desactualizada</td>
+                        <td contenteditable="true">Evaluación de riesgos no actualizada por 6 meses, perdiendo relevancia para condiciones actuales de sitio. No identificó riesgos emergentes de montaje de andamios ni evaluó adecuación de controles existentes ante cambios de configuración de trabajo.</td>
+                        <td class="impact-low" contenteditable="true">Medio</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Inspecciones Infrecuentes</td>
+                        <td contenteditable="true">Inspecciones de andamios realizadas solo una vez por semana, frecuencia inadecuada para entorno de montaje en constante cambio. Inspección 2 días antes del incidente no detectó ni registró deficiencia crítica de barandilla incompleta.</td>
+                        <td class="impact-low" contenteditable="true">Medio</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Normalización de Desviaciones</td>
+                        <td contenteditable="true">Trabajo sin arnés se convirtió en práctica normalizada en todo el equipo ('todos lo hacemos') sin intervención correctiva. Desviaciones de seguridad ocurrían a la vista de supervisores sin consecuencias, erosionando percepción de que reglas eran obligatorias.</td>
+                        <td class="impact-low" contenteditable="true">Alto</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Falta de Autoridad de Detención de Trabajo</td>
+                        <td contenteditable="true">Trabajadores no tenían autoridad clara o se sentían sin poder para detener trabajo inseguro. Presión de supervisor de 'terminar rápido' superó cualquier preocupación de seguridad que trabajadores pudieran haber tenido sobre trabajar sin arnés o con barandilla incompleta.</td>
+                        <td class="impact-low" contenteditable="true">Medio</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Implementación obligatoria de sistema de verificación de arnés antes de inicio de cada turno para todo trabajo en altura, con registro documental y prohibición de acceso a andamios sin arnés certificado</td>
+                        <td><span class="priority-low">URGENTE</span></td>
+                        <td contenteditable="true">Gerente HSE</td>
+                        <td contenteditable="true">1 semana</td>
+                        <td contenteditable="true">100% trabajadores verificados diariamente, 0 accesos sin arnés</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Establecimiento de hold points obligatorios en montaje de andamios: prohibición de trabajo en plataforma hasta que barandillas perimetrales completas estén instaladas e inspeccionadas, con señalización visual de estado</td>
+                        <td><span class="priority-low">URGENTE</span></td>
+                        <td contenteditable="true">Supervisor de Andamios</td>
+                        <td contenteditable="true">1 semana</td>
+                        <td contenteditable="true">100% plataformas con barandillas completas antes de trabajo</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Rediseño de sistema de permisos de andamio con mecanismo de actualización diaria según cambios de configuración, criterios de suspensión automática ante deficiencias, e integración con hallazgos de inspección</td>
+                        <td><span class="priority-low">ALTA</span></td>
+                        <td contenteditable="true">Gerente de Sitio</td>
+                        <td contenteditable="true">2 semanas</td>
+                        <td contenteditable="true">100% permisos actualizados diariamente, 0 trabajos con permisos desactualizados</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Incremento de frecuencia de inspecciones de andamios a diaria durante montaje activo, con checklist específico de barandillas, anclajes y plataformas, y registro fotográfico de condiciones</td>
+                        <td><span class="priority-low">ALTA</span></td>
+                        <td contenteditable="true">Ingeniero de Seguridad</td>
+                        <td contenteditable="true">2 semanas</td>
+                        <td contenteditable="true">Inspección diaria 100% completada, deficiencias registradas en 24h</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Restablecimiento inmediato de reuniones de seguridad semanales obligatorias con agenda estructurada: revisión de incidentes, discusión de peligros observados, refuerzo de procedimientos críticos, y participación de trabajadores</td>
+                        <td><span class="priority-low">ALTA</span></td>
+                        <td contenteditable="true">Gerente HSE</td>
+                        <td contenteditable="true">1 semana</td>
+                        <td contenteditable="true">100% reuniones realizadas semanalmente, 90% asistencia de personal</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Implementación de programa de recorridos de seguridad diarios por oficial HSE con checklist de verificación de uso de arnés, estado de barandillas, validez de permisos, y autoridad de detención inmediata de trabajo inseguro</td>
+                        <td><span class="priority-low">ALTA</span></td>
+                        <td contenteditable="true">Oficial de Seguridad</td>
+                        <td contenteditable="true">1 semana</td>
+                        <td contenteditable="true">Recorrido diario 100% completado, hallazgos registrados y corregidos en 24h</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Capacitación obligatoria de re-certificación en trabajo en altura para todo personal de andamios, incluyendo riesgos de caída, uso correcto de arnés, inspección de barandillas, y autoridad de detención de trabajo</td>
+                        <td><span class="priority-low">ALTA</span></td>
+                        <td contenteditable="true">Gerente de Capacitación</td>
+                        <td contenteditable="true">1 mes</td>
+                        <td contenteditable="true">100% personal certificado, evaluación práctica aprobada</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Actualización completa de evaluación de riesgos de montaje de andamios con participación de trabajadores, identificación de controles críticos (arnés, barandillas, permisos), y plan de verificación de efectividad de controles</td>
+                        <td><span class="priority-low">ALTA</span></td>
+                        <td contenteditable="true">Especialista en Seguridad</td>
+                        <td contenteditable="true">3 semanas</td>
+                        <td contenteditable="true">Evaluación completada y comunicada a 100% personal afectado</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Establecimiento de política de 'Seguridad Primero' con declaración explícita de que ningún cronograma de producción justifica compromiso de seguridad, y autoridad de cualquier trabajador para detener trabajo inseguro sin represalias</td>
+                        <td><span class="priority-low">ALTA</span></td>
+                        <td contenteditable="true">Director de Proyecto</td>
+                        <td contenteditable="true">2 semanas</td>
+                        <td contenteditable="true">Política comunicada a 100% personal, casos de detención de trabajo documentados positivamente</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Implementación de sistema de reporte de condiciones inseguras con mecanismo anónimo, investigación obligatoria de reportes en 48h, y retroalimentación a reportador sobre acciones tomadas</td>
+                        <td><span class="priority-low">MEDIA</span></td>
+                        <td contenteditable="true">Gerente HSE</td>
+                        <td contenteditable="true">1 mes</td>
+                        <td contenteditable="true">Sistema operativo, 100% reportes investigados en 48h</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Desarrollo de programa de observación de comportamiento de seguridad (BBS) con observadores entrenados, enfoque en comportamientos críticos (uso de arnés, verificación de barandillas), y retroalimentación positiva</td>
+                        <td><span class="priority-low">MEDIA</span></td>
+                        <td contenteditable="true">Coordinador de Seguridad</td>
+                        <td contenteditable="true">2 meses</td>
+                        <td contenteditable="true">20 observaciones por semana, tendencia de mejora en comportamientos seguros</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Revisión de cronograma de proyecto con cliente para establecer fechas realistas que no requieran comprometer seguridad, y establecimiento de reuniones mensuales de revisión de seguridad con cliente</td>
+                        <td><span class="priority-low">MEDIA</span></td>
+                        <td contenteditable="true">Gerente de Proyecto</td>
+                        <td contenteditable="true">1 mes</td>
+                        <td contenteditable="true">Cronograma revisado acordado, 0 instrucciones de acelerar trabajo comprometiendo seguridad</td>
+                    </tr>
+
+                    <tr>
+                        <td>13</td>
+                        <td contenteditable="true">Implementación de sistema de gestión de cambios para montaje de andamios que requiera re-evaluación de riesgos y actualización de permisos ante cualquier cambio de configuración (agregar/quitar componentes)</td>
+                        <td><span class="priority-low">MEDIA</span></td>
+                        <td contenteditable="true">Ingeniero de Seguridad</td>
+                        <td contenteditable="true">6 semanas</td>
+                        <td contenteditable="true">100% cambios evaluados antes de implementación</td>
+                    </tr>
+
+                    <tr>
+                        <td>14</td>
+                        <td contenteditable="true">Desarrollo de programa de reconocimiento de seguridad que premie comportamientos seguros, reporte de condiciones inseguras, y detención de trabajo ante riesgos, reforzando cultura de seguridad positiva</td>
+                        <td><span class="priority-low">BAJA</span></td>
+                        <td contenteditable="true">Gerente de RRHH</td>
+                        <td contenteditable="true">2 meses</td>
+                        <td contenteditable="true">Reconocimientos mensuales otorgados, encuesta de percepción de cultura de seguridad</td>
+                    </tr>
+
+                    <tr>
+                        <td>15</td>
+                        <td contenteditable="true">Auditoría externa independiente de sistemas de gestión de seguridad del sitio (permisos, inspecciones, capacitación, supervisión) con recomendaciones de mejora y plan de implementación</td>
+                        <td><span class="priority-low">MEDIA</span></td>
+                        <td contenteditable="true">Director HSE Corporativo</td>
+                        <td contenteditable="true">3 meses</td>
+                        <td contenteditable="true">Auditoría completada, plan de acción de hallazgos implementado</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Nunca permitir trabajo en altura sin arnés de seguridad de cuerpo completo correctamente anclado, independientemente de presión de cronograma o instrucciones de supervisión. El arnés es el último control crítico que previene fatalidad en caso de caída y su uso debe ser absolutamente no negociable en toda circunstancia.
+• Nunca comenzar trabajo en plataforma de andamio hasta que barandillas perimetrales completas estén instaladas en todos los lados abiertos e inspeccionadas. Las barandillas son control primario contra caída y su completitud debe verificarse antes de cada turno de trabajo, no asumirse basado en permiso desactualizado.
+• Ejercer autoridad de detención de trabajo inmediatamente al observar condiciones inseguras (arnés faltante, barandilla incompleta, permiso desactualizado) sin esperar autorización de supervisor. La seguridad personal y de compañeros es responsabilidad de cada trabajador y supera cualquier instrucción de producción.
+• Reportar todas las desviaciones de seguridad observadas (trabajo sin arnés, barandillas incompletas, presión de acelerar trabajo) a través de canales formales incluso si parecen 'normales' o 'aceptadas'. La normalización de desviaciones es señal de alerta temprana de cultura de seguridad degradada que requiere intervención de gestión.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Desarrollar cultura organizacional donde la seguridad es valor fundamental no negociable, no variable de ajuste ante presión de cronograma. Esto requiere liderazgo visible de alta gerencia que demuestre con acciones (no solo palabras) que ningún cronograma justifica compromiso de seguridad, incluyendo disposición de renegociar fechas con clientes cuando sea necesario para mantener condiciones seguras.
+• Implementar sistemas de gestión de seguridad robustos con controles redundantes (permisos, inspecciones, recorridos, reuniones, capacitación) que funcionen independientemente de presión de producción. Los sistemas deben tener mecanismos de auto-verificación que detecten cuando controles se degradan (ej. reuniones no realizadas, inspecciones atrasadas) y escalen automáticamente a gerencia para corrección.
+• Establecer competencia verificada en trabajo en altura como requisito absoluto antes de asignar personal a montaje de andamios. La competencia debe incluir no solo conocimiento técnico (uso de arnés, inspección de barandillas) sino también habilidades de toma de decisiones de seguridad (reconocer condiciones inseguras, ejercer autoridad de detención) y ser re-certificada periódicamente con evaluación práctica.
+• Crear mecanismos de retroalimentación de trabajadores de primera línea hacia gerencia sobre presiones de producción que comprometen seguridad, con protección contra represalias y obligación de gerencia de responder. Los trabajadores son los primeros en experimentar conflicto entre cronograma y seguridad y deben tener voz efectiva para escalar estas situaciones antes de que resulten en incidentes.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Comunicar este incidente y sus causas raíz a todo el personal del sitio y otros sitios de la organización como caso de estudio de cómo presión de producción puede degradar sistemas de seguridad. La comunicación debe ser honesta sobre fallas de gestión (tolerancia de desviaciones, degradación de controles) no solo enfocarse en error de trabajador, para generar aprendizaje organizacional genuino.
+• Establecer comunicación regular y estructurada entre gerencia de proyecto, supervisión de operaciones y departamento HSE sobre estado de cronograma y cualquier presión de aceleración, con evaluación conjunta de impacto en seguridad antes de tomar decisiones. Esta comunicación debe incluir mecanismo de escalamiento a alta gerencia cuando presión de cronograma amenaza comprometer controles de seguridad críticos.
+• Implementar comunicación diaria de inicio de turno (toolbox talk) que incluya revisión de peligros específicos del trabajo del día, verificación de controles críticos (arnés, barandillas, permisos), y recordatorio de autoridad de detención de trabajo. Esta comunicación debe ser interactiva con participación de trabajadores no solo presentación unidireccional de supervisor.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Desarrollar programa de capacitación en trabajo en altura que vaya más allá de procedimientos técnicos para incluir toma de decisiones de seguridad bajo presión. La capacitación debe usar escenarios realistas (ej. supervisor instruye terminar rápido con barandilla incompleta) y practicar respuestas apropiadas (detener trabajo, reportar condición insegura, escalar a gerencia) con role-playing y discusión de consecuencias.
+• Proporcionar capacitación específica a supervisores y gerentes de sitio sobre gestión de presión de cronograma sin comprometer seguridad, incluyendo habilidades de comunicación con clientes sobre limitaciones de seguridad, planificación realista de cronogramas que incluyan tiempo para controles de seguridad, y reconocimiento de señales de alerta temprana de degradación de cultura de seguridad (desviaciones normalizadas, reuniones canceladas, inspecciones atrasadas).
+• Implementar capacitación de re-certificación periódica (anual) para todo personal de trabajo en altura que incluya evaluación práctica de competencias (inspección de arnés, anclaje correcto, verificación de barandillas) y evaluación de conocimiento de procedimientos actualizados. La re-certificación debe ser requisito absoluto para continuar asignación a trabajo en altura, sin excepciones por presión de cronograma o escasez de personal.
+• Desarrollar capacitación en sistemas de permisos de trabajo para personal de supervisión e inspección, enfocándose en importancia de mantener permisos actualizados según condiciones reales, criterios de suspensión de permisos ante cambios de configuración, e integración de hallazgos de inspección en sistema de permisos. La capacitación debe incluir casos de estudio de incidentes causados por permisos desactualizados para ilustrar consecuencias de fallas de sistema.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">Este incidente de caída desde altura que resultó en lesiones graves múltiples al trabajador Hasan Yıldız representa un fallo sistémico de gestión de seguridad, no simplemente un error individual de trabajador. El análisis de causa raíz HSG245 revela tres causas raíz organizacionales interrelacionadas que crearon las condiciones para este incidente: (1) tolerancia de la gerencia a múltiples desviaciones conocidas de seguridad incluyendo trabajo sin arnés, barandillas incompletas y permisos desactualizados; (2) presión de producción sistemáticamente priorizada sobre seguridad debido a retraso de proyecto de 3 semanas y demanda de cliente de finalización rápida; y (3) sistema de permisos de trabajo inefectivo que no rastreaba cambios dinámicos de condiciones de montaje de andamios ni suspendía trabajo ante configuraciones inseguras. Estas causas raíz se manifestaron en el colapso simultáneo de múltiples controles de seguridad: oficial de seguridad sin realizar recorridos de sitio, reuniones de seguridad suspendidas por 2 meses, evaluación de riesgos desactualizada por 6 meses, inspecciones infrecuentes que no detectaron deficiencias críticas, y supervisores que instruyeron activamente trabajo en condiciones inseguras bajo presión de cronograma. El resultado fue un entorno donde las desviaciones de seguridad se normalizaron, los trabajadores recibieron mensaje claro de que velocidad era más importante que protección, y los sistemas que debían prevenir trabajo inseguro fallaron completamente. La gravedad de las lesiones (fractura vertebral, fractura pélvica, hemorragia interna) y el potencial fatal del incidente subrayan la urgencia de intervención organizacional profunda para prevenir recurrencia.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Implementación inmediata (1 semana) de verificación obligatoria de arnés antes de inicio de cada turno con registro documental y prohibición absoluta de acceso a andamios sin arnés certificado, eliminando la posibilidad de trabajo en altura sin protección contra caídas que fue causa directa de este incidente.</li>
+<li contenteditable="true">Establecimiento urgente (1 semana) de hold points obligatorios en montaje de andamios que prohíban trabajo en plataforma hasta que barandillas perimetrales completas estén instaladas e inspeccionadas, con señalización visual clara de estado de plataforma (rojo=no autorizada, verde=autorizada para trabajo).</li>
+<li contenteditable="true">Restablecimiento inmediato (1 semana) de reuniones de seguridad semanales obligatorias y recorridos de seguridad diarios por oficial HSE con autoridad de detención inmediata de trabajo inseguro, restaurando presencia de seguridad en campo que había colapsado bajo presión de producción.</li>
+<li contenteditable="true">Rediseño urgente (2 semanas) de sistema de permisos de andamio con mecanismo de actualización diaria según cambios de configuración, criterios de suspensión automática ante deficiencias detectadas en inspección, e integración entre proceso de inspección y sistema de permisos para asegurar que permisos reflejen condiciones reales.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Desarrollo de cultura organizacional de 'Seguridad Primero' (3-6 meses) con declaración explícita de alta gerencia de que ningún cronograma justifica compromiso de seguridad, establecimiento de autoridad de cualquier trabajador para detener trabajo inseguro sin represalias, y programa de reconocimiento que premie comportamientos seguros y reporte de condiciones inseguras, transformando cultura de producción sobre seguridad que contribuyó a este incidente.</li>
+<li contenteditable="true">Implementación de sistema robusto de gestión de cambios para montaje de andamios (2-3 meses) que requiera re-evaluación de riesgos y actualización de permisos ante cualquier cambio de configuración, con hold points obligatorios en etapas críticas y mecanismo de verificación independiente antes de autorizar progresión de trabajo.</li>
+<li contenteditable="true">Establecimiento de programa de competencia verificada en trabajo en altura (3-6 meses) con capacitación que incluya no solo habilidades técnicas sino también toma de decisiones de seguridad bajo presión, evaluación práctica de competencias, y re-certificación periódica anual como requisito absoluto para asignación a trabajo en altura.</li>
+<li contenteditable="true">Desarrollo de mecanismos de retroalimentación de trabajadores hacia gerencia (6-12 meses) sobre presiones de producción que comprometen seguridad, con protección contra represalias, obligación de gerencia de responder, y auditoría externa independiente periódica de sistemas de gestión de seguridad para asegurar que controles no se degraden nuevamente bajo presión operacional.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Nivel de Riesgo de Caída</td>
+                        <td class="current" contenteditable="true">Crítico - Trabajo en altura sin arnés ni barandillas completas</td>
+                        <td class="target" contenteditable="true">Bajo - Arnés obligatorio verificado + barandillas completas antes de trabajo</td>
+                    </tr>
+
+                    <tr>
+                        <td>Tasa de Cumplimiento de Procedimientos</td>
+                        <td class="current" contenteditable="true">~40% - Desviaciones normalizadas (sin arnés, barandillas incompletas)</td>
+                        <td class="target" contenteditable="true">95%+ - Cumplimiento verificado diariamente con detención de no conformidades</td>
+                    </tr>
+
+                    <tr>
+                        <td>Frecuencia de Inspección de Andamios</td>
+                        <td class="current" contenteditable="true">Semanal - Inadecuada para montaje dinámico</td>
+                        <td class="target" contenteditable="true">Diaria durante montaje activo con registro fotográfico</td>
+                    </tr>
+
+                    <tr>
+                        <td>Actualización de Permisos de Trabajo</td>
+                        <td class="current" contenteditable="true">Estática - Permiso emitido una vez, no actualizado</td>
+                        <td class="target" contenteditable="true">Dinámica - Actualización diaria según cambios de configuración</td>
+                    </tr>
+
+                    <tr>
+                        <td>Frecuencia de Reuniones de Seguridad</td>
+                        <td class="current" contenteditable="true">0 - Suspendidas por 2 meses</td>
+                        <td class="target" contenteditable="true">Semanal obligatoria + toolbox talk diario de inicio de turno</td>
+                    </tr>
+
+                    <tr>
+                        <td>Presencia de Seguridad en Campo</td>
+                        <td class="current" contenteditable="true">Ausente - Oficial HSE sin recorridos de sitio</td>
+                        <td class="target" contenteditable="true">Diaria - Recorridos estructurados con checklist y autoridad de detención</td>
+                    </tr>
+
+                    <tr>
+                        <td>Actualización de Evaluación de Riesgos</td>
+                        <td class="current" contenteditable="true">6 meses desactualizada</td>
+                        <td class="target" contenteditable="true">Trimestral + actualización ante cambios significativos de trabajo</td>
+                    </tr>
+
+                    <tr>
+                        <td>Cultura de Seguridad vs Producción</td>
+                        <td class="current" contenteditable="true">Producción priorizada - 'Terminar rápido' supera seguridad</td>
+                        <td class="target" contenteditable="true">'Seguridad Primero' - Autoridad de detención sin represalias</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header">📷 OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /* ── OLAY FOTOĞRAFLARI JS ─────────────────────────────── */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

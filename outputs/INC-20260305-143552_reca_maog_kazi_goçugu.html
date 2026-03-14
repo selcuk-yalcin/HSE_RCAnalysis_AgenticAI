@@ -1,0 +1,2331 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /* ── OLAY FOTOĞRAFLARI ─────────────────────────────────── */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+
+        .btn-pdf {
+            background: #C0392B;
+            color: white;
+        }
+
+        .btn-word {
+            background: #2980B9;
+            color: white;
+        }
+
+        /* Font boyutu slider */
+        .font-size-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.82em;
+            color: #444;
+        }
+
+        .font-size-control label {
+            white-space: nowrap;
+            font-weight: 600;
+            color: #1B3A5C;
+        }
+
+        .font-size-control input[type=range] {
+            width: 90px;
+            accent-color: #1B3A5C;
+            cursor: pointer;
+        }
+
+        .font-size-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+            color: #1B3A5C;
+        }
+
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - RECA-MAOG-IRP-26-00765";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')">📷 Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <div class="font-size-control" title="Yazı boyutunu ayarlayın">
+            <label>🔤 Yazı:</label>
+            <input type="range" id="fontSizeSlider" min="70" max="140" value="100"
+                   oninput="changeFontSize(this.value)">
+            <span class="font-size-value" id="fontSizeValue">100%</span>
+        </div>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-pdf" onclick="downloadPDF()" title="PDF Olarak İndir">
+            📄 PDF İndir
+        </button>
+        <button class="toolbar-btn btn-word" onclick="downloadWord()" title="Word (DOCX) Olarak İndir">
+            📝 Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">HSG245 Metodolojisi ile Hazırlanmıştır</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">RECA-MAOG-IRP-26-00765</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">12.02.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">MAOG Projesi - Mersin-Adana Kesimi KM 359+300</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Kayıp İş Günlü Kaza (LTI) - Kazı Göçüğü</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">12 Şubat 2026 tarihinde saat 16:15'te atık su hattı deplase çalışması sırasında 2,60 m derinliğindeki kazı alanında zemin düzenleme yapan plastik kaynakçısı Nuri Karakuş, şev/iksa bulunmayan ve 94 mm yağış sonrası suya doygun hale gelen kazı yüzeyinde meydana gelen ani toprak kayması sonucu göçük altında kalmış ve Adana Şehir Hastanesi'ne sevk edilmiştir.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">MAOG Projesi Mersin-Adana kesiminde Akdeniz Altyapı firması tarafından yürütülen atık su hattı deplase çalışması kapsamında, 50 yaşındaki plastik kaynakçısı Nuri Karakuş 2,60 metre derinliğindeki kazı alanında boru montajı için zemin düzenleme çalışması yaparken kazı yüzeyinde oluşan çatlak nedeniyle ani toprak kayması meydana gelmiş ve çalışan göçük altında kalmıştır. Ekip arkadaşları tarafından yaklaşık 5 dakika içinde kurtarılan kazazede, 112 ambulans ekibi tarafından bilinci açık şekilde Adana Şehir Hastanesi'ne sevk edilmiştir.</div>
+<div class="paragraph" contenteditable="true">MAOG Projesi - Mersin-Adana Kesimi KM 359+300 mevkii, atık su hattı deplase kazı alanı</div>
+<div class="paragraph" contenteditable="true">Nuri Karakuş (50 yaş, Plastik Kaynakçısı, Akdeniz Altyapı çalışanı, 10 yıllık deneyim)</div>
+<div class="paragraph" contenteditable="true">Kazı yüzeyinde çatlak fark edilmesi üzerine çalışma arkadaşları tarafından uyarılan kazazede alanı terk etmeye çalışırken göçük meydana gelmiştir. Ekip çalışanları ve çevredeki kişiler tarafından yaklaşık 5 dakika içinde göçük altından çıkarılmış, eş zamanlı olarak 112 Acil Sağlık ve REC Acil Çağrı hattına bildirim yapılmıştır. İlk yardım (bak-dinle-hisset, şok pozisyonu) uygulanmış, saat 16:40'ta olay yerine ulaşan ambulans ekibi tarafından bilinci açık şekilde hastaneye sevk edilmiştir. Olay yeri derhal güvenliğe alınmış ve proje genelinde tüm kazı çalışmaları durdurulmuştur.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">1,50 m'den derin kazılarda zorunlu olan şev/iksa uygulaması 2,60 m derinliğindeki kazıda yapılmamış, prosedür ihlali gerçekleşmiştir</li>
+<li contenteditable="true">94 mm yağış (Şubat ortalamasının %115'i) sonrası zemin suya tamamen doygun hale gelmiş ancak iş izni iptal edilmemiş ve çalışmaya devam edilmiştir</li>
+<li contenteditable="true">Şantiye şefi ve İSG denetçisi çalışmayı durdurma kararı verip sahadan ayrıldıktan sonra çalışanlar yetkisiz olarak çalışmayı yeniden başlatmıştır</li>
+<li contenteditable="true">7 aktif lokasyonu denetlemek için sadece 3 kişilik ekip tahsis edilmiş, kaza günü deplase şefi izinde olup vekil belirlenmemiş, bölge İSG sorumlusu sağlık nedeniyle sahada bulunmamıştır</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Kazazedenin göçük altından kurtarılması ve hastaneye sevki</td>
+                        <td contenteditable="true">Ekip Çalışanları / 112 Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Olay yerinin güvenliğe alınması ve korunması</td>
+                        <td contenteditable="true">Şantiye Yönetimi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Proje genelinde tüm kazı çalışmalarının durdurulması</td>
+                        <td contenteditable="true">Proje Yönetimi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Soruşturma ekibinin görevlendirilmesi ve düzenleyici bildirimin yapılması</td>
+                        <td contenteditable="true">HSE Yönetimi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">RECA-MAOG-IRP-26-00765 / INC-20260305-143552</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">12.02.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">16:15</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">MAOG Projesi - Mersin-Adana Kesimi KM 359+300</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Atık Su Hattı Deplase Çalışması</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Nuri Karakuş (50 yaş, Plastik Kaynakçısı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası (08:00-18:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Ekskavatör, 600 mm Beton Borular, Zemin Düzenleme Ekipmanları</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Dolgu Malzemesi, Beton Borular</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Şiddetli Yağış (94,0 mm/24 saat), Sıcaklık: 13-15°C</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Gündüz Doğal Aydınlatma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart İnşaat KKD (Baret, Yelek, İş Ayakkabısı)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Kayıp İş Günlü Kaza (LTI) - Kazı Göçüğü</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Göçük Altında Kalma - Hastaneye Sevk</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 Kişi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Ciddi (Seviye 2 - Hospitalizasyon)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Evet (05.03.26 tarihinde bildirildi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">İbrahim Karademir (Ekip Arkadaşı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet (112 ve REC Acil Çağrı - 16:15)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Adana Şehir Hastanesi'ne sevk (bilinci açık)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:00</div>
+                    <div class="timeline-event" contenteditable="true">Çalışma sahasında TRIC Kart İSG eğitimi alındı (Konu: Demir tezgah çalışmaları - iş kapsamıyla uyumsuz)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:30</div>
+                    <div class="timeline-event" contenteditable="true">Kazı ve boru montaj çalışmalarına başlandı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:00-11:40</div>
+                    <div class="timeline-event" contenteditable="true">600 mm çapında 8 adet beton boru montajı tamamlandı ve dolgu ile kapatıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:40-13:15</div>
+                    <div class="timeline-event" contenteditable="true">Öğle yemeği molası</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">13:15-15:15</div>
+                    <div class="timeline-event" contenteditable="true">3 adet daha beton boru montajı tamamlandı (toplam 11 adet). Saat 14:30'da yağmur başladı ve şiddeti arttı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:15</div>
+                    <div class="timeline-event" contenteditable="true">Dolgu malzemesi tükendi, şiddetli yağış nedeniyle çalışma beklemeye alındı. Şantiye şefi Niyazi Tanrıverdi sahaya geldi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:30</div>
+                    <div class="timeline-event" contenteditable="true">Şantiye şefi ve OSGB İSG denetçisi Harun Bedircan hava koşulları nedeniyle çalışmanın sonlandırılmasına karar verdi ve sahadan ayrıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:10</div>
+                    <div class="timeline-event" contenteditable="true">Çalışanlar sundurma taşıyıcı ayağının kazı kenarında boşaldığını görüp çökme riski değerlendirerek 12. borunun montajını tamamlama kararını yetkisiz olarak aldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:15</div>
+                    <div class="timeline-event" contenteditable="true">Nuri Karakuş kazı alanına girdi. Zemin düzenleme sırasında kuzey kazı yüzeyinde çatlak oluştu, uyarıldı ancak kaçarken ani toprak kayması meydana geldi ve göçük altında kaldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:15-16:20</div>
+                    <div class="timeline-event" contenteditable="true">112 Acil ve REC Acil Çağrı hattına bildirim yapıldı. Kazazede göçük altından kurtarıldı, ilk yardım uygulandı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:40</div>
+                    <div class="timeline-event" contenteditable="true">112 ambulans ekibi olay yerine ulaştı ve kazazedeyi bilinci açık şekilde Adana Şehir Hastanesi'ne sevk etti</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why tekniği, bir olayın kök nedenine ulaşmak için 'Neden?' sorusunun sistematik olarak en az beş kez sorulmasını içeren analiz yöntemidir. Bu kazı göçüğü olayında 5-Why tekniği üç ayrı dalda uygulanmıştır. Birinci dalda çalışanların yetkisiz çalışma başlatmasından başlanarak sahada gözetim yokluğuna, oradan denetim kapasitesi yetersizliğine ve nihayetinde yönetimin bilinen sapmalara tolerans göstermesine ulaşılmıştır. İkinci dalda kazazedenin prosedür ihlalinden başlanarak yetkisiz yeniden başlatmaya, fiziksel durdurma mekanizması yokluğuna ve etkisiz iş durdurma yetkisi sistemine ulaşılmıştır. Üçüncü dalda ise şev/iksa olmayan kazıdaki göçükten başlanarak yetkisiz çalışma, sahada denetim otoritesi yokluğu ve yetersiz personel/iş yükü planlamasına ulaşılmıştır. Her 'Neden?' sorusu rapordaki somut bulgularla desteklenmiş ve bir sonraki seviyeye geçiş için yeterli kanıt sağlanmıştır. Teknik, yüzeysel nedenlerin ötesine geçerek organizasyonun sistem düzeyindeki eksikliklerini ortaya çıkarmıştır.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü</td>
+                        <td contenteditable="true">Bireysel kural/prosedür ihlalleri, yetkisiz bilinçli sapmalar, bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk gibi çalışan davranışlarına ilişkin faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Prosedür eksikliği veya etkisizliği, iletişim bozukluğu, yönetim kararları, politika yetersizlikleri, gözetim eksikliği, iş durdurma mekanizması etkisizliği gibi yönetim sistemi faktörleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Ekipman arızası, tasarım hatası, fiziksel yük, ergonomi sorunları, korunmasız yükseklik/düşme tehlikesi, şev/iksa yokluğu gibi iş ve ekipman faktörleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Çevresel Faktör</td>
+                        <td contenteditable="true">Hava koşulları (şiddetli yağış), aydınlatma, gürültü, sıcaklık, alan düzeni, zemin stabilitesi gibi fiziksel çevre faktörleri</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Miraç Burak Navruz</td>
+                        <td contenteditable="true">Baş Araştırmacı / HSE Uzmanı</td>
+                        <td contenteditable="true">12.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Yeliz Sert</td>
+                        <td contenteditable="true">Baş Araştırmacı / HSE Uzmanı</td>
+                        <td contenteditable="true">12.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Kıvanç Soydemir</td>
+                        <td contenteditable="true">Onaylayan Yetkili / HSE Yöneticisi</td>
+                        <td contenteditable="true">12.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Engin Gürpınar</td>
+                        <td contenteditable="true">Onaylayan Yetkili / Proje Direktörü</td>
+                        <td contenteditable="true">12.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Jeoteknik Mühendis</td>
+                        <td contenteditable="true">Teknik Uzman (Zemin Analizi)</td>
+                        <td contenteditable="true">12.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İnşaat Müdürü</td>
+                        <td contenteditable="true">Operasyonel Temsilci</td>
+                        <td contenteditable="true">12.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">OSGB Temsilcisi</td>
+                        <td contenteditable="true">İş Sağlığı ve Güvenliği Uzmanı</td>
+                        <td contenteditable="true">12.02.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hukuk/Uyum Görevlisi</td>
+                        <td contenteditable="true">Yasal Uyum Danışmanı</td>
+                        <td contenteditable="true">12.02.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - YETKİSİZ BİLİNÇLİ SAPMA VE YÖNETİMSEL TOLERANS</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">12 Şubat 2026 günü saat 15:15-15:30 arasında şantiye şefi Niyazi Tanrıverdi ve OSGB İSG denetçisi Harun Bedircan, 94 mm yağış ve şiddetli hava koşulları nedeniyle çalışmanın durdurulmasına karar vermiş ve bu kararı çalışanlara sözlü olarak bildirerek sahadan ayrılmıştır. Ancak her iki yetkili de sahadan ayrıldıktan sonra, çalışanlar (topograf Gürkan Demir ve kazazede Nuri Karakuş) kendi aralarında 3. şahsa ait sundurma çatısının taşıyıcı ayağının kazı kenarında boşalma gösterdiğini ve çökme riski oluşabileceğini değerlendirerek, 12. borunun montajını tamamlama kararını herhangi bir yetkiliye danışmadan almış ve çalışmayı yetkisiz olarak yeniden başlatmıştır. Bu durum, resmi durdurma kararına açık bir ihlal teşkil etmektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Şantiye şefi ve İSG denetçisinin çalışmayı durdurma kararı vermesi ve sahadan ayrılmasının ardından, çalışanlar herhangi bir yetkiliye danışmadan kendi aralarında çalışmayı yetkisiz olarak yeniden başlattılar</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Çalışanlar (Gürkan Demir ve Nuri Karakuş) neden şantiye şefi ve İSG denetçisinin çalışmayı durdurma kararına rağmen yetkisiz olarak çalışmayı yeniden başlattılar?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışanlar, 3. şahsa ait sundurma çatısının taşıyıcı ayağının kazı kenarında boşalma gösterdiğini ve çökme riski oluşabileceğini kendi aralarında değerlendirerek, 12. borunun montajını tamamlamanın acil bir gereklilik olduğuna karar verdiler. Bu kararı herhangi bir yetkiliye danışmadan aldılar ve sundurma çökme riskinin 12. boruyu monte ederek azaltılabileceğini düşündüler.</div>
+                    <span class="why-code">A - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Çalışanlar neden sundurma çökme riskine karşı yetkililere danışmak yerine kendi başlarına müdahale kararı aldılar?</div>
+                    <div class="why-answer" contenteditable="true">→ Şantiye şefi Niyazi Tanrıverdi ve OSGB İSG denetçisi Harun Bedircan çalışmayı durdurma kararını sözlü olarak bildirdikten sonra sahadan ayrıldılar. Sahadan ayrılmalarının ardından çalışanları yerinde izleyecek, denetleyecek ve olası durum değişikliklerinde yetki kullanabilecek bir gözetim mekanizması veya vekil yetkili bulunmuyordu. Çalışanlar yeni bir risk algıladıklarında danışabilecekleri hiçbir yetkili sahada yoktu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Şantiye şefi ve İSG denetçisi sahadan ayrıldıktan sonra neden çalışanları denetleyecek bir gözetim mekanizması veya vekil yetkili mevcut değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ REC deplase işleri kısım şefi Burak Kekevi'nin ifadesine göre 7 aktif lokasyonu sadece 1 yönetici ve 2 teknikerle takip etmek zorundaydılar. Kaza günü deplase şefi saatlik izindeydi ve yerine vekil belirlenmemişti. Alt işveren tarafında ise bölge İSG sorumlusu sağlık problemleri nedeniyle yoktu. Bu durum, sahada fiziksel gözetim ve denetim kapasitesinin yapısal olarak yetersiz olduğunu göstermektedir. 7 lokasyonu 3 kişiyle denetlemek fiilen imkansızdı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">7 aktif lokasyona karşı bu denli yetersiz denetim kadrosu ve vekil belirlenmemesi neden düzeltilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Proje genelinde 01.01.2025–12.02.2026 arasında 777 uygunsuzluk kaydı, 54 iş durdurma ve 32 disiplin işlemi yapılmış olmasına rağmen, denetim kapasitesinin yetersizliği ve şev/iksa uygulamalarındaki sistematik uyumsuzluk kalıcı olarak çözülmemişti. Şantiye şefi Niyazi Tanrıverdi hakkında 3 disiplin kaydı bulunmasına rağmen projeden uzaklaştırılmamıştı. Q3 2025'te %82, Q4 2025'te %78 olan prosedür uyum oranları düşüş göstermesine rağmen köklü düzeltici önlemler alınmamıştı. Bu durum, yönetimin bilinen sapmalara ve yetersiz denetim kapasitesine tolerans gösterdiğini ve tekrarlayan uygunsuzluklardan etkin ders çıkarılmadığını ortaya koymaktadır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Yönetim neden 777 uygunsuzluk, 54 iş durdurma ve sistematik prosedür ihlallerine rağmen denetim kapasitesini artırmadı ve bilinen sapmaları tolere etti?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonun iş yükü ve üretim baskısı altında, denetim kapasitesi yetersizliğinin ve tekrarlayan sapmaların kalıcı çözümü için gerekli kaynak tahsisi (ek personel, vekil atama mekanizması, disiplin süreçlerinin etkin uygulanması) yapılmamıştır. 566.300 TL sözleşmesel idari yaptırıma rağmen sistem düzeyinde iyileştirme gerçekleştirilmemiş, kısa vadeli çözümlerle yetinilmiştir. Yönetim, bilinen riskleri kabul ederek operasyonel sürekliliği önceliklendirmiş ve bu tolerans çalışanların yetkisiz karar alabildiği bir denetim boşluğu yaratmıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Yönetimin Bilinen Sapmalara Tolerans Göstermesi ve Sistematik İyileştirme Eksikliği</div>
+                <div class="box-content" contenteditable="true">[D1.9 / Organizasyonel]
+
+Proje genelinde 01.01.2025–12.02.2026 döneminde kaydedilen 777 uygunsuzluk, 54 iş durdurma, şev/iksa uygulamalarında sistematik uyumsuzluk (Q3 2025: %82, Q4 2025: %78 prosedür uyum oranı), 3 disiplin kaydına rağmen projeden uzaklaştırılmayan şantiye şefi ve 566.300 TL sözleşmesel yaptırım gibi tekrarlayan sinyallere karşın, yönetim denetim kapasitesi yetersizliğini (7 lokasyona 3 kişi), vekil belirlenmemesi pratiğini ve prosedür ihlallerinin kalıcı olarak devam etmesini tolere etmiştir. Bu yönetimsel tolerans, çalışanların yetkisiz karar alabildiği, iş durdurma kararının sahada fiilen uygulanamadığı ve gözetim boşluğunun sürekli hale geldiği bir çalışma ortamı yaratmıştır. Kök neden, teknik veya bireysel eksiklikler değil, bilinen sistem hatalarının ısrarla düzeltilmemesi ve sapmaların kabul edilebilir görülmesidir.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">777 uygunsuzluk kaydı ve 54 iş durdurma işlemine rağmen denetim kapasitesi artırılmamış, 7 aktif lokasyon için sadece 3 kişilik ekip tahsis edilmeye devam edilmiştir</li>
+<li contenteditable="true">Şantiye şefi Niyazi Tanrıverdi hakkında 3 disiplin kaydı bulunmasına rağmen projeden uzaklaştırma veya ek gözetim önlemi alınmamış, disiplin süreci caydırıcılık sağlamamıştır</li>
+<li contenteditable="true">Q3 2025'te %82, Q4 2025'te %78'e düşen prosedür uyum oranlarına rağmen köklü iyileştirme programı başlatılmamış, şev/iksa sistematik uyumsuzluğu devam etmiştir</li>
+<li contenteditable="true">566.300 TL sözleşmesel idari yaptırım uygulanmış ancak bu yaptırım sistem düzeyinde değişim yaratmamış, benzer ihlaller tekrarlanmaya devam etmiştir</li>
+<li contenteditable="true">Kritik personel yokluğunda (deplase şefi izinde, İSG sorumlusu hasta) vekil atama mekanizması işletilmemiş, gözetim sürekliliği sağlanamamıştır</li>
+<li contenteditable="true">İş yükü ve üretim baskısı altında operasyonel süreklilik güvenlik sistemlerinin etkinliğine öncelik almış, bilinen riskler kabul edilebilir görülmüştür</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - ETKİSİZ İŞ DURDURMA YETKİSİ VE FİZİKSEL UYGULAMA EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">12 Şubat 2026 günü saat 15:15-15:30 arasında şantiye şefi Niyazi Tanrıverdi ve OSGB İSG denetçisi Harun Bedircan, 94 mm yağış ve şiddetli hava koşulları nedeniyle çalışmanın durdurulmasına karar vermiş ve bu kararı çalışanlara sözlü olarak bildirmiştir. Ancak iş durdurma kararı yalnızca sözlü bildirimle sınırlı kalmış, kazı alanının fiziksel olarak kapatılması (bariyer, şerit), ekipmanın devre dışı bırakılması (ekskavatör kilitleme), iş izni kartlarının iptal edilmesi veya sahada gözetim sürekliliğini sağlayacak vekil personel atanması gibi durdurma kararını fiilen uygulayacak hiçbir mekanizma devreye sokulmamıştır. Her iki yetkili de sahadan ayrıldıktan sonra çalışanlar kendi inisiyatifleriyle çalışmayı yeniden başlatabilmiş ve kazazede şev/iksa olmayan, suya doygun kazıya girerek göçük altında kalmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Kazazede Nuri Karakuş, şiddetli yağış altında (94 mm yağış) ve 2,60 m derinliğinde şev/iksa olmayan kazı alanına girerek zemin düzenleme çalışması yaptı; bu durum HOL-HSE-PRO-108 kazı prosedürü ve yağış altında kazı yasağını doğrudan ihlal etti</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Nuri Karakuş neden 94 mm yağış altında, 2,60 m derinliğinde şev/iksa olmayan kazıya girip zemin düzenleme çalışması yaptı?</div>
+                    <div class="why-answer" contenteditable="true">→ Şantiye şefi ve İSG denetçisi çalışmayı durdurup sahadan ayrıldıktan sonra, kazazede ve topograf Gürkan Demir kendi aralarında sundurma taşıyıcı ayağının kazı kenarında boşalması nedeniyle çökme riski değerlendirmesi yaparak 12. borunun montajını tamamlama kararı aldı ve herhangi bir yetkiliden onay almadan çalışmayı yeniden başlattı. Kazazede, bu yetkisiz karar çerçevesinde kazıya girerek zemin düzenleme çalışmasına başladı.</div>
+                    <span class="why-code">A - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Çalışanlar neden yetkili onayı olmadan, resmi durdurma kararına rağmen çalışmayı kendi inisiyatifleriyle yeniden başlatabildiler?</div>
+                    <div class="why-answer" contenteditable="true">→ Şantiye şefi ve İSG denetçisi sahadan ayrıldıktan sonra çalışma alanında herhangi bir yetkili gözetim personeli kalmadı; durdurma kararının fiziksel olarak uygulanmasını (alan kapatma, bariyerleme, ekipman kilitleme, iş izni kartlarının toplanması) sağlayacak veya çalışanların yeniden başlatma girişimini engelleyecek bir mekanizma devreye sokulmadı. Çalışanlar, fiziksel bir engel olmadığı için kendi kararlarıyla çalışmayı sürdürebildiler.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden iş durdurma kararı yalnızca sözlü bildirimle bırakıldı ve fiziksel uygulama mekanizması (alan kapatma, ekipman kilitleme, vekil gözetmen atama) devreye sokulmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ REC deplase şefi kaza günü saatlik izindeydi ve yerine vekil belirlenmemişti; Akdeniz Altyapı bölge İSG sorumlusu sağlık problemleri nedeniyle sahada yoktu. 7 aktif lokasyonu 2 teknikerle takip eden REC denetim yapısı, durdurma kararının sahada fiilen sürdürülmesini sağlayacak personel kapasitesinden yoksundu. Şantiye şefi ve İSG denetçisi sahadan ayrılırken durdurma kararının fiziksel uygulamasını yapacak başka bir yetkili bırakmadı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden kritik personel (deplase şefi, İSG bölge sorumlusu) yokluğunda vekil atanmadı ve 7 lokasyonu 2 teknikerle denetleyen yapı yeterli görüldü?</div>
+                    <div class="why-answer" contenteditable="true">→ Proje genelinde iş durdurma kararlarının sahada fiziksel olarak uygulanmasını ve gözetimin devamlılığını garanti altına alacak bir iş durdurma uygulama prosedürü etkin değildi. Sözlü durdurma kararı verilmesine rağmen, bu kararın çalışanlar tarafından fiilen uygulanıp uygulanmadığını kontrol edecek, sahadan ayrılmadan önce alanı güvenceye alacak (bariyer kurma, ekipman kilitleme, iş izni iptali) ve yokluk durumunda vekil gözetim zorunluluğu getirecek sistematik bir iş durdurma mekanizması bulunmuyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">İş durdurma yetkisi prosedürü neden fiziksel uygulama mekanizmalarını (alan güvenceye alma, vekil atama zorunluluğu) içermiyordu ve sözlü bildirimle sınırlı kaldı?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonun iş durdurma yetkisi sistemi, kararın verilmesine odaklanmış ancak kararın sahada fiilen uygulanmasını sağlayacak kontrol mekanizmalarını içermemiştir. İş durdurma prosedürü, yetkililerin sahadan ayrılması durumunda alanın fiziksel olarak güvenceye alınmasını, ekipmanın devre dışı bırakılmasını, iş izinlerinin iptal edilmesini ve vekil gözetim atanmasını zorunlu kılmamaktadır. Bu eksiklik, iş durdurma yetkisinin kağıt üzerinde kalmasına ve sahada etkin olmamasına yol açmıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Etkisiz İş Durdurma Yetkisi Sistemi ve Fiziksel Uygulama Mekanizması Yokluğu</div>
+                <div class="box-content" contenteditable="true">[D1.6 / Organizasyonel]
+
+Şantiye şefi Niyazi Tanrıverdi ve OSGB İSG denetçisi Harun Bedircan tarafından verilen iş durdurma kararı yalnızca sözlü bildirimle sınırlı kalmış, kazı alanının fiziksel olarak kapatılması (bariyer, uyarı şeritleri), ekipmanın devre dışı bırakılması (ekskavatör anahtarının alınması, kilitleme), iş izni kartlarının iptal edilmesi veya sahada gözetim sürekliliğini sağlayacak vekil personel atanması gibi durdurma kararını fiilen uygulayacak mekanizmalar devreye sokulmamıştır. Organizasyonun iş durdurma yetkisi prosedürü, kararın verilmesine odaklanmış ancak kararın sahada etkin şekilde uygulanmasını garanti altına alacak fiziksel kontrolleri ve gözetim sürekliliğini içermemiştir. Bu nedenle yetkililer sahadan ayrıldıktan sonra çalışanlar kendi inisiyatifleriyle çalışmayı yeniden başlatabilmiş ve kazazede şev/iksa olmayan, suya doygun kazıya girerek göçük altında kalmıştır. Kök neden, iş durdurma yetkisinin kağıt üzerinde kalması ve sahada fiilen uygulanamamasıdır.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">İş durdurma prosedürü, yetkililerin sahadan ayrılması durumunda alanın fiziksel olarak güvenceye alınmasını (bariyer, şerit, ekipman kilitleme) zorunlu kılmamaktadır</li>
+<li contenteditable="true">İş durdurma kararı verildiğinde iş izni kartlarının otomatik olarak iptal edilmesi ve toplanması mekanizması bulunmamaktadır</li>
+<li contenteditable="true">Kritik personel yokluğunda (deplase şefi izinde, İSG sorumlusu hasta) vekil gözetim atama zorunluluğu prosedürde tanımlanmamış ve uygulanmamıştır</li>
+<li contenteditable="true">İş durdurma kararının sahada fiilen uygulanıp uygulanmadığını kontrol edecek takip mekanizması (fotoğraf, kontrol listesi, onay imzası) yoktur</li>
+<li contenteditable="true">Sözlü durdurma kararı sonrası çalışanların alana yeniden girişini engelleyecek fiziksel bariyer veya gözetim personeli bırakılmamıştır</li>
+<li contenteditable="true">İş durdurma yetkisi eğitimleri teorik düzeyde kalmış, fiziksel uygulama adımları (alan kapatma, ekipman kilitleme) pratikte gösterilmemiş ve denetlenmemiştir</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - YETERSİZ PERSONEL VE İŞ YÜKÜ PLANLAMASI</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">MAOG Projesi kapsamında 7 aktif kazı lokasyonunda eş zamanlı olarak deplase çalışmaları yürütülmektedir. Bu 7 lokasyonun denetimi için REC tarafından yalnızca 1 yönetici (deplase şefi) ve 2 tekniker olmak üzere toplam 3 kişilik bir ekip tahsis edilmiştir. Alt işveren Akdeniz Altyapı'nın 198 kişilik kadrosuna ise sadece 2 C sınıfı İSG uzmanı görevlendirilmiştir. Kaza günü olan 12 Şubat 2026'da deplase şefi saatlik izindeydi ve yerine vekil belirlenmemişti; Akdeniz Altyapı bölge İSG sorumlusu da sağlık problemleri nedeniyle sahada bulunmuyordu. Bu durum, şantiye şefi ve İSG denetçisinin çalışma durdurma kararı verip sahadan ayrılmasının ardından sahada hiçbir yetkili denetim otoritesinin kalmamasına yol açmış ve çalışanların yetkisiz olarak çalışmayı yeniden başlatmasını engelleyecek fiziksel denetim kapasitesini ortadan kaldırmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">2,60 m derinliğindeki kazının kuzey yüzeyinde şev veya iksa uygulanmamış olması ve 94 mm yağış sonrası zeminin suya tamamen doygun hale gelmesiyle taşıma kapasitesi ve kayma direncinin kritik ölçüde azalması sonucu kazı yüzeyinde ani toprak kayması meydana geldi</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">2,60 m derinliğindeki kazıda neden şev veya iksa uygulanmamış ve 94 mm yağış sonrası zemin neden suya doygun hale gelmiş durumda çalışmaya devam edilmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Saat 15:15-15:30 arasında şantiye şefi ve İSG denetçisi çalışmayı durdurma kararı verip sahadan ayrılmış, ancak sonrasında çalışanlar (topograf Gürkan Demir ve kazazede Nuri Karakuş) sundurma taşıyıcı ayağının kazı kenarında boşalması nedeniyle çökme riski değerlendirerek 12. borunun montajını tamamlama kararını kendi aralarında alıp herhangi bir yetkiliye danışmadan şev/iksa olmaksızın çalışmayı yeniden başlatmıştır. Prosedür gereği 1,50 m'den derin kazılarda şev/iksa zorunlu olmasına rağmen bu uygulama yapılmamıştır.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Çalışanlar neden yetkisiz olarak, şev/iksa bulunmayan ve suya doygun zemindeki kazıda çalışmayı yeniden başlatma kararını kendi başlarına alabilmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Şantiye şefi ve İSG denetçisi çalışma durdurma kararını yalnızca sözlü olarak bildirip sahadan ayrılmış, sahada çalışanların bu karara uyumunu izleyecek veya yetkisiz yeniden başlatmayı engelleyecek herhangi bir denetim mekanizması (fiziksel bariyer, kilitli iş izni kapatma, sahada kalan yetkili personel) bırakılmamıştır. Deplase şefi saatlik izinde olup vekil belirlenmemişti; bölge İSG sorumlusu da sağlık problemleri nedeniyle yoktu. Sahada hiçbir denetim otoritesi kalmamıştı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Şantiye şefi ve İSG denetçisi sahadan ayrıldıktan sonra neden sahada yetkilendirilmiş bir denetim personeli bulunmuyordu ve çalışma durdurma kararının uygulanması neden takip edilmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ REC deplase ekibi 1 yönetici ve 2 teknikerden oluşmakta olup 7 aktif lokasyonu aynı anda denetlemekteydi. Kaza günü deplase şefi saatlik izindeydi ve yerine vekil belirlenmemişti. Alt işveren Akdeniz Altyapı'nın bölge İSG sorumlusu da sağlık problemleri nedeniyle sahada yoktu. Kısım şefi Burak Kekevi ifadesinde '7 aktif lokasyonu iki teknikerle takip etmenin son derece zorlu olduğunu ve mevcut personel düzeyinin sistematik denetim için yetersiz kaldığını' açıkça belirtmiştir. Bu durum, çalışma durdurma kararı verildikten sonra sahada hiçbir yetkili denetim otoritesinin kalmamasına yol açmıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">7 aktif lokasyonu denetleyecek yalnızca 3 kişilik deplase ekibi bulunması, kaza günü hem deplase şefinin hem alt işveren İSG sorumlusunun sahada olmaması ve vekil belirlenmemesi neden yaşanmıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ 7 aktif lokasyona karşılık 3 kişilik denetim kadrosu tahsis edilmesi, personel yokluğunda vekil atama prosedürünün işletilmemesi ve 198 kişilik alt işveren kadrosuna yalnızca 2 C sınıfı İSG uzmanı görevlendirilmesi, organizasyonun iş yükü ile denetim kapasitesi arasındaki dengesizliği planlama aşamasında yeterince değerlendirmediğini göstermektedir. Kısım şefi Burak Kekevi de ifadesinde mevcut personel düzeyinin sistematik denetim için yetersiz kaldığını açıkça belirtmiştir. İş yükü analizi yapılmamış, kritik personel yokluğunda vekil atama mekanizması öngörülmemiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Organizasyon neden 7 aktif lokasyon için yeterli denetim kadrosu tahsis etmedi ve kritik personel yokluğunda vekil atama mekanizmasını öngörmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Proje planlaması aşamasında iş yükü ile denetim kapasitesi arasındaki denge analiz edilmemiş, 7 aktif lokasyonun eş zamanlı denetimi için gerekli personel sayısı hesaplanmamıştır. Kritik personel yokluğunda (izin, hastalık) vekil atama zorunluluğu prosedürlerde tanımlanmamış ve uygulanmamıştır. 198 kişilik alt işveren kadrosuna sadece 2 İSG uzmanı görevlendirilmesi, yasal minimum gerekliliklerin karşılanmasına odaklanmış ancak operasyonel ihtiyaçları karşılamamıştır. Organizasyon, kaynak tahsisinde maliyet optimizasyonunu güvenlik kapasitesine önceliklendirmiş ve yetersiz personel planlaması çalışanların yetkisiz karar alabildiği denetim boşluğu yaratmıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Yetersiz Personel ve İş Yükü Planlaması ile Vekil Atama Mekanizması Yokluğu</div>
+                <div class="box-content" contenteditable="true">[D3.5 / Organizasyonel]
+
+7 aktif kazı lokasyonuna karşılık yalnızca 3 kişilik REC deplase denetim ekibi (1 yönetici + 2 tekniker) tahsis edilmiş, 198 kişilik alt işveren Akdeniz Altyapı kadrosuna sadece 2 C sınıfı İSG uzmanı görevlendirilmiştir. Proje planlaması aşamasında iş yükü ile denetim kapasitesi arasındaki denge analiz edilmemiş, 7 aktif lokasyonun eş zamanlı denetimi için gerekli personel sayısı hesaplanmamıştır. Kritik personel yokluğunda (deplase şefinin saatlik izni, bölge İSG sorumlusunun sağlık problemi) vekil atama mekanizması prosedürlerde tanımlanmamış ve işletilmemiştir. Bu yetersiz personel ve iş yükü planlaması, çalışma durdurma kararı verildikten sonra sahada hiçbir yetkili denetim otoritesinin kalmamasına yol açmış ve çalışanların yetkisiz olarak şev/iksa bulunmayan suya doygun zemindeki kazıda çalışmayı yeniden başlatmasını engelleyecek fiziksel denetim kapasitesini ortadan kaldırmıştır. Kısım şefi Burak Kekevi'nin ifadesinde açıkça belirttiği gibi, mevcut personel düzeyi sistematik denetim için yetersizdir.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">7 aktif kazı lokasyonuna karşılık yalnızca 3 kişilik REC deplase denetim ekibi tahsis edilmiş, iş yükü analizi yapılmadan personel planlaması gerçekleştirilmiştir</li>
+<li contenteditable="true">198 kişilik alt işveren kadrosuna sadece 2 C sınıfı İSG uzmanı görevlendirilmiş, yasal minimum gereklilikler karşılanmış ancak operasyonel ihtiyaçlar göz ardı edilmiştir</li>
+<li contenteditable="true">Kritik personel yokluğunda (izin, hastalık) vekil atama zorunluluğu prosedürlerde tanımlanmamış, deplase şefi izinde olmasına rağmen vekil belirlenmemiştir</li>
+<li contenteditable="true">Kısım şefi Burak Kekevi'nin '7 aktif lokasyonu iki teknikerle takip etmenin son derece zorlu olduğu ve mevcut personel düzeyinin sistematik denetim için yetersiz kaldığı' ifadesine rağmen personel takviyesi yapılmamıştır</li>
+<li contenteditable="true">Eş zamanlı çoklu lokasyon denetimi için gerekli personel sayısı hesaplanmamış, bir yöneticinin aynı anda 7 lokasyonu etkin denetlemesi beklenmiştir</li>
+<li contenteditable="true">Kaynak tahsisinde maliyet optimizasyonu güvenlik kapasitesine önceliklendirilmiş, yetersiz denetim kapasitesi bilinen bir risk olarak kabul edilmiştir</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">İş durdurma kararı sözlü olarak bildirilmiş ancak fiziksel uygulama adımları (alan kapatma, ekipman kilitleme) çalışanlara net şekilde iletilmemiş ve takip edilmemiştir</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">Kazazede 463 toolbox ve 82 interaktif eğitim almış olmasına rağmen teorik eğitim davranışa dönüşmemiş, TRIC kart konusu iş kapsamıyla uyumsuz (demir tezgah) olmuştur</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim Eksikliği</td>
+                        <td contenteditable="true">7 aktif lokasyonu 3 kişiyle denetleme zorunluluğu sistematik gözetimi imkansız hale getirmiş, kritik personel yokluğunda vekil atanmamıştır</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Uyumsuzluğu</td>
+                        <td contenteditable="true">1,50 m'den derin kazılarda zorunlu şev/iksa uygulanmamış, 94 mm yağış sonrası iş izni iptal edilmemiş, yağış altında kazı yasağı ihlal edilmiştir</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Risk Değerlendirme Eksikliği</td>
+                        <td contenteditable="true">94 mm yağış (majör çevresel değişim) sonrası dinamik risk değerlendirmesi yapılmamış, TRIC kartı güncellenmemiş, TBT yapılmamıştır</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Çevresel Faktörler</td>
+                        <td contenteditable="true">94 mm yağış (Şubat ortalamasının %115'i) zemini suya doygun hale getirmiş, taşıma kapasitesi ve kayma direnci kritik ölçüde azalmıştır</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kültürel Faktörler</td>
+                        <td contenteditable="true">777 uygunsuzluk ve 54 iş durdurma kaydına rağmen yönetimin bilinen sapmalara tolerans göstermesi, güvenlik kültürünü zayıflatmış ve sapmaları normalleştirmiştir</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kaynak Yetersizliği</td>
+                        <td contenteditable="true">7 aktif lokasyona 3 kişilik denetim ekibi, 198 kişiye 2 İSG uzmanı tahsisi, maliyet optimizasyonunun güvenlik kapasitesine öncelenmesi</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">İş durdurma yetkisi prosedürüne fiziksel uygulama mekanizmaları eklenmesi: alan bariyerleme, ekipman kilitleme, iş izni iptali, vekil gözetim atama zorunluluğu</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Fiziksel uygulama adımları tamamlanma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Tüm kazı çalışmalarında 1,50 m'den derin kazılarda şev/iksa zorunluluğunun fiili uygulanması ve günlük denetimi</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">İnşaat Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Şev/iksa uygulanma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">≥50 mm yağış durumunda iş izinlerinin otomatik iptal edilmesi ve yeniden risk değerlendirmesi yapılması mekanizmasının kurulması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Operasyonel Yönetim</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Otomatik iptal sistemi işlerliği %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">7 aktif lokasyon için denetim kapasitesi analizi yapılması ve yeterli personel tahsisi (minimum 1 yetkili/lokasyon)</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İnsan Kaynakları Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Denetim personeli/lokasyon oranı ≥1</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Kritik personel yokluğunda (izin, hastalık) zorunlu vekil atama prosedürünün oluşturulması ve uygulanması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Operasyonel Yönetim</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Vekil atama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">İş durdurma yetkisi pratik eğitimi: fiziksel alan kapatma, ekipman kilitleme, vekil atama uygulamaları</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Eğitim Koordinatörü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama %100, pratik uygulama testi geçme %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Şev/iksa sistematik uyumsuzluğu için kök neden analizi ve kalıcı düzeltici önlem planı oluşturulması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Düzeltici önlem planı tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Şantiye şefi Niyazi Tanrıverdi'nin disiplin geçmişi değerlendirmesi ve gerekirse projeden uzaklaştırılması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İnsan Kaynakları Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Değerlendirme tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Majör çevresel değişim (yağış, rüzgar, sıcaklık) durumunda dinamik risk değerlendirmesi ve TRIC/TBT güncelleme zorunluluğu</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Dinamik risk değerlendirme yapılma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">777 uygunsuzluk kaydının trend analizi ve sistematik kök neden analizi yapılması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Kalite Yöneticisi</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Trend analizi tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Prosedür uyum oranını artırmak için davranış bazlı güvenlik (BBS) programı başlatılması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">BBS gözlem sayısı ≥50/ay, prosedür uyum oranı ≥%95</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Alt işveren Akdeniz Altyapı için İSG uzmanı sayısının artırılması (198 kişiye minimum 4 uzman)</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Alt İşveren Yönetimi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">İSG uzmanı sayısı ≥4</td>
+                    </tr>
+
+                    <tr>
+                        <td>13</td>
+                        <td contenteditable="true">İş yükü ve denetim kapasitesi dengesini sağlayacak personel planlama modeli geliştirilmesi</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Proje Planlama Müdürü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Planlama modeli tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>14</td>
+                        <td contenteditable="true">Güvenlik kültürü değerlendirme anketi ve iyileştirme programı uygulanması</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">İnsan Kaynakları Müdürü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Anket katılım oranı ≥%80, kültür skoru artışı ≥%20</td>
+                    </tr>
+
+                    <tr>
+                        <td>15</td>
+                        <td contenteditable="true">Üst yönetim güvenlik liderliği görünürlük programı (saha ziyaretleri, güvenlik toplantıları)</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Genel Müdür</td>
+                        <td contenteditable="true">12 ay</td>
+                        <td contenteditable="true">Üst yönetim saha ziyareti ≥2/ay</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• İş durdurma kararları yalnızca sözlü bildirimle sınırlı kalmamalı, mutlaka fiziksel uygulama mekanizmalarıyla (alan bariyerleme, ekipman kilitleme, iş izni iptali) desteklenmelidir. Yetkililerin sahadan ayrılması durumunda vekil gözetim atanması zorunlu hale getirilmelidir.
+• Kritik çevresel değişimler (≥50 mm yağış, şiddetli rüzgar, aşırı sıcaklık) durumunda iş izinleri otomatik olarak iptal edilmeli, dinamik risk değerlendirmesi yapılmadan çalışmaya devam edilmemelidir. TRIC kartları ve TBT toplantıları güncel koşullara göre güncellenmelidir.
+• Denetim kapasitesi planlaması iş yükü analizine dayalı olarak yapılmalı, eş zamanlı çoklu lokasyon çalışmalarında her lokasyon için yeterli denetim personeli tahsis edilmelidir. Kritik personel yokluğunda vekil atama mekanizması işletilmelidir.
+• Tekrarlayan uygunsuzluklar (777 kayıt, 54 iş durdurma) ve düşen prosedür uyum oranları (%82→%78) sistematik kök neden analizi ile incelenmeli, kalıcı düzeltici önlemler alınmalıdır. Yönetim, bilinen sapmalara tolerans göstermemeli ve disiplin süreçlerini etkin uygulamalıdır.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Organizasyonun güvenlik kültürü, üretim baskısı altında bile prosedür uyumunu önceliklendiren bir yapıya dönüştürülmelidir. Üst yönetim, güvenlik liderliği görünürlüğünü artırarak (düzenli saha ziyaretleri, güvenlik toplantılarına katılım) güvenliğin öncelik olduğu mesajını güçlendirmelidir.
+• İş yükü ve denetim kapasitesi dengesi sürekli izlenmeli, proje genişlemesi veya yeni lokasyon eklenmesi durumunda denetim personeli orantılı olarak artırılmalıdır. Kaynak tahsisinde maliyet optimizasyonu güvenlik kapasitesine öncelenmemelidir.
+• Davranış bazlı güvenlik (BBS) programı ile çalışanların prosedür uyumu sürekli gözlemlenmeli, pozitif davranışlar ödüllendirilmeli ve sapmalara anında müdahale edilmelidir. Eğitimlerin teorik bilgiden davranış değişimine dönüşmesi sağlanmalıdır.
+• İş durdurma yetkisi sistemi, kararın verilmesinden fiziksel uygulamaya, takip ve doğrulamaya kadar tüm adımları kapsayacak şekilde yeniden tasarlanmalıdır. Sistem etkinliği düzenli olarak denetlenmeli ve sürekli iyileştirilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Kaza raporu ve kök neden analizi tüm proje personeline (REC, alt işverenler, OSGB) paylaşılmalı, benzer kazaların önlenmesi için öğrenilen dersler vurgulanmalıdır. İletişim, suçlama yerine öğrenme odaklı olmalıdır.
+• İş durdurma yetkisi ve fiziksel uygulama mekanizmaları tüm yöneticilere ve saha liderlerine pratik eğitimlerle anlatılmalı, uygulama örnekleri gösterilmelidir. Yetkililerin sahadan ayrılmadan önce yapması gereken adımlar (alan kapatma, vekil atama) net şekilde tanımlanmalıdır.
+• Majör çevresel değişim durumunda (≥50 mm yağış) iş izni otomatik iptal prosedürü tüm çalışanlara duyurulmalı, yeniden başlatma için gerekli onay süreci açıklanmalıdır. Çalışanlar, yetkisiz yeniden başlatmanın sonuçları konusunda bilgilendirilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• İş durdurma yetkisi pratik eğitimi: Tüm yöneticiler ve saha liderleri için fiziksel alan kapatma, ekipman kilitleme, iş izni iptali ve vekil atama uygulamaları içeren uygulamalı eğitim programı düzenlenmelidir. Eğitim sonunda pratik uygulama testi yapılmalıdır.
+• Kazı güvenliği ve şev/iksa uygulamaları eğitimi: Tüm kazı çalışanları için 1,50 m derinlik kuralı, şev oranları, iksa tipleri, zemin stabilitesi değerlendirmesi konularında teorik ve pratik eğitim verilmelidir. Eğitim, farklı zemin tipleri ve hava koşulları senaryolarını içermelidir.
+• Dinamik risk değerlendirmesi ve TRIC/TBT güncelleme eğitimi: Tüm saha personeli için çevresel değişimlerin (yağış, rüzgar, sıcaklık) risklere etkisi, dinamik risk değerlendirme yöntemi ve TRIC/TBT güncelleme prosedürü konularında eğitim düzenlenmelidir.
+• Güvenlik liderliği ve davranış bazlı güvenlik (BBS) eğitimi: Tüm yöneticiler için güvenlik liderliği, pozitif pekiştirme, sapmalara müdahale, güvenlik kültürü oluşturma konularında liderlik eğitimi verilmelidir. BBS gözlem teknikleri öğretilmelidir.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">12 Şubat 2026 tarihinde MAOG Projesi Mersin-Adana kesiminde meydana gelen kazı göçüğü kazası, çoklu bariyer ihlallerinin ve organizasyonel sistem eksikliklerinin bir araya gelmesi sonucu gerçekleşmiştir. HSG245 metodolojisi ile yapılan kök neden analizi, kazanın yalnızca bireysel hatalardan değil, derin organizasyonel faktörlerden kaynaklandığını ortaya koymuştur. Üç ana kök neden tespit edilmiştir: (1) Yönetimin bilinen sapmalara tolerans göstermesi (D1.9), (2) Etkisiz iş durdurma yetkisi (D1.6) ve (3) Yetersiz personel ve iş yükü planlaması (D3.5). 777 uygunsuzluk kaydı, 54 iş durdurma, şev/iksa sistematik uyumsuzluğu ve düşen prosedür uyum oranlarına rağmen yönetimin kalıcı düzeltici önlem almaması, organizasyonun öğrenme kapasitesinin zayıf olduğunu göstermektedir. İş durdurma kararının sözlü bildirimle sınırlı kalması ve fiziksel uygulama mekanizmalarının yokluğu, güvenlik yetkilerinin sembolik düzeyde kaldığını ortaya koymaktadır. 7 aktif lokasyonu 3 kişiyle denetleme zorunluluğu ve kritik personel yokluğunda vekil atanmaması, denetim kapasitesinin yapısal olarak yetersiz olduğunu göstermektedir. Kaza önlenebilirdi; mevcut prosedürler ve kontroller yeterli olsaydı, ancak bu prosedürlerin sahada etkin uygulanmaması ve sistem eksiklikleri kazayı kaçınılmaz hale getirmiştir. Organizasyonun, iş yükü ve üretim baskısı altında güvenlik sistemlerinin etkinliğini ikinci plana atması, benzer kazaların tekrarlanma riskini sürekli hale getirmektedir.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kısa Vade Önlem 1 (1 hafta): İş durdurma yetkisi prosedürüne fiziksel uygulama mekanizmaları (alan bariyerleme, ekipman kilitleme, iş izni iptali, vekil gözetim atama) eklenmesi ve tüm yöneticilere acil eğitim verilmesi. Uygulama adımlarının kontrol listesi oluşturulması ve günlük denetimi.</li>
+<li contenteditable="true">Kısa Vade Önlem 2 (1 hafta): Tüm kazı çalışmalarında 1,50 m'den derin kazılarda şev/iksa zorunluluğunun fiili uygulanması ve günlük denetimi. Uyumsuz kazıların derhal durdurulması ve düzeltilmesi. Şev/iksa uygulanma oranının %100'e çıkarılması.</li>
+<li contenteditable="true">Kısa Vade Önlem 3 (2 hafta): ≥50 mm yağış durumunda iş izinlerinin otomatik iptal edilmesi ve yeniden risk değerlendirmesi yapılması mekanizmasının kurulması. Hava tahmin sisteminin iş izni sürecine entegrasyonu. Majör çevresel değişim prosedürünün tüm personele duyurulması.</li>
+<li contenteditable="true">Kısa Vade Önlem 4 (2 hafta): 7 aktif lokasyon için denetim kapasitesi analizi yapılması ve yeterli personel tahsisi (minimum 1 yetkili/lokasyon). Kritik personel yokluğunda zorunlu vekil atama prosedürünün oluşturulması ve uygulanması. Denetim personeli/lokasyon oranının ≥1'e çıkarılması.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Uzun Vade İyileştirme 1 (3 ay): Davranış bazlı güvenlik (BBS) programı başlatılması ve prosedür uyum oranının %95'e çıkarılması. Pozitif davranışların ödüllendirilmesi ve sapmalara anında müdahale sistemi kurulması. Aylık minimum 50 BBS gözlemi hedeflenmesi.</li>
+<li contenteditable="true">Uzun Vade İyileştirme 2 (3-6 ay): 777 uygunsuzluk kaydının trend analizi ve sistematik kök neden analizi yapılması. Tekrarlayan uygunsuzluklar için kalıcı düzeltici önlem planı oluşturulması. Disiplin süreçlerinin etkinleştirilmesi ve caydırıcılık sağlanması.</li>
+<li contenteditable="true">Uzun Vade İyileştirme 3 (6 ay): Güvenlik kültürü değerlendirme anketi ve iyileştirme programı uygulanması. Üst yönetim güvenlik liderliği görünürlük programı (aylık minimum 2 saha ziyareti). Güvenlik kültürü skorunun %20 artırılması hedeflenmesi.</li>
+<li contenteditable="true">Uzun Vade İyileştirme 4 (6-12 ay): İş yükü ve denetim kapasitesi dengesini sağlayacak personel planlama modeli geliştirilmesi. Proje genişlemesi veya yeni lokasyon eklenmesi durumunda denetim personelinin orantılı artırılması mekanizmasının kurulması. Kaynak tahsisinde güvenlik kapasitesinin önceliklendirilmesi.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Şev/İksa Uygulanma Oranı</td>
+                        <td class="current" contenteditable="true">%0 (2,60 m kazıda yok)</td>
+                        <td class="target" contenteditable="true">%100 (≥1,50 m tüm kazılarda)</td>
+                    </tr>
+
+                    <tr>
+                        <td>İş Durdurma Fiziksel Uygulama</td>
+                        <td class="current" contenteditable="true">Sözlü bildirim (etkisiz)</td>
+                        <td class="target" contenteditable="true">Fiziksel mekanizmalar (bariyer, kilitleme, vekil)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Denetim Personeli/Lokasyon</td>
+                        <td class="current" contenteditable="true">0,43 (3 kişi/7 lokasyon)</td>
+                        <td class="target" contenteditable="true">≥1,0 (her lokasyona yetkili)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Uyum Oranı</td>
+                        <td class="current" contenteditable="true">%78 (Q4 2025)</td>
+                        <td class="target" contenteditable="true">%95 (BBS ile)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Vekil Atama Oranı</td>
+                        <td class="current" contenteditable="true">%0 (deplase şefi izinde, vekil yok)</td>
+                        <td class="target" contenteditable="true">%100 (kritik personel yokluğunda)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Majör Çevresel Değişim Yönetimi</td>
+                        <td class="current" contenteditable="true">94 mm yağış, iş izni iptal edilmedi</td>
+                        <td class="target" contenteditable="true">≥50 mm yağışta otomatik iptal</td>
+                    </tr>
+
+                    <tr>
+                        <td>İSG Uzmanı/Çalışan Oranı (Alt İşveren)</td>
+                        <td class="current" contenteditable="true">1/99 (2 uzman/198 kişi)</td>
+                        <td class="target" contenteditable="true">1/50 (4 uzman/198 kişi)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Tekrarlayan Uygunsuzluk Yönetimi</td>
+                        <td class="current" contenteditable="true">777 kayıt, köklü önlem yok</td>
+                        <td class="target" contenteditable="true">Trend analizi, kalıcı düzeltici önlem</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header">📷 OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')">✕</button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon">📷</span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /* ── OLAY FOTOĞRAFLARI JS ─────────────────────────────── */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+
+        // PDF olarak indir (tarayıcı print → Save as PDF)
+        function downloadPDF() {
+            if (editMode) toggleEditMode();
+            showNotification('📄 PDF için: Yazdır ekranında "PDF olarak kaydet" seçeneğini kullanın', 'info');
+            const originalTitle = document.title;
+            document.title = 'HSE_Report_' + new Date().getTime();
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => { document.title = originalTitle; }, 2000);
+            }, 600);
+        }
+
+        // Word (DOCX) olarak indir — HTML-to-Word yöntemi
+        function downloadWord() {
+            showNotification('📝 Word dosyası hazırlanıyor...', 'info');
+            var header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+                'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+                'xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><meta charset="utf-8">' +
+                '<meta name=ProgId content=Word.Document>' +
+                '<style>body{{font-family:Calibri,sans-serif;font-size:11pt;}}' +
+                'table{{border-collapse:collapse;width:100%;}}' +
+                'td,th{{border:1px solid #ccc;padding:6pt;}}' +
+                '.section-header{{background:#1B3A5C;color:white;padding:8pt;font-weight:bold;}}' +
+                '.edit-toolbar,.nav-menu,.nav-toggle,.scroll-top{{display:none!important;}}' +
+                '</style></head>';
+            var container = document.querySelector('.container');
+            var body = container ? container.innerHTML : document.body.innerHTML;
+            var wordHtml = header + '<body>' + body + '</body></html>';
+            var blob = new Blob([wordHtml], {{
+                type: 'application/msword'
+            }});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'HSE_Report_' + new Date().getTime() + '.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📝 Word dosyası indiriliyor...', 'success');
+        }
+
+        // Yazı boyutunu değiştir
+        function changeFontSize(value) {
+            document.getElementById('fontSizeValue').textContent = value + '%';
+            document.querySelector('.container').style.fontSize = value + '%';
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

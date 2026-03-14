@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260225-003205";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 Kritik Faktörler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260225-003205</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">18 Mayıs 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Boru Hattı Boşaltma Sahası, BOC'a Ait OHTL Hattı Güzergahı, CPS5-DS2-DS3-CPS4 Besleme Devresi</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">İş Kazası - Yüksek Gerilim Elektrik Teması</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Boru hattı boşaltma hazırlığı sırasında side boom ekipmanı 6.6 kV havai iletim hattına temas etmiş, kabloların koparak yere düşmesine neden olmuştur. Operatör hafif elektrik hissi yaşamış, hastaneye sevk edilmiş ve herhangi bir yaralanma olmaksızın taburcu edilmiştir. Olay, risk değerlendirmesinin yetersizliği ve havai hat tehlikesinin tanımlanmaması sonucu meydana gelmiştir.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">18 Mayıs 2026 tarihinde saat 15:45 civarında, boru hattı boşaltma sahası hazırlık çalışmaları sırasında BNT Company'ye ait side boom ekipmanı, BOC'a ait 6.6 kV yüksek gerilim taşıyan havai iletim hattına (OHTL) temas etmiştir. Temas sonucunda elektrik kabloları koparak yere düşmüş, operatör hafif statik benzeri bir elektrik hissi yaşamıştır. Koruma rölesi 20-50 milisaniye içinde devre kesiciyi açarak enerji akışını durdurmuştur.
+
+Operatör derhal Dar Alshifa Investment Hospital'e sevk edilmiş, EKG monitörizasyonu dahil tıbbi muayenelerden geçirilmiş ve herhangi bir yaralanma tespit edilmeden taburcu edilmiştir. Saha ekibi derhal tahliye edilmiş, kablolar barikatlanmış, CPS5'ten gelen enerji beslemesi izole edilerek kilitlenmiş ve saat 19:20'de enerji kaynağının tamamen devre dışı olduğu test edilerek teyit edilmiştir.</div>
+<div class="paragraph" contenteditable="true">Boru hattı boşaltma sahası, BOC'a ait OHTL hattı güzergahı (CPS5'ten kaynaklanan ve DS2, DS3, CPS4 (Manifold 6) ile akış hattı katodik koruma sistemini besleyen devre)</div>
+<div class="paragraph" contenteditable="true">BNT Company side boom operatörü (tecrübeli, hafif elektrik hissi yaşadı, hastaneye sevk edildi, yaralanma olmaksızın taburcu edildi), mekanik süpervizör (50 metre mesafede), iki işçi (kablolardan 20 metre mesafede)</div>
+<div class="paragraph" contenteditable="true">Saha ekibi derhal tahliye edildi, düşen kablolar barikatlandı, CPS5'ten gelen enerji beslemesi izole edilerek kilitlendi, DS2'de izolasyon yapıldı, saat 19:20'de enerji kaynağı test edilerek devre dışı olduğu teyit edildi, operatör EKG monitörizasyonu için hastaneye sevk edildi.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk değerlendirmesi çalışma alanındaki 6.6 kV havai iletim hattını tehlike olarak tanımlamamış, güvenli mesafe ve kontrol önlemleri belirlenmemiştir</li>
+<li contenteditable="true">Ağır ekipman operasyonlarında havai enerji hatlarıyla etkileşim riski, organizasyonun risk analiz prosedürlerinde zorunlu değerlendirme kalemi olarak yer almamaktadır</li>
+<li contenteditable="true">Hat sahibi BOC ile koordinasyon sağlanmamış, enerjisizleştirme talebi yapılmamış, fiziksel bariyer ve uyarı işaretleri konulmamıştır</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Kritik Kök Nedenler</div>
+
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Risk Analizi Sisteminin Yüksek Enerjili Tehlikeleri Kapsamaması ve Bağımsız Gözden Geçirme Eksikliği</div>
+                <div class="box-content" contenteditable="true">[D4.1 / Organizasyonel]
+                
+Organizasyonun risk yönetim sistemi, ağır ekipman operasyonlarında (side boom, vinç, ekskavatör vb.) havai enerji hatlarıyla temas riskini standart ve zorunlu bir tehlike kategorisi olarak tanımlamamaktadır. Risk değerlendirme prosedürleri ve şablonları, bu kritik tehlike kategorisini kapsamayacak ş...</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Enerji Hatları Yakınında Çalışma Risk Kontrollerinin Sistematik Olmaması ve Koordinasyon Eksikliği</div>
+                <div class="box-content" contenteditable="true">[D4.1 / Organizasyonel]
+                
+Boru hattı indirme operasyonu için yapılan risk değerlendirmesinde, side boom vinçlerinin çalışma yarıçapı içindeki 6.6 kV havai iletim hattı tehlikesinin tanımlanmaması, hat sahibi (BOC) ile koordinasyon, enerjisizleştirme talebi, fiziksel bariyer kurulumu ve güvenli mesafe belirlenmesi gibi kritik...</div>
+            </div>
+
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: İş Kontrol Sisteminin Yüksek Riskli İşlerde Yeterli Kontrol Sağlamaması ve Gözetim Eksikliği</div>
+                <div class="box-content" contenteditable="true">[D4.1 / Organizasyonel]
+                
+Havai elektrik hattı yakınında ağır ekipman (side boom) operasyonu için yapılan risk değerlendirmesinde OHTL tehlikesi tanımlanmamış, güvenli yaklaşma mesafeleri belirlenmemiş, hat sahibi kuruluşla (BOC) koordinasyon sağlanmamış ve gerekli kontrol önlemleri (fiziksel bariyer, gözetmen/banksman atanm...</div>
+            </div>
+
+            <div class="subsection-header">1.4 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Enerji kaynağı CPS5'ten izole edildi ve kilitlendi, DS2'de izolasyon yapıldı</td>
+                        <td contenteditable="true">Elektrik Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Operatör Dar Alshifa Investment Hospital'e sevk edildi, EKG monitörizasyonu yapıldı</td>
+                        <td contenteditable="true">HSE Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Düşen kablolar barikatlandı, saha güvenliği sağlandı</td>
+                        <td contenteditable="true">Saha Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">RIDDOR bildirimi yapıldı (25.02.26)</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Kaza kayıt defterine işlendi (Ref: 056/26)</td>
+                        <td contenteditable="true">HSE Memuru</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260225-003205</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">18 Mayıs 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">15:45</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Boru Hattı Boşaltma Sahası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">BOC OHTL Hattı (CPS5-DS2-DS3-CPS4 Besleme Devresi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">BNT Company Side Boom Operatörü (Tecrübeli)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Side Boom (Boru Hattı Kaldırma Ekipmanı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">6.6 kV Havai İletim Hattı (OHTL), Elektrik Kabloları</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Kayıtlarda belirtilmemiş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Gün ışığı (15:45)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart KKD (Detay belirtilmemiş)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">İş Kazası - Yüksek Gerilim Elektrik Teması</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Operatör hafif elektrik hissi yaşadı, tıbbi muayene sonrası yaralanma tespit edilmedi; 6.6 kV elektrik kabloları koptu ve yere düştü</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 kişi doğrudan (operatör), 3 kişi dolaylı (süpervizör ve 2 işçi yakın mesafede)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Ciddi Potansiyel (Yüksek gerilim teması, ölümcül olabilirdi; koruma rölesi sayesinde büyük yaralanma önlendi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Kapsamında mı</td>
+                    <td contenteditable="true">Evet (25.02.26 tarihinde bildirildi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Mekanik Süpervizör (50 metre mesafede)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet, operatör Dar Alshifa Investment Hospital'e sevk edildi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Taburcu (EKG monitörizasyonu dahil muayene sonrası yaralanma tespit edilmedi)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:30</div>
+                    <div class="timeline-event" contenteditable="true">Boru hattı boşaltma hazırlık çalışmaları başladı, side boom ekipmanı konumlandırılıyor</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:40</div>
+                    <div class="timeline-event" contenteditable="true">Side boom operatörü ekipmanı hareket ettirmeye başladı, havai hat tehlikesi fark edilmedi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:45</div>
+                    <div class="timeline-event" contenteditable="true">Side boom 6.6 kV havai iletim hattına temas etti, kablolar koptu ve yere düştü, operatör hafif elektrik hissi yaşadı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:45:00.02-0.05</div>
+                    <div class="timeline-event" contenteditable="true">Koruma rölesi 20-50 milisaniye içinde devre kesiciyi açtı, enerji akışı durduruldu</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:50</div>
+                    <div class="timeline-event" contenteditable="true">Saha ekibi derhal tahliye edildi, düşen kablolar barikatlandı, acil durum prosedürleri başlatıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:00</div>
+                    <div class="timeline-event" contenteditable="true">Operatör Dar Alshifa Investment Hospital'e sevk edildi, EKG monitörizasyonu için hazırlık</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:30</div>
+                    <div class="timeline-event" contenteditable="true">CPS5'ten gelen enerji beslemesi izole edildi ve kilitlendi, DS2'de izolasyon yapıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">19:20</div>
+                    <div class="timeline-event" contenteditable="true">Enerji kaynağı test edildi ve tamamen devre dışı olduğu teyit edildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">20:00</div>
+                    <div class="timeline-event" contenteditable="true">Operatör hastaneden taburcu edildi (yaralanma tespit edilmedi)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">25.02.26</div>
+                    <div class="timeline-event" contenteditable="true">RIDDOR bildirimi yapıldı, kaza kayıt defterine işlendi (Ref: 056/26)</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ</div>
+            
+            <div class="subsection-header">3.1 Metodoloji</div>
+            <div class="paragraph" contenteditable="true">Bu kök neden analizi, İngiltere Sağlık ve Güvenlik İdaresi (HSE) tarafından yayınlanan HSG245 kılavuzunda önerilen Hiyerarşik 5-Why (Neden-Neden) metodolojisi kullanılarak gerçekleştirilmiştir. HSG245 yaklaşımı, olayların doğrudan nedenlerinden (davranışsal ve koşulsal faktörler) başlayarak, sistematik bir sorgulama zinciriyle organizasyonel kök nedenlere ulaşmayı hedefler. Bu metodoloji, kazaların yalnızca bireysel hatalardan değil, altta yatan sistem eksikliklerinden kaynaklandığını kabul eder ve sürdürülebilir iyileştirmeler için organizasyonel düzeyde çözümler geliştirilmesini sağlar.
+
+Analiz sürecinde, olayın üç farklı perspektiften (davranışsal ve koşulsal faktörler) incelenmesi için üç ayrı dal oluşturulmuştur. Her dal, doğrudan nedenden başlayarak beş seviyeli 'Neden?' sorusuyla derinleştirilmiş ve her seviyede elde edilen yanıtlar bir sonraki seviyenin sorusunu oluşturmuştur. Bu sistematik yaklaşım, yüzeysel nedenlerin ötesine geçerek, organizasyonun risk yönetim sistemindeki yapısal eksiklikleri ortaya çıkarmıştır. Tüm dallar, risk analizinin yapılmaması veya yetersiz olması şeklinde ortak bir organizasyonel kök nedende birleşmiştir.
+
+Analiz ekibi, olaya ilişkin tüm kanıtları (olay raporları, tanık ifadeleri, ekipman kayıtları, koruma rölesi verileri, hastane raporları, mevcut risk değerlendirmeleri, prosedürler ve iş izin belgeleri) toplamış ve değerlendirmiştir. Her 'Neden?' sorusunun yanıtı, somut kanıtlara dayandırılmış ve çok disiplinli ekip tarafından doğrulanmıştır. Metodoloji, sadece teknik faktörleri değil, insan faktörlerini, organizasyonel kültürü ve yönetim sistemlerini de kapsayacak şekilde bütünsel bir yaklaşım benimsemiştir.</div>
+            
+            <div class="subsection-header">3.2 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why (5-Neden) tekniği, bir problemin kök nedenine ulaşmak için 'Neden?' sorusunun art arda beş kez sorulmasına dayanan basit ama güçlü bir analiz yöntemidir. Bu olayda, her dal için doğrudan nedenden başlanarak sistematik olarak 'Neden bu oldu?' sorusu sorulmuş ve her yanıt bir sonraki seviyenin sorusunu oluşturmuştur. İlk seviyeler genellikle davranışsal veya koşulsal faktörleri ortaya çıkarırken, daha derin seviyeler organizasyonel sistem eksikliklerine ulaşmıştır.
+
+Örneğin, Birinci Dalda: (1) Operatör neden havai hattı fark etmedi? → Saha keşfi ve brifing yapılmadı. (2) Neden yapılmadı? → Risk değerlendirmesi bu tehlikeyi tanımlamadı. (3) Neden tanımlamadı? → Sistematik kontrol listesi yoktu. (4) Neden yoktu? → Risk yönetim sistemi bu tehlike kategorisini kapsamıyordu. (5) Neden kapsamıyordu? → Risk analiz prosedürleri yüksek enerjili tehlikeleri zorunlu kılmıyordu ve bağımsız gözden geçirme süreci yoktu. Bu sistematik sorgulama, olayın kök nedeninin bireysel hata değil, organizasyonun risk yönetim sistemindeki yapısal eksiklik olduğunu açıkça ortaya koymuştur. Üç farklı dalın da aynı organizasyonel kök nedende birleşmesi, bulgunun güvenilirliğini ve geçerliliğini güçlendirmiştir.</div>
+            
+            <div class="subsection-header">3.3 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışsal Faktörler</td>
+                        <td contenteditable="true">Çalışanların bilgi eksikliği, beceri yetersizliği, farkındalık eksikliği, dikkatsizlik, yorgunluk, stres, risk algısı hataları gibi bireysel davranışlardan kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktörler</td>
+                        <td contenteditable="true">Ekipman arızası, enerji kaynakları, fiziksel tehlikeler, çevresel koşullar, ekipman yerleşimi, tasarım hataları, bakım eksiklikleri gibi çalışma ortamındaki fiziksel ve teknik koşullardan kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörleri</td>
+                        <td contenteditable="true">Prosedür eksikliği, iş talimatlarının belirsizliği, görev karmaşıklığı, zaman baskısı, iş yükü, ergonomi sorunları, iletişim eksiklikleri gibi işin kendisinden kaynaklanan faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktörler</td>
+                        <td contenteditable="true">Risk yönetim sistemi eksiklikleri, politika yetersizlikleri, eğitim programı eksiklikleri, gözetim ve denetim yetersizlikleri, kaynak tahsisi sorunları, güvenlik kültürü zayıflıkları, yönetim kararları gibi organizasyonel düzeydeki sistemik faktörler</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.4 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Kıdemli HSE Yöneticisi</td>
+                        <td contenteditable="true">Baş Araştırmacı ve Analiz Lideri</td>
+                        <td contenteditable="true">18-25 Mayıs 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Elektrik Güvenliği Mühendisi</td>
+                        <td contenteditable="true">Teknik Uzman (Elektrik Sistemleri)</td>
+                        <td contenteditable="true">18-25 Mayıs 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Operasyon Müdürü</td>
+                        <td contenteditable="true">Operasyonel Süreç Temsilcisi</td>
+                        <td contenteditable="true">18-25 Mayıs 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">BNT Company Temsilcisi</td>
+                        <td contenteditable="true">Yüklenici Firma Temsilcisi</td>
+                        <td contenteditable="true">18-25 Mayıs 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">BOC Elektrik Otoritesi Temsilcisi</td>
+                        <td contenteditable="true">Altyapı Sahibi Temsilcisi</td>
+                        <td contenteditable="true">18-25 Mayıs 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İş Sağlığı Hekimi</td>
+                        <td contenteditable="true">Tıbbi Değerlendirme Uzmanı</td>
+                        <td contenteditable="true">18-25 Mayıs 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İnsan Faktörleri Uzmanı</td>
+                        <td contenteditable="true">Davranışsal Analiz Uzmanı</td>
+                        <td contenteditable="true">18-25 Mayıs 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İş İzin Sistemi Uzmanı</td>
+                        <td contenteditable="true">İş Kontrol Sistemi Uzmanı</td>
+                        <td contenteditable="true">18-25 Mayıs 2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. OPERATÖRÜN HAVAI HAT TEHLİKESİNİ FARK EDEMEMESİ</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Side boom operatörü, boru hattı boşaltma hazırlığı sırasında çalışma alanında bulunan 6.6 kV yüksek gerilim taşıyan havai iletim hattının (OHTL) varlığını ve bu hattın yarattığı ciddi elektrik çarpması tehlikesini fark edememiştir. Operatör, ekipmanı hareket ettirirken mevcut enerji hattını tespit edememiş ve side boom'un havai hatta temas etmesine neden olmuştur. Bu durum, operatörün çalışma alanındaki çevresel tehlikelerin farkında olmadan iş yapmasının doğrudan sonucudur.
+
+Olay kanıtları, operatörün side boom'u hareket ettirirken 6.6 kV havai iletim hattına çarptığını ve kabloların koparak yere düştüğünü göstermektedir. Operatör tecrübeli bir çalışan olmasına rağmen, bu kritik tehlikenin varlığından haberdar edilmemiş ve çalışma alanında herhangi bir uyarı işareti, fiziksel bariyer veya güvenli mesafe işaretlemesi bulunmamıştır. Bu durum, operatörün tehlikeyi fark etmesini imkansız hale getirmiştir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Operatörün çalışma alanındaki 6.6 kV havai iletim hattının varlığını ve tehlikesini fark edememesi, çevresel tehlikelerin tanımlanmaması ve operatöre bildirilmemesi sonucu meydana gelmiştir. Side boom ekipmanı hareket ettirilirken, mevcut enerji hattı tespit edilememiş ve ekipman doğrudan hatta temas etmiştir.</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden side boom operatörü çalışma alanındaki 6.6 kV havai iletim hattının varlığını ve tehlikesini fark etmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Boru boşaltma operasyonu öncesinde çalışma alanındaki havai enerji hatlarını tespit eden bir saha keşfi, tehlike haritalaması veya operasyon öncesi güvenlik brifing yapılmadı. Operatör, çalışma alanında 6.6 kV yüksek gerilim hattının bulunduğu konusunda bilgilendirilmedi ve tehlikenin farkında olmadan çalışmaya başladı. Sahada havai hat güzergahını gösteren herhangi bir uyarı işareti, fiziksel bariyer veya güvenli mesafe işaretlemesi bulunmuyordu.</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden operasyon öncesinde saha keşfi, tehlike haritalaması veya güvenlik brifing yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Bu iş için hazırlanan risk değerlendirmesi (JSA/JHA - Job Safety Analysis/Job Hazard Analysis) çalışma alanındaki havai enerji hatlarını bir tehlike olarak tanımlamamıştı. Risk değerlendirmesinde 6.6 kV OHTL hattının varlığı ve side boom operasyonunun bu hatla etkileşim riski ele alınmadığı için, bu tehlikeye yönelik kontrol önlemleri (güvenli mesafe belirleme, gözlemci/banksman atama, hat kapatma talebi, fiziksel bariyer kurulumu, uyarı işaretleri) planlanmamış ve uygulanmamıştır.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden risk değerlendirmesi havai enerji hatlarını bir tehlike olarak tanımlayamadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk değerlendirme süreci, çalışma alanındaki mevcut altyapı tehlikelerini (havai hatlar, yeraltı kabloları, boru hatları vb.) sistematik olarak envantere almayı gerektiren bir kontrol listesi veya standart prosedür içermiyordu. Ayrıca, risk değerlendirmesinin masabaşında hazırlanması sonrası saha koşullarının yerinde doğrulanması adımı atlanmıştı. Üçüncü taraf altyapı sahipleriyle (BOC gibi) koordinasyon protokolü işletilmemiş, mevcut enerji hatlarının konumları ve özellikleri sorgulanmamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden risk değerlendirme süreci bu tür kritik çevresel tehlikeleri yakalayacak sistematik bir mekanizmaya sahip değildi ve saha doğrulaması yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonun iş kontrol ve risk yönetim sistemi, ağır ekipman operasyonları (vinç, side boom, ekskavatör vb.) için havai ve yeraltı enerji hatlarıyla etkileşim riskini standart bir tehlike kategorisi olarak tanımlamıyordu. Risk değerlendirme şablonları ve kontrol listeleri bu kritik tehlike kategorisini kapsamıyordu. Gözetim mekanizması da risk değerlendirmesinin sahadaki gerçek koşullarla uyumunu, tehlike tanımlamasının yeterliliğini ve kontrol önlemlerinin uygulanabilirliğini denetlemiyordu. Risk değerlendirmelerinin kalite kontrolü yapılmıyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden organizasyonun risk yönetim sistemi bu kritik tehlike kategorisini kapsamıyordu ve gözetim mekanizması risk değerlendirmesinin kalitesini denetlemiyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk analiz prosedürleri, ağır ekipman-enerji hattı etkileşimi gibi yüksek enerjili tehlikeleri zorunlu değerlendirme kapsamına almıyordu. Risk değerlendirmelerinin yeterliliğini, kapsamını ve sahadaki uygulanabilirliğini doğrulayan bağımsız bir gözden geçirme, teknik onay veya yeterlilik denetimi süreci bulunmuyordu. Risk değerlendirme yapan personelin yetkinliği ve eğitimi sistematik olarak değerlendirilmiyordu. Bu durum, risk analizinin yapılmaması veya yetersiz olması şeklinde sistemik bir organizasyonel eksikliktir ve tüm iş kontrol sisteminin temelini zayıflatmaktadır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Risk Analizi Sisteminin Yüksek Enerjili Tehlikeleri Kapsamaması</div>
+                <div class="box-content" contenteditable="true">[D4.1 / Organizasyonel]
+
+Organizasyonun risk yönetim sistemi, ağır ekipman operasyonlarında havai enerji hatlarıyla temas riskini standart ve zorunlu bir tehlike kategorisi olarak tanımlamamaktadır. Risk değerlendirme prosedürleri, çalışma alanındaki mevcut altyapı tehlikelerinin (özellikle üçüncü taraf altyapıları) sistematik olarak envanterini çıkarmayı, saha koşullarının yerinde doğrulanmasını ve altyapı sahipleriyle koordinasyonu zorunlu kılmamaktadır. Risk değerlendirmelerinin kalitesini, kapsamını ve uygulanabilirliğini denetleyen bağımsız bir gözden geçirme veya teknik onay mekanizması bulunmamaktadır. Bu sistemik eksiklik, operatörün tehlikenin farkında olmadan çalışmasına, kritik kontrol önlemlerinin planlanmamasına ve sonuç olarak side boom'un 6.6 kV havai iletim hattına çarparak kabloların kopup yere düşmesine doğrudan yol açmıştır.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk değerlendirme prosedürleri ve şablonları, ağır ekipman operasyonlarında havai ve yeraltı enerji hatlarıyla etkileşim riskini zorunlu değerlendirme kalemi olarak içermemektedir</li>
+<li contenteditable="true">Saha keşfi ve mevcut altyapı envanteri (havai hatlar, yeraltı kabloları, boru hatları) çıkarma adımı risk değerlendirme sürecinde standart bir gereklilik olarak tanımlanmamıştır</li>
+<li contenteditable="true">Üçüncü taraf altyapı sahipleriyle (BOC, elektrik dağıtım şirketleri vb.) koordinasyon ve bilgi paylaşımı protokolü sistematik olarak işletilmemektedir</li>
+<li contenteditable="true">Risk değerlendirmelerinin kalitesini, kapsamını ve sahadaki uygulanabilirliğini doğrulayan bağımsız gözden geçirme, teknik onay veya yeterlilik denetimi süreci bulunmamaktadır</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. ÇALIŞMA ALANINDA ENERJİLİ HAVAI HATIN KORUNMASIZ BULUNMASI</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Boru hattı boşaltma operasyonunun gerçekleştirileceği çalışma alanında, BOC'a ait 6.6 kV yüksek gerilim taşıyan enerjili havai iletim hattı (OHTL) korunmasız şekilde bulunuyordu. Bu hat, CPS5'ten kaynaklanan ve DS2, DS3, CPS4 (Manifold 6) ile akış hattı katodik koruma sistemini besleyen kritik bir enerji devresiydi. Side boom ekipmanının çalışma yarıçapı içinde bulunan bu yüksek gerilim hattı, herhangi bir fiziksel bariyer, uyarı işareti veya güvenli mesafe işaretlemesi olmaksızın aktif durumda kalmıştır.
+
+Çalışma alanı hazırlığı sırasında, mevcut havai enerji hattının varlığı yeterince değerlendirilmemiş, hattın enerjisinin geçici olarak kesilmesi, fiziksel koruma bariyeri konulması veya güvenli çalışma mesafesinin belirlenmesi gibi temel kontrol önlemleri uygulanmamıştır. Hat sahibi BOC ile koordinasyon sağlanmamış ve enerjisizleştirme talebi yapılmamıştır. Bu durum, yüksek enerjili bir tehlike kaynağının kontrol altına alınmadan çalışma ortamında aktif kalmasına neden olmuştur.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Çalışma alanında 6.6 kV yüksek gerilim taşıyan enerjili havai hattın korunmasız bulunması, hattın enerjisinin kesilmemesi, fiziksel bariyer konulmaması ve güvenli mesafe belirlenmemesi sonucu meydana gelmiştir. Side boom operasyonu sırasında bu kontrol edilmemiş enerji kaynağı aktif kalmış ve ekipmanın hatta teması sonucu kabloların kopmasına neden olmuştur.</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden çalışma alanında 6.6 kV enerjili havai hat korunmasız şekilde bulunuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Boru hattı indirme operasyonu için saha hazırlığı yapılırken, mevcut havai enerji hattının varlığı ve yarattığı ciddi elektrik çarpması tehlikesi yeterince değerlendirilmemiştir. Hattın geçici olarak enerjisinin kesilmesi (BOC ile koordinasyon), fiziksel koruma bariyeri konulması, güvenli çalışma mesafesinin belirlenmesi ve işaretlenmesi, uyarı levhalarının yerleştirilmesi gibi temel kontrol önlemleri uygulanmamıştır. Çalışma alanı tehlike haritası oluşturulmamış ve enerji izolasyonu prosedürü başlatılmamıştır.</div>
+                    <span class="why-code">B - Koşullar</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden havai hattın enerjisinin kesilmesi, bariyer konulması veya güvenli mesafe belirlenmesi gibi kontrol önlemleri uygulanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ İş öncesi yapılan risk değerlendirmesinde (RA/JSA) side boom vinçlerinin çalışma yarıçapı içinde 6.6 kV havai iletim hattının bulunduğu tehlikesi yeterince tanımlanmamış veya hiç ele alınmamıştır. Risk değerlendirmesi, BOC'a ait OHTL hattının enerjisizleştirilmesi için hat sahibiyle koordinasyon ihtiyacını, geçici enerji kesme talebini, alternatif besleme düzenlemelerini ve iş izin sistemi gerekliliklerini belirlememişti. Dolayısıyla bu kritik kontrol önlemleri iş planına dahil edilmemiş ve uygulanmamıştır.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden iş öncesi risk değerlendirmesinde havai hat tehlikesi ve gerekli koordinasyon ihtiyacı yeterince tanımlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Saha keşfi ve iş planlama aşamasında mevcut altyapı envanteri (havai hatlar, yeraltı tesisatları, boru hatları vb.) sistematik olarak kontrol edilmemiştir. Ağır ekipman (side boom, vinç vb.) kullanılacak operasyonlar için havai hat yakınlığına ilişkin spesifik bir risk kontrol prosedürü ya bulunmuyordu ya da etkin şekilde uygulanmıyordu. Üçüncü taraf altyapı sahipleriyle (BOC) bilgi paylaşımı ve koordinasyon protokolü işletilmemiş, mevcut enerji hatlarının konumları, gerilimleri ve güvenli yaklaşma mesafeleri sorgulanmamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden ağır ekipman operasyonları için havai hat yakınlığına ilişkin spesifik risk kontrol prosedürü etkin şekilde uygulanmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonel düzeyde, vinç ve ağır ekipman operasyonlarında enerji nakil hatlarına yakınlık riskini sistematik olarak ele alan bir risk yönetim çerçevesi eksikti. Risk analiz süreçleri, sahada mevcut tüm enerji kaynaklarının (özellikle üçüncü taraflara ait havai hatların) tanımlanmasını, güvenli yaklaşma mesafelerinin belirlenmesini ve enerji izolasyonu protokollerinin uygulanmasını zorunlu kılacak şekilde yapılandırılmamıştı. Mevcut kontrollerin (fiziksel bariyer, uyarı işaretleri, gözetmen atanması) uygulanıp uygulanmadığı sistematik olarak denetlenmiyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden risk analiz süreçleri sahada mevcut tüm enerji kaynaklarını kapsayacak şekilde yapılandırılmamış ve kontroller denetlenmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk değerlendirme sistemi, ağır ekipman operasyonlarında havai enerji hatlarının yarattığı yüksek tehlikeyi (elektrik çarpması, ark patlaması, ölüm riski) kapsayacak derinlikte tasarlanmamıştır. Yapılan risk analizlerinin kalitesi, kapsamı, tehlike tanımlamasının yeterliliği ve belirlenen kontrollerin sahada uygulanıp uygulanmadığı sistematik olarak takip edilmiyor ve bağımsız olarak denetlenmiyordu. Risk kontrol hiyerarşisi (eliminasyon, ikame, mühendislik kontrolleri, idari kontroller, KKD) etkin şekilde uygulanmıyordu. Bu durum, risk analizinin yetersiz yapılması ve risk kontrollerinin uygulanmaması şeklinde kök neden olarak tezahür etmiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Enerji Hatları Yakınında Çalışma Risk Kontrollerinin Sistematik Olmaması</div>
+                <div class="box-content" contenteditable="true">[D4.1 / Organizasyonel]
+
+Boru hattı indirme operasyonu için yapılan risk değerlendirmesinde, side boom vinçlerinin çalışma yarıçapı içindeki 6.6 kV havai iletim hattı tehlikesinin tanımlanmaması, hat sahibi (BOC) ile koordinasyon, enerjisizleştirme talebi, fiziksel bariyer kurulumu ve güvenli mesafe belirlenmesi gibi kritik kontrol önlemlerinin belirlenmemesi ve uygulanmaması söz konusudur. İş öncesi risk analizi, sahada mevcut 6.6 kV enerjili havai iletim hattını ve side boom operasyonunun bu hatla etkileşim riskini kapsayacak derinlikte yapılmamıştır. Ağır ekipman kullanımı öncesinde havai hat yakınlığına ilişkin spesifik tehlike tanımlaması, hat sahibiyle enerjisizleştirme koordinasyonu, fiziksel bariyer yerleşimi ve minimum güvenli çalışma mesafesi belirlenmesi gibi hayati kontrol önlemleri risk değerlendirmesinde ele alınmamış veya hiç uygulanmamıştır. Bu sistemik eksiklik, side boom'un korunmasız havai hatta temas ederek kabloların kopmasına ve yere düşmesine doğrudan zemin hazırlamıştır.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Vinç ve ağır ekipman operasyonlarında enerji nakil hatlarına yakınlık riskini sistematik olarak ele alan risk yönetim çerçevesi eksiktir</li>
+<li contenteditable="true">Üçüncü taraf altyapı sahipleriyle (BOC, elektrik dağıtım şirketleri) koordinasyon, bilgi paylaşımı ve enerjisizleştirme talep protokolü sistematik olarak işletilmemektedir</li>
+<li contenteditable="true">Risk kontrol hiyerarşisi (eliminasyon-enerji kesme, ikame, mühendislik kontrolleri-bariyer, idari kontroller-gözetmen, KKD) etkin şekilde uygulanmamaktadır</li>
+<li contenteditable="true">Belirlenen risk kontrollerinin (fiziksel bariyer, uyarı işaretleri, güvenli mesafe, gözetmen atanması) sahada uygulanıp uygulanmadığı sistematik olarak takip edilmiyor ve denetlenmemektedir</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. SIDE BOOM EKİPMANININ HAVAI HATA ÇARPACAK MESAFEDE ÇALIŞTIRILMASI</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Side boom ekipmanı, 6.6 kV havai elektrik hattına çarpacak kadar yakın mesafede konumlandırılmış ve hareket ettirilmiştir. Ekipman operatörü, side boom'u hareket ettirirken havai hattın varlığından ve güvenli yaklaşma mesafelerinden haberdar değildi. Çalışma alanında havai hat güzergahını gösteren herhangi bir fiziksel bariyer, uyarı işareti, güvenli mesafe işaretlemesi veya ekipman hareket sınırlaması bulunmuyordu. Ayrıca, ekipman hareketlerini izleyecek ve havai hata yaklaşıldığında uyarı verecek bir gözetmen (banksman/spotter) atanmamıştı.
+
+Side boom'un çalışma yarıçapı ve maksimum yüksekliği dikkate alındığında, ekipmanın havai hatta temas etme riski çok yüksekti. Ancak bu risk iş öncesi değerlendirilmemiş, ekipman konumlandırması ve hareket planlaması yapılırken havai hat tehlikesi göz önünde bulundurulmamıştır. Sonuç olarak, ekipman doğrudan 6.6 kV havai iletim hattına çarpmış ve kabloların koparak yere düşmesine neden olmuştur.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Side boom ekipmanının havai elektrik hattına çarpacak kadar yakın mesafede konumlandırılması ve hareket ettirilmesi, güvenli çalışma mesafesinin belirlenmemesi, fiziksel bariyer ve uyarı sistemlerinin bulunmaması sonucu meydana gelmiştir. Ekipman, enerji hattı güvenli mesafesi dışında çalıştırılmış ve kontrol edilmemiştir.</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden side boom ekipmanı havai elektrik hattına çarpacak kadar yakın mesafede konumlandırıldı ve hareket ettirildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Boru hattı indirme hazırlığı sırasında çalışma alanındaki 6.6 kV havai iletim hattının (OHTL) varlığı, konumu ve güvenli yaklaşma mesafeleri operatöre ve saha ekibine yeterince bildirilmedi. Operatör, ekipmanı hareket ettirirken havai hattın varlığından haberdar değildi. Saha düzeninde hat güzergahına ilişkin fiziksel uyarı, bariyer, güvenli mesafe işaretlemesi veya ekipman hareket sınırlaması bulunmuyordu. Ekipman hareketlerini izleyecek gözetmen (banksman/spotter) atanmamıştı.</div>
+                    <span class="why-code">B - Koşullar</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden havai iletim hattının varlığı ve güvenli yaklaşma mesafeleri operatöre ve saha ekibine yeterince bildirilmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ İş öncesi yapılan risk değerlendirmesinde (JSA/RA) havai elektrik hatlarına yakın çalışma tehlikesi yeterince tanımlanmadı ve bu tehlikeye yönelik spesifik kontrol önlemleri (güvenli mesafe belirleme ve işaretleme, gözetmen/banksman atanması, fiziksel bariyer kurulumu, uyarı işaretleri yerleştirme, ekipman yükseklik sınırlayıcısı) belirlenmedi. İş öncesi güvenlik brifing yapılmadı veya yetersiz kaldı. Operatöre ve saha ekibine havai hat tehlikesi konusunda spesifik talimat ve eğitim verilmedi.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden iş öncesi risk değerlendirmesinde havai elektrik hattı tehlikesi ve ilgili kontrol önlemleri yeterince tanımlanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk değerlendirme süreci, sahada mevcut tüm enerji kaynaklarını (özellikle BOC'a ait OHTL hatlarını) sistematik olarak kapsayacak şekilde yürütülmedi. Saha keşfi yetersiz yapıldı veya hiç yapılmadı, mevcut altyapı envanteri çıkarılmadı. Hat sahibi kuruluşla (BOC) koordinasyon sağlanmadı, havai hatların konumları, gerilimleri ve güvenli yaklaşma mesafeleri sorgulanmadı. Ağır ekipman operasyonları için özel risk değerlendirme gereksinimleri (havai hat yakınlığı, ekipman çalışma yarıçapı, maksimum yükseklik) dikkate alınmadı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden risk değerlendirme süreci sahada mevcut tüm enerji kaynaklarını sistematik olarak kapsayacak şekilde yürütülmedi ve hat sahibi kuruluşla koordinasyon sağlanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Havai hat yakınında ağır ekipman operasyonu için gerekli olan özel risk değerlendirme prosedürü, iş izin sistemi gereksinimleri (özel çalışma izni, enerji izolasyonu izni) ve üçüncü taraf altyapı sahipleriyle koordinasyon protokolü ya mevcut değildi ya da etkin biçimde uygulanmıyordu. Gözetim mekanizması (iş öncesi denetim, saha güvenlik turu) bu eksikliği tespit edemedi veya düzeltici önlem almadı. Risk değerlendirmesinin kalitesini ve uygulanabilirliğini doğrulayan bağımsız gözden geçirme süreci işletilmedi.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden havai hat yakınında çalışmaya özgü risk değerlendirme prosedürü ve kontrol mekanizmaları etkin biçimde uygulanmıyordu ve gözetim bu eksikliği tespit edemedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonel düzeyde risk analizi ve iş kontrol sistemleri, sahada karşılaşılabilecek tüm tehlikeleri (özellikle üçüncü taraf altyapı tehlikelerini - havai hatlar, yeraltı kabloları, boru hatları) kapsayacak derinlikte değildi. Risk değerlendirmelerinin kalitesi, kapsamı ve uygulanabilirliği yeterince denetlenmiyordu. Kontrol önlemlerinin sahada uygulanıp uygulanmadığının takibi yapılmıyordu. İş izin sistemi, yüksek riskli işler için yeterli kontrol mekanizmaları sağlamıyordu. Gözetim ve denetim faaliyetleri (iş öncesi denetim, saha güvenlik turu, yönetim denetimi) etkin değildi veya sistematik olarak yürütülmüyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: İş Kontrol Sisteminin Yüksek Riskli İşlerde Yeterli Kontrol Sağlamaması</div>
+                <div class="box-content" contenteditable="true">[D4.1 / Organizasyonel]
+
+Havai elektrik hattı yakınında ağır ekipman (side boom) operasyonu için yapılan risk değerlendirmesinde OHTL tehlikesi tanımlanmamış, güvenli yaklaşma mesafeleri belirlenmemiş, hat sahibi kuruluşla (BOC) koordinasyon sağlanmamış ve gerekli kontrol önlemleri (fiziksel bariyer, gözetmen/banksman atanması, uyarı işaretleri, ekipman yükseklik sınırlayıcısı, enerji kesme talebi) planlanmamış ve uygulanmamıştır. Boru hattı indirme operasyonu öncesinde gerçekleştirilen risk analizi, çalışma alanındaki 6.6 kV havai iletim hattını ve bu hattın side boom ekipmanı için oluşturduğu elektrik çarpması/temas tehlikesini yeterince kapsamadı. Saha keşfi sırasında OHTL güzergahı haritalanmadı, BOC ile koordinasyon kurulmadı, güvenli çalışma mesafeleri tanımlanmadı ve operatör ile saha personeline bu tehlikeye ilişkin spesifik talimatlar verilmedi. Risk kontrol hiyerarşisine uygun önlemler (hattın enerjisinin kesilmesi, fiziksel bariyer, banksman/gözetmen atanması, ekipman yükseklik sınırlayıcısı) belirlenmedi ve uygulanmadı. Bu durum, risk değerlendirme sürecinin sistematik olmadığını ve iş kontrol sisteminin bu kritik tehlikeyi yakalayamadığını göstermektedir.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Havai hat yakınında ağır ekipman operasyonu için özel risk değerlendirme prosedürü ve iş izin sistemi gereksinimleri mevcut değil veya etkin şekilde uygulanmamaktadır</li>
+<li contenteditable="true">Saha keşfi, mevcut altyapı envanteri çıkarma ve üçüncü taraf altyapı sahipleriyle koordinasyon protokolü sistematik olarak işletilmemektedir</li>
+<li contenteditable="true">Risk kontrol hiyerarşisi (eliminasyon-enerji kesme, mühendislik kontrolleri-bariyer/sınırlayıcı, idari kontroller-gözetmen/eğitim) etkin şekilde uygulanmamaktadır</li>
+<li contenteditable="true">Gözetim ve denetim faaliyetleri (iş öncesi denetim, saha güvenlik turu, yönetim denetimi) risk değerlendirmesinin kalitesini ve kontrol önlemlerinin uygulanmasını yeterince takip etmemektedir</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Çalışma alanındaki 6.6 kV havai iletim hattının varlığı, konumu ve güvenli yaklaşma mesafeleri operatöre ve saha ekibine yeterince bildirilmedi. İş öncesi güvenlik brifing yapılmadı veya yetersiz kaldı. Hat sahibi BOC ile koordinasyon ve bilgi paylaşımı sağlanmadı. Operatör ile saha personeline havai hat tehlikesi konusunda spesifik talimat verilmedi.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">Risk değerlendirme yapan personelin yetkinliği ve eğitimi sistematik olarak değerlendirilmedi. Operatör ve saha personeline havai hat yakınında çalışma, güvenli mesafeler, elektrik çarpması tehlikeleri ve acil durum prosedürleri konusunda yeterli eğitim verilmedi. Ağır ekipman operatörlerine enerji hatları yakınında çalışma özel eğitimi verilmedi.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yorgunluk/Stres</td>
+                        <td contenteditable="true">Olay raporunda yorgunluk veya stres faktörüne ilişkin doğrudan kanıt bulunmamaktadır. Ancak, operatörün tecrübeli olmasına rağmen havai hattı fark edememesi, dikkat ve farkındalık eksikliğine işaret edebilir. İş yükü ve zaman baskısı faktörleri değerlendirilmelidir.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman Bakım Eksikliği</td>
+                        <td contenteditable="true">Side boom ekipmanının teknik durumu ve bakım kayıtlarına ilişkin bilgi raporda yer almamaktadır. Ekipman arızası olayın doğrudan nedeni değildir. Ancak, ekipman yükseklik sınırlayıcısı veya yakınlık uyarı sistemi gibi güvenlik özelliklerinin bulunup bulunmadığı araştırılmalıdır.</td>
+                        <td class="impact-low" contenteditable="true">Düşük</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Uyumsuzluğu</td>
+                        <td contenteditable="true">Risk değerlendirme prosedürü, saha keşfi prosedürü, üçüncü taraf koordinasyon protokolü, iş izin sistemi prosedürü ve enerji izolasyonu prosedürü ya mevcut değildi ya da etkin şekilde uygulanmadı. Mevcut prosedürler, ağır ekipman operasyonlarında havai hat tehlikesini yeterince kapsamıyordu. Prosedür uyumsuzluğu yaygın ve sistematik bir sorundur.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yönetim Denetim Eksikliği</td>
+                        <td contenteditable="true">Risk değerlendirmelerinin kalitesini ve uygulanabilirliğini doğrulayan bağımsız gözden geçirme süreci işletilmedi. Gözetim ve denetim faaliyetleri (iş öncesi denetim, saha güvenlik turu, yönetim denetimi) risk değerlendirmesinin yetersizliğini ve kontrol önlemlerinin uygulanmamasını tespit edemedi. Yönetim, risk yönetim sisteminin etkinliğini yeterince izlemiyor ve denetlemiyor.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Çevresel Koşullar</td>
+                        <td contenteditable="true">Hava koşulları ve aydınlatma (gün ışığı, 15:45) olayın doğrudan nedeni değildir. Ancak, havai hattın görünürlüğü ve operatörün fark edebilirliği açısından değerlendirilmelidir. Çalışma alanının düzeni ve havai hat güzergahının işaretlenmemesi önemli bir çevresel faktördür.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            1
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Tüm ağır ekipman operasyonları (side boom, vinç, ekskavatör vb.) için havai ve yeraltı enerji hatları yakınında çalışma özel risk değerlendirme prosedürü geliştirilmeli ve uygulanmalıdır. Prosedür, zorunlu saha keşfi, mevcut altyapı envanteri çıkarma, üçüncü taraf koordinasyonu, güvenli mesafe belirleme, enerji izolasyonu talebi ve kontrol önlemleri (bariyer, gözetmen, uyarı) gerekliliklerini içermelidir.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #C0392B; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ACİL
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Yöneticisi
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            2 hafta
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Prosedür onaylanması ve tüm operasyonlarda uygulanması (Hedef: 2 hafta içinde %100 uygulama)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            2
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Risk değerlendirme şablonları ve kontrol listeleri revize edilmeli, ağır ekipman operasyonlarında havai ve yeraltı enerji hatlarıyla etkileşim riski zorunlu değerlendirme kalemi olarak eklenmelidir. Saha keşfi, altyapı envanteri ve üçüncü taraf koordinasyonu adımları standart gereklilik haline getirilmelidir.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #C0392B; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ACİL
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Yöneticisi
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            2 hafta
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Revize edilmiş şablonların onaylanması ve kullanıma alınması (Hedef: 2 hafta içinde tamamlanma)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            3
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Tüm yüksek riskli iş risk değerlendirmeleri için bağımsız gözden geçirme ve teknik onay süreci oluşturulmalı ve uygulanmalıdır. Risk değerlendirmesinin kalitesi, kapsamı, tehlike tanımlamasının yeterliliği ve kontrol önlemlerinin uygulanabilirliği HSE uzmanı veya teknik uzman tarafından onaylanmalıdır.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #C0392B; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ACİL
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Müdürü
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            3 hafta
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Onay sürecinin tanımlanması ve tüm yüksek riskli işlerde uygulanması (Hedef: 3 hafta içinde %100 uygulama)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            4
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            BOC ve diğer altyapı sahipleriyle (elektrik dağıtım şirketleri, gaz şirketleri vb.) koordinasyon ve bilgi paylaşımı protokolü oluşturulmalıdır. Çalışma alanlarındaki mevcut altyapıların (havai hatlar, yeraltı kabloları, boru hatları) konumları, gerilimleri ve güvenli yaklaşma mesafeleri sistematik olarak sorgulanmalı ve paylaşılmalıdır.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #E67E22; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            YÜKSEK
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Operasyon Müdürü
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            1 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Protokol anlaşmasının imzalanması ve bilgi paylaşım sisteminin kurulması (Hedef: 1 ay içinde tamamlanma)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            5
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Havai hat yakınında ağır ekipman operasyonları için özel iş izin sistemi gereksinimleri tanımlanmalı ve uygulanmalıdır. Enerji izolasyonu izni, özel çalışma izni, gözetmen atanması ve kontrol önlemlerinin doğrulanması zorunlu hale getirilmelidir.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #E67E22; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            YÜKSEK
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Yöneticisi
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            1 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            İş izin sistemi prosedürünün güncellenmesi ve uygulanması (Hedef: 1 ay içinde %100 uygulama)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            6
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Tüm ağır ekipman operatörlerine ve saha süpervizörlerine 'Enerji Hatları Yakınında Güvenli Çalışma' eğitimi verilmelidir. Eğitim, havai hat tehlikeleri, güvenli mesafeler, elektrik çarpması riskleri, kontrol önlemleri ve acil durum prosedürlerini kapsamalıdır. Eğitim sonrası yetkinlik değerlendirmesi yapılmalıdır.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #E67E22; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            YÜKSEK
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Eğitim Koordinatörü
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            6 hafta
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Tüm ilgili personelin eğitilmesi ve yetkinlik belgesi alması (Hedef: 6 hafta içinde %100 tamamlanma)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            7
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Risk değerlendirme yapan tüm personele (HSE uzmanları, süpervizörler, iş planlamacıları) 'İleri Düzey Risk Değerlendirme ve Tehlike Tanımlama' eğitimi verilmelidir. Eğitim, saha keşfi teknikleri, altyapı tehlikelerinin tanımlanması, risk kontrol hiyerarşisi ve üçüncü taraf koordinasyonunu kapsamalıdır.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #E67E22; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            YÜKSEK
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Eğitim Koordinatörü
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            2 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Tüm risk değerlendirme personelinin eğitilmesi ve yetkinlik sertifikası alması (Hedef: 2 ay içinde %100 tamamlanma)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            8
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Saha keşfi ve iş öncesi denetim prosedürü geliştirilmeli ve uygulanmalıdır. Tüm yüksek riskli işler için zorunlu saha keşfi, mevcut tehlikelerin yerinde doğrulanması, fotoğraflama ve haritalama yapılmalıdır. İş öncesi denetim kontrol listesi oluşturulmalı ve süpervizörler tarafından uygulanmalıdır.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #27AE60; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ORTA
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Operasyon Müdürü
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            2 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Prosedürün onaylanması ve tüm yüksek riskli işlerde uygulanması (Hedef: 2 ay içinde %100 uygulama)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            9
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Havai hat yakınında çalışma alanlarında fiziksel bariyer, uyarı işaretleri ve güvenli mesafe işaretleme standartları oluşturulmalı ve uygulanmalıdır. Standart bariyer ekipmanları temin edilmeli ve saha ekiplerine dağıtılmalıdır. Gözetmen/banksman atanması gereklilikleri tanımlanmalıdır.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #27AE60; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ORTA
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Uzmanı
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            2 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Standartların onaylanması, ekipman temininin tamamlanması ve uygulanması (Hedef: 2 ay içinde %100 uygulama)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            10
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Gözetim ve denetim faaliyetleri (iş öncesi denetim, saha güvenlik turu, yönetim denetimi) programı oluşturulmalı ve sistematik olarak yürütülmelidir. Denetim kontrol listeleri risk değerlendirmesinin kalitesini, kontrol önlemlerinin uygulanmasını ve prosedür uyumunu değerlendirmelidir. Denetim bulguları takip edilmeli ve düzeltici önlemler alınmalıdır.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #27AE60; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ORTA
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            HSE Müdürü
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            3 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Denetim programının oluşturulması ve aylık denetim hedeflerinin %100 gerçekleştirilmesi (Hedef: 3 ay içinde sistem kurulumu)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            11
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Side boom ve diğer ağır ekipmanlara yükseklik sınırlayıcısı ve yakınlık uyarı sistemi gibi güvenlik özelliklerinin eklenmesi değerlendirilmelidir. Teknik fizibilite çalışması yapılmalı ve uygulanabilir çözümler belirlenmelidir.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #27AE60; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            ORTA
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Bakım Mühendisi
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            3 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Fizibilite çalışmasının tamamlanması ve uygulama planının onaylanması (Hedef: 3 ay içinde tamamlanma)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <!-- Üst tablo: NO + FAALİYET -->
+                <table style="width: 100%; margin-bottom: 5px; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 8%; background: #1B3A5C; color: white; padding: 8px; text-align: center; border: 1px solid #ddd;">NO</th>
+                        <th style="width: 92%; background: #1B3A5C; color: white; padding: 8px; border: 1px solid #ddd;">FAALİYET</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #F0F0F0; padding: 10px; text-align: center; font-weight: bold; color: #1B3A5C; font-size: 14px; border: 1px solid #ddd;">
+                            12
+                        </td>
+                        <td style="background: white; padding: 12px; border: 1px solid #ddd;" contenteditable="true">
+                            Risk yönetim sistemi ve güvenlik kültürü değerlendirmesi yapılmalıdır. Organizasyonun risk yönetim sisteminin etkinliği, güvenlik kültürü olgunluğu ve iyileştirme alanları bağımsız bir danışman tarafından değerlendirilmelidir. Değerlendirme sonuçlarına göre uzun vadeli iyileştirme programı geliştirilmelidir.
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Alt tablo: ÖNCELİK | SORUMLU | SÜRE | KPI -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">ÖNCELİK</th>
+                        <th style="width: 30%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SORUMLU</th>
+                        <th style="width: 15%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">SÜRE</th>
+                        <th style="width: 40%; background: #2E6DA4; color: white; padding: 6px; text-align: center; font-size: 11px; border: 1px solid #ddd;">KPI</th>
+                    </tr>
+                    <tr>
+                        <td style="background: #2E6DA4; color: white; padding: 8px; text-align: center; font-weight: bold; border: 1px solid #ddd;">
+                            DÜŞÜK
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Genel Müdür
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            6 ay
+                        </td>
+                        <td style="background: #F0F0F0; padding: 8px; text-align: center; border: 1px solid #ddd;" contenteditable="true">
+                            Bağımsız değerlendirmenin tamamlanması ve iyileştirme programının onaylanması (Hedef: 6 ay içinde tamamlanma)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Ağır ekipman operasyonları öncesinde mutlaka detaylı saha keşfi yapılmalı, çalışma alanındaki tüm mevcut altyapılar (havai hatlar, yeraltı kabloları, boru hatları) sistematik olarak tespit edilmeli ve haritalanmalıdır. Üçüncü taraf altyapı sahipleriyle koordinasyon sağlanmalı, mevcut tehlikelerin konumları, özellikleri ve güvenli yaklaşma mesafeleri sorgulanmalıdır.
+• Risk değerlendirmesi, masabaşında değil sahada gerçek koşullar dikkate alınarak yapılmalıdır. Yüksek enerjili tehlikeler (elektrik, basınç, kimyasal vb.) risk değerlendirmesinde zorunlu olarak ele alınmalı ve bağımsız teknik onaydan geçirilmelidir. Risk kontrol hiyerarşisi (eliminasyon, ikame, mühendislik kontrolleri, idari kontroller, KKD) sistematik olarak uygulanmalıdır.
+• Havai enerji hatları yakınında çalışma yapılacaksa, öncelikle hattın enerjisinin kesilmesi talep edilmeli, bu mümkün değilse fiziksel bariyer kurulmalı, güvenli mesafe işaretlenmeli, gözetmen/banksman atanmalı ve operatöre spesifik talimat verilmelidir. Hiçbir durumda kontrol önlemleri olmadan çalışmaya başlanmamalıdır.
+• İş öncesi güvenlik brifing mutlaka yapılmalı, operatör ve saha personeli çalışma alanındaki tüm tehlikeler (özellikle yüksek enerjili tehlikeler) konusunda bilgilendirilmelidir. Acil durum prosedürleri ve iletişim kanalları netleştirilmelidir. Brifing kayıt altına alınmalı ve katılımcılar tarafından imzalanmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Organizasyonun risk yönetim sistemi kapsamlı olarak gözden geçirilmeli ve güçlendirilmelidir. Risk değerlendirme prosedürleri, tüm yüksek enerjili tehlikeleri (elektrik, basınç, kimyasal, radyasyon vb.) zorunlu olarak kapsayacak şekilde revize edilmelidir. Saha keşfi, altyapı envanteri, üçüncü taraf koordinasyonu ve bağımsız teknik onay adımları standart gereklilik haline getirilmelidir.
+• Üçüncü taraf altyapı sahipleriyle (BOC, elektrik dağıtım şirketleri, gaz şirketleri, telekomünikasyon şirketleri vb.) stratejik işbirliği protokolleri geliştirilmelidir. Mevcut altyapıların dijital haritaları paylaşılmalı, çalışma öncesi bildirim ve koordinasyon sistemleri kurulmalıdır. Ortak güvenlik standartları ve acil durum prosedürleri oluşturulmalıdır.
+• Güvenlik kültürü geliştirme programı başlatılmalıdır. Tüm seviyelerde (operatör, süpervizör, yönetici) güvenlik liderliği, risk farkındalığı, prosedür uyumu ve durdurup düzeltme yetkisi konularında eğitim ve farkındalık çalışmaları yapılmalıdır. Güvenlik performansı, bireysel ve departman performans değerlendirmelerine dahil edilmelidir.
+• Teknoloji destekli güvenlik çözümleri değerlendirilmeli ve uygulanmalıdır. Ağır ekipmanlara yükseklik sınırlayıcısı, yakınlık uyarı sistemi, GPS tabanlı tehlike bölgesi uyarısı gibi güvenlik özellikleri eklenmelidir. Dijital risk değerlendirme ve iş izin sistemi platformları kullanılmalıdır. Saha keşfi ve denetim faaliyetlerinde mobil uygulamalar ve drone teknolojisi kullanılmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Olay detayları, kök neden analizi bulguları ve alınan dersler tüm organizasyonla (tüm sahalar, departmanlar ve yüklenici firmalar) paylaşılmalıdır. Güvenlik bülteni, toolbox talk sunumu ve video hazırlanmalı, tüm personele ulaştırılmalıdır. Benzer operasyonlar yapan diğer ekipler özel olarak bilgilendirilmelidir.
+• BOC ve diğer altyapı sahipleriyle olay bilgileri paylaşılmalı, ortak güvenlik iyileştirme fırsatları değerlendirilmelidir. Sektör güvenlik forumlarında ve konferanslarında olay sunulmalı, sektör genelinde farkındalık artırılmalıdır. Benzer olayların önlenmesi için sektör iyi uygulamaları paylaşılmalıdır.
+• Düzenleyici otoritelerle (RIDDOR bildirimi yapıldı) işbirliği sürdürülmeli, alınan düzeltici önlemler ve iyileştirmeler raporlanmalıdır. Denetim ve inceleme süreçlerine tam destek verilmelidir. Düzenleyici gereksinimlere uyum sistematik olarak izlenmelidir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm ağır ekipman operatörlerine 'Enerji Hatları Yakınında Güvenli Çalışma' sertifika programı düzenlenmelidir. Program, elektrik tehlikeleri teorisi, güvenli mesafeler, kontrol önlemleri, acil durum prosedürleri, pratik uygulamalar ve yetkinlik değerlendirmesini içermelidir. Sertifika geçerliliği periyodik olarak yenilenmelidir.
+• Saha süpervizörleri ve iş planlamacıları için 'İleri Düzey Risk Değerlendirme ve Tehlike Tanımlama' eğitim programı geliştirilmelidir. Program, saha keşfi teknikleri, altyapı tehlikelerinin tanımlanması, risk kontrol hiyerarşisi, üçüncü taraf koordinasyonu, iş izin sistemi ve gözetim sorumlulukları konularını kapsamalıdır.
+• HSE uzmanları ve risk değerlendirme personeli için 'Yüksek Enerjili Tehlikeler Risk Yönetimi' uzmanlık eğitimi düzenlenmelidir. Eğitim, elektrik güvenliği standartları, enerji izolasyonu prosedürleri, mühendislik kontrolleri tasarımı ve bağımsız risk değerlendirmesi gözden geçirme tekniklerini içermelidir.
+• Tüm personel için 'Güvenlik Kültürü ve Liderliği' farkındalık eğitimi verilmelidir. Eğitim, güvenlik değerleri, risk farkındalığı, prosedür uyumunun önemi, durdurup düzeltme yetkisi ve güvenlik liderliği davranışlarını kapsamalıdır. Eğitim interaktif yöntemlerle (vaka çalışmaları, simülasyonlar, grup tartışmaları) verilmelidir.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">9. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">9.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">18 Mayıs 2026 tarihinde meydana gelen side boom ekipmanının 6.6 kV havai iletim hattına temas olayı, organizasyonun risk yönetim sistemindeki ciddi ve sistemik eksiklikleri ortaya çıkarmıştır. Olay, potansiyel olarak ölümcül sonuçlar doğurabilecek bir yüksek gerilim elektrik teması olayıdır ve sadece koruma rölesinin 20-50 milisaniye içinde devreyi kesmesi sayesinde büyük bir felaket önlenmiştir. Operatör hafif elektrik hissi yaşamış, hastaneye sevk edilmiş ve EKG monitörizasyonu dahil tıbbi muayenelerden geçirilmiş, neyse ki herhangi bir yaralanma tespit edilmeden taburcu edilmiştir. Ancak, olayın potansiyel sonuçları (elektrik çarpması, ark patlaması, ölüm) son derece ciddidir ve derhal kapsamlı düzeltici önlemler alınmasını gerektirmektedir.
+
+HSG245 metodolojisi kullanılarak gerçekleştirilen kök neden analizi, olayın bireysel bir hatadan değil, organizasyonun risk yönetim sistemindeki yapısal ve sistemik eksikliklerden kaynaklandığını açıkça ortaya koymuştur. Üç farklı perspektiften (operatörün tehlikeyi fark edememesi, enerjili hattın korunmasız bulunması, ekipmanın uygunsuz konumlandırılması) yürütülen analiz dallarının tümü, 'Risk Analizinin Yapılmaması veya Yetersiz Olması' (D4.1) şeklinde ortak bir organizasyonel kök nedende birleşmiştir. Bu bulgu, sorunun organizasyonun risk yönetim sisteminin temelinde olduğunu ve kapsamlı bir sistem revizyonu gerektirdiğini göstermektedir.
+
+Temel sorun, organizasyonun risk değerlendirme prosedürlerinin ağır ekipman operasyonlarında havai enerji hatlarıyla etkileşim gibi yüksek enerjili tehlikeleri zorunlu olarak kapsamamasıdır. Risk değerlendirme şablonları ve kontrol listeleri bu kritik tehlike kategorisini içermemekte, saha keşfi ve mevcut altyapı envanteri çıkarma adımı standart bir gereklilik olarak tanımlanmamakta, üçüncü taraf altyapı sahipleriyle koordinasyon protokolü sistematik olarak işletilmemektedir. Daha da önemlisi, risk değerlendirmelerinin kalitesini, kapsamını ve uygulanabilirliğini doğrulayan bağımsız bir gözden geçirme veya teknik onay mekanizması bulunmamaktadır. Bu sistemik eksiklikler, kritik tehlikelerin gözden kaçmasına, hayati kontrol önlemlerinin planlanmamasına ve uygulanmamasına yol açmaktadır.
+
+Olay, aynı zamanda iş kontrol sisteminin (iş izin sistemi, gözetim ve denetim faaliyetleri) yüksek riskli işlerde yeterli kontrol sağlayamadığını göstermiştir. Havai hat yakınında ağır ekipman operasyonu gibi yüksek riskli bir iş için özel iş izin gereksinimleri tanımlanmamış, gözetim mekanizması risk değerlendirmesinin yetersizliğini tespit edememiş ve düzeltici önlem alınmamıştır. Bu durum, sadece prosedür eksikliği değil, aynı zamanda güvenlik kültürü ve yönetim gözetimi konularında da iyileştirme ihtiyacı olduğunu göstermektedir.</div>
+            
+            <div class="subsection-header">9.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm devam eden ve planlanan ağır ekipman operasyonları (side boom, vinç, ekskavatör vb.) derhal durdurulmalı, çalışma alanlarında havai ve yeraltı enerji hatları varlığı kontrol edilmelidir. Enerji hatları tespit edilen alanlarda, hat sahibiyle koordinasyon sağlanmalı, enerjisizleştirme talebi yapılmalı veya fiziksel bariyer, güvenli mesafe işaretlemesi ve gözetmen atanması gibi kontrol önlemleri uygulanmalıdır. Kontrol önlemleri uygulanmadan operasyonlara devam edilmemelidir. (Hedef: 1 hafta içinde tüm operasyonların gözden geçirilmesi ve kontrol altına alınması)</li>
+<li contenteditable="true">Havai ve yeraltı enerji hatları yakınında çalışma için acil risk değerlendirme prosedürü ve kontrol listesi geliştirilmeli, tüm ilgili personele (HSE uzmanları, süpervizörler, iş planlamacıları) duyurulmalı ve uygulanmalıdır. Prosedür, zorunlu saha keşfi, altyapı envanteri, üçüncü taraf koordinasyonu, güvenli mesafe belirleme ve kontrol önlemleri gerekliliklerini içermelidir. (Hedef: 2 hafta içinde prosedür onayı ve %100 uygulama)</li>
+<li contenteditable="true">Tüm ağır ekipman operatörlerine ve saha süpervizörlerine acil 'Enerji Hatları Yakınında Güvenli Çalışma' toolbox talk eğitimi verilmelidir. Eğitim, bu olayın detaylarını, alınan dersleri, havai hat tehlikelerini, güvenli mesafeleri ve kontrol önlemlerini kapsamalıdır. Eğitim katılımı zorunlu olmalı ve kayıt altına alınmalıdır. (Hedef: 3 hafta içinde tüm ilgili personelin eğitilmesi)</li>
+<li contenteditable="true">Yüksek riskli iş risk değerlendirmeleri için acil bağımsız gözden geçirme ve onay süreci başlatılmalıdır. Tüm devam eden yüksek riskli işlerin risk değerlendirmeleri HSE uzmanı veya teknik uzman tarafından gözden geçirilmeli, eksiklikler tespit edilmeli ve düzeltilmelidir. Onaysız yüksek riskli işlere başlanmamalıdır. (Hedef: 1 ay içinde tüm yüksek riskli işlerin gözden geçirilmesi ve onaylanması)</li>
+
+            </ul>
+            
+            <div class="subsection-header">9.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk yönetim sistemi kapsamlı olarak revize edilmelidir. Risk değerlendirme prosedürleri, şablonları ve kontrol listeleri tüm yüksek enerjili tehlikeleri (elektrik, basınç, kimyasal, radyasyon vb.) zorunlu olarak kapsayacak şekilde yeniden tasarlanmalıdır. Saha keşfi, altyapı envanteri, üçüncü taraf koordinasyonu, risk kontrol hiyerarşisi uygulaması ve bağımsız teknik onay adımları standart gereklilik haline getirilmelidir. Risk değerlendirme yapan personelin yetkinlik gereksinimleri tanımlanmalı ve sertifikasyon sistemi kurulmalıdır. (Hedef: 3-6 ay içinde sistem revizyonu ve uygulama)</li>
+<li contenteditable="true">Üçüncü taraf altyapı sahipleriyle (BOC, elektrik dağıtım şirketleri, gaz şirketleri, telekomünikasyon şirketleri vb.) stratejik işbirliği protokolleri ve bilgi paylaşım sistemleri geliştirilmelidir. Mevcut altyapıların dijital haritaları (GIS tabanlı) oluşturulmalı ve güncel tutulmalıdır. Çalışma öncesi otomatik bildirim ve koordinasyon sistemi kurulmalıdır. Ortak güvenlik standartları, acil durum prosedürleri ve eğitim programları geliştirilmelidir. (Hedef: 6-12 ay içinde protokol anlaşmaları ve sistem kurulumu)</li>
+<li contenteditable="true">İş kontrol sistemi (iş izin sistemi, gözetim ve denetim faaliyetleri) güçlendirilmelidir. Yüksek riskli işler için özel iş izin kategorileri (enerji hatları yakınında çalışma izni, enerji izolasyonu izni vb.) tanımlanmalıdır. Gözetim ve denetim faaliyetleri (iş öncesi denetim, saha güvenlik turu, yönetim denetimi) programı oluşturulmalı ve sistematik olarak yürütülmelidir. Denetim bulguları takip sistemi kurulmalı ve düzeltici önlemlerin tamamlanması izlenmelidir. (Hedef: 3-6 ay içinde sistem güçlendirme ve uygulama)</li>
+<li contenteditable="true">Güvenlik kültürü geliştirme ve teknoloji destekli güvenlik çözümleri programı başlatılmalıdır. Tüm seviyelerde güvenlik liderliği, risk farkındalığı ve prosedür uyumu eğitimleri verilmelidir. Ağır ekipmanlara yükseklik sınırlayıcısı, yakınlık uyarı sistemi gibi güvenlik özellikleri eklenmelidir. Dijital risk değerlendirme ve iş izin sistemi platformları kullanılmalıdır. Saha keşfi ve denetim faaliyetlerinde mobil uygulamalar ve drone teknolojisi kullanılmalıdır. (Hedef: 6-12 ay içinde kültür programı ve teknoloji uygulamaları)</li>
+
+            </ul>
+            
+            <div class="subsection-header">9.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Seviyesi (Havai Hat Teması)</td>
+                        <td class="current" contenteditable="true">Çok Yüksek (Kontrol yok, potansiyel ölümcül)</td>
+                        <td class="target" contenteditable="true">Düşük (Çoklu kontroller, ALARP)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Değerlendirme Kapsamı</td>
+                        <td class="current" contenteditable="true">Yetersiz (Yüksek enerjili tehlikeler kapsanmıyor)</td>
+                        <td class="target" contenteditable="true">Kapsamlı (Tüm tehlikeler zorunlu, bağımsız onay)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Saha Keşfi ve Altyapı Envanteri</td>
+                        <td class="current" contenteditable="true">Yapılmıyor veya yetersiz</td>
+                        <td class="target" contenteditable="true">%100 (Tüm yüksek riskli işlerde zorunlu)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Üçüncü Taraf Koordinasyonu</td>
+                        <td class="current" contenteditable="true">Sistematik değil</td>
+                        <td class="target" contenteditable="true">%100 (Protokol ve dijital sistem)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Bağımsız Risk Değ. Gözden Geçirme</td>
+                        <td class="current" contenteditable="true">%0 (Mevcut değil)</td>
+                        <td class="target" contenteditable="true">%100 (Tüm yüksek riskli işlerde zorunlu)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Operatör Eğitimi (Enerji Hatları)</td>
+                        <td class="current" contenteditable="true">Yetersiz veya yok</td>
+                        <td class="target" contenteditable="true">%100 Sertifikalı (Periyodik yenileme)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Fiziksel Kontroller (Bariyer, Uyarı)</td>
+                        <td class="current" contenteditable="true">Uygulanmıyor</td>
+                        <td class="target" contenteditable="true">%100 (Standart uygulama)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Gözetim ve Denetim Etkinliği</td>
+                        <td class="current" contenteditable="true">Düşük (Eksiklikleri tespit edemiyor)</td>
+                        <td class="target" contenteditable="true">Yüksek (Sistematik program, %100 takip)</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">10. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

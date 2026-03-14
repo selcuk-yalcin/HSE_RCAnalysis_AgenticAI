@@ -1,0 +1,13 @@
+# Railway Configuration for Worker Service (Celery)
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "pip install -r agents/v3_vector_search/requirements_async.txt"
+
+[deploy]
+startCommand = "cd agents/v3_vector_search && celery -A async_orchestrator_v3.celery_app worker --loglevel=info --concurrency=${WORKER_CONCURRENCY:-10} --max-tasks-per-child=50 --time-limit=1800 --soft-time-limit=1500"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[env]
+WORKER_CONCURRENCY = { default = "10" }

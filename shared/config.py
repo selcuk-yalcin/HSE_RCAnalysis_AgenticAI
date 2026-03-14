@@ -43,6 +43,10 @@ class Config:
     OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
     OPENAI_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.3"))
     
+    # OpenRouter Configuration
+    OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+    OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+    
     # Project paths
     PROJECT_ROOT = Path(__file__).parent
     AGENTS_DIR = PROJECT_ROOT / "agents"

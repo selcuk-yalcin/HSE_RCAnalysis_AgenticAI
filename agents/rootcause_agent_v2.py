@@ -36,6 +36,8 @@ V2.1 → V2.2 (Incident Summary Fix):
 from openai import OpenAI
 from typing import Dict, List, Optional
 import os
+import sys
+from pathlib import Path
 
 # Try different import paths for knowledge_base
 try:
@@ -55,20 +57,51 @@ except ImportError:
     except ImportError:
         from agents.json_parser import extract_json_from_response, safe_json_parse
 
+# Import RAG Analyzer for context augmentation
+try:
+    from rag_pipeline.retrieval import RAGAnalyzer
+    RAG_AVAILABLE = True
+except ImportError:
+    RAG_AVAILABLE = False
+    try:
+        # Try adding project root to path
+        project_root = Path(__file__).parent.parent
+        sys.path.insert(0, str(project_root))
+        from rag_pipeline.retrieval import RAGAnalyzer
+        RAG_AVAILABLE = True
+    except ImportError:
+        RAGAnalyzer = None
+        print("⚠️  RAG pipeline not available. Proceeding with static knowledge base.")
+
 
 class RootCauseAgentV2:
     """
     Part 3: Hiyerarşik Kök Neden Analizi
     A/B → 5-Why → C/D yapısı
+    
+    RAG Enhancement: MongoDB vector store ile taxonomy causes'lar retrieval yapılır
     """
 
-    def __init__(self):
+    def __init__(self, use_rag: bool = True):
         api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
         self.client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key
         )
-        print("✅ Kök Neden Ajanı V2 başlatıldı (knowledge_base)")
+        
+        # Initialize RAG Analyzer if available
+        self.rag_analyzer = None
+        self.use_rag = use_rag
+        if use_rag and RAG_AVAILABLE:
+            try:
+                self.rag_analyzer = RAGAnalyzer()
+                print("✅ Kök Neden Ajanı V2 başlatıldı (RAG enhanced)")
+            except Exception as e:
+                print(f"⚠️  RAG initialization failed: {e}")
+                print("   Proceeding with static knowledge base")
+                self.rag_analyzer = None
+        else:
+            print("✅ Kök Neden Ajanı V2 başlatıldı (static knowledge base)")
 
     # ─────────────────────────────────────────────────────────────────────────
     # ANA GİRİŞ NOKTASI
@@ -89,6 +122,10 @@ class RootCauseAgentV2:
         incident_summary = self._prepare_incident_summary(
             part1_data, part2_data, investigation_data
         )
+
+        # HITL cevapları varsa özete ekle — her olayda farklı kök neden üretilmesini sağlar
+        incident_summary = self._append_hitl_answers(incident_summary, investigation_data)
+
         print(f"\n📋 OLAY ÖZETİ (ilk 300 karakter):\n{incident_summary[:300]}...\n")
 
         rca_data = {
@@ -155,7 +192,7 @@ class RootCauseAgentV2:
     # ─────────────────────────────────────────────────────────────────────────
 
     def _identify_immediate_causes_with_codes(self, incident_summary: str) -> List[Dict]:
-        """A/B kategorilerinden immediate causes bul"""
+        """A/B kategorilerinden immediate causes bul (RAG-enhanced)"""
 
         rag_context_a = get_category_text('A')
         rag_context_b = get_category_text('B')
@@ -226,9 +263,34 @@ BEKLENEN ÇIKTI (JSON ŞEMASI):
 }}
 """
 
+        # RAG augmentation: Sorguya uygun taxonomy causes'ları ekle
+        if self.rag_analyzer and self.use_rag:
+            try:
+                rag_context = self.rag_analyzer.get_context_for_query(
+                    query=incident_summary[:500],  # İlk 500 char
+                    k=3,
+                    language="tr",
+                    cause_type_filter="A"  # Davranışsal kodlar
+                )
+                
+                if rag_context.get("status") == "success" and rag_context.get("retrieved_causes"):
+                    rag_excerpt = rag_context.get("knowledge_base_excerpt", "")
+                    prompt = f"""{prompt}
+
+─────────────────────────────────────────────
+📚 VECTOR SEARCH'TEN ALNAN İLGİLİ SEBEPLER
+(Incident'a benzer önceki vakalardan):
+─────────────────────────────────────────────
+{rag_excerpt}
+"""
+                    print("🔍 RAG context added to immediate causes analysis")
+            except Exception as e:
+                print(f"⚠️  RAG augmentation failed: {e}. Using static context.")
+
         response = self.client.chat.completions.create(
             model="anthropic/claude-sonnet-4.5",
             temperature=0.4,
+            max_tokens=4000,
             messages=[
                 {
                     "role": "system",
@@ -362,9 +424,34 @@ DÖNDÜR (JSON ŞEMASI):
 
 KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür. Markdown etiketi kullanma."""
 
+        # RAG augmentation for 5-Why analysis
+        if self.rag_analyzer and self.use_rag:
+            try:
+                rag_context_root = self.rag_analyzer.get_context_for_query(
+                    query=f"{cause_tr} {incident_summary[:300]}",
+                    k=2,
+                    language="tr",
+                    cause_type_filter=None  # Both C and D
+                )
+                
+                if rag_context_root.get("status") == "success" and rag_context_root.get("retrieved_causes"):
+                    rag_excerpt = rag_context_root.get("knowledge_base_excerpt", "")
+                    prompt = f"""{prompt}
+
+─────────────────────────────────────────────
+📚 VECTOR SEARCH'TEN ALNAN KÖK SEBEP ÖRNEKLERI
+(Benzer incident'lardan):
+─────────────────────────────────────────────
+{rag_excerpt}
+"""
+                    print("🔍 RAG context added to 5-Why analysis")
+            except Exception as e:
+                print(f"⚠️  RAG augmentation failed for 5-Why: {e}")
+
         response = self.client.chat.completions.create(
             model="anthropic/claude-opus-4.6",
             temperature=0.6,
+            max_tokens=4000,
             messages=[
                 {
                     "role": "system",
@@ -636,3 +723,59 @@ KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür. Markdown etiketi k
             return ". ".join(summary_parts)
 
         return "Olay detayı mevcut değil — lütfen investigation_data['description'] alanını doldurun."
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # HITL ENTEGRASYON — 5-WHY CEVAPLARINI ÖZETE EKLE
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _append_hitl_answers(self, summary: str, investigation_data: dict) -> str:
+        """
+        build_investigation_data() tarafından üretilen five_why_answers listesini
+        olay özetinin sonuna ekler. Bu sayede RootCauseAgentV2 prompt'u
+        kullanıcının gerçek cevaplarını görerek her olayda farklı, spesifik
+        kök nedenler üretir.
+
+        Çağrı yeri: analyze_root_causes() içinde _prepare_incident_summary() sonrası.
+        """
+        if not investigation_data:
+            return summary
+
+        answers = investigation_data.get("five_why_answers", [])
+        if not answers:
+            return summary
+
+        lines = [
+            "",
+            "",
+            "=" * 60,
+            "KULLANICI TARAFINDAN TOPLANAN 5-WHY CEVAPLARI (HITL)",
+            "=" * 60,
+            "ÖNEMLI: Aşağıdaki cevaplar bu olayı soruşturan kişiden",
+            "gerçek zamanlı alınmıştır. Kök neden analizini SADECE",
+            "bu cevaplara dayandır. Genel varsayım kullanma.",
+            "",
+        ]
+
+        for fw in answers:
+            lvl = fw.get("why_level", "?")
+            q   = fw.get("question", "")
+            ans = fw.get("user_answer", "")
+            d   = fw.get("suggested_direction", "")
+            foc = fw.get("hsg245_focus", "")
+
+            lines.append(f"Why-{lvl} Sorusu  : {q}")
+            lines.append(f"Why-{lvl} Cevabı  : {ans}")
+            if foc:
+                lines.append(f"HSG245 Odak     : {foc}")
+            if d:
+                lines.append(f"Ön Yönlendirme  : {d}")
+            lines.append("")
+
+        code  = investigation_data.get("immediate_cause_code", "")
+        desc  = investigation_data.get("immediate_cause_desc", "")
+        if code:
+            lines.append(f"Seçilen Immediate Cause: [{code}] {desc}")
+            lines.append("")
+
+        lines.append("=" * 60)
+        return summary + "\n".join(lines)

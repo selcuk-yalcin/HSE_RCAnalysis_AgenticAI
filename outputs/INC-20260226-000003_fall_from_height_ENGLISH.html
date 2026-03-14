@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOT CAUSE ANALYSIS REPORT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260226-000003";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: "✏️ Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()">📋 İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')">🏠 Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')">📊 Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')">📝 Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')">🔬 Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')">🌳 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')">🎯 Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')">⚠️ Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')">✅ Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')">💡 Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')">🏁 Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')">✍️ İmzalar</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText">🔒 Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+            💾 Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+            🖨️ Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+            📥 HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+            🔄 Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">ROOT CAUSE ANALYSIS REPORT</h1>
+            <div class="subtitle" contenteditable="true">Prepared Using HSG245 Methodology</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                CONFIDENTIAL - AUTHORIZED PERSONNEL ACCESS ONLY
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260226-000003</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">February 26, 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Construction Site - 4th Floor Scaffolding Area</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Major Injury - Fall from Height</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">A 32-year-old scaffolding worker fell 6 meters from incomplete 4th floor scaffolding, sustaining L2 spinal fracture and pelvic injuries. The worker was not wearing a safety harness and guardrails were incomplete at the working edge.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">On February 18, 2026 at 10:35, scaffolding assembly worker Hasan Yıldız lost balance while working on an unprotected edge of 4th floor scaffolding and fell approximately 6 meters to ground level. The worker was transported to hospital with serious injuries including L2 vertebral fracture, pelvic fracture, and internal bleeding requiring intensive care admission.</div>
+<div class="paragraph" contenteditable="true">Construction Site - 4th Floor Scaffolding Platform Assembly Area</div>
+<div class="paragraph" contenteditable="true">Hasan Yıldız (32 years old, 8 months scaffolding experience), hospitalized in serious condition with long-term treatment prognosis</div>
+<div class="paragraph" contenteditable="true">Co-workers immediately called emergency services at 10:37. First aid was administered at 10:42 while the worker remained conscious. Ambulance arrived at 10:55 and transported the injured worker to hospital, where he was admitted to intensive care at 11:20. All work at height was immediately suspended, scaffolding inspections were repeated, mandatory harness use was enforced, and safety briefings were conducted across the site.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Worker was not wearing required full-body safety harness despite working at 6-meter height</li>
+<li contenteditable="true">Guardrail installation was incomplete - only one side protected, working edge remained unguarded</li>
+<li contenteditable="true">Work permit system failed to prevent work commencement on incomplete scaffolding structure</li>
+<li contenteditable="true">Management systematically tolerated known safety deviations under production pressure from 3-week project delay</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">All work at height suspended pending safety review</td>
+                        <td contenteditable="true">Site Manager</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Comprehensive scaffolding inspection conducted</td>
+                        <td contenteditable="true">Safety Officer</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Mandatory safety harness use enforced with supervision</td>
+                        <td contenteditable="true">Foreman</td>
+                        <td contenteditable="true">Ongoing</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Emergency safety briefing delivered to all workers</td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Incident Reference No</td>
+                    <td contenteditable="true">INC-20260226-000003</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Date</td>
+                    <td contenteditable="true">February 18, 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Time</td>
+                    <td contenteditable="true">10:35</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Location</td>
+                    <td contenteditable="true">Construction Site - 4th Floor Scaffolding Area</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Department/Line</td>
+                    <td contenteditable="true">Scaffolding Assembly - 4th Floor Platform</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operator/Worker</td>
+                    <td contenteditable="true">Hasan Yıldız (32 years old, 8 months experience)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Shift</td>
+                    <td contenteditable="true">Day Shift (08:00-17:00)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Equipment</td>
+                    <td contenteditable="true">Steel Tube Scaffolding System - 4th Floor Platform</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Material/Substance</td>
+                    <td contenteditable="true">Scaffolding tubes, couplers, platform boards</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Weather Conditions</td>
+                    <td contenteditable="true">Clear, dry conditions</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lighting</td>
+                    <td contenteditable="true">Natural daylight - adequate</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Personal Protective Equipment</td>
+                    <td contenteditable="true">Hard hat: WORN / Safety boots: WORN / Safety harness: NOT WORN / Guardrail: INCOMPLETE</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Incident Type</td>
+                    <td contenteditable="true">Fall from Height - Major Injury</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Injury/Damage Status</td>
+                    <td contenteditable="true">Serious injury: L2 spinal fracture, pelvic fracture, internal bleeding</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Number of Persons Affected</td>
+                    <td contenteditable="true">1 (Hasan Yıldız)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Damage Severity</td>
+                    <td contenteditable="true">Major - Long-term treatment required, intensive care admission</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">RIDDOR Reportable</td>
+                    <td contenteditable="true">Yes - Reported on 26.02.26</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">First Witness</td>
+                    <td contenteditable="true">Ali Demir (Co-worker) and Mehmet Kara (Foreman)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Emergency Services Called</td>
+                    <td contenteditable="true">Yes - 112 called at 10:37, ambulance arrived 10:55</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hospitalization/Discharge</td>
+                    <td contenteditable="true">Admitted to intensive care 11:20, serious condition, long-term treatment prognosis</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:00</div>
+                    <div class="timeline-event" contenteditable="true">Worker Hasan Yıldız started day shift, assigned to 4th floor scaffolding platform assembly work</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:30</div>
+                    <div class="timeline-event" contenteditable="true">Scaffolding platform assembly work in progress, guardrail installation incomplete on working edge</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:30</div>
+                    <div class="timeline-event" contenteditable="true">Worker lost balance while working at unprotected scaffolding edge without safety harness</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:35</div>
+                    <div class="timeline-event" contenteditable="true">Worker fell approximately 6 meters from 4th floor scaffolding to ground level</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:37</div>
+                    <div class="timeline-event" contenteditable="true">Co-workers rushed to assist, emergency services (112) called immediately</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:42</div>
+                    <div class="timeline-event" contenteditable="true">First aid administered on site - worker conscious but severely injured with visible trauma</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:55</div>
+                    <div class="timeline-event" contenteditable="true">Ambulance arrived at construction site, paramedics took over medical care</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:20</div>
+                    <div class="timeline-event" contenteditable="true">Worker admitted to hospital intensive care with L2 spinal fracture, pelvic fracture, internal bleeding</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">12:00</div>
+                    <div class="timeline-event" contenteditable="true">Site management suspended all work at height, initiated emergency safety review and incident investigation</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">The 5-Why technique was applied rigorously in this investigation by starting each causal chain with a documented immediate cause and repeatedly asking 'Why did this happen?' until an organizational root cause was reached. For example, in Branch 1, the immediate cause 'Worker did not wear safety harness' prompted the first Why: 'Why did the worker not wear the harness?' The answer revealed that harness use was not monitored and supervisors directed workers to work quickly on incomplete scaffolding. The second Why asked 'Why was this unsafe behavior widespread and uncorrected?' revealing that everyone worked without harnesses and safety officers were absent. The third Why explored 'Why was this unsafe behavior normalized across management levels?' uncovering production pressure from project delays. The fourth Why probed 'Why did production pressure override safety?' revealing that management systematically ignored known deviations including outdated permits, missing guardrails, and lapsed risk assessments. This final answer identified the organizational root cause: management tolerance of known deviations. The technique was similarly applied to the other two branches, each time drilling down from observable conditions (incomplete guardrails, missing safety nets) through intermediate failures (ineffective permit systems, outdated risk assessments) to organizational root causes (ineffective permit system, production pressure overriding safety). The discipline of asking exactly five Whys prevented premature conclusions while ensuring the investigation reached actionable organizational levels rather than stopping at individual errors or equipment failures.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Behavioral Factor</td>
+                        <td contenteditable="true">Individual factors including knowledge deficiency, skill inadequacy, inattention, fatigue, and other human performance issues</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Condition Factor</td>
+                        <td contenteditable="true">Physical workplace conditions including equipment failure, design defects, unguarded hazards, and environmental deficiencies</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Job/Task Factor</td>
+                        <td contenteditable="true">Work-related factors including equipment malfunction, design errors, physical workload, and ergonomic issues</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizational Factor</td>
+                        <td contenteditable="true">Management and organizational factors including procedure deficiencies, communication breakdowns, management decisions, policy inadequacies, and systemic failures</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Senior H&S Manager</td>
+                        <td contenteditable="true">Lead Investigator</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">External H&S Investigator</td>
+                        <td contenteditable="true">Independent Expert</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Scaffolding Technical Expert</td>
+                        <td contenteditable="true">Technical Specialist</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Site Manager - Mustafa Çelik</td>
+                        <td contenteditable="true">Site Management Representative</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">H&S Officer</td>
+                        <td contenteditable="true">Safety Department Representative</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">HR Representative</td>
+                        <td contenteditable="true">Human Resources Liaison</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Worker Representative</td>
+                        <td contenteditable="true">Workforce Voice</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Medical Advisor</td>
+                        <td contenteditable="true">Medical Assessment</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Regulatory Compliance Officer</td>
+                        <td contenteditable="true">Compliance Review</td>
+                        <td contenteditable="true">February 26, 2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. CRITICAL FACTOR 1 - BEHAVIORAL CAUSE: FAILURE TO USE REQUIRED PERSONAL PROTECTIVE EQUIPMENT</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Worker Hasan Yıldız was performing scaffolding assembly work at approximately 6 meters height on the 4th floor platform. Despite company procedures requiring full-body safety harness use for all work at height above 2 meters, the worker was not wearing any fall arrest equipment. Witness statements confirmed this was not an isolated incident but a widespread practice on site. Co-worker Ali Demir stated 'Hasan was working without harness. Everyone does it.' This behavioral deviation occurred in the context of production pressure, with the foreman Mehmet Kara acknowledging that supervisors instructed workers to 'finish quickly' even when working on incomplete scaffolding with missing guardrails. The absence of harness use, combined with the unprotected working edge, created a direct fall hazard that materialized when the worker lost balance.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Worker did not wear required full-body safety harness while working at 6-meter height</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did worker Hasan Yıldız work at 6-meter height without wearing full-body safety harness?</div>
+                    <div class="why-answer" contenteditable="true">→ Safety harness use was not monitored on site, and his supervisor directed workers to complete work quickly on scaffolding edge where guardrail installation was incomplete; not wearing harness was a widespread and uncorrected behavior</div>
+                    <span class="why-code">A - Behavioral</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was the behavior of not wearing safety harness widespread and why was it not corrected?</div>
+                    <div class="why-answer" contenteditable="true">→ According to witness Ali Demir's statement, 'everyone worked without harness'; foreman Mehmet Kara also considered working in unguarded areas as normal. The safety officer was not conducting site tours and this unsafe behavior was not corrected at any management level</div>
+                    <span class="why-code">D - Organizational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why was unsafe behavior (working without harness) not corrected at any management level and had become normalized?</div>
+                    <div class="why-answer" contenteditable="true">→ The project was 3 weeks delayed and there was client pressure for 'quick completion'. Supervisors prioritized production speed over safety by directing workers to work without harnesses on the unguarded side. Safety meetings had not been held for 2 months and weekly inspections were inadequate</div>
+                    <span class="why-code">D - Organizational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">What was the fundamental reason that supervisors and management tolerated these unsafe working conditions under production pressure?</div>
+                    <div class="why-answer" contenteditable="true">→ The site manager stated he 'didn't know guardrails were incomplete' yet the risk assessment had not been updated for 6 months, the scaffolding permit was not current, and the inspection 2 days prior did not even note the missing guardrails. Management systematically ignored known safety deviations (working without harness, incomplete guardrails, outdated permits) and allowed project schedule pressure to override safety requirements</div>
+                    <span class="why-code">D - Organizational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Why did management systematically ignore multiple known safety deviations and allow schedule pressure to override fundamental safety requirements?</div>
+                    <div class="why-answer" contenteditable="true">→ Site management, facing 3-week project delay and client pressure, systematically tolerated known and visible safety deviations including non-use of safety harnesses, commencement of work before guardrail completion, outdated scaffolding permits, and 6-month-old risk assessments. Safety meetings had not been conducted for 2 months, safety officer was not present on site tours, and the inspection 2 days prior failed to report the guardrail deficiency</div>
+                    <span class="why-code">D - Organizational</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Management Tolerance of Known Deviations</div>
+                <div class="box-content" contenteditable="true">[D1.9 / Organizational]
+
+Site management systematically tolerated multiple known and visible safety deviations due to 3-week project delay and client pressure for rapid completion. These deviations included widespread non-use of safety harnesses, commencement of work before guardrail installation was complete, outdated scaffolding work permits, and risk assessments that had not been updated for 6 months. Safety meetings had not been conducted for 2 months, the safety officer was not conducting site tours, and the inspection conducted just 2 days before the incident failed to identify or report the incomplete guardrail condition. This pattern demonstrates that management did not merely fail to detect safety violations, but rather knowingly or willfully ignored multiple layers of safety system breakdown while prioritizing production schedule over fundamental safety requirements.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Safety meetings suspended for 2 months despite ongoing high-risk work at height activities across the construction site</li>
+<li contenteditable="true">Risk assessment documentation outdated by 6 months, failing to reflect current scaffolding assembly phase hazards and required controls</li>
+<li contenteditable="true">Scaffolding work permit system not current, allowing work to commence on incomplete structures without proper verification</li>
+<li contenteditable="true">Site safety officer not conducting regular site tours, eliminating primary mechanism for identifying and correcting unsafe conditions and behaviors in real-time</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. CRITICAL FACTOR 2 - CONDITION CAUSE: UNPROTECTED FALL HAZARD DUE TO INCOMPLETE GUARDRAILS</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">The 4th floor scaffolding platform where the incident occurred had incomplete edge protection. Guardrails were installed on only one side of the platform, while the working edge where Hasan Yıldız was performing assembly tasks remained completely unguarded. This created an unprotected fall hazard of approximately 6 meters to ground level. Witness Ali Demir confirmed that workers 'moved to the side without guardrail' to complete their tasks. Foreman Mehmet Kara acknowledged that 'guardrail was to be installed tomorrow' but 'platform assembly had to be finished today.' The scaffolding inspection conducted just 2 days prior to the incident failed to identify or document this critical deficiency. The work permit for the scaffolding was available but not current, and did not reflect the actual incomplete state of the edge protection system. This condition factor directly contributed to the fall by removing the primary passive fall protection that should have prevented the worker from falling even in the absence of personal fall arrest equipment.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Scaffolding platform working edge had no guardrail protection - only one side was guarded</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why was there no guardrail on the working edge of the scaffolding platform?</div>
+                    <div class="why-answer" contenteditable="true">→ Guardrail installation was not yet complete; only one side had guardrails installed, and the edge where the worker was working was left unguarded. According to foreman Mehmet Kara's statement, the guardrail was scheduled to be installed the next day</div>
+                    <span class="why-code">C - Job/Task</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why did work commence on the platform before guardrail installation was complete?</div>
+                    <div class="why-answer" contenteditable="true">→ There was an instruction to complete the platform assembly that day. Following the supervisor's 'finish quickly' direction, workers were directed to work on the unguarded edge despite the missing guardrails</div>
+                    <span class="why-code">B - Organizational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why was work permitted to continue despite the guardrail deficiency, and why did the work permit system not prevent this?</div>
+                    <div class="why-answer" contenteditable="true">→ The scaffolding work permit was available but not current. The last inspection conducted 2 days prior did not note the guardrail deficiency in the report. The work permit system did not accurately reflect the current scaffolding condition and work was permitted without updating</div>
+                    <span class="why-code">D - Organizational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why did the scaffolding inspection fail to detect the guardrail deficiency and why was the work permit not updated?</div>
+                    <div class="why-answer" contenteditable="true">→ Inspection frequency of once per week was inadequate, the safety officer was not conducting site tours, and the project was 3 weeks delayed. Due to client pressure for rapid completion, production priority overrode safety controls; the work permit system became effectively non-functional</div>
+                    <span class="why-code">D - Organizational</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Ineffective Work Permit System</div>
+                <div class="box-content" contenteditable="true">[D4.4 / Organizational]
+
+Although a scaffolding work permit existed, it was not current and did not reflect the actual condition of the scaffolding structure. The inspection conducted just 2 days before the incident failed to identify or document the incomplete guardrail installation. Work was permitted to commence before the scaffolding structure was complete and before the permit was updated to reflect actual site conditions. The work permit system failed to verify the actual state of the scaffolding (single-sided guardrail, open working edge) and did not prevent work from starting on an incomplete and unsafe structure. This system failure allowed workers to be exposed to unprotected fall hazards that should have been identified and controlled through the permit-to-work process.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Work permit system failed to verify actual scaffolding condition before authorizing work commencement on incomplete structure</li>
+<li contenteditable="true">Inspection conducted 2 days prior to incident failed to identify and document critical guardrail deficiency in official records</li>
+<li contenteditable="true">No mechanism in place to prevent work permit issuance when scaffolding edge protection installation was demonstrably incomplete</li>
+<li contenteditable="true">Permit system did not require real-time verification of safety-critical elements (guardrails, platforms, access) before each work phase</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. CRITICAL FACTOR 3 - CONDITION CAUSE: ABSENCE OF SECONDARY FALL PROTECTION SYSTEMS</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">The scaffolding work area had no safety net system installed as a secondary fall protection measure. Safety nets are recognized as a critical layer of defense in the hierarchy of fall protection controls, particularly during scaffolding assembly and modification work where primary edge protection may be temporarily incomplete. The investigation revealed that safety net installation was never planned for this scaffolding assembly area. Workers were expected to rely solely on personal fall arrest equipment (harnesses) and edge protection (guardrails), both of which were absent or incomplete at the time of the incident. The risk assessment, which had not been updated for 6 months, did not identify the need for safety nets during the intermediate phases of scaffolding assembly when guardrails were not yet installed. This absence of secondary fall protection meant that when the primary controls failed (no harness worn, incomplete guardrails), there was no final barrier to prevent the 6-meter fall to ground level.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">No safety net system was present to protect against falls from height</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why was there no safety net system to protect against falls from height?</div>
+                    <div class="why-answer" contenteditable="true">→ Safety net installation was never planned for the scaffolding assembly area; work commenced before guardrail installation was complete and without harness use, and safety nets as an alternative fall protection measure were not considered as a last line of defense</div>
+                    <span class="why-code">C - Job/Task</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was this collective protection gap (missing guardrails, no harness use, no safety nets) not identified when all three protection layers were absent?</div>
+                    <div class="why-answer" contenteditable="true">→ The risk assessment had not been updated for 6 months and did not include a current analysis covering the specific phased hazards of scaffolding assembly work (such as working on platforms before guardrail installation is complete). Therefore, the need for additional fall protection layers such as safety nets was not identified</div>
+                    <span class="why-code">B - Organizational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why had the risk assessment not been updated for 6 months and why were additional protection measures for intermediate scaffolding assembly phases (unguarded edges, incomplete platforms) not defined?</div>
+                    <div class="why-answer" contenteditable="true">→ The project was 3 weeks delayed and due to client pressure for 'rapid completion', management was not conducting safety meetings for 2 months and not updating risk assessments. Production schedule had overridden safety planning</div>
+                    <span class="why-code">D - Organizational</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why did project delay and client pressure lead to complete omission of fundamental safety activities such as planning fall protection systems including safety nets and updating risk assessments?</div>
+                    <div class="why-answer" contenteditable="true">→ Production pressure systematically overrode safety on the construction site. Supervisors instructed workers to 'finish quickly', guardrail installation was postponed to the next day, safety officer was not conducting site tours, and safety meetings had not been held for 2 months. This demonstrates that production targets overriding safety controls had become an institutionalized behavior pattern</div>
+                    <span class="why-code">D - Organizational</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Production Pressure Overriding Safety</div>
+                <div class="box-content" contenteditable="true">[D1.4 / Organizational]
+
+Due to the project's 3-week delay and client demand for rapid completion, management systematically prioritized production schedule over safety activities. In this pressure environment, safety meetings had not been conducted for 2 months, risk assessment had not been updated for 6 months, guardrail installation was postponed to the next day, additional fall protection measures such as safety nets were never planned, and supervisors instructed workers to work on unguarded edges. The absence of safety nets was not an isolated oversight but rather a consequence of production pressure systematically disabling all layers of safety controls. This organizational pattern created an environment where schedule demands consistently trumped fundamental safety requirements across multiple protection systems.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Project delay of 3 weeks created sustained pressure to accelerate work without corresponding safety planning adjustments</li>
+<li contenteditable="true">Client demand for rapid completion transmitted through management as direct pressure on supervisors and workers to cut corners</li>
+<li contenteditable="true">Safety meetings suspended for 2 months, eliminating primary forum for identifying and addressing emerging hazards during accelerated work</li>
+<li contenteditable="true">Risk assessment not updated for 6 months despite significant changes in work phases, schedules, and pressure conditions on site</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Communication Breakdown</td>
+                        <td contenteditable="true">Safety requirements and non-negotiable standards were not effectively communicated to workers and supervisors; production targets were communicated as absolute while safety was treated as flexible</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Training Deficiency</td>
+                        <td contenteditable="true">Worker training records were incomplete and irregular; specific training on fall protection requirements and work at height procedures was not verified for the injured worker</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Supervision Inadequacy</td>
+                        <td contenteditable="true">Site supervision failed to enforce harness use, failed to prevent work on incomplete scaffolding, and actively directed workers to work unsafely to meet production targets</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Cultural Factors</td>
+                        <td contenteditable="true">Production-first culture where schedule pressure systematically overrode safety requirements; normalization of deviance where unsafe practices became accepted standard behavior</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Inspection System Failure</td>
+                        <td contenteditable="true">Weekly inspection frequency inadequate for dynamic scaffolding assembly work; inspection 2 days before incident failed to identify critical guardrail deficiency</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Resource Allocation</td>
+                        <td contenteditable="true">Safety officer not allocated time for regular site tours; safety meetings not scheduled or resourced for 2 months during high-risk work period</td>
+                        <td class="impact-medium" contenteditable="true">Medium</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Client Pressure</td>
+                        <td contenteditable="true">Client demand for rapid completion transmitted through organization as pressure to cut corners and defer safety activities</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Competency Verification</td>
+                        <td contenteditable="true">No system to verify that workers assigned to scaffolding work had current competency in fall protection and work at height procedures</td>
+                        <td class="impact-medium" contenteditable="true">Medium</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Implement mandatory stop-work authority for any work at height where guardrails are incomplete or safety harnesses are not worn; empower all workers to halt unsafe work without fear of reprisal</td>
+                        <td><span class="priority-low">IMMEDIATE</span></td>
+                        <td contenteditable="true">Site Manager</td>
+                        <td contenteditable="true">1 week</td>
+                        <td contenteditable="true">Zero instances of work at height without complete edge protection or harness use</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Revise and enforce scaffolding work permit system to require real-time verification of guardrails, platforms, and access before each work shift; no permit valid unless verified complete</td>
+                        <td><span class="priority-low">IMMEDIATE</span></td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">2 weeks</td>
+                        <td contenteditable="true">100% permit verification compliance; zero work on incomplete scaffolding</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Conduct mandatory fall protection and work at height training for all scaffolding workers, supervisors, and managers; include consequences of non-compliance</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">HR Manager</td>
+                        <td contenteditable="true">1 month</td>
+                        <td contenteditable="true">100% training completion with competency assessment</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Establish daily safety officer site tours with documented inspection of all work at height activities; immediate correction of any harness or guardrail deficiencies</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Safety Officer</td>
+                        <td contenteditable="true">1 month</td>
+                        <td contenteditable="true">Daily inspection completion rate 100%; deficiency correction within 1 hour</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Install safety net systems as secondary fall protection for all scaffolding assembly and modification work above 4 meters height</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Site Manager</td>
+                        <td contenteditable="true">2 months</td>
+                        <td contenteditable="true">Safety nets installed and inspected for 100% of qualifying work areas</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Reinstate weekly safety meetings with mandatory attendance by site management, supervisors, and worker representatives; focus on work at height hazards</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Site Manager</td>
+                        <td contenteditable="true">Immediate</td>
+                        <td contenteditable="true">100% meeting attendance; hazard action items closed within 1 week</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Update risk assessment for scaffolding work to include all assembly phases, interim conditions, and required controls; review and update monthly during active scaffolding work</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">2 weeks</td>
+                        <td contenteditable="true">Risk assessment current and reviewed monthly; 100% control implementation</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Implement production-safety balance policy stating that schedule pressure never justifies deviation from fall protection requirements; communicate from senior management</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Project Director</td>
+                        <td contenteditable="true">1 month</td>
+                        <td contenteditable="true">Policy communicated to 100% of site personnel; zero schedule-driven safety deviations</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Establish safety deviation reporting system where workers can anonymously report pressure to work unsafely; investigate and address all reports within 48 hours</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">H&S Manager</td>
+                        <td contenteditable="true">2 months</td>
+                        <td contenteditable="true">Reporting system operational; 100% reports investigated and closed</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Conduct independent audit of all scaffolding structures on site; tag and quarantine any incomplete or non-compliant scaffolding until corrected</td>
+                        <td><span class="priority-low">IMMEDIATE</span></td>
+                        <td contenteditable="true">External Auditor</td>
+                        <td contenteditable="true">2 weeks</td>
+                        <td contenteditable="true">100% scaffolding audited; zero non-compliant structures in use</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Revise project schedule to include realistic timeframes for safety-critical activities; no compression of guardrail installation or safety equipment setup</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Project Manager</td>
+                        <td contenteditable="true">1 month</td>
+                        <td contenteditable="true">Revised schedule approved; zero instances of safety work deferral</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Implement visible safety leadership program where senior managers conduct weekly site walks focused on work at height; address deviations immediately</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Senior Management</td>
+                        <td contenteditable="true">Ongoing</td>
+                        <td contenteditable="true">Weekly management site walks completed; visible leadership presence</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Always enforce the hierarchy of fall protection controls: eliminate the hazard first, then use guardrails and edge protection, then personal fall arrest systems, and finally safety nets as last resort. Never rely on a single layer of protection for work at height above 2 meters.
+• Recognize that production pressure is a leading indicator of safety system breakdown. When project delays occur, increase safety oversight and verification rather than reducing it. Schedule pressure must trigger enhanced safety focus, not relaxation of safety requirements.
+• Implement real-time permit verification systems that require physical confirmation of safety-critical conditions before each work shift. Permits based on planned conditions rather than verified actual conditions provide false assurance and enable unsafe work.
+• Establish and enforce stop-work authority at all organizational levels. Workers, supervisors, and managers must have clear authority and obligation to halt work when safety conditions are not met, without fear of schedule or production consequences.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Develop organizational culture where safety is genuinely non-negotiable and production targets are adjusted to accommodate safety requirements rather than safety being sacrificed to meet production targets. This requires visible, consistent leadership commitment demonstrated through decisions and resource allocation.
+• Implement comprehensive fall protection program including engineering controls (guardrails, safety nets), administrative controls (permits, inspections, training), and personal protective equipment (harnesses, lanyards) with clear accountability for each layer and verification that all layers are functioning before work authorization.
+• Establish robust safety deviation reporting and response system that encourages workers to report pressure to work unsafely, investigates root causes of such pressure, and addresses organizational factors that create pressure rather than blaming individuals who report it.
+• Create systematic approach to managing production pressure that includes early warning indicators, decision protocols for schedule-safety conflicts, and senior management involvement in any decision to modify safety requirements under time constraints.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Communicate this incident and its root causes to all construction sites in the organization, emphasizing that the causes were organizational and systemic rather than individual worker error. Use the incident as a case study in safety training programs.
+• Share lessons learned with client organizations, emphasizing that client schedule pressure can contribute to safety incidents and that clients have a responsibility to allow realistic timeframes for safe work execution.
+• Establish regular communication channel between site workers and senior management for safety concerns, bypassing normal reporting hierarchy to ensure that production pressure from middle management does not suppress safety information flow.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Develop and deliver comprehensive work at height training program covering fall hazard recognition, hierarchy of controls, proper harness use, guardrail requirements, permit system, and individual authority to stop unsafe work. Include realistic scenarios of production pressure and correct responses.
+• Provide specific training for supervisors and managers on recognizing and resisting production pressure that compromises safety, including case studies of incidents caused by schedule-driven corner-cutting and techniques for balancing production and safety requirements.
+• Implement competency verification system for all workers assigned to work at height, requiring demonstration of knowledge and skills before authorization to work on scaffolding or other elevated work platforms.
+• Conduct regular refresher training on fall protection requirements, particularly during periods of production pressure or schedule challenges, to reinforce that safety requirements remain non-negotiable regardless of project status.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">This serious fall from height incident was not caused by a single failure or individual error, but rather by systematic organizational breakdowns across multiple layers of safety management. The investigation identified three distinct but interconnected root causes: management tolerance of known safety deviations, ineffective work permit system, and production pressure overriding safety requirements. These organizational failures created an environment where a worker could work at 6-meter height without a safety harness on scaffolding with incomplete guardrails and no safety net backup protection. The incident was entirely preventable through proper application of existing safety systems and controls. The investigation found that safety meetings had not been conducted for 2 months, risk assessments had not been updated for 6 months, the safety officer was not conducting site tours, and the scaffolding inspection 2 days before the incident failed to identify critical deficiencies. These are not isolated oversights but rather symptoms of systematic prioritization of production schedule over safety compliance. The 3-week project delay and client pressure for rapid completion created an organizational environment where supervisors actively directed workers to work unsafely, where known safety deviations were tolerated across multiple management levels, and where safety systems that should have prevented the incident were rendered ineffective. The corrective actions identified in this report address not only the immediate technical failures (incomplete guardrails, missing harness, absent safety nets) but more importantly the organizational root causes that allowed these conditions to exist and persist. Implementation of these corrective actions will require sustained commitment from senior management, allocation of adequate resources, and fundamental shift in organizational culture to ensure that safety requirements are genuinely non-negotiable regardless of production pressure.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Immediate implementation of stop-work authority for any work at height without complete edge protection and verified harness use (1-2 weeks); empower all personnel to halt unsafe work without production consequences</li>
+<li contenteditable="true">Comprehensive audit and correction of all scaffolding structures on site (2 weeks); tag and quarantine any incomplete or non-compliant scaffolding until guardrails, platforms, and access are verified complete and safe</li>
+<li contenteditable="true">Mandatory fall protection retraining for all scaffolding workers, supervisors, and site management (1 month); include competency assessment and consequences of non-compliance with clear accountability</li>
+<li contenteditable="true">Reinstatement of weekly safety meetings with mandatory senior management attendance (immediate); focus on work at height hazards and establish clear communication that production pressure does not justify safety deviations</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Development and implementation of comprehensive fall protection program (3-6 months) including engineering controls (guardrails, safety nets for all scaffolding assembly work), administrative controls (revised permit system with real-time verification), and PPE requirements with daily supervision and enforcement</li>
+<li contenteditable="true">Establishment of organizational culture change program (6-12 months) addressing production-safety balance, normalization of deviance, and visible safety leadership; include senior management commitment, resource allocation, and accountability for safety performance equal to production performance</li>
+<li contenteditable="true">Implementation of robust safety deviation reporting and response system (3-6 months) where workers can report production pressure to work unsafely without fear of reprisal; investigate and address organizational factors creating pressure rather than blaming individuals</li>
+<li contenteditable="true">Creation of systematic approach to managing schedule pressure (6-12 months) including early warning indicators, decision protocols for schedule-safety conflicts requiring senior management involvement, and realistic project planning that includes adequate time for safety-critical activities</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Fall Protection Compliance</td>
+                        <td class="current" contenteditable="true">Harness use not enforced; widespread non-compliance tolerated</td>
+                        <td class="target" contenteditable="true">100% harness use verified daily; stop-work for any non-compliance</td>
+                    </tr>
+
+                    <tr>
+                        <td>Guardrail Completion</td>
+                        <td class="current" contenteditable="true">Work permitted on incomplete scaffolding; guardrails deferred</td>
+                        <td class="target" contenteditable="true">Zero work authorization until guardrails verified complete</td>
+                    </tr>
+
+                    <tr>
+                        <td>Permit System Effectiveness</td>
+                        <td class="current" contenteditable="true">Permits not current; no verification of actual conditions</td>
+                        <td class="target" contenteditable="true">Real-time verification required; permits invalid if conditions not met</td>
+                    </tr>
+
+                    <tr>
+                        <td>Safety Meeting Frequency</td>
+                        <td class="current" contenteditable="true">No meetings for 2 months during high-risk work</td>
+                        <td class="target" contenteditable="true">Weekly meetings mandatory with management attendance</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Assessment Currency</td>
+                        <td class="current" contenteditable="true">6 months outdated; not reflecting current work phases</td>
+                        <td class="target" contenteditable="true">Monthly review and update during active scaffolding work</td>
+                    </tr>
+
+                    <tr>
+                        <td>Safety Officer Presence</td>
+                        <td class="current" contenteditable="true">No regular site tours; reactive only</td>
+                        <td class="target" contenteditable="true">Daily site tours with documented inspections and immediate correction</td>
+                    </tr>
+
+                    <tr>
+                        <td>Production-Safety Balance</td>
+                        <td class="current" contenteditable="true">Schedule pressure overrides safety; deviations tolerated</td>
+                        <td class="target" contenteditable="true">Safety non-negotiable; schedule adjusted to accommodate safety requirements</td>
+                    </tr>
+
+                    <tr>
+                        <td>Secondary Fall Protection</td>
+                        <td class="current" contenteditable="true">No safety nets; single-layer protection only</td>
+                        <td class="target" contenteditable="true">Safety nets installed for all scaffolding assembly work above 4 meters</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong>📝 Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong>🖨️ Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = '🔓 Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification('✏️ Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = '🔒 Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification('🔒 Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification('💾 Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification('🖨️ Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('📥 HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm('⚠️ Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification('🔄 Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log('📝 Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log('💾 Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification('📄 Rapor yüklendi - Düzenlemek için 🔓 butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log('💡 KULLANIM İPUÇLARI:');
+        console.log('📋 Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log('💾 Ctrl+S: Kaydet');
+        console.log('🖨️ Ctrl+P: Yazdır / PDF kaydet');
+        console.log('📥 HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log('🔄 Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Railway Configuration for Web Service (FastAPI)
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "pip install -r agents/v3_vector_search/requirements_async.txt"
+
+[deploy]
+startCommand = "cd agents/v3_vector_search && uvicorn async_orchestrator_v3:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[env]
+PORT = { default = "8000" }
