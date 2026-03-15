@@ -344,6 +344,98 @@
             line-height: 1.5;
         }
 
+        /* Detailed Investigation Styles */
+        .investigation-section {
+            background: #f0f4f8;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .conditional-group {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .conditional-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .conditional-group label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .conditional-checkbox {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            margin-top: 0.2rem;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-label {
+            flex: 1;
+        }
+
+        .conditional-field {
+            margin-top: 0.75rem;
+            margin-left: 2.25rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .conditional-field.hidden {
+            display: none;
+        }
+
+        .radio-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #495057;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .radio-group textarea {
+            margin-top: 0.5rem;
+            margin-left: 1.5rem;
+        }
+
         .button-group {
             display: flex;
             gap: 1rem;
@@ -555,8 +647,9 @@
                 <button class="tab" onclick="showSection(4)">🌍 Çevre & Koşullar</button>
                 <button class="tab" onclick="showSection(5)">💼 Çalışma Detayları</button>
                 <button class="tab" onclick="showSection(6)">🚑 Yaralanma & Hasar</button>
-                <button class="tab" onclick="showSection(7)">🔍 Kök Neden Analizi</button>
-                <button class="tab" onclick="showSection(8)">✅ Özet & Gönder</button>
+                <button class="tab" onclick="showSection(7)">� Detaylı Araştırma</button>
+                <button class="tab" onclick="showSection(8)">�🔍 Kök Neden Analizi</button>
+                <button class="tab" onclick="showSection(9)">✅ Özet & Gönder</button>
             </div>
 
             <form id="incidentForm">
@@ -1397,8 +1490,351 @@
                     </div>
                 </div>
 
-                <!-- SECTION 8: ROOT CAUSE ANALYSIS -->
+                <!-- SECTION 7: DETAILED INVESTIGATION -->
                 <div class="section" data-section="7">
+                    <div class="section-header">
+                        <h2>🔎 Detaylı Araştırma</h2>
+                        <p>Kapsamlı olay incelemesi - Soruları sırasıyla cevaplandırın</p>
+                    </div>
+
+                    <div class="warning-box">
+                        <p><strong>ℹ️ Bilgi:</strong> Aşağıdaki sorular kapsamlı bir araştırma için tasarlanmıştır. Lütfen her soruyu dikkatli bir şekilde cevaplandırınız. Bir sorunun cevabı "HAYIR" ise, sonraki ilişkili sorular otomatik olarak açılacaktır.</p>
+                    </div>
+
+                    <!-- NEREDE, NE ZAMAN VE KİM? -->
+                    <div class="investigation-section">
+                        <div class="section-title">📍 Nerede, Ne Zaman ve Kim?</div>
+                        
+                        <div class="form-group conditional-group">
+                            <label for="q1">
+                                <input type="checkbox" id="q1" name="q1" class="conditional-checkbox" data-shows="q1-detail">
+                                <span class="checkbox-label">1. Olumsuz olay nerede ve ne zaman gerçekleşti?</span>
+                            </label>
+                            <textarea id="q1-detail" name="q1_detail" rows="3" placeholder="Olay yeri (bölüm, makine, konum), tarih, saat ve olay ne kadar sürdü?" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q2">
+                                <input type="checkbox" id="q2" name="q2" class="conditional-checkbox" data-shows="q2-detail">
+                                <span class="checkbox-label">2. Olumsuz olayda kim yaralandı/hastalandı veya başka bir şekilde etkilendi?</span>
+                            </label>
+                            <textarea id="q2-detail" name="q2_detail" rows="3" placeholder="Etkilenen kişi(ler), adı, yaşı, deneyimi, vasıfı, çalışma durumu" class="conditional-field hidden"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- AYRINTI BİLGİ TOPLAMA: NEYİ VE NASIL? -->
+                    <div class="investigation-section">
+                        <div class="section-title">📋 Ayrıntılı Bilgi Toplama: Neyi ve Nasıl?</div>
+                        
+                        <div class="form-group conditional-group">
+                            <label for="q3">
+                                <input type="checkbox" id="q3" name="q3" class="conditional-checkbox" data-shows="q3-detail">
+                                <span class="checkbox-label">3. Olumsuz olay nasıl oldu? Olayla ilgili tüm ekipmanların not edilmesi</span>
+                            </label>
+                            <textarea id="q3-detail" name="q3_detail" rows="4" placeholder="Olay sırası (adım adım), kullanılan ekipmanlar, makine detayları, araçlar" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q4">
+                                <input type="checkbox" id="q4" name="q4" class="conditional-checkbox" data-shows="q4-detail">
+                                <span class="checkbox-label">4. O sırada hangi faaliyetler gerçekleştiriliyordu?</span>
+                            </label>
+                            <textarea id="q4-detail" name="q4_detail" rows="3" placeholder="İşin türü, başlangıç saati, süre, diğer eş zamanlı faaliyetler" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q5">
+                                <input type="checkbox" id="q5" name="q5" class="conditional-checkbox" data-shows="q5-detail">
+                                <span class="checkbox-label">5. Çalışma koşullarında olağandışı veya farklı bir şey var mıydı?</span>
+                            </label>
+                            <div id="q5-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q5_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q5_yes_detail" rows="2" placeholder="Olağandışı koşullar nelerdir?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q5_answer" value="no"> HAYIR - Normal koşullar</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q6">
+                                <input type="checkbox" id="q6" name="q6" class="conditional-checkbox" data-shows="q6-detail">
+                                <span class="checkbox-label">6. Güvenli çalışma prosedürleri (GÇP) yeterli miydi ve bu prosedürlere uyuluyor muydu?</span>
+                            </label>
+                            <div id="q6-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q6_answer" value="prosedur_yok"> Prosedür yoktu</label>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q6_answer" value="prosedur_yetersiz"> Prosedür yetersizdi - Açıklayın:</label>
+                                    <textarea name="q6_yetersiz_detail" rows="2" placeholder="Hangi kısımlar yetersizdi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q6_answer" value="uyulmadi"> Prosedüre uyulmadı - Neden?</label>
+                                    <textarea name="q6_uyulmadi_detail" rows="2" placeholder="Neden prosedüre uyulmadı?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q6_answer" value="uyuldu"> Prosedüre uyuldu ve yeterliydi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q7">
+                                <input type="checkbox" id="q7" name="q7" class="conditional-checkbox" data-shows="q7-detail">
+                                <span class="checkbox-label">7. Olumsuz olay ne tür yaralanmalara veya sağlık sorunlarına neden oldu?</span>
+                            </label>
+                            <textarea id="q7-detail" name="q7_detail" rows="3" placeholder="Yaralanma türü, sağlık etkileri, tedavi gereksinimleri, prognoz" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q8">
+                                <input type="checkbox" id="q8" name="q8" class="conditional-checkbox" data-shows="q8-detail">
+                                <span class="checkbox-label">8. Bir yaralanma varsa nasıl oldu ve buna ne sebep oldu?</span>
+                            </label>
+                            <textarea id="q8-detail" name="q8_detail" rows="3" placeholder="Yaralanmanın mekanizması, nedeni, zamanı, şiddeti" class="conditional-field hidden"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- RİSK DEĞERLENDİRME -->
+                    <div class="investigation-section">
+                        <div class="section-title">⚠️ Risk Değerlendirmesi</div>
+                        
+                        <div class="form-group conditional-group">
+                            <label for="q9">
+                                <input type="checkbox" id="q9" name="q9" class="conditional-checkbox" data-shows="q9-detail">
+                                <span class="checkbox-label">9. Risk biliniyor muydu? Öyleyse, neden kontrol edilmedi? Edilmediyse, neden edilmedi?</span>
+                            </label>
+                            <div id="q9-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q9_answer" value="unknown"> Risk bilinmiyordu - Neden?</label>
+                                    <textarea name="q9_unknown_detail" rows="2" placeholder="Neden risk bilinmiyordu?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q9_answer" value="known_not_controlled"> Risk biliniyordu ama kontrol edilmedi - Neden?</label>
+                                    <textarea name="q9_not_controlled_detail" rows="2" placeholder="Neden kontrol edilmedi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q9_answer" value="known_controlled"> Risk biliniyordu ve kontrol edilmişti</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q10">
+                                <input type="checkbox" id="q10" name="q10" class="conditional-checkbox" data-shows="q10-detail">
+                                <span class="checkbox-label">10. Organizasyon ve çalışmanın düzenlenmesi olumsuz olayı etkiledi mi?</span>
+                            </label>
+                            <div id="q10-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q10_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q10_yes_detail" rows="2" placeholder="Nasıl etkiledi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q10_answer" value="no"> HAYIR - Etkilemedi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q11">
+                                <input type="checkbox" id="q11" name="q11" class="conditional-checkbox" data-shows="q11-detail">
+                                <span class="checkbox-label">11. Bakım ve temizlik yeterli miydi? Eğer değilse, neden olmadığını açıklayın.</span>
+                            </label>
+                            <div id="q11-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q11_answer" value="sufficient"> Yeterli - Düzenli bakım/temizlik yapılıyordu</label>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q11_answer" value="insufficient"> Yetersiz - Neden?</label>
+                                    <textarea name="q11_insufficient_detail" rows="2" placeholder="Neden yetersizdi?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q12">
+                                <input type="checkbox" id="q12" name="q12" class="conditional-checkbox" data-shows="q12-detail">
+                                <span class="checkbox-label">12. Dâhil olan kişiler yetkin ve uygun muydu?</span>
+                            </label>
+                            <div id="q12-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q12_answer" value="yes"> EVET - Yetkin ve uygun</label>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q12_answer" value="no"> HAYIR - Açıklayın:</label>
+                                    <textarea name="q12_no_detail" rows="2" placeholder="Neden yetkin/uygun değildi?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q13">
+                                <input type="checkbox" id="q13" name="q13" class="conditional-checkbox" data-shows="q13-detail">
+                                <span class="checkbox-label">13. İşyeri düzeni olumsuz olayı etkiledi mi?</span>
+                            </label>
+                            <div id="q13-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q13_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q13_yes_detail" rows="2" placeholder="Nasıl etkiledi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q13_answer" value="no"> HAYIR - Etkilemedi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q14">
+                                <input type="checkbox" id="q14" name="q14" class="conditional-checkbox" data-shows="q14-detail">
+                                <span class="checkbox-label">14. Materyallerin / malzemelerin doğası veya şekli olumsuz olayı etkiledi mi?</span>
+                            </label>
+                            <div id="q14-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q14_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q14_yes_detail" rows="2" placeholder="Nasıl etkiledi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q14_answer" value="no"> HAYIR - Etkilemedi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q15">
+                                <input type="checkbox" id="q15" name="q15" class="conditional-checkbox" data-shows="q15-detail">
+                                <span class="checkbox-label">15. Tesis ve ekipmanı kullanmada yaşanan zorluklar olumsuz olayı etkiledi mi?</span>
+                            </label>
+                            <div id="q15-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q15_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q15_yes_detail" rows="2" placeholder="Hangi zorluklar vardı?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q15_answer" value="no"> HAYIR - Zorluk yoktu</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q16">
+                                <input type="checkbox" id="q16" name="q16" class="conditional-checkbox" data-shows="q16-detail">
+                                <span class="checkbox-label">16. Güvenlik ekipmanı yeterli miydi?</span>
+                            </label>
+                            <div id="q16-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q16_answer" value="sufficient"> Yeterli - Uygun ve yeterli miktarda</label>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q16_answer" value="insufficient"> Yetersiz - Neler eksik?</label>
+                                    <textarea name="q16_insufficient_detail" rows="2" placeholder="Neler eksikti?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q16_answer" value="not_used"> Yeterli ama kullanılmadı - Neden?</label>
+                                    <textarea name="q16_not_used_detail" rows="2" placeholder="Neden kullanılmadı?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q17">
+                                <input type="checkbox" id="q17" name="q17" class="conditional-checkbox" data-shows="q17-detail">
+                                <span class="checkbox-label">17. Olumsuz olayı diğer koşullar etkiledi mi?</span>
+                            </label>
+                            <div id="q17-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q17_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q17_yes_detail" rows="2" placeholder="Hangi diğer koşullar?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q17_answer" value="no"> HAYIR - Başka etkileyici koşul yoktu</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KÖK NEDEN VE ÇÖZÜMLER -->
+                    <div class="investigation-section">
+                        <div class="section-title">🎯 Kök Neden ve Çözümler</div>
+                        
+                        <div class="form-group conditional-group">
+                            <label for="q18">
+                                <input type="checkbox" id="q18" name="q18" class="conditional-checkbox" data-shows="q18-detail">
+                                <span class="checkbox-label">18. Doğrudan, altta yatan ve kök nedenler nelerdi?</span>
+                            </label>
+                            <textarea id="q18-detail" name="q18_detail" rows="4" placeholder="Doğrudan nedenler (immediate causes) ve kök nedenler (root causes) - Hierarchical olarak liste yapın" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q19">
+                                <input type="checkbox" id="q19" name="q19" class="conditional-checkbox" data-shows="q19-detail">
+                                <span class="checkbox-label">19. Hangi risk kontrol önlemlerine ihtiyaç var / tavsiye ediliyor?</span>
+                            </label>
+                            <textarea id="q19-detail" name="q19_detail" rows="4" placeholder="Hiyerarşik sırada: İnşaat/tasarım, teknik, yönetim, eğitim, KKD, diğer" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q20">
+                                <input type="checkbox" id="q20" name="q20" class="conditional-checkbox" data-shows="q20-detail">
+                                <span class="checkbox-label">20. Başka yerde benzer riskler var mı? Varsa ne ve nerede?</span>
+                            </label>
+                            <div id="q20-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q20_answer" value="yes"> EVET - Benzer riskler var:</label>
+                                    <textarea name="q20_yes_detail" rows="2" placeholder="Nerede, ne tür riskler?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q20_answer" value="no"> HAYIR - Başka yerde benzer risk yok</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q21">
+                                <input type="checkbox" id="q21" name="q21" class="conditional-checkbox" data-shows="q21-detail">
+                                <span class="checkbox-label">21. Daha önce benzer olumsuz olaylar yaşandı mı? Detaylar nelerdir?</span>
+                            </label>
+                            <div id="q21-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q21_answer" value="yes"> EVET - Benzer olaylar yaşandı:</label>
+                                    <textarea name="q21_yes_detail" rows="2" placeholder="Tarihler ve detaylar"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q21_answer" value="no"> HAYIR - İlk kez yaşanıyor</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q22">
+                                <input type="checkbox" id="q22" name="q22" class="conditional-checkbox" data-shows="q22-detail">
+                                <span class="checkbox-label">22. Kısa ve uzun vadede hangi risk kontrol önlemleri uygulanmalıdır?</span>
+                            </label>
+                            <textarea id="q22-detail" name="q22_detail" rows="4" placeholder="Acil (0-1 ay), Orta vadeli (1-3 ay), Uzun vadeli (3+ ay) önlemler" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q23">
+                                <input type="checkbox" id="q23" name="q23" class="conditional-checkbox" data-shows="q23-detail">
+                                <span class="checkbox-label">23. Hangi risk değerlendirmeleri ve güvenli çalışma prosedürlerinin gözden geçirilmesi ve güncellenmesi gerekiyor?</span>
+                            </label>
+                            <textarea id="q23-detail" name="q23_detail" rows="4" placeholder="Risk assessment revizyonu, SOP güncelleme, HAZOP, LOPA, diğer" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q24">
+                                <input type="checkbox" id="q24" name="q24" class="conditional-checkbox" data-shows="q24-detail">
+                                <span class="checkbox-label">24. Olumsuz olayın detayları ve araştırma bulguları kaydedilip analiz edildi mi?</span>
+                            </label>
+                            <textarea id="q24-detail" name="q24_detail" rows="4" placeholder="Olayın maliyeti, araştırma bulguları, analiz sonuçları, öneriler" class="conditional-field hidden"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 8: ROOT CAUSE ANALYSIS -->
+                <div class="section" data-section="8">
                     <div class="section-header">
                         <h2>🔍 Kök Neden Analizi ve Düzeltici Aksiyonlar</h2>
                         <p>5 Neden Analizi, kök nedenler, düzeltici ve önleyici tedbirler</p>
@@ -1505,7 +1941,7 @@
                 </div>
 
                 <!-- SECTION 9: SUMMARY & SUBMIT -->
-                <div class="section" data-section="8">
+                <div class="section" data-section="9">
                     <div class="section-header">
                         <h2>✅ Form Özeti ve Gönderim</h2>
                         <p>Girdiğiniz bilgileri kontrol edin ve raporu gönderin</p>
@@ -1803,6 +2239,60 @@
             }
         }
 
+        // Conditional Field Logic for Detailed Investigation
+        function initializeConditionalFields() {
+            const conditionalCheckboxes = document.querySelectorAll('.conditional-checkbox');
+            
+            conditionalCheckboxes.forEach(checkbox => {
+                const targetId = checkbox.dataset.shows;
+                
+                // Initial state
+                updateConditionalField(checkbox, targetId);
+                
+                // On change
+                checkbox.addEventListener('change', () => {
+                    updateConditionalField(checkbox, targetId);
+                });
+            });
+
+            // Radio button conditional fields
+            const radios = document.querySelectorAll('.radio-group input[type="radio"]');
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const parent = this.closest('.conditional-field');
+                    if (parent) {
+                        const textareas = parent.querySelectorAll('textarea');
+                        textareas.forEach(ta => {
+                            if (this.value === ta.name.split('_')[0] + '_' + ta.name.split('_')[1]) {
+                                ta.parentElement.style.display = 'block';
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        function updateConditionalField(checkbox, targetId) {
+            const field = document.getElementById(targetId);
+            if (!field) return;
+            
+            if (checkbox.checked) {
+                field.classList.remove('hidden');
+                // Mark as required if parent form-group has required attribute
+                const parent = checkbox.closest('.form-group');
+                if (parent) {
+                    const inputs = field.querySelectorAll('textarea, input[type="text"]');
+                    inputs.forEach(input => input.required = true);
+                }
+            } else {
+                field.classList.add('hidden');
+                // Clear values when hidden (optional)
+                const inputs = field.querySelectorAll('textarea, input');
+                // Uncomment below to clear on uncheck:
+                // inputs.forEach(input => input.value = '');
+            }
+        }
+
         // Section navigation
         function showSection(index) {
             if (index < 0 || index >= totalSections) return;
@@ -1902,6 +2392,9 @@
 
         // Load draft on page load
         window.addEventListener('DOMContentLoaded', () => {
+            // Initialize conditional fields for detailed investigation
+            initializeConditionalFields();
+
             const draft = localStorage.getItem('incidentReportDraft');
             if (draft && confirm('Kaydedilmiş taslak bulundu. Yüklemek ister misiniz?')) {
                 const data = JSON.parse(draft);
