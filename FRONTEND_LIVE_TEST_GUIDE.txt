@@ -1,0 +1,177 @@
+📱 FRONTEND LIVE TEST - HTTP SERVER ÜZERINDE
+=============================================
+
+✅ SERVER BAŞLATILDI: http://localhost:8000/
+✅ FORM YÜKLENDI: incident_report_form.html
+
+🧪 TEST ADIMLAR:
+
+1️⃣ FORM SAYFASINI KONTROL ET
+   ✅ Header görünüyor mu?
+   ✅ Logo/başlık var mı?
+   ✅ Tab'lar görünüyor mu?
+   ✅ Test scenario butonları var mı?
+
+2️⃣ "🔎 DETAYLI ARAŞTIRMA" TAB'INI TIKLA
+   - Tab listesinde 7. seçenek (0-indexed)
+   - "Detaylı Araştırma" yazısı olmalı
+   → Yeni section görülecek
+   → 4 kategori başlığı gösterilecek
+
+3️⃣ SORU 1'İ TEST ET (Checkbox + Textarea)
+   📍 Nerede, Ne Zaman, Kim? bölümüne scroll et
+   "1. Olumsuz olay nerede ve ne zaman gerçekleşti?" checkbox'ı gör
+   
+   TEST:
+   ✓ Checkbox'ı tıkla
+   → Textarea açılacak (Conditional Field)
+   → Placeholder: "Olay yeri (bölüm, makine, konum), tarih, saat..."
+   ✓ Textarea'ya yazı yaz: "Test yazısı"
+   ✓ Checkbox'ı untık
+   → Textarea kaybolacak (Hidden)
+   ✓ Checkbox'ı tekrar tıkla
+   → Textarea tekrar açılacak (yazı hala orada olacak)
+
+4️⃣ SORU 5'İ TEST ET (Evet/Hayır Radio butonları)
+   📋 Ayrıntılı Bilgi Toplama bölümüne scroll et
+   "5. Çalışma koşullarında olağandışı veya farklı bir şey var mıydı?" bul
+   
+   TEST:
+   ✓ Checkbox'ı tıkla
+   → Radio butonlar açılacak:
+      ○ EVET - Açıklayın:
+      ○ HAYIR - Normal koşullar
+   ✓ "EVET" radio'sunu tıkla
+   → Detay textarea'sı açılacak
+   → Placeholder: "Olağandışı koşullar nelerdir?"
+   ✓ Textarea'ya yazı yaz: "Sıcak havada çalışıldı"
+   ✓ "HAYIR" radio'sunu tıkla
+   → Textarea kaybolacak
+   → Yazıyı kaybetmeyecek (sadece gizlenecek)
+
+5️⃣ SORU 6'YI TEST ET (Kompleks Radio + Textarea)
+   "6. Güvenli çalışma prosedürleri (GÇP) yeterli miydi?" bul
+   
+   TEST:
+   ✓ Checkbox'ı tıkla
+   → 4 radio butonu gösterilecek:
+      ○ Prosedür yoktu
+      ○ Prosedür yetersizdi - Açıklayın:
+      ○ Prosedüre uyulmadı - Neden?
+      ○ Prosedüre uyuldu ve yeterliydi
+   ✓ Her bir radio'yu tıklayarak test et
+   → Her seferinde farklı textarea'sı açılacak
+   → Sadece seçilen option'un textarea'sı görülecek
+
+6️⃣ SORU 9'U TEST ET (3 Seçenekli Radio)
+   ⚠️ Risk Değerlendirmesi bölümüne scroll et
+   "9. Risk biliniyor muydu?" bul
+   
+   TEST:
+   ✓ Checkbox'ı tıkla
+   → 3 radio butonu gösterilecek:
+      ○ Risk bilinmiyordu - Neden?
+      ○ Risk biliniyordu ama kontrol edilmedi - Neden?
+      ○ Risk biliniyordu ve kontrol edilmişti
+   ✓ Her seferinde farklı detay textarea'sı açılmalı
+
+7️⃣ AUTO-SAVE TEST
+   ✓ Herhangi bir soruya yazı yaz
+   ✓ Sayfayı yenile (F5 veya Cmd+R)
+   → Yazı hala orada olacak! (localStorage'dan yüklendi)
+   ✓ Tarayıcı konsolu açarak kontrol et:
+      • F12 → Application tab → Local Storage → file://...
+      • Veriler kaydedilmiş mi kontrol et
+
+8️⃣ FORM ÖZETI TAB'INI KONTROL ET
+   ✓ "✅ Özet & Gönder" tab'ını tıkla (9. seçenek)
+   → Form doluluk oranı gösterilecek
+   → Zorunlu alanlar listesi
+   → Kontrol listesi (5W1H, tanık ifadeleri, vb.)
+
+9️⃣ RESPONSIVE TEST
+   💻 Desktop'ta:
+   ✓ Tüm alanlar güzelce görülüyor mu?
+   ✓ Checkbox'lar tıklanabilir mi?
+   ✓ Textarea'lar yeterince geniş mi?
+   
+   📱 Mobile'da (DevTools → Toggle device toolbar):
+   ✓ Responsive mi?
+   ✓ Touch-friendly mi?
+   ✓ Özel alan görünüyor mu?
+
+🔟 CONSOLE ERROR KONTROL
+   ✓ F12 → Console tab açıp kontrol et
+   → JavaScript hataları var mı?
+   → Network errors var mı?
+   → Uyarılar var mı?
+
+---
+
+🎯 EXPECTED RESULTS:
+
+✅ CHECKBOX DAVRANIŞI:
+   - Checkbox tıkla → Field açılır
+   - Checkbox untık → Field kapanır
+   - Yazılar korunur
+   - Page refresh'te veriler kalır
+
+✅ RADIO BUTTONS:
+   - Radio seçimi → İlgili textarea açılır
+   - Diğer radio seçimi → O textarea açılır, önceki gizlenir
+   - Yazılar korunur (hidden state'de)
+
+✅ FORM KAYDI:
+   - Otomatik kaydediliyor (2 dakika)
+   - localStorage'da görülüyor
+   - Page refresh'te restore ediliyor
+
+✅ CSS STYLING:
+   - Mavi tema uygulanmış
+   - Investigation section gri arka planlı
+   - Conditional fields iç içe
+   - Radio groups düzenli
+
+✅ LAYOUT:
+   - Tab navigation çalışıyor
+   - Scroll smooth
+   - Responsive font sizes
+   - Touch-friendly buttons
+
+---
+
+⚠️ OLASI SORUNLAR & ÇÖZÜMLER:
+
+Problem: Checkbox tıklanmıyor
+→ Çözüm: JavaScript hatasını kontrol et (F12 → Console)
+
+Problem: Textarea açılmıyor
+→ Çözüm: Conditional field CSS'i kontrol et
+
+Problem: Auto-save çalışmıyor
+→ Çözüm: localStorage'ı kontrol et (F12 → Application)
+
+Problem: Tab geçişi çalışmıyor
+→ Çözüm: showSection() fonksiyonunu kontrol et
+
+---
+
+📊 SUCCESS CHECKLIST:
+
+□ Form yüklendi
+□ 10 tab görülüyor
+□ Detaylı Araştırma tab'ı mevcut
+□ 24 soru görülüyor
+□ Checkbox'lar tıklanabilir
+□ Conditional fields açılıp kapanıyor
+□ Radio butonlar çalışıyor
+□ Auto-save çalışıyor
+□ Responsive görünüyor
+□ Console hatasız
+□ localStorage kaydediyor
+
+---
+
+🚀 IF ALL GREEN → PRODUCTION READY!
+
+Test sonuçlarını yazıp iletiriz! 🎉

@@ -1,6 +1,29 @@
 # HITL Test Ortamı
 
 Bu klasör, **Human-in-the-Loop (HITL)** sisteminin **test versiyonunu** içerir.
+1. KULLANICI OLAY AÇIKLAMASI GİRER
+   └─ (İlk başta kısıtlı bilgi: "Elektrik çarpması oldu")
+   
+2. SISTEM ANALIZ EDER (Overview + Assessment)
+   ├─ Olay tipini tanımla
+   ├─ Şiddeti belirle
+   └─ Investigation level set et
+   
+3. SORU SORMA YAPISI DEVREYE GİRER (Knowledge Base'le entegre)
+   ├─ Eksik kategorileri tespit et
+   ├─ HSG245 kodlarına bağlı sorular üret
+   └─ GRADIO arayüzü ile kullanıcıya sor
+   
+4. KULLANICI CEVAPLAR
+   └─ Her cevap ile daha detaylı bilgi
+   
+5. ROOT CAUSE ANALYSIS (RootCauseAgentV2)
+   ├─ Immediate Cause'tan başla
+   ├─ 5-Why zinciri ile inerken sorular sor
+   └─ Dallar halinde root causes belirle
+   
+6. RAPOR ÜRETİMİ (SkillBasedDocxAgent)
+   └─ Toplanan tüm bilgilerle DOCX + HTML rapor
 
 ## ⚠️ ÖNEMLİ
 Bu test ortamı, **ana sistem dosyalarını DEĞİŞTİRMEZ**. Sadece test amaçlıdır.

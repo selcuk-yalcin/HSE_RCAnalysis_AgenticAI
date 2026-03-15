@@ -73,7 +73,7 @@ OLAY KRONOLOJİSİ:
 - 10:42 - İlk yardım uygulandı (bilinçli ama ağır yaralı)
 - 10:55 - Ambulans geldi, hastaneye sevk edildi
 - 11:20 - Hastane raporu: L2 omurga kırığı, iç kanama, ciddi durum
-
+ 
 ETKİLENEN KİŞİ:
 - Ad Soyad: Hasan Yıldız
 - Yaş: 32
