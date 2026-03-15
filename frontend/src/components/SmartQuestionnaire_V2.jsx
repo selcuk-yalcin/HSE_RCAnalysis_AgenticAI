@@ -10,9 +10,9 @@ import './SmartQuestionnaire_V2.css';
  * HSG245 Knowledge Base Uyumlu
  */
 
-const SmartQuestionnaire_V2 = ({ onComplete }) => {
+const SmartQuestionnaire_V2 = ({ onComplete, isDarkMode: parentDarkMode }) => {
   // ===== STATE =====
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const isDarkMode = parentDarkMode || false;
   const [activeTab, setActiveTab] = useState('general');
   const [answers, setAnswers] = useState({});
   const [expandedSections, setExpandedSections] = useState({});
@@ -291,16 +291,6 @@ const SmartQuestionnaire_V2 = ({ onComplete }) => {
   // ===== RENDER =====
   return (
     <div className={`questionnaire-v2 ${isDarkMode ? 'dark' : 'light'}`}>
-      {/* Theme Toggle */}
-      <button
-        className="theme-toggle-btn"
-        onClick={() => setIsDarkMode(!isDarkMode)}
-        title={isDarkMode ? 'Açık Mod' : 'Karanlık Mod'}
-      >
-        {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-        <span className="theme-label">{isDarkMode ? 'Açık Mod' : 'Karanlık Mod'}</span>
-      </button>
-
       {/* Header */}
       <div className="questionnaire-header">
         <div className="header-content">
