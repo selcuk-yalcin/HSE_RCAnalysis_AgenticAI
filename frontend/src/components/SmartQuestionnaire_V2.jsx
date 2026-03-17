@@ -1,420 +1,554 @@
-import React, { useState } from 'react';
-import { Sun, Moon, ChevronDown, Plus, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sun, Moon, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import './SmartQuestionnaire_V2.css';
 
 /**
- * SMART QUESTIONNAIRE V2 - UPDATED
- * ===================================
- * 24 Düzeltilmiş Genel Soru + Detaylı Analiz
- * Gramer ve Anlam İyileştirilmiş
- * HSG245 Knowledge Base Uyumlu
+ * SMART QUESTIONNAIRE V2
+ * ========================
+ * - Genel Sorular (15 temel soru - tüm olaylar)
+ * - Detaylı Analiz sekmesi (koşullu, açılı-kapanabilir)
+ * - Light/Dark Mode seçeneği
+ * - Taxonomy otomatik bağlama
  */
 
-const SmartQuestionnaire_V2 = ({ onComplete, isDarkMode: parentDarkMode }) => {
-  // ===== STATE =====
-  const isDarkMode = parentDarkMode || false;
-  const [activeTab, setActiveTab] = useState('general');
+const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
+  // ========================================================================
+  // STATE
+  // ========================================================================
+  const [activeTab, setActiveTab] = useState('general'); // 'general' | 'detailed'
+  const [darkMode, setDarkMode] = useState(false);
   const [answers, setAnswers] = useState({});
+  const [detectedCodes, setDetectedCodes] = useState(new Set());
   const [expandedSections, setExpandedSections] = useState({});
+  const [questionsAnswered, setQuestionsAnswered] = useState(0);
 
-  // ===== 24 DÜZELTILMIŞ GENEL SORULAR =====
+  // ========================================================================
+  // GENEL SORULAR (15 SORU - TÜM OLAYLAR)
+  // ========================================================================
   const generalQuestions = [
-    // BÖLÜM 1: NEREDE, NE ZAMAN, KİM
     {
-      id: 'q1',
-      order: 1,
-      category: 'Temel Bilgiler',
-      question: 'Olay nerede ve ne zaman gerçekleşti?',
+      id: 'g1',
+      question: 'Olayın Özeti Nedir?',
       type: 'textarea',
-      placeholder: 'Yer, tarih ve saat bilgisini giriniz...',
-      description: 'Tesis, bölüm, spesifik yer ve tam tarih-saat'
+      category: 'Temel',
+      description: 'Ne oldu, nerede, ne zaman, kim etkilendi?',
+      placeholder: 'Kısaca olayı özetleyin...'
     },
     {
-      id: 'q2',
-      order: 2,
-      category: 'Temel Bilgiler',
-      question: 'Olayda kim yaralandı, hastalandı veya etkilendi?',
-      type: 'textarea',
-      placeholder: 'Kişi sayısı, adları, görevleri giriniz...',
-      description: 'Ad, ünvan, deneyim, yaş grubu, sayı'
-    },
-    // BÖLÜM 2: AYRINTI - NEYİ VE NASIL
-    {
-      id: 'q3',
-      order: 3,
-      category: 'Olay Detayları',
-      question: 'Olay nasıl gerçekleşti? Dahil olan ekipmanları belirtiniz.',
-      type: 'textarea',
-      placeholder: 'Olay süreci ve kullanılan ekipmanları açıklayınız...',
-      description: 'Olay sırasını adım adım, ilgili ekipmanları listeleyin'
+      id: 'g2',
+      question: 'Olay Ne Zaman Gerçekleşti?',
+      type: 'datetime',
+      category: 'Temel',
+      description: 'Tarih ve saat?'
     },
     {
-      id: 'q4',
-      order: 4,
-      category: 'Olay Detayları',
-      question: 'O sırada hangi faaliyetler/işler gerçekleştiriliyordu?',
-      type: 'textarea',
-      placeholder: 'Yapılan işlerin adımlarını açıklayınız...',
-      description: 'Yapılan işlem, prosedür, kullanılan yöntem'
+      id: 'g3',
+      question: 'Olay Nerede Gerçekleşti?',
+      type: 'text',
+      category: 'Konum',
+      description: 'Tesis, bölüm, spesifik yer',
+      placeholder: 'Üretim hattı A, Depo 3, vb.'
     },
     {
-      id: 'q5',
-      order: 5,
-      category: 'Olay Detayları',
-      question: 'Çalışma koşullarında olağandışı veya farklı bir durum var mıydı?',
-      type: 'select',
-      options: ['Evet', 'Hayır', 'Bilinmiyor'],
-      description: 'Sıcaklık, nem, gürültü, aydınlatma, temizlik vb.'
-    },
-    {
-      id: 'q6',
-      order: 6,
-      category: 'Prosedür ve Kontrol',
-      question: 'Güvenli çalışma prosedürleri (GÇP) yeterli miydi ve uygulanıyor muydu?',
-      type: 'select',
-      options: [
-        'Prosedür yok',
-        'Prosedür var ama yetersiz',
-        'Prosedür yeterli ama uygulanmıyor',
-        'Prosedür var ve uygulanıyor'
-      ],
-      description: 'Yazılı prosedür varlığı ve uygulanması'
-    },
-    {
-      id: 'q7',
-      order: 7,
-      category: 'Yaralanma',
-      question: 'Olay ne tür yaralanma veya sağlık sorunlarına neden oldu?',
-      type: 'textarea',
-      placeholder: 'Yaralanma türü, ciddiyet ve sağlık etkileri...',
-      description: 'Kesik, çürük, kırık, yanık, zehirlenme vb.'
-    },
-    {
-      id: 'q8',
-      order: 8,
-      category: 'Yaralanma',
-      question: 'Yaralanma mekanizması neydi ve buna ne sebep oldu?',
-      type: 'textarea',
-      placeholder: 'Yaralanma süreci ve temel sebebini açıklayınız...',
-      description: 'Enerji transferi, etki alanı, ısı transferi vb.'
-    },
-    {
-      id: 'q9',
-      order: 9,
-      category: 'Risk Bilinci',
-      question: 'Risk önceden biliniyordu mu? Eğer öyleyse, neden kontrol edilmedi?',
-      type: 'select',
-      options: [
-        'Risk bilinmiyor',
-        'Risk biliniyordu ama göz ardı edildi',
-        'Risk biliniyordu ama kontrol edilmedi (bütçe/kaynak)',
-        'Risk biliniyordu ve kontrol edildi'
-      ],
-      description: 'Risk tanımlanması ve yönetimi durumu'
-    },
-    // BÖLÜM 3: ORGANİZASYON VE ÇEVRE
-    {
-      id: 'q10',
-      order: 10,
-      category: 'Organizasyon',
-      question: 'Organizasyon ve çalışmanın yapılandırılması olayı etkiledi mi?',
-      type: 'select',
-      options: ['Evet', 'Hayır', 'Kısmen', 'Bilinmiyor'],
-      description: 'Yönetim yapısı, sorumluluklar açık mı?'
-    },
-    {
-      id: 'q11',
-      order: 11,
-      category: 'Bakım ve Temizlik',
-      question: 'Bakım ve temizlik yeterli miydi? Değilse, neden?',
-      type: 'select',
-      options: [
-        'Bakım ve temizlik yeterli',
-        'Bakım yetmez / Prosedür yok',
-        'Temizlik yetmez / Prosedür yok',
-        'Her ikisi de yetmez'
-      ],
-      description: 'Bakım ve temizlik standartları'
-    },
-    {
-      id: 'q12',
-      order: 12,
+      id: 'g4',
+      question: 'Etkilenen Personel Bilgileri',
+      type: 'text',
       category: 'Personel',
-      question: 'Dahil olan kişiler yetkin ve uygun muydu?',
+      description: 'Ad, ünvan, deneyim',
+      placeholder: 'Ahmet Çelik - Operatör - 2 yıl'
+    },
+    {
+      id: 'g5',
+      question: 'Olayın Türü Nedir?',
       type: 'select',
+      category: 'Sınıflandırma',
       options: [
-        'Evet, yetkin ve eğitimli',
-        'Kısmen eğitimli',
-        'Eğitimsiz',
-        'Bilinmiyor'
-      ],
-      description: 'Personel eğitim ve yetkinlik seviyeleri'
+        'İş Kazası',
+        'Ramak Kala (Near Miss)',
+        'Çevre Olayı',
+        'Mülkiyet Hasarı',
+        'Diğer'
+      ]
     },
     {
-      id: 'q13',
-      order: 13,
-      category: 'İşyeri',
-      question: 'İşyeri düzeni olayı etkiledi mi?',
-      type: 'textarea',
-      placeholder: 'Çalışma alanı organize mı? Tehlikeli mı?',
-      description: 'Geçit yolları, korkuluklar, bariyerler, aydınlatma vb.'
-    },
-    {
-      id: 'q14',
-      order: 14,
-      category: 'Malzeme',
-      question: 'Malzemelerin niteliği veya durumu olayı etkiledi mi?',
-      type: 'textarea',
-      placeholder: 'Kusurlu/bozuk malzeme var mıydı?',
-      description: 'Kimyasal özellikleri, sıcaklığı, keskinliği, ağırlığı vb.'
-    },
-    {
-      id: 'q15',
-      order: 15,
-      category: 'Ekipman',
-      question: 'Tesis ve ekipmanı kullanmada yaşanan zorluklar olayı etkiledi mi?',
-      type: 'textarea',
-      placeholder: 'Ekipman arızası, kullanım güçlüğü vb...',
-      description: 'Tasarım sorunları, HMI, ergonomi vb.'
-    },
-    {
-      id: 'q16',
-      order: 16,
-      category: 'KKD',
-      question: 'Kişisel koruyucu donanım (KKD) yeterli miydi?',
+      id: 'g6',
+      question: 'Yaralanma/Hasar Şiddeti',
       type: 'select',
+      category: 'Şiddet',
       options: [
-        'KKD yeterli ve uygun',
-        'KKD yeterli ama uygun değil',
-        'KKD yetersiz',
-        'KKD kullanılmadı'
+        'İlk Yardım (Hafif)',
+        'Tedavi Gerektiren (Orta)',
+        'Hastaneye Yatış',
+        'Kalıcı Hasar',
+        'Ölümlü',
+        'Hasar Yok'
+      ]
+    },
+    {
+      id: 'g7',
+      question: 'Prosedür/İş Talimatı Var Mıydı?',
+      type: 'select',
+      category: 'Sistem',
+      options: [
+        'Hayır, yoktu',
+        'Vardı ama bilinmiyordu',
+        'Vardı ve biliniyordu',
+        'Vardı ama uygulanmıyordu'
       ],
-      description: 'Koruyucu donanım durumu'
+      taxonomy: ['D9.1', 'D9.3', 'D9.5']
     },
     {
-      id: 'q17',
-      order: 17,
-      category: 'Diğer Faktörler',
-      question: 'Diğer hangi koşullar olayı etkiledi?',
-      type: 'textarea',
-      placeholder: 'Hava durumu, zaman baskısı, stres, yorgunluk vb...',
-      description: 'İnsan faktörleri, çevresel koşullar vb.'
-    },
-    // BÖLÜM 4: KÖK NEDEN VE KONTROL
-    {
-      id: 'q18',
-      order: 18,
-      category: 'Kök Neden',
-      question: 'Doğrudan, altta yatan ve kök nedenler nelerdi?',
-      type: 'textarea',
-      placeholder: 'Doğrudan sebep → Sistem eksikliği → Kök neden zinciri...',
-      description: '5 Neden, HAZOP veya HSG245 taxonomy kullanın'
+      id: 'g8',
+      question: 'Eğitim Verilmiş Miydi?',
+      type: 'select',
+      category: 'Personel',
+      options: [
+        'Hayır',
+        'Genel eğitim var ama spesifik yoktu',
+        'Evet, spesifik eğitim vardı'
+      ],
+      taxonomy: ['D3.1', 'D3.2']
     },
     {
-      id: 'q19',
-      order: 19,
-      category: 'Kontrol Önlemleri',
-      question: 'Hangi risk kontrol önlemleri gereklidir?',
-      type: 'textarea',
-      placeholder: 'Acil, kısa vadeli ve uzun vadeli önlemler...',
-      description: 'Hiyerarşik kontrol: Eleme > Değiştirme > Mühendislik > Yönetim > KKD'
+      id: 'g9',
+      question: 'Risk Değerlendirmesi Yapılmış Mıydı?',
+      type: 'select',
+      category: 'Yönetim',
+      options: [
+        'Hayır',
+        'Yapıldı ama kontroller uygulanmadı',
+        'Yapıldı ve kontroller takip edildi'
+      ],
+      taxonomy: ['D4.1', 'D4.2']
     },
     {
-      id: 'q20',
-      order: 20,
-      category: 'Benzer Riskler',
-      question: 'Başka yerlerde benzer riskler var mı? Varsa nerede?',
-      type: 'textarea',
-      placeholder: 'Diğer departmanlar, benzer görevler vb...',
-      description: 'Diğer tesisler, vardiyalar, benzeri operasyonlar'
+      id: 'g10',
+      question: 'Denetim/Gözetim Var Mıydı?',
+      type: 'select',
+      category: 'Yönetim',
+      options: [
+        'Hayır',
+        'Kısmen',
+        'Evet, tam denetim vardı'
+      ],
+      taxonomy: ['D1.2']
     },
     {
-      id: 'q21',
-      order: 21,
-      category: 'Geçmiş Olaylar',
-      question: 'Daha önce benzer olaylar yaşandı mı? Detayları nelerdir?',
-      type: 'textarea',
-      placeholder: 'Tarih, ne oldu, hangi önlemler alındı...',
-      description: 'Geçmiş ramak kala, kazalar, eğilimler'
+      id: 'g11',
+      question: 'KKD (Kişisel Koruyucu Donanım) Yeterli Miydi?',
+      type: 'select',
+      category: 'Koruma',
+      options: [
+        'Gerekli değildi',
+        'Gerekli ama sağlanmadı',
+        'Sağlandı ama kullanılmadı',
+        'Sağlandı ve kullanıldı'
+      ],
+      taxonomy: ['A3.1', 'A3.2', 'A3.4']
     },
     {
-      id: 'q22',
-      order: 22,
-      category: 'Eylem Planı',
-      question: 'Kısa ve uzun vadede hangi kontrol önlemleri uygulanmalıdır?',
-      type: 'textarea',
-      placeholder: 'Acil (24s), kısa vadeli (1ay), uzun vadeli (3-6ay)...',
-      description: 'Kimlerin sorumlu, bütçe, tarih, izleme'
+      id: 'g12',
+      question: 'İletişim Sorun Var Mıydı?',
+      type: 'select',
+      category: 'İletişim',
+      options: [
+        'Evet, önemli iletişim kopukluğu',
+        'Kısmen, talimatlar açık değildi',
+        'Hayır, iletişim açıktı'
+      ],
+      taxonomy: ['D2.1', 'D2.2']
     },
     {
-      id: 'q23',
-      order: 23,
-      category: 'Gözden Geçirme',
-      question: 'Hangi risk değerlendirmeleri ve prosedürler gözden geçirilmeli?',
-      type: 'textarea',
-      placeholder: 'Risk değerlendirmesi, GÇP, KKD prosedürleri vb...',
-      description: 'Güncellenecek belgeler ve yeni eğitimler'
+      id: 'g13',
+      question: 'Benzer Olay Daha Önce Yaşandı Mı?',
+      type: 'select',
+      category: 'Sistem',
+      options: [
+        'Evet, benzer olaylar yaşandı',
+        'Ramak kala (near miss) var',
+        'Hayır, bu ilk'
+      ],
+      taxonomy: ['D1.3']
     },
     {
-      id: 'q24',
-      order: 24,
-      category: 'Belgeleme',
-      question: 'Araştırma bulguları kaydedildi mi? Benzer/ortak nedenler var mı?',
+      id: 'g14',
+      question: 'Acil Müdahale/Ilk Yardım Yeterli Miydi?',
+      type: 'select',
+      category: 'Müdahale',
+      options: [
+        'Hayır, yetersizdi',
+        'Kısmen yapıldı',
+        'Evet, profesyonel müdahale yapıldı'
+      ]
+    },
+    {
+      id: 'g15',
+      question: 'Ek Açıklamalar',
       type: 'textarea',
-      placeholder: 'Hangi belgeler hazırlandı? Trend analizi yapıldı mı?',
-      description: 'Belgeleme durumu ve müteakip araştırma gereksinimleri'
+      category: 'Diğer',
+      description: 'Önemli detaylar, tanık ifadeleri, vb.',
+      placeholder: 'Başka dikkat çeken noktalar...'
     }
   ];
 
-  // ===== HANDLERS =====
-  const handleAnswer = (questionId, value) => {
+  // ========================================================================
+  // DETAYLI ANALIZ SEKTÖRLERİ (Koşullu, açılı-kapanabilir)
+  // ========================================================================
+  const detailedAnalysisSections = [
+    {
+      id: 'confined-space',
+      title: '🔒 Kapalı Alan (Confined Space)',
+      condition: (answers) => answers.g3?.toLowerCase().includes('kapalı') || answers.g3?.toLowerCase().includes('tank'),
+      questions: [
+        { id: 'cs1', q: 'Permit sistemi uygulandı mı?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'cs2', q: 'Atmosfer testi yapıldı mı?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'cs3', q: 'Gözcü personel var mıydı?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'cs4', q: 'Kurtarma ekipmanı hazırlanmış mıydı?', type: 'select', options: ['Hayır', 'Vardı ama erişilmez', 'Evet'] }
+      ]
+    },
+    {
+      id: 'loto',
+      title: '🔌 Lockout-Tagout (LOTO)',
+      condition: (answers) => answers.g3?.toLowerCase().includes('makine') || answers.g3?.toLowerCase().includes('ekipman'),
+      questions: [
+        { id: 'loto1', q: 'LOTO prosedürü uygulandı mı?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'loto2', q: 'Tüm enerji kaynakları bloke edildi mi?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'loto3', q: 'Lock açma yetkisi kime aitti?', type: 'text', placeholder: 'İSG Uzmanı, Şef, vb.' },
+        { id: 'loto4', q: 'Güvenlik kontrolü yapıldı mı?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] }
+      ]
+    },
+    {
+      id: 'height-work',
+      title: '⬆️ Yüksekte Çalışma',
+      condition: (answers) => answers.g3?.toLowerCase().includes('yüksek') || answers.g3?.toLowerCase().includes('iskele'),
+      questions: [
+        { id: 'hw1', q: 'Emniyet kemeri/Halat sistemi var mıydı?', type: 'select', options: ['Hayır', 'Vardı ama kullanılmadı', 'Evet, kullanıldı'] },
+        { id: 'hw2', q: 'Çalışma yüksekliği ne kadardı?', type: 'text', placeholder: 'Metre cinsinden' },
+        { id: 'hw3', q: 'Iskele/Platform durumu neydi?', type: 'select', options: ['Hasarlı', 'Normal', 'İyi'] },
+        { id: 'hw4', q: 'Hava durumu nasıldı?', type: 'text', placeholder: 'Rüzgarlı, yağmurlu, vb.' }
+      ]
+    },
+    {
+      id: 'chemical',
+      title: '⚗️ Kimyasal İşlem',
+      condition: (answers) => answers.g3?.toLowerCase().includes('kimya') || answers.g3?.toLowerCase().includes('endüstri'),
+      questions: [
+        { id: 'ch1', q: 'Kimyasal madde MSDS (Güvenlik Bilgi Formu) mevcut miydi?', type: 'select', options: ['Hayır', 'Vardı ama personel bilmiyordu', 'Evet, personel biliyordu'] },
+        { id: 'ch2', q: 'Havalandırma yeterli miydi?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'ch3', q: 'Uygun KKD kullanıldı mı?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'ch4', q: 'İlk yardım ekipmanı uygun muydu?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] }
+      ]
+    },
+    {
+      id: 'ergonomics',
+      title: '🏋️ Ergonomi / Tekrarlayan Hareket',
+      condition: (answers) => answers.g3?.toLowerCase().includes('montaj') || answers.g3?.toLowerCase().includes('taşıma'),
+      questions: [
+        { id: 'erg1', q: 'İş istasyonu ergonomik miydi?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'erg2', q: 'Çalışma süresi kaç saat?', type: 'text', placeholder: '8, 10 saat, vb.' },
+        { id: 'erg3', q: 'Mola/Dinlenme süresi yeterli miydi?', type: 'select', options: ['Hayır', 'Kısmen', 'Evet'] },
+        { id: 'erg4', q: 'Mekanik yardımcı araçlar var mıydı?', type: 'select', options: ['Hayır', 'Vardı ama kullanılmadı', 'Evet, kullanıldı'] }
+      ]
+    }
+  ];
+
+  // ========================================================================
+  // HELPER FUNCTIONS
+  // ========================================================================
+
+  const handleGeneralAnswer = (questionId, value) => {
     setAnswers(prev => ({
       ...prev,
       [questionId]: value
     }));
+
+    // Taxonomy otomatik bağlama
+    const question = generalQuestions.find(q => q.id === questionId);
+    if (question?.taxonomy && value !== '') {
+      question.taxonomy.forEach(code => {
+        setDetectedCodes(prev => new Set([...prev, code]));
+      });
+    }
+
+    // Cevaplanan soru sayısını güncelle
+    const answered = Object.keys(answers).length + 1;
+    setQuestionsAnswered(answered);
+  };
+
+  const handleDetailedAnswer = (sectionId, questionId, value) => {
+    setAnswers(prev => ({
+      ...prev,
+      [`${sectionId}-${questionId}`]: value
+    }));
+  };
+
+  const toggleSection = (sectionId) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+
+  const getVisibleDetailedSections = () => {
+    return detailedAnalysisSections.filter(section => section.condition(answers));
   };
 
   const handleComplete = () => {
-    const questionsAnswered = Object.keys(answers).length;
-    if (onComplete) {
-      onComplete({
-        answers,
-        totalQuestionsAnswered: questionsAnswered,
-        completionPercentage: (questionsAnswered / generalQuestions.length) * 100
-      });
-    }
+    onComplete({
+      answers,
+      detectedCodes: Array.from(detectedCodes),
+      totalQuestionsAnswered: questionsAnswered
+    });
   };
 
-  const progress = (Object.keys(answers).length / generalQuestions.length) * 100;
-  const currentQuestion = generalQuestions.filter(q => !answers[q.id])[0] || generalQuestions[0];
+  // ========================================================================
+  // RENDER
+  // ========================================================================
 
-  // ===== RENDER =====
   return (
-    <div className={`questionnaire-v2 ${isDarkMode ? 'dark' : 'light'}`}>
+    <div className={`smart-questionnaire-v2`} data-theme={darkMode ? 'dark' : 'light'}>
       {/* Header */}
       <div className="questionnaire-header">
-        <div className="header-content">
-          <h1>🎯 Genel Soruşturma Formu</h1>
-          <p className="header-subtitle">HSG245 Standartlarına Uygun - Düzeltilmiş Soru Seti</p>
+        <div className="header-left">
+          <h1>🎯 Akıllı Soruşturma Sistemi</h1>
+          <p>Olay hakkında sistemli bilgi toplayarak kök nedene ulaşın</p>
         </div>
 
-        {/* Progress */}
-        <div className="progress-section">
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+        <div className="header-right">
+          {/* Theme Toggle */}
+          <button
+            className="theme-toggle"
+            onClick={() => setDarkMode(!darkMode)}
+            title={darkMode ? 'Aydınlık Mod' : 'Karanlık Mod'}
+          >
+            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
+          {/* Progress */}
+          <div className="progress-indicator">
+            <span className="progress-text">
+              {questionsAnswered} / {generalQuestions.length} Soru
+            </span>
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${(questionsAnswered / generalQuestions.length) * 100}%`
+                }}
+              />
+            </div>
           </div>
-          <p className="progress-text">{Object.keys(answers).length} / {generalQuestions.length} Soru</p>
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tab Navigation */}
       <div className="tab-navigation">
         <button
-          className={`tab-btn ${activeTab === 'general' ? 'active' : ''}`}
+          className={`tab-button ${activeTab === 'general' ? 'active' : ''}`}
           onClick={() => setActiveTab('general')}
         >
-          📋 Genel Sorular (24)
+          <span className="tab-icon">📋</span>
+          <span className="tab-label">Genel Sorular</span>
+          <span className="tab-badge">{generalQuestions.length}</span>
         </button>
+
         <button
-          className={`tab-btn ${activeTab === 'detailed' ? 'active' : ''}`}
+          className={`tab-button ${activeTab === 'detailed' ? 'active' : ''}`}
           onClick={() => setActiveTab('detailed')}
         >
-          📊 Detaylı Analiz
+          <span className="tab-icon">🔍</span>
+          <span className="tab-label">Detaylı Analiz</span>
+          <span className="tab-badge">{getVisibleDetailedSections().length}</span>
         </button>
       </div>
 
       {/* Content */}
       <div className="questionnaire-content">
+        {/* TAB 1: GENEL SORULAR */}
         {activeTab === 'general' && (
-          <div className="questions-section">
+          <div className="tab-content general-questions">
             <div className="questions-grid">
-              {generalQuestions.map((question) => (
+              {generalQuestions.map((question, idx) => (
                 <div key={question.id} className="question-card">
-                  <div className="question-meta">
+                  <div className="question-header">
+                    <h3 className="question-title">
+                      <span className="question-number">{idx + 1}</span>
+                      {question.question}
+                    </h3>
                     <span className="category-badge">{question.category}</span>
-                    <span className="question-number">S{question.order}</span>
                   </div>
 
-                  <h3 className="question-title">{question.question}</h3>
-                  <p className="question-description">💡 {question.description}</p>
+                  {question.description && (
+                    <p className="question-description">{question.description}</p>
+                  )}
 
-                  {/* Answer Area */}
-                  <div className="answer-area">
-                    {question.type === 'textarea' && (
-                      <textarea
-                        className="text-input"
-                        placeholder={question.placeholder}
-                        value={answers[question.id] || ''}
-                        onChange={(e) => handleAnswer(question.id, e.target.value)}
-                        rows={3}
+                  {/* Input Types */}
+                  {question.type === 'text' && (
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder={question.placeholder || ''}
+                      value={answers[question.id] || ''}
+                      onChange={(e) => handleGeneralAnswer(question.id, e.target.value)}
+                    />
+                  )}
+
+                  {question.type === 'textarea' && (
+                    <textarea
+                      className="form-textarea"
+                      placeholder={question.placeholder || ''}
+                      value={answers[question.id] || ''}
+                      onChange={(e) => handleGeneralAnswer(question.id, e.target.value)}
+                      rows="3"
+                    />
+                  )}
+
+                  {question.type === 'datetime' && (
+                    <div className="datetime-inputs">
+                      <input
+                        type="date"
+                        className="form-input"
+                        value={answers[`${question.id}-date`] || ''}
+                        onChange={(e) => handleGeneralAnswer(`${question.id}-date`, e.target.value)}
                       />
-                    )}
+                      <input
+                        type="time"
+                        className="form-input"
+                        value={answers[`${question.id}-time`] || ''}
+                        onChange={(e) => handleGeneralAnswer(`${question.id}-time`, e.target.value)}
+                      />
+                    </div>
+                  )}
 
-                    {question.type === 'select' && (
-                      <div className="select-options">
-                        {question.options.map((option, idx) => (
-                          <button
-                            key={idx}
-                            className={`option-btn ${answers[question.id] === option ? 'selected' : ''}`}
-                            onClick={() => handleAnswer(question.id, option)}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  {question.type === 'select' && (
+                    <select
+                      className="form-select"
+                      value={answers[question.id] || ''}
+                      onChange={(e) => handleGeneralAnswer(question.id, e.target.value)}
+                    >
+                      <option value="">-- Seçiniz --</option>
+                      {question.options.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
+                  {question.taxonomy && answers[question.id] && (
+                    <div className="taxonomy-hint">
+                      🏷️ <strong>Kodlar:</strong> {question.taxonomy.join(', ')}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <button className="btn-reset" onClick={() => setAnswers({})}>
-                🔄 Sıfırla
-              </button>
-              <button
-                className="btn-complete"
-                onClick={handleComplete}
-                disabled={Object.keys(answers).length === 0}
-              >
-                ✅ Tamamla
-              </button>
-            </div>
+            {/* Detected Codes Summary */}
+            {detectedCodes.size > 0 && (
+              <div className="detected-codes-panel">
+                <h4>📌 Otomatik Tespit Edilen Kodlar</h4>
+                <div className="codes-list">
+                  {Array.from(detectedCodes)
+                    .sort()
+                    .map((code) => (
+                      <span key={code} className="code-tag">
+                        {code}
+                      </span>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
+        {/* TAB 2: DETAYLI ANALIZ */}
         {activeTab === 'detailed' && (
-          <div className="detailed-section">
-            <div className="info-box">
-              <h2>📊 Detaylı Analiz Sekmesi</h2>
-              <p>
-                Genel soruları tamamladıktan sonra, burada detaylı kök neden analizi
-                (Fishbone, 5 Neden, Barrier Analysis vb.) yapabilirsiniz.
-              </p>
-              <div className="placeholder">
-                🔧 Geliştirilmekte - Kısa zamanda hazır olacak
+          <div className="tab-content detailed-analysis">
+            {getVisibleDetailedSections().length === 0 ? (
+              <div className="no-sections">
+                <p>📋 Henüz detaylı analiz bölümü yok.</p>
+                <p>Genel sorularda daha fazla bilgi girerek detaylı seçenekler görün.</p>
               </div>
-            </div>
+            ) : (
+              getVisibleDetailedSections().map((section) => (
+                <div key={section.id} className="detail-section">
+                  {/* Section Header */}
+                  <button
+                    className="section-header-button"
+                    onClick={() => toggleSection(section.id)}
+                  >
+                    <span className="section-title">{section.title}</span>
+                    <span className="section-toggle">
+                      {expandedSections[section.id] ? (
+                        <ChevronUp size={20} />
+                      ) : (
+                        <ChevronDown size={20} />
+                      )}
+                    </span>
+                  </button>
+
+                  {/* Section Questions */}
+                  {expandedSections[section.id] && (
+                    <div className="section-questions">
+                      {section.questions.map((q) => (
+                        <div key={q.id} className="detail-question">
+                          <label className="detail-question-label">{q.q}</label>
+
+                          {q.type === 'select' && (
+                            <select
+                              className="form-select detail"
+                              value={answers[`${section.id}-${q.id}`] || ''}
+                              onChange={(e) =>
+                                handleDetailedAnswer(section.id, q.id, e.target.value)
+                              }
+                            >
+                              <option value="">-- Seçiniz --</option>
+                              {q.options.map((opt) => (
+                                <option key={opt} value={opt}>
+                                  {opt}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+
+                          {q.type === 'text' && (
+                            <input
+                              type="text"
+                              className="form-input detail"
+                              placeholder={q.placeholder || ''}
+                              value={answers[`${section.id}-${q.id}`] || ''}
+                              onChange={(e) =>
+                                handleDetailedAnswer(section.id, q.id, e.target.value)
+                              }
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
 
-      {/* Sidebar Stats */}
-      <div className="sidebar-stats">
-        <h4>📈 İstatistikler</h4>
-        <div className="stat-item">
-          <span>Yanıtlanan:</span>
-          <strong>{Object.keys(answers).length} / {generalQuestions.length}</strong>
-        </div>
-        <div className="stat-item">
-          <span>Tamamlanma:</span>
-          <strong>{Math.round(progress)}%</strong>
-        </div>
-        <div className="stat-item">
-          <span>Kalan:</span>
-          <strong>{generalQuestions.length - Object.keys(answers).length}</strong>
-        </div>
+      {/* Footer */}
+      <div className="questionnaire-footer">
+        <button
+          className="btn-secondary"
+          onClick={() => {
+            setAnswers({});
+            setDetectedCodes(new Set());
+            setQuestionsAnswered(0);
+          }}
+        >
+          🔄 Sıfırla
+        </button>
+        <button className="btn-primary" onClick={handleComplete}>
+          ✅ Soruşturmayı Tamamla
+        </button>
       </div>
     </div>
   );

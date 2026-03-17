@@ -24,11 +24,6 @@ const IncidentForm = ({ language, onSubmit }) => {
     
     // Incident Description
     incidentDescription: '',
-    whatHappened: '',
-    whereHappened: '',
-    whenHappened: '',
-    whoInvolved: '',
-    emergencyMeasures: '',
     
     // Safety Equipment
     fallProtection: '',
@@ -100,10 +95,6 @@ const IncidentForm = ({ language, onSubmit }) => {
       department: '',
       eventCategory: 'incident',
       incidentDescription: '',
-      whatHappened: '',
-      whereHappened: '',
-      whenHappened: '',
-      whoInvolved: '',
       emergencyMeasures: '',
       fallProtection: '',
       safetyHarness: '',
@@ -358,58 +349,14 @@ const IncidentForm = ({ language, onSubmit }) => {
               value={formData.incidentDescription}
               onChange={(e) => handleChange('incidentDescription', e.target.value)}
               placeholder={t('describe_incident_detail')}
-              rows={6}
+              rows={8}
               required
             />
           </div>
           
           <div className="info-box">
             <AlertTriangle size={16} />
-            <span>{t('include_details_hint')}</span>
-          </div>
-          
-          <div className="form-row">
-            <div className="form-field">
-              <label>{t('what_happened')}</label>
-              <textarea
-                value={formData.whatHappened}
-                onChange={(e) => handleChange('whatHappened', e.target.value)}
-                placeholder={t('what_placeholder')}
-                rows={3}
-              />
-            </div>
-            
-            <div className="form-field">
-              <label>{t('where_happened')}</label>
-              <textarea
-                value={formData.whereHappened}
-                onChange={(e) => handleChange('whereHappened', e.target.value)}
-                placeholder={t('where_placeholder')}
-                rows={3}
-              />
-            </div>
-          </div>
-          
-          <div className="form-row">
-            <div className="form-field">
-              <label>{t('when_happened')}</label>
-              <textarea
-                value={formData.whenHappened}
-                onChange={(e) => handleChange('whenHappened', e.target.value)}
-                placeholder={t('when_placeholder')}
-                rows={3}
-              />
-            </div>
-            
-            <div className="form-field">
-              <label>{t('who_involved')}</label>
-              <textarea
-                value={formData.whoInvolved}
-                onChange={(e) => handleChange('whoInvolved', e.target.value)}
-                placeholder={t('who_placeholder')}
-                rows={3}
-              />
-            </div>
+            <span><strong>Lütfen belirtin:</strong> Ne oldu? Nerede oldu? Ne zaman oldu? Kim katılı?</span>
           </div>
           
           <div className="form-field full-width">
@@ -532,50 +479,73 @@ const IncidentForm = ({ language, onSubmit }) => {
         {/* SECTION 6: ENVIRONMENTAL CONDITIONS */}
         <div className="form-section" ref={(el) => (sectionRefs.current[5] = el)}>
           <div className="section-header">
+            <Cloud size={20} />
             <h2>{t('section_environment')}</h2>
           </div>
           
           <div className="form-row">
             <div className="form-field">
               <label>{t('weather_conditions')}</label>
-              <input
-                type="text"
+              <select
                 value={formData.weatherConditions}
                 onChange={(e) => handleChange('weatherConditions', e.target.value)}
-                placeholder={t('weather_placeholder')}
-              />
+              >
+                <option value="">{t('select_option')}</option>
+                <option value="sunny">☀️ Güneşli</option>
+                <option value="cloudy">☁️ Bulutlu</option>
+                <option value="rainy">🌧️ Yağmurlu</option>
+                <option value="snowy">❄️ Karlı</option>
+                <option value="windy">💨 Rüzgarlı</option>
+                <option value="foggy">🌫️ Sisli</option>
+                <option value="stormy">⛈️ Fırtınalı</option>
+              </select>
             </div>
             
             <div className="form-field">
               <label>{t('lighting_conditions')}</label>
-              <input
-                type="text"
+              <select
                 value={formData.lightingConditions}
                 onChange={(e) => handleChange('lightingConditions', e.target.value)}
-                placeholder={t('lighting_placeholder')}
-              />
+              >
+                <option value="">{t('select_option')}</option>
+                <option value="excellent">⭐⭐⭐⭐⭐ Mükemmel</option>
+                <option value="good">⭐⭐⭐⭐ İyi</option>
+                <option value="adequate">⭐⭐⭐ Yeterli</option>
+                <option value="poor">⭐⭐ Zayıf</option>
+                <option value="very_poor">⭐ Çok Zayıf</option>
+              </select>
             </div>
           </div>
           
           <div className="form-row">
             <div className="form-field">
               <label>{t('noise_level')}</label>
-              <input
-                type="text"
+              <select
                 value={formData.noiseLevel}
                 onChange={(e) => handleChange('noiseLevel', e.target.value)}
-                placeholder={t('noise_placeholder')}
-              />
+              >
+                <option value="">{t('select_option')}</option>
+                <option value="quiet">🔇 Sessiz (&lt; 50 dB)</option>
+                <option value="normal">🔉 Normal (50-70 dB)</option>
+                <option value="loud">🔊 Yüksek (70-85 dB)</option>
+                <option value="very_loud">🔊🔊 Çok Yüksek (&gt; 85 dB)</option>
+              </select>
             </div>
             
             <div className="form-field">
               <label>{t('temperature')}</label>
-              <input
-                type="text"
+              <select
                 value={formData.temperature}
                 onChange={(e) => handleChange('temperature', e.target.value)}
-                placeholder={t('temperature_placeholder')}
-              />
+              >
+                <option value="">{t('select_option')}</option>
+                <option value="very_cold">❄️ Çok Soğuk (&lt; 0°C)</option>
+                <option value="cold">🧊 Soğuk (0-10°C)</option>
+                <option value="cool">🌤️ Serin (10-15°C)</option>
+                <option value="comfortable">😊 Rahat (15-25°C)</option>
+                <option value="warm">☀️ Sıcak (25-35°C)</option>
+                <option value="hot">🔥 Çok Sıcak (&gt; 35°C)</option>
+              </select>
             </div>
           </div>
         </div>
@@ -583,50 +553,79 @@ const IncidentForm = ({ language, onSubmit }) => {
         {/* SECTION 7: WORK CONDITIONS */}
         <div className="form-section" ref={(el) => (sectionRefs.current[6] = el)}>
           <div className="section-header">
+            <Briefcase size={20} />
             <h2>{t('section_work_conditions')}</h2>
           </div>
           
           <div className="form-row">
             <div className="form-field">
               <label>{t('work_type')}</label>
-              <input
-                type="text"
+              <select
                 value={formData.workType}
                 onChange={(e) => handleChange('workType', e.target.value)}
-                placeholder={t('work_type_placeholder')}
-              />
+              >
+                <option value="">{t('select_option')}</option>
+                <option value="manual_labor">👷 Elle İşçilik</option>
+                <option value="machine_operation">⚙️ Makine Operasyon</option>
+                <option value="assembly">🔧 Montaj</option>
+                <option value="construction">🏗️ İnşaat</option>
+                <option value="maintenance">🛠️ Bakım/Onarım</option>
+                <option value="cleaning">🧹 Temizlik</option>
+                <option value="driving">🚗 Araç Kullanma</option>
+                <option value="admin_work">📝 İdari İş</option>
+                <option value="other">📌 Diğer</option>
+              </select>
             </div>
             
             <div className="form-field">
               <label>{t('work_height')}</label>
-              <input
-                type="text"
+              <select
                 value={formData.workHeight}
                 onChange={(e) => handleChange('workHeight', e.target.value)}
-                placeholder={t('work_height_placeholder')}
-              />
+              >
+                <option value="">{t('select_option')}</option>
+                <option value="ground_level">🟢 Yer Seviyesi (0 m)</option>
+                <option value="low_height">🟡 Düşük Yükseklik (1-2 m)</option>
+                <option value="medium_height">🟠 Orta Yükseklik (2-5 m)</option>
+                <option value="high">🔴 Yüksek (5-10 m)</option>
+                <option value="very_high">⭕ Çok Yüksek (&gt; 10 m)</option>
+                <option value="confined_space">⬛ Kapalı Alan</option>
+              </select>
             </div>
           </div>
           
           <div className="form-row">
             <div className="form-field">
               <label>{t('experience_level')}</label>
-              <input
-                type="text"
+              <select
                 value={formData.experienceLevel}
                 onChange={(e) => handleChange('experienceLevel', e.target.value)}
-                placeholder={t('experience_placeholder')}
-              />
+              >
+                <option value="">{t('select_option')}</option>
+                <option value="new_employee">👶 Yeni Çalışan (&lt; 1 ay)</option>
+                <option value="trainee">📚 Stajyer/Eğitimdeki (1-3 ay)</option>
+                <option value="junior">🟢 Acemi (3-6 ay)</option>
+                <option value="experienced">🟡 Tecrübeli (6-12 ay)</option>
+                <option value="senior">🟠 Kıdemli (1-5 yıl)</option>
+                <option value="expert">⭐ Uzman (&gt; 5 yıl)</option>
+              </select>
             </div>
             
             <div className="form-field">
               <label>{t('shift_time')}</label>
-              <input
-                type="text"
+              <select
                 value={formData.shiftTime}
                 onChange={(e) => handleChange('shiftTime', e.target.value)}
-                placeholder={t('shift_placeholder')}
-              />
+              >
+                <option value="">{t('select_option')}</option>
+                <option value="morning_shift">🌅 Sabah Vardiyası (06:00-14:00)</option>
+                <option value="afternoon_shift">☀️ Öğle Vardiyası (14:00-22:00)</option>
+                <option value="night_shift">🌙 Gece Vardiyası (22:00-06:00)</option>
+                <option value="early_morning">🌄 Erken Sabah (04:00-12:00)</option>
+                <option value="late_evening">🌆 Geç Akşam (20:00-04:00)</option>
+                <option value="overtime">⏰ Fazla Mesai</option>
+                <option value="not_applicable">N/A Uygulanmaz</option>
+              </select>
             </div>
           </div>
         </div>

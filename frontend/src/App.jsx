@@ -9,7 +9,6 @@ import './App.css';
 function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('tr');
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'form' | 'smart'
-  const [isDarkMode, setIsDarkMode] = useState(false); // Global Dark Mode
 
   const handleFormSubmit = (formData) => {
     console.log('Form submitted:', formData);
@@ -29,13 +28,11 @@ function App() {
   };
 
   return (
-    <div className={`app ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+    <div className="app">
       {/* Header */}
       <Header 
         selectedLanguage={selectedLanguage}
         onLanguageChange={setSelectedLanguage}
-        isDarkMode={isDarkMode}
-        onToggleDarkMode={setIsDarkMode}
       />
 
       {/* Tab Navigation */}
@@ -83,18 +80,15 @@ function App() {
         {activeTab === 'smart' ? (
           <SmartQuestionnaire_V2 
             onComplete={handleSmartQuestionnaireComplete}
-            isDarkMode={isDarkMode}
           />
         ) : activeTab === 'form' ? (
           <IncidentForm 
             language={selectedLanguage}
             onSubmit={handleFormSubmit}
-            isDarkMode={isDarkMode}
           />
         ) : (
           <ChatInterface 
             language={selectedLanguage}
-            isDarkMode={isDarkMode}
           />
         )}
       </main>
