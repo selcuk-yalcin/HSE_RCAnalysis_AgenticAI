@@ -190,6 +190,19 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
       "contributing_organizations": "Hangi organizasyonel birimler bu nedenle ilişkili"
     }
   ],
+  "meta_root_cause": {
+    "exists": true,
+    "code": "D8.2",
+    "title": "Meta Kök Neden Başlığı (Tüm Dalların Ortak Paydası)",
+    "description": "3-4 paragraf: Tüm dalların ortak paydası olan üst-seviye organizasyonel zayıflık",
+    "synthesized_from": ["D2.1", "D6.3", "D4.10"],
+    "systemic_weakness": "Hangi yönetim sistemi zayıflığı tüm nedenleri doğurdu",
+    "strategic_implications": [
+      "Stratejik sonuç 1",
+      "Stratejik sonuç 2",
+      "Stratejik sonuç 3"
+    ]
+  },
   "contributing_factors": [
     {"factor_type": "İletişim Eksikliği", "description": "Güvenlik prosedürlerinin önemi ve zorunluluğu çalışanlara etkin şekilde iletilmemiş", "impact_level": "Yüksek"},
     {"factor_type": "Eğitim Yetersizliği", "description": "LOTO prosedürü ve elektrik güvenliği eğitimleri yetersiz veya etkin değil", "impact_level": "Yüksek"},
@@ -637,8 +650,44 @@ def _build_branches(doc, branches: list):
         _add_page_break(doc)
 
 
+def _build_meta_root_cause(doc, meta: dict):
+    """Meta kök neden bölümü oluşturur (tüm dalların ortak paydası)"""
+    if not meta or not meta.get("exists"):
+        return
+    
+    _add_section_header(doc, "5", "META KÖK NEDEN ANALİZİ")
+    _add_subsection_header(doc, "5.1 Stratejik Kök Neden (Tüm Dalların Ortak Paydası)")
+    
+    # Ana meta kök neden kutusu
+    meta_title = f"[{meta.get('code', '?')}] {meta.get('title', 'Meta Kök Neden')}"
+    meta_desc = meta.get('description', '')
+    _add_colored_box(doc, meta_title, meta_desc, COLOR["red"], COLOR["white"])
+    
+    # Sentezlenen kodlar
+    synthesized = meta.get('synthesized_from', [])
+    if synthesized:
+        _add_subsection_header(doc, "5.2 Sentezlenen Kök Nedenler")
+        synth_text = f"Bu meta kök neden aşağıdaki {len(synthesized)} kök nedeni birleştirerek üst-seviye sistemik zayıflığı ortaya koymuştur:\n\n"
+        synth_text += "\n".join([f"  • {code}" for code in synthesized])
+        _add_paragraph(doc, synth_text, space_after=8)
+    
+    # Sistemik zayıflık
+    if meta.get('systemic_weakness'):
+        _add_subsection_header(doc, "5.3 Sistemik Zayıflık")
+        _add_paragraph(doc, meta.get('systemic_weakness', ''), space_after=8)
+    
+    # Stratejik sonuçlar
+    implications = meta.get('strategic_implications', [])
+    if implications:
+        _add_subsection_header(doc, "5.4 Stratejik Sonuçlar ve Etkiler")
+        _add_bullet_list(doc, implications, COLOR["red"])
+    
+    doc.add_paragraph()
+    _add_page_break(doc)
+
+
 def _build_contributing_factors(doc, factors: list):
-    _add_section_header(doc, "6", "KATKIDA BULUNAN FAKTÖRLER")
+    _add_section_header(doc, "6", "SİSTEMSEL FAKTÖRLER")
     doc.add_paragraph()
     priority_colors = {"Yüksek": COLOR["red"], "Orta": COLOR["orange"], "Düşük": COLOR["green"]}
     if factors:
@@ -995,11 +1044,21 @@ class SkillBasedDocxAgent:
         # HTML rapor da üret
         html_path = str(output_file).replace('.docx', '.html')
         print(f"\n HTML raporu oluşturuluyor...")
-        self._build_html(content, html_path, lang)
+        self._build_html(content, html_path, lang, investigation_data)
         html_size_kb = Path(html_path).stat().st_size / 1024
         print(f" HTML başarıyla oluşturuldu!")
         print(f" Dosya : {html_path}")
         print(f" Boyut : {html_size_kb:.1f} KB")
+        
+        # 5-Why Decision Tree HTML'ini oluştur
+        decision_tree_path = str(output_file).replace('.docx', '_decision_tree.html')
+        print(f"\n 5-Why Decision Tree oluşturuluyor...")
+        self._build_decision_tree(data, decision_tree_path)
+        if Path(decision_tree_path).exists():
+            dt_size_kb = Path(decision_tree_path).stat().st_size / 1024
+            print(f" Decision Tree başarıyla oluşturuldu!")
+            print(f" Dosya : {decision_tree_path}")
+            print(f" Boyut : {dt_size_kb:.1f} KB")
         
         print("=" * 70)
         return str(output_file.resolve())
@@ -1134,6 +1193,12 @@ class SkillBasedDocxAgent:
         branches = content.get("branches", [])
         if branches:
             _build_branches(doc, branches)
+        
+        # Meta root cause (varsa)
+        meta_root = content.get("meta_root_cause", {})
+        if meta_root and meta_root.get("exists"):
+            _build_meta_root_cause(doc, meta_root)
+        
         _build_contributing_factors(doc, content.get("contributing_factors", []))
         _build_corrective_actions(doc, content.get("corrective_actions", []))
         _build_lessons_learned(doc, content.get("lessons_learned", {}))
@@ -1160,14 +1225,47 @@ class SkillBasedDocxAgent:
 
         doc.save(output_path)
         print(f" Dosya kaydedildi: {output_path}")
+    
+    def _build_decision_tree(self, data: Dict, output_path: str) -> None:
+        """5-Why Decision Tree HTML'ini oluşturur."""
+        try:
+            # RCA verisini çıkar
+            rca_data = None
+            incident_title = "Kaza Analizi"
+            
+            if "part3_rca" in data:
+                rca_data = data["part3_rca"]
+                # Olay başlığını part1'den al
+                if "part1" in data and "overview" in data["part1"]:
+                    overview = data["part1"]["overview"]
+                    incident_title = overview.get("what_happened", "Kaza Analizi")
+            elif "analysis_branches" in data:
+                rca_data = data
+                incident_title = rca_data.get("incident_event", "Kaza Analizi")
+            
+            if not rca_data:
+                print("  Uyarı: RCA verisi bulunamadı, decision tree oluşturulamadı")
+                return
+            
+            # Decision tree HTML'ini oluştur
+            from agents.decision_tree_mermaid import DecisionTreeGenerator
+            gen = DecisionTreeGenerator()
+            gen.generate_html(
+                rca_data=rca_data,
+                output_path=output_path,
+                incident_title=incident_title
+            )
+            
+        except Exception as e:
+            print(f"  Uyarı: Decision tree oluşturulurken hata: {e}")
 
-    def _build_html(self, content: Dict, output_path: str, lang: Optional[Dict] = None) -> None:
+    def _build_html(self, content: Dict, output_path: str, lang: Optional[Dict] = None, investigation_data: Optional[Dict] = None) -> None:
         """Düzenlenebilir HTML rapor oluşturur."""
-        html = self._generate_html_template(content, lang)
+        html = self._generate_html_template(content, lang, investigation_data)
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html)
 
-    def _generate_html_template(self, content: Dict, lang: Optional[Dict] = None) -> str:
+    def _generate_html_template(self, content: Dict, lang: Optional[Dict] = None, investigation_data: Optional[Dict] = None) -> str:
         """Modern, responsive ve düzenlenebilir HTML rapor şablonu."""
         lang = lang or {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr"}
         html_lang = lang.get("html_lang", "tr")
@@ -1933,6 +2031,7 @@ class SkillBasedDocxAgent:
             <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
             <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
             <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
             <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
         </ul>
     </div>
@@ -2016,7 +2115,9 @@ class SkillBasedDocxAgent:
         # 4-N. DALLAR
         html += self._html_branches(branches)
         
-        # N+1. KATKIDA BULUNAN FAKTÖRLER
+        # META KÖK NEDEN KALDIRILDI - İstenmeyen karmaşıklık
+        
+        # N+1. SİSTEMSEL FAKTÖRLER
         html += self._html_contributing_factors(contributing_factors)
         
         # N+2. DÜZELTİCİ FAALİYETLER
@@ -2031,7 +2132,11 @@ class SkillBasedDocxAgent:
         # N+6. İMZA SAYFASI
         html += self._html_signatures()
 
-        # N+7. OLAY FOTOĞRAFLARI (2 sayfa × 4 foto)
+        # N+7. 5-WHY DECISION TREE (Karar Ağacı)
+        if investigation_data:
+            html += self._html_decision_tree(investigation_data)
+
+        # N+8. OLAY FOTOĞRAFLARI (2 sayfa × 4 foto)
         html += self._html_incident_photos()
 
         html += """
@@ -2535,28 +2640,32 @@ class SkillBasedDocxAgent:
             <div class="why-chain">
 """
             
-            for why in branch.get("why_chain", []):
+            why_chain = branch.get("why_chain", [])
+            for idx, why in enumerate(why_chain):
+                is_last = (idx == len(why_chain) - 1)
+                code_display = '' if is_last else f'<span class="why-code">{why.get("code", "")} - {why.get("category", "")}</span>'
                 html += f"""
                 <div class="why-item">
                     <div class="why-number">NEDEN {why.get('number', '')}</div>
                     <div class="why-question" contenteditable="true">{why.get('question', '')}</div>
                     <div class="why-answer" contenteditable="true">→ {why.get('answer', '')}</div>
-                    <span class="why-code">{why.get('code', '')} - {why.get('category', '')}</span>
+                    {code_display}
                 </div>
 """
             
             colors = ['red', 'orange', 'green', 'blue']
             color = colors[(bn - 1) % len(colors)]
             
+            root_cause_title = branch.get('root_cause_title', '')
+            root_cause_code = branch.get('root_cause_code', '')
+            
             html += f"""
             </div>
             
-            <div class="subsection-header">{3+bn}.3 Kök Neden</div>
+            <div class="subsection-header">{3+bn}.3 Kök Neden ({root_cause_title})</div>
             <div class="colored-box box-{color}">
-                <div class="box-header" contenteditable="true">KÖK NEDEN {bn}: {branch.get('root_cause_title', '')}</div>
-                <div class="box-content" contenteditable="true">[{branch.get('root_cause_code', '')} / {branch.get('root_cause_category', '')}]
-
-{branch.get('root_cause_detail', '')}</div>
+                <div class="box-header" contenteditable="true">KÖK NEDEN {bn}: {root_cause_title}</div>
+                <div class="box-content" contenteditable="true">{branch.get('root_cause_detail', '')}</div>
             </div>
 """
             
@@ -2628,11 +2737,94 @@ class SkillBasedDocxAgent:
 """
         return html
 
+    def _html_meta_root_cause(self, meta: Dict) -> str:
+        """Meta kök neden HTML (tüm dalların ortak paydası)."""
+        if not meta or not meta.get("exists"):
+            return ""
+        
+        code = meta.get('code', '?')
+        title = meta.get('title', 'Meta Kök Neden')
+        description = meta.get('description', '')
+        
+        html = f"""
+        <div class="section" id="meta-root-cause" style="page-break-before: always;">
+            <div class="subsection">
+                <h3 style="color: #C0392B;">🎯 Stratejik Kök Neden (Tüm Dalların Ortak Paydası)</h3>
+                <div class="alert-box" style="background: linear-gradient(to right, #C0392B, #E74C3C); color: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                    <h4 contenteditable="true" style="color: white; font-size: 18px; margin-top: 0;">
+                        <strong>{title}</strong>
+                    </h4>
+                    <p contenteditable="true" style="font-size: 14px; line-height: 1.8;">
+                        {description}
+                    </p>
+                </div>
+            </div>
+"""
+        
+        # Sentezlenen kodlar
+        synthesized = meta.get('synthesized_from', [])
+        if synthesized:
+            html += f"""
+            <div class="subsection">
+                <h3 style="color: #C0392B;">🔗 Sentezlenen Kök Nedenler</h3>
+                <p contenteditable="true" style="margin-bottom: 10px;">
+                    Bu meta kök neden aşağıdaki <strong>{len(synthesized)}</strong> kök nedeni birleştirerek 
+                    üst-seviye sistemik zayıflığı ortaya koymuştur:
+                </p>
+                <ul style="list-style: none; padding-left: 0;">
+"""
+            for syn_code in synthesized:
+                html += f"""
+                    <li style="background: #FFE6E6; padding: 10px; margin: 5px 0; border-left: 4px solid #C0392B; border-radius: 4px;">
+                        <strong style="color: #C0392B;">{syn_code}</strong>
+                    </li>
+"""
+            html += """
+                </ul>
+            </div>
+"""
+        
+        # Sistemik zayıflık
+        systemic = meta.get('systemic_weakness', '')
+        if systemic:
+            html += f"""
+            <div class="subsection">
+                <h3 style="color: #C0392B;">⚠️ Sistemik Zayıflık</h3>
+                <p contenteditable="true" style="background: #FFF3E0; padding: 15px; border-left: 4px solid #E67E22; border-radius: 4px;">
+                    {systemic}
+                </p>
+            </div>
+"""
+        
+        # Stratejik sonuçlar
+        implications = meta.get('strategic_implications', [])
+        if implications:
+            html += """
+            <div class="subsection">
+                <h3 style="color: #C0392B;">📊 Stratejik Sonuçlar ve Etkiler</h3>
+                <ul style="list-style: none; padding-left: 0;">
+"""
+            for i, imp in enumerate(implications, 1):
+                html += f"""
+                    <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
+                        <strong style="color: #C0392B;">{i}.</strong> <span contenteditable="true">{imp}</span>
+                    </li>
+"""
+            html += """
+                </ul>
+            </div>
+"""
+        
+        html += """
+        </div>
+"""
+        return html
+
     def _html_contributing_factors(self, factors: List[Dict]) -> str:
-        """Katkıda bulunan faktörler HTML."""
+        """Sistemsel faktörler HTML."""
         html = """
         <div class="section" id="contributing-factors">
-            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
             
             <table>
                 <thead>
@@ -2857,6 +3049,107 @@ class SkillBasedDocxAgent:
         </div>
 """
         return html
+
+    def _html_decision_tree(self, investigation_data: Dict) -> str:
+        """5-Why Decision Tree bölümü — Mermaid diagram embedded."""
+        from agents.decision_tree_mermaid import DecisionTreeGenerator
+        
+        try:
+            # RCA verisini çıkar
+            rca_data = None
+            incident_title = "Kaza Analizi"
+            
+            if "part3_rca" in investigation_data:
+                rca_data = investigation_data["part3_rca"]
+                # Olay başlığını part1'den al
+                if "part1" in investigation_data and "overview" in investigation_data["part1"]:
+                    overview = investigation_data["part1"]["overview"]
+                    incident_title = overview.get("what_happened", "Kaza Analizi")[:100]
+            elif "analysis_branches" in investigation_data:
+                rca_data = investigation_data
+                incident_title = rca_data.get("incident_event", "Kaza Analizi")
+            
+            if not rca_data or not rca_data.get("analysis_branches", rca_data.get("branches")):
+                return ""  # Decision tree için veri yok
+            
+            # Decision tree generator
+            gen = DecisionTreeGenerator()
+            mermaid_code = gen._generate_mermaid_graph(
+                rca_data.get("analysis_branches", rca_data.get("branches", [])),
+                incident_title
+            )
+            
+            html = f"""
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            
+            <div id="decision-tree-diagram" style="background: white; padding: 10px; border: 1px solid #ddd; width: 100%; height: 800px; overflow: hidden;">
+                <div class="mermaid" style="width: 100%; height: 100%;">
+{mermaid_code}
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                // Mermaid initialization için bekle
+                if (typeof mermaid !== 'undefined') {{
+                    mermaid.initialize({{
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {{
+                            useMaxWidth: true,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 15,
+                            nodeSpacing: 50,
+                            rankSpacing: 80,
+                            diagramPadding: 10
+                        }},
+                        themeVariables: {{
+                            fontSize: '11px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#333',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }}
+                    }});
+                }} else {{
+                    // Mermaid yüklenene kadar bekle
+                    setTimeout(function() {{
+                        if (typeof mermaid !== 'undefined') {{
+                            mermaid.initialize({{
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {{
+                                    useMaxWidth: true,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 15,
+                                    nodeSpacing: 50,
+                                    rankSpacing: 80,
+                                    diagramPadding: 10
+                                }},
+                                themeVariables: {{
+                                    fontSize: '11px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }}
+                            }});
+                            mermaid.contentLoaded();
+                        }}
+                    }}, 1000);
+                }}
+            </script>
+        </div>
+"""
+            return html
+            
+        except Exception as e:
+            print(f"  Uyarı: Decision tree oluşturulamadı: {str(e)}")
+            return ""
 
     def _html_incident_photos(self) -> str:
         """Olay fotoğrafları bölümü — 2 sayfa × 4 foto, tıkla-yükle."""

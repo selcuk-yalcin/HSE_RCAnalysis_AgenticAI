@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - 02-26";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">02-26</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">20.01.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">MPT Test Sahası, MPT Bölgesi</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Ramak Kala (Near Miss) - Kritik Potansiyel Ölüm Riski</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">MPT test sahasında sarmal kapının üst mekanizmasından kopan ağır metal parça, test çalışması yapan personelin 2 metre yakınına düştü. Yaralanma olmadı ancak parça baş/omuz bölgesine düşseydi ölümcül sonuç doğurabilirdi. Olay öncesi anormal sesler duyulmasına rağmen işlem durdurulmadı.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">20 Ocak 2026 tarihinde saat 09:10'da MPT test sahasında sarmal kapının kapatılması işlemi sırasında, kapının üst mekanizmasından anormal sesler gelmiş ve ardından yaklaşık 3-4 metre yükseklikten ağır bir metal parça koparak düşmüştür. Parça, o anda test sahasında çalışan personelin 2 metre yakınına düşmüş, herhangi bir yaralanma meydana gelmemiştir. Ancak parçanın çalışanın baş, omuz veya sırt bölgesine düşmesi halinde kafatası kırığı, omurga hasarı, iç kanama veya ölüm gibi kritik sonuçlar doğurabilecek potansiyel taşıdığı tespit edilmiştir.</div>
+<div class="paragraph" contenteditable="true">MPT Test Sahası, MPT Bölgesi - Sarmal kapı giriş/çıkış noktası</div>
+<div class="paragraph" contenteditable="true">Test sahasında görevli çalışan personel (isim belirtilmemiş), vardiya arkadaşları (2 tanık), Bölge Sorumlusu: Hakan Sevil</div>
+<div class="paragraph" contenteditable="true">Olay anında çalışan güvenli mesafeye çekilmiş, kapı mekanizması derhal durdurulmuş ve vardiya amirine rapor edilmiştir. Güvenlik ekibi ve bölge sorumlusu olay yerine gelmiş, sarmal kapı kullanım dışı bırakılarak alternatif giriş/çıkış yolu belirlenmiştir. Kopan metal parça inceleme için ayrılmış ve tüm sarmal kapılar acil periyodik kontrole alınmıştır. Olay RIDDOR kapsamında raporlanmış ve kaza defterine 081/26 referans numarasıyla kaydedilmiştir.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sarmal kapı üst mekanizması için uygulanan periyodik muayene programı, yüksek kullanım sıklığından kaynaklanan bağlantı noktası aşınması ve gevşemesini tespit edecek kapsamda değildi; son detaylı bakım tarihi bile belirsizdi</li>
+<li contenteditable="true">Risk değerlendirmesinde 3-4 metre yükseklikten düşen ağır metal parça senaryosu ve buna bağlı baş/omurga yaralanması riski hiç analiz edilmemişti; kapı sadece sıkışma/ezilme riski açısından değerlendirilmişti</li>
+<li contenteditable="true">Sarmal kapı kullanım prosedürü mekanik arıza öncü belirtilerini (anormal ses, titreşim, parça gevşemesi) ve bu durumlarda uygulanacak acil durdurma adımlarını içermiyordu; çalışan anormal sesi duymasına rağmen tehlike algısı gelişmedi</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Sarmal kapı kullanım dışı bırakıldı ve alternatif giriş/çıkış yolu devreye alındı</td>
+                        <td contenteditable="true">Bölge Sorumlusu</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Kopan metal parça emniyet ekibi tarafından inceleme için ayrıldı ve hasarlı mekanizma fotoğraflandı</td>
+                        <td contenteditable="true">Güvenlik Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm sarmal kapılar acil periyodik kontrole alındı ve üst mekanizma bağlantı noktaları muayene edildi</td>
+                        <td contenteditable="true">Bakım Ekibi</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Olay RIDDOR kapsamında raporlandı ve kaza defterine 081/26 referansıyla kaydedildi</td>
+                        <td contenteditable="true">H&S Officer</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">02-26</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">20.01.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">09:10 (sabah vardiyası)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">MPT Test Sahası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">MPT Bölgesi - Test Aktivitesi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Test personeli (isim belirtilmemiş)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Sabah vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Sarmal kapı üst mekanizması - metal bağlantı parçası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Ağır metal parça (mekanizma bileşeni)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Kapalı alan - test sahası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Normal iç mekan aydınlatması</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart test sahası KKE (baret, güvenlik ayakkabısı)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Ramak Kala (Near Miss) - Kritik Potansiyel Ölüm Riski</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Yaralanma yok - Ekipman hasarı (sarmal kapı üst mekanizması)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 çalışan (2 metre yakınlık), 2 tanık</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Potansiyel Seviye 1 - Ölümcül/Ciddi Yaralanma (baş/omurga bölgesine düşme riski)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Vardiya arkadaşları (2 kişi) - anormal ses duyulduğunu doğruladılar</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Hayır (yaralanma olmadı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Gerekli değil</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:05</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan test sahasına giriş yaptı ve normal çalışma koşullarında işe başladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:08</div>
+                    <div class="timeline-event" contenteditable="true">Sarmal kapının kapatılması işlemi başlatıldı - kapı normal çalışma modunda</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:09</div>
+                    <div class="timeline-event" contenteditable="true">Kapı üst mekanizmasından anormal sesler duyulmaya başladı - aşınma/gevşeme belirtisi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:10</div>
+                    <div class="timeline-event" contenteditable="true">Anormal sesler devam etti, çalışan sesi fark etti ancak tehlike algısı gelişmedi ve işlem devam etti</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:10:15</div>
+                    <div class="timeline-event" contenteditable="true">Metal parça üst mekanizmadan koptu - bağlantı noktası aşınma/gevşeme nedeniyle arızalandı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:10:16</div>
+                    <div class="timeline-event" contenteditable="true">Parça 3-4 metre yükseklikten düştü ve çalışanın 2 metre yakınına çarptı - şans faktörü kritik rol oynadı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:10:20</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan durumu fark etti ve güvenli mesafeye çekildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:11</div>
+                    <div class="timeline-event" contenteditable="true">Kapı mekanizması acil durduruldu</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:15</div>
+                    <div class="timeline-event" contenteditable="true">Olay vardiya amirine rapor edildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:30</div>
+                    <div class="timeline-event" contenteditable="true">Güvenlik ekibi ve bölge sorumlusu (Hakan Sevil) olay yerine geldi - ilk inceleme başlatıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:00</div>
+                    <div class="timeline-event" contenteditable="true">Kapı kullanım dışı bırakıldı, alternatif giriş/çıkış yolu belirlendi, kopan parça inceleme için ayrıldı, tüm sarmal kapılar periyodik kontrole alındı</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why tekniği, bir olayın yüzeysel nedenlerinden derin organizasyonel kök nedenlere ulaşmak için sistematik olarak 'Neden?' sorusunu beş kez soran bir analiz yöntemidir. Bu olayda teknik şu şekilde uygulanmıştır: Birinci dal, ekipman arızasından (metal parça kopması) başlayarak periyodik muayene programının yetersizliğine ulaşmıştır. İkinci dal, prosedürde acil durdurma talimatı eksikliğinden başlayarak risk değerlendirmesinin yetersizliğine ulaşmıştır. Üçüncü dal, çalışanın tehlike algısı eksikliğinden başlayarak prosedür geliştirme sürecinin yetersizliğine ulaşmıştır. Her 'Neden?' sorusu, bir önceki yanıtın altında yatan nedeni sorgulamış ve raporda belirtilen somut bulgularla desteklenmiştir. Beşinci 'Neden?' sorusunda ulaşılan yanıtlar, organizasyonun kontrol edemediği dış faktörler değil, yönetim sistemlerindeki düzeltilebilir eksiklikler olarak tanımlanmıştır. Bu yaklaşım, etkili düzeltici önlemlerin geliştirilmesini sağlamıştır.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü (Davranışsal)</td>
+                        <td contenteditable="true">Bilgi eksikliği, beceri yetersizliği, prosedür anlaşılmaması, dikkatsizlik, yorgunluk, tehlike algısı eksikliği gibi bireysel davranışsal faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktör</td>
+                        <td contenteditable="true">Ekipman arızası, uygun ekipman/araç mevcut değil, malzeme kusuru, fiziksel çevre koşulları gibi doğrudan olay koşulları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Ekipman tasarım hatası, fiziksel yük, ergonomi sorunları, iş organizasyonu eksiklikleri, görev karmaşıklığı</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Risk değerlendirmesi yetersizliği, prosedür eksikliği, bakım/muayene yetersizliği, eğitim eksikliği, yönetim kararları, politika yetersizlikleri, iletişim bozukluğu gibi sistemik organizasyonel faktörler</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">H&S Officer</td>
+                        <td contenteditable="true">Baş Araştırmacı - İlk değerlendirme ve araştırma koordinasyonu</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Site Manager</td>
+                        <td contenteditable="true">Tesis Yöneticisi - Operasyonel süreç analizi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Mechanical Engineering Expert</td>
+                        <td contenteditable="true">Mekanik Mühendislik Uzmanı - Ekipman arıza analizi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Maintenance Manager</td>
+                        <td contenteditable="true">Bakım Müdürü - Periyodik muayene programı değerlendirmesi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hakan Sevil</td>
+                        <td contenteditable="true">Bölge Sorumlusu - Olay tanığı ve saha bilgisi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Equipment Specialist</td>
+                        <td contenteditable="true">Ekipman Uzmanı - Sarmal kapı mekanizması analizi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Human Factors Specialist</td>
+                        <td contenteditable="true">İnsan Faktörleri Uzmanı - Davranışsal analiz ve prosedür değerlendirmesi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Operations Manager</td>
+                        <td contenteditable="true">Operasyon Müdürü - Risk değerlendirmesi ve prosedür geliştirme süreci analizi</td>
+                        <td contenteditable="true">22.03.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - KOŞULSAL NEDEN: Sarmal Kapı Üst Mekanizması Ekipman Arızası</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">MPT test sahasında bulunan sarmal kapının kapatılması işlemi sırasında, kapının üst mekanizmasından anormal sesler gelmiş ve ardından metal parçanın bağlantı noktasında aşınma ve gevşeme nedeniyle beklenmeyen bir ekipman arızası meydana gelmiştir. Yaklaşık 3-4 metre yükseklikteki üst mekanizmadan kopan ağır metal parça, o anda test sahasında çalışan personelin 2 metre yakınına düşmüştür. Raporda açıkça belirtildiği üzere, sarmal kapı üst mekanizmasında bakım ve kontrol eksikliği bulunmakta, metal parça bağlantısındaki aşınma ve gevşeme zamanında tespit edilememiş, periyodik kontrol eksikliği nedeniyle son detaylı bakım tarihi bile belirsiz kalmıştır. Kapı güvenlik sensörlerinde mekanik arıza tespiti bulunmamaktadır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Sarmal kapı üst mekanizmasında metal parçanın bağlantı noktasında aşınma ve gevşeme nedeniyle beklenmeyen ekipman arızası oluştu ve parça koptu [B2.1 - Uygun Ekipman/Araç Mevcut Değil]</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı kapatılması sırasında neden üst mekanizmadan metal parça koparak çalışanın 2 metre yakınına düştü?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı üst mekanizmasında metal parçanın bağlantı noktasında aşınma ve gevşeme nedeniyle beklenmeyen ekipman arızası oluştu ve parça koptu. Raporda 'kapının üst mekanizmasından anormal sesler gelmiştir. Seslerin hemen ardından, kapının üst bölümünde yer alan bir parçanın yerinden koparak düştüğü tespit edilmiştir' ve 'Metal parça bağlantısı: Aşınma/gevşeme tespit edilememiş' ifadeleri bu durumu doğrulamaktadır.</div>
+                    <span class="why-code">B2.1 - Koşulsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı üst mekanizmasındaki metal parça bağlantı noktasında neden aşınma ve gevşeme oluştu?</div>
+                    <div class="why-answer" contenteditable="true">→ Kapının yüksek kullanım sıklığına rağmen üst mekanizma bağlantı noktalarının periyodik muayenesi yapılmadığından aşınma ve gevşeme zamanında tespit edilemedi. Raporda 'Kapı kullanım sıklığı yüksek - aşınma riski artar' ve 'Bakım kayıtları: Son detaylı bakım tarihi belirsiz' bulguları bu durumu desteklemektedir.</div>
+                    <span class="why-code">D6.3 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden üst mekanizma bağlantı noktalarının periyodik muayenesi yapılmadı ve aşınma tespit edilemedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı periyodik bakım ve muayene programı üst mekanizma bileşenlerini (bağlantı elemanları, aşınma noktaları) kapsamıyordu; son detaylı bakım tarihi bile belirsizdi. Raporda 'Sarmal kapı periyodik bakım sistemi yetersiz (üst mekanizma kontrolü eksik)' ve 'Anormal ses önceden fark edilmemiş (periyodik kontrol eksikliği)' ifadeleri açıkça belirtilmiştir.</div>
+                    <span class="why-code">D6.3 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden sarmal kapı periyodik bakım ve muayene programı üst mekanizma bileşenlerini kapsamıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı muayene ve kalibrasyon programı, mekanik aşınma ve bağlantı gevşemesi gibi kritik arıza modlarını tespit edecek şekilde tasarlanmamıştı; kapı güvenlik sensörlerinde de mekanik arıza tespiti bulunmuyordu. Raporda 'Kapı güvenlik sensörleri: Mekanik arıza tespiti yok' bulgusu bu durumu doğrulamaktadır.</div>
+                    <span class="why-code">D6.3 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden sarmal kapı muayene programı mekanik aşınma ve bağlantı gevşemesi gibi kritik arıza modlarını tespit edecek şekilde tasarlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı üst mekanizması için muayene programı, yüksek kullanım sıklığından kaynaklanan aşınma ve gevşeme riskini ve düşen parça senaryosunu kapsayacak yeterlilikte değildi; NDT (Tahribatsız Muayene) veya görsel bağlantı kontrolü gibi muayene yöntemleri programa dahil edilmemişti. Raporda 'Risk değerlendirmesi: Düşen parça senaryosu değerlendirilmemiş' bulgusu bu eksikliği ortaya koymaktadır.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Sarmal Kapı Üst Mekanizması Muayene ve Kalibrasyon Programı Yetersizliği)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Sarmal Kapı Üst Mekanizması Muayene ve Kalibrasyon Programı Yetersizliği</div>
+                <div class="box-content" contenteditable="true">MPT test sahasındaki sarmal kapı üst mekanizması için uygulanan muayene ve kontrol programı, yüksek kullanım sıklığından kaynaklanan bağlantı noktası aşınması ve gevşemesini tespit edecek kapsamda değildi. Üst mekanizma bileşenlerinin görsel ve fiziksel kontrolü, bağlantı elemanı sıkılık testi veya aşınma ölçümü gibi muayene yöntemleri periyodik programa dahil edilmemişti; bu nedenle metal parçadaki ilerleyen aşınma ve gevşeme tespit edilemeden kopma noktasına ulaştı. Raporda açıkça belirtilen bulgular - bakım ve kontrol eksikliği, metal parça bağlantısındaki aşınmanın tespit edilememesi, periyodik kontrol eksikliği, son detaylı bakım tarihinin belirsiz olması ve kapı güvenlik sensörlerinde mekanik arıza tespitinin bulunmaması - tümü muayene programının yetersizliğine işaret etmektedir.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sarmal kapı periyodik bakım ve muayene programı, üst mekanizma bileşenlerinin (bağlantı elemanları, aşınma noktaları) detaylı kontrolünü içermiyordu; program sadece kapının genel çalışma fonksiyonunu test ediyordu ancak kritik bağlantı noktalarının fiziksel durumunu değerlendirmiyordu</li>
+<li contenteditable="true">Yüksek kullanım sıklığına sahip ekipmanlar için risk temelli muayene frekansı belirleme sistemi mevcut değildi; tüm sarmal kapılar aynı standart periyotta kontrol ediliyordu, kullanım yoğunluğuna göre farklılaştırılmış muayene planı yoktu</li>
+<li contenteditable="true">Mekanik aşınma ve bağlantı gevşemesi gibi kritik arıza modlarını tespit edecek muayene yöntemleri (NDT, görsel bağlantı kontrolü, sıkılık testi, titreşim analizi) programa dahil edilmemişti; muayene sadece kapının açılıp kapanma fonksiyonunu test ediyordu</li>
+<li contenteditable="true">Kapı güvenlik sensörleri sadece sıkışma ve ezilme riskini tespit edecek şekilde tasarlanmıştı; üst mekanizmadan düşen parça gibi mekanik arıza senaryolarını algılayacak sensör veya alarm sistemi bulunmuyordu, bu nedenle aşınma ve gevşeme ilerlerken hiçbir erken uyarı sinyali alınamadı</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - DAVRANIŞSAL NEDEN: Prosedürde Acil Durdurma Talimatı Eksikliği</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Sarmal kapının kapatılması işlemi sırasında kapı üst mekanizmasından anormal sesler gelmiş, ancak çalışan bu sesleri duymasına rağmen işlemi durdurmamış ve kapı çalıştırılmaya devam edilmiştir. Raporda açıkça belirtildiği üzere, 'Sarmal kapı kullanım prosedüründe anormal ses durumunda acil durdurma talimatı yok' ve 'Anormal ses duyulmasına rağmen işlem durdurulmadı (kritik hata)' bulguları mevcuttur. Çalışan anormal sesi fark etmiş ancak bu sinyali tehlike olarak yorumlayacak bir prosedür talimatı veya eğitim almamıştır. Prosedür sadece normal çalışma koşullarını kapsıyor, mekanik arıza belirtileri (anormal ses, titreşim) durumunda izlenecek adımları içermiyordu.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Sarmal kapı kullanım prosedüründe anormal ses durumunda acil durdurma talimatı bulunmaması nedeniyle çalışan işlemi durdurmadı ve parça kopana kadar kapı çalıştırılmaya devam edildi [A1.4 - Prosedür Anlaşılmadı]</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapının üst mekanizmasından kopan metal parça neden çalışanın 2 metre yakınına düştü?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı kullanım prosedüründe anormal ses durumunda acil durdurma talimatı bulunmaması nedeniyle çalışan işlemi durdurmadı ve parça kopana kadar kapı çalıştırılmaya devam edildi. Raporda 'Sarmal kapı kullanım prosedüründe anormal ses durumunda acil durdurma talimatı yok' ve 'Anormal ses duyulmasına rağmen işlem durdurulmadı (kritik hata)' ifadeleri açıkça belirtilmiştir.</div>
+                    <span class="why-code">A1.4 - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı kullanım prosedüründe neden anormal ses durumunda acil durdurma talimatı bulunmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı kullanım prosedürü geliştirilirken mekanik arıza belirtileri (anormal ses, titreşim) durumunda izlenecek adımlar prosedüre dahil edilmemişti; prosedür sadece normal çalışma koşullarını kapsıyordu. Raporda 'Çalışma öncesi kapı mekanizması görsel/işitsel kontrol yapılmıyor' bulgusu bu durumu desteklemektedir.</div>
+                    <span class="why-code">D9.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı prosedürü neden sadece normal çalışma koşullarını kapsıyor ve mekanik arıza belirtileri senaryolarını içermiyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı üst mekanizmasından parça kopması ve düşmesi senaryosu risk değerlendirmesinde tanımlanmamıştı; bu nedenle prosedüre anormal durum talimatları eklenmemişti. Raporda 'Risk değerlendirmesi: Düşen parça senaryosu değerlendirilmemiş' bulgusu açıkça yer almaktadır.</div>
+                    <span class="why-code">D4.1 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı üst mekanizmasından parça kopması ve düşmesi senaryosu neden risk değerlendirmesinde tanımlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı mekanizması için yapılan risk değerlendirmesinde düşen parça tehlikesi ve mekanik aşınmaya bağlı kopma riski hiç değerlendirilmemişti; kapı sadece sıkışma ve ezilme riski açısından ele alınmıştı. Raporda bu durum 'Kapı sadece sıkışma/ezilme riski açısından değerlendirilmiş' ifadesiyle doğrulanmaktadır.</div>
+                    <span class="why-code">D4.1 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı risk değerlendirmesinde neden düşen parça tehlikesi ve mekanik aşınmaya bağlı kopma riski değerlendirilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı için yapılan risk değerlendirmesi yetersizdi; üst mekanizma bağlantı elemanlarının aşınma ve gevşeme sonucu koparak düşme tehlikesi, kapı kullanım sıklığına bağlı aşınma riski ve yüksekten düşen parça senaryosu risk analizinde hiç tanımlanmamıştı. Raporda 'Risk değerlendirmesi: Düşen parça senaryosu değerlendirilmemiş' ve 'Potansiyel vuruş bölgesi: Baş, omuz, sırt bölgesi - Sonuç olabilirdi: Kafatası kırığı, omurga hasarı, iç kanama, ölüm' bulguları bu kritik eksikliği ortaya koymaktadır.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Sarmal Kapı Risk Değerlendirmesi Yetersizliği - Düşen Parça Senaryosu Tanımlanmamış)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Sarmal Kapı Risk Değerlendirmesi Yetersizliği - Düşen Parça Senaryosu Tanımlanmamış</div>
+                <div class="box-content" contenteditable="true">MPT test sahasındaki sarmal kapı için yapılan risk değerlendirmesinde, üst mekanizma bağlantı elemanlarının yoğun kullanıma bağlı aşınma ve gevşeme sonucu koparak düşme tehlikesi tanımlanmamıştır. Kapı yalnızca sıkışma ve ezilme riski açısından değerlendirilmiş, 3-4 metre yükseklikten düşen ağır metal parça senaryosu ve buna bağlı baş veya omurga yaralanması riski hiç analiz edilmemiştir. Bu eksiklik, prosedüre anormal ses durumunda acil durdurma talimatının eklenmemesine ve periyodik üst mekanizma kontrolünün planlanmamasına doğrudan yol açmıştır. Raporda açıkça 'Risk değerlendirmesi: Düşen parça senaryosu değerlendirilmemiş' bulgusu yer almaktadır. Sarmal kapının yüksek kullanım sıklığına rağmen üst mekanizma aşınma ve kopma riskinin JHA'da (Job Hazard Analysis) hiç yer almaması, risk değerlendirmesinin kapsamının yetersiz olduğunu göstermektedir.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sarmal kapı risk değerlendirmesi, ekipmanın tüm yaşam döngüsünü ve kullanım yoğunluğunu dikkate almadan yapılmıştı; sadece kapının ilk devreye alım anındaki durumu değerlendirilmiş, yoğun kullanıma bağlı aşınma ve bozulma senaryoları analiz edilmemişti</li>
+<li contenteditable="true">Risk değerlendirmesinde 'yüksekten düşen cisim' tehlike kategorisi sarmal kapı üst mekanizması için hiç ele alınmamıştı; değerlendirme sadece kapının hareket eden parçalarının neden olduğu sıkışma ve ezilme risklerine odaklanmış, sabit bileşenlerin koparak düşme ihtimali göz ardı edilmişti</li>
+<li contenteditable="true">Üst mekanizma bağlantı elemanlarının aşınma ve gevşeme sonucu kopma riski, potansiyel sonuçları (baş/omurga yaralanması, ölüm) ve bu riskin olasılığı (yüksek kullanım sıklığı) hiç değerlendirilmemişti; risk matrisi bu kritik senaryoyu içermiyordu</li>
+<li contenteditable="true">Risk değerlendirmesi sonucunda oluşturulan kontrol önlemleri (prosedür, muayene, eğitim) düşen parça senaryosunu kapsamadığından, anormal ses gibi erken uyarı sinyallerinin nasıl yönetileceği hiç tanımlanmamıştı; bu durum prosedürün ve muayene programının eksik kalmasına doğrudan neden olmuştur</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - DAVRANIŞSAL NEDEN: Çalışanın Tehlike Algısı Eksikliği</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Sarmal kapının kapatılması işlemi sırasında kapı üst mekanizmasından anormal sesler gelmiş, çalışan bu sesleri duymuş ancak tehlike algısı gelişmemiş ve işleme devam etmiştir. Raporda açıkça belirtildiği üzere, '09:09 - Kapı üst mekanizmasından anormal sesler duyulmaya başladı', '09:10 - Anormal sesler devam etti, çalışan sesi fark etti ama işlem devam etti' ve 'Anormal ses fark edildi ama işlem durdurulmadı (tehlike algısı eksik)' ifadeleri mevcuttur. Çalışan anormal sesi duymasına rağmen bu sinyali tehlike olarak yorumlayacak bir referans çerçevesine sahip değildi; 'Ses = Tehlike' refleksi gelişmemişti. Raporda ayrıca 'Çalışan eğitimi: Anormal ses/titreşim durumunda işlem durdurma eğitimi eksik' bulgusu da yer almaktadır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Çalışan anormal sesi duymasına rağmen tehlike algısı gelişmemiş ve işleme devam etmiş [A4.2 - Çevresel Tehlikeler Fark Edilmedi]</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapının üst mekanizmasından kopan metal parça neden çalışanın 2 metre yakınına düştü?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışan, kapı mekanizmasından gelen anormal sesi duymasına rağmen tehlike algısı gelişmemiş ve kapı kapatma işlemine devam etmiştir. Raporda '09:09 - Kapı üst mekanizmasından anormal sesler duyulmaya başladı', '09:10 - Anormal sesler devam etti, çalışan sesi fark etti ama işlem devam etti' ve 'Anormal ses fark edildi ama işlem durdurulmadı (tehlike algısı eksik)' ifadeleri bu durumu doğrulamaktadır.</div>
+                    <span class="why-code">A4.2 - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Çalışan neden anormal sesi duyduğu halde tehlike olarak algılayamadı ve işlemi durdurmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı kullanım prosedüründe anormal ses ve titreşim durumunda acil durdurma talimatı bulunmadığından, çalışan bu sinyali tehlike olarak yorumlayacak bir referans çerçevesine sahip değildi. Raporda 'Sarmal kapı kullanım prosedüründe anormal ses durumunda acil durdurma talimatı yok' ve 'Ses = Tehlike refleksi gelişmemiş' bulguları bu durumu desteklemektedir.</div>
+                    <span class="why-code">D9.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı kullanım prosedüründe neden anormal ses durumunda acil durdurma talimatı bulunmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Mevcut prosedür, kapının mekanik arıza belirtileri (anormal ses, titreşim, gevşeme) gibi uyarı sinyallerini kapsayacak şekilde geliştirilmemişti; prosedür saha gerçekliğiyle uyumsuzdu. Raporda 'Çalışma öncesi kapı mekanizması görsel/işitsel kontrol yapılmıyor' bulgusu bu durumu doğrulamaktadır.</div>
+                    <span class="why-code">D9.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı kullanım prosedürü neden mekanik arıza belirtilerini ve uyarı sinyallerini kapsayacak şekilde geliştirilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Prosedür tasarımı sırasında sarmal kapının üst mekanizmasından parça kopması, aşınma kaynaklı gevşeme gibi arıza senaryoları ve bunların öncü belirtileri prosedüre dahil edilmemişti; prosedür sadece normal çalışma koşullarını kapsıyordu. Raporda 'Prosedür sadece normal çalışma koşullarını kapsıyor' ifadesi bu durumu açıklamaktadır.</div>
+                    <span class="why-code">D9.2 - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Prosedür tasarımında neden arıza senaryoları ve öncü belirtiler (anormal ses, gevşeme) dahil edilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı kullanım prosedürü, saha koşullarını ve potansiyel arıza modlarını yansıtacak şekilde değil, teorik ve genel çerçevede hazırlanmıştı; prosedür geliştirme süreci saha gerçekliğiyle uyuşmuyordu. Raporda 'Çalışan eğitimi: Anormal ses/titreşim durumunda işlem durdurma eğitimi eksik' bulgusu, prosedürün operasyonel deneyimi yansıtmadığını göstermektedir.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden (Sarmal Kapı Prosedür Geliştirme Süreci Yetersizliği - Arıza Öncü Belirtileri Dahil Edilmemiş)</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Sarmal Kapı Prosedür Geliştirme Süreci Yetersizliği - Arıza Öncü Belirtileri Dahil Edilmemiş</div>
+                <div class="box-content" contenteditable="true">Sarmal kapı kullanım prosedürü, mekanik arıza öncü belirtilerini (anormal ses, titreşim, parça gevşemesi) ve bu durumlarda uygulanacak acil durdurma adımlarını içermiyordu. Prosedür sadece normal çalışma koşullarını kapsıyor, saha gerçekliğindeki arıza senaryolarını ve çalışanın tehlike algısını yönlendirecek kritik uyarı kriterlerini barındırmıyordu. Raporda açıkça belirtildiği üzere kapı kullanım prosedüründe anormal ses durumunda acil durdurma talimatı yoktu ve çalışma öncesi kapı mekanizması görsel ve işitsel kontrol yapılmıyordu. Bu durum prosedürün var olduğunu ancak saha koşullarıyla uyumsuz ve yetersiz kapsamda geliştirildiğini göstermektedir. Prosedür geliştirme süreci, operasyonel deneyimden gelen arıza öncü belirtilerini (anormal ses gibi) prosedüre entegre etmemiş, teorik ve genel bir çerçevede kalmıştır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sarmal kapı kullanım prosedürü geliştirilirken, saha operatörlerinin ve bakım personelinin operasyonel deneyimleri (anormal sesler, titreşimler, geçmiş arıza kayıtları) prosedür tasarımına dahil edilmemişti; prosedür sadece ekipman üreticisinin genel talimatlarına dayanıyordu</li>
+<li contenteditable="true">Prosedürde 'anormal durum' senaryoları ve bunlara karşı alınacak önlemler (işlemi durdurma, güvenli mesafeye çekilme, bakım ekibini çağırma) tanımlanmamıştı; prosedür sadece 'normal çalışma' adımlarını içeriyor, arıza belirtileri durumunda ne yapılacağını belirtmiyordu</li>
+<li contenteditable="true">Çalışma öncesi kapı mekanizması görsel ve işitsel kontrol adımları prosedüre dahil edilmemişti; prosedür doğrudan kapı kapatma işlemine başlamayı öngörüyor, öncesinde ekipman durumunu değerlendirme adımı içermiyordu</li>
+<li contenteditable="true">Prosedür geliştirme süreci, risk değerlendirmesi sonuçlarıyla entegre değildi; risk değerlendirmesinde düşen parça senaryosu tanımlanmadığı için prosedürde de bu senaryoya karşı önlemler (anormal ses = tehlike algısı) yer almamıştı; bu durum prosedürün reaktif değil proaktif olması gerektiğini göstermektedir</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="meta-root-cause" style="page-break-before: always;">
+            <div class="subsection">
+                <h3 style="color: #C0392B;">🎯 Stratejik Kök Neden (Tüm Dalların Ortak Paydası)</h3>
+                <div class="alert-box" style="background: linear-gradient(to right, #C0392B, #E74C3C); color: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                    <h4 contenteditable="true" style="color: white; font-size: 18px; margin-top: 0;">
+                        <strong>Sarmal Kapı Yaşam Döngüsü Performans İzleme ve Erken Uyarı Sistemi Yetersizliği</strong>
+                    </h4>
+                    <p contenteditable="true" style="font-size: 14px; line-height: 1.8;">
+                        MPT test sahasındaki sarmal kapı için yaşam döngüsü boyunca performans bozulma göstergelerini (aşınma, gevşeme, anormal ses, titreşim) sistematik olarak izleyen ve bunlara müdahale tetikleyen bir erken uyarı sistemi kurulmamıştır. Ekipman devreye alındıktan sonra yoğun kullanım koşullarında bozulma eğilimlerinin takip edilmemesi, hem risk değerlendirmesinin güncellenmemesine, hem muayene programının yetersiz kalmasına, hem de prosedürde arıza öncü belirtilerine yer verilmemesine yol açmıştır.
+
+Bu meta kök neden, üç alt nedeni birleştiren sistemik zayıflıktır: Risk değerlendirmesi (D4.1) ekipmanın operasyonel gerçekliğini yansıtmıyor çünkü devreye alma sonrası performans trendi izlenmiyor ve kullanım yoğunluğuna bağlı aşınma senaryoları güncellenmiyordu. Muayene programı (D6.3) yetersiz çünkü erken dönem izleme yapılsaydı aşınma ve gevşeme paternleri tespit edilir ve muayene programı bu kritik arıza modlarını kapsayacak şekilde tasarlanırdı. Prosedür geliştirme (D9.2) eksik çünkü operasyonel deneyimden gelen arıza öncü belirtileri (anormal ses, titreşim) prosedüre entegre edilmedi ve çalışanlar bu sinyalleri tehlike olarak yorumlayacak talimat almadı.
+
+D5.6 kodu, ekipmanın ilk devreye alımından sonraki kritik dönemde performans tutarlılığının doğrulanmaması ve bozulma eğilimlerinin yakalanmaması sorununu ele alır. Sarmal kapının yüksek kullanım sıklığına rağmen, üst mekanizma bağlantı noktalarının aşınma hızı, gevşeme eğilimi ve anormal ses/titreşim gibi erken uyarı sinyalleri sistematik olarak izlenmedi. Bu eksiklik, diğer tüm yönetim sistemlerinin (risk değerlendirmesi, muayene programı, prosedür) güncel kalamamasına ve operasyonel gerçeklikle uyumsuz hale gelmesine neden olan temel zayıflıktır.
+                    </p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 style="color: #C0392B;">🔗 Sentezlenen Kök Nedenler</h3>
+                <p contenteditable="true" style="margin-bottom: 10px;">
+                    Bu meta kök neden aşağıdaki <strong>3</strong> kök nedeni birleştirerek 
+                    üst-seviye sistemik zayıflığı ortaya koymuştur:
+                </p>
+                <ul style="list-style: none; padding-left: 0;">
+
+                    <li style="background: #FFE6E6; padding: 10px; margin: 5px 0; border-left: 4px solid #C0392B; border-radius: 4px;">
+                        <strong style="color: #C0392B;">D6.3</strong>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 10px; margin: 5px 0; border-left: 4px solid #C0392B; border-radius: 4px;">
+                        <strong style="color: #C0392B;">D4.1</strong>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 10px; margin: 5px 0; border-left: 4px solid #C0392B; border-radius: 4px;">
+                        <strong style="color: #C0392B;">D9.2</strong>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3 style="color: #C0392B;">⚠️ Sistemik Zayıflık</h3>
+                <p contenteditable="true" style="background: #FFF3E0; padding: 15px; border-left: 4px solid #E67E22; border-radius: 4px;">
+                    Ekipman yaşam döngüsü yönetim sistemi, devreye alma sonrası performans izleme ve erken uyarı mekanizması içermiyor; risk değerlendirmesi, muayene programı ve prosedürler statik kalıyor ve operasyonel deneyimle güncellenmiyordu
+                </p>
+            </div>
+
+            <div class="subsection">
+                <h3 style="color: #C0392B;">📊 Stratejik Sonuçlar ve Etkiler</h3>
+                <ul style="list-style: none; padding-left: 0;">
+
+                    <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
+                        <strong style="color: #C0392B;">1.</strong> <span contenteditable="true">Tüm kritik ekipmanlar için yaşam döngüsü performans izleme sistemi kurulmalı; devreye alma sonrası ilk 6-12 ay boyunca yoğun izleme yapılmalı ve bozulma eğilimleri tespit edilmelidir</span>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
+                        <strong style="color: #C0392B;">2.</strong> <span contenteditable="true">Risk değerlendirmesi, muayene programı ve prosedürler dinamik hale getirilmeli; operasyonel deneyim ve performans verileri düzenli olarak bu dokümanlara entegre edilmelidir</span>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
+                        <strong style="color: #C0392B;">3.</strong> <span contenteditable="true">Erken uyarı sinyalleri (anormal ses, titreşim, aşınma belirtileri) tanımlanmalı ve bu sinyallerin nasıl yönetileceği tüm yönetim sistemlerine (risk, muayene, prosedür, eğitim) dahil edilmelidir</span>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Periyodik Muayene Programı Eksikliği</td>
+                        <td contenteditable="true">Sarmal kapı üst mekanizması için uygulanan muayene programı, bağlantı noktası aşınması ve gevşemesini tespit edecek kapsamda değildi; NDT, görsel bağlantı kontrolü, sıkılık testi gibi yöntemler programa dahil edilmemişti</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Risk Değerlendirmesi Yetersizliği</td>
+                        <td contenteditable="true">Sarmal kapı risk değerlendirmesinde 3-4 metre yükseklikten düşen ağır metal parça senaryosu ve buna bağlı baş/omurga yaralanması riski hiç analiz edilmemişti; kapı sadece sıkışma/ezilme riski açısından değerlendirilmişti</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Geliştirme Süreci Eksikliği</td>
+                        <td contenteditable="true">Sarmal kapı kullanım prosedürü mekanik arıza öncü belirtilerini (anormal ses, titreşim) ve bu durumlarda uygulanacak acil durdurma adımlarını içermiyordu; prosedür saha gerçekliğiyle uyumsuzdu</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Çalışan Eğitimi Yetersizliği</td>
+                        <td contenteditable="true">Çalışan eğitimi anormal ses/titreşim durumunda işlem durdurma konusunu içermiyordu; 'Ses = Tehlike' refleksi gelişmedi ve tehlike algısı eksik kaldı</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman Güvenlik Sensörleri Yetersizliği</td>
+                        <td contenteditable="true">Kapı güvenlik sensörleri sadece sıkışma/ezilme riskini tespit edecek şekilde tasarlanmıştı; üst mekanizmadan düşen parça gibi mekanik arıza senaryolarını algılayacak sensör veya alarm sistemi bulunmuyordu</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Bakım Kayıt Sistemi Eksikliği</td>
+                        <td contenteditable="true">Sarmal kapı bakım kayıtları yetersizdi; son detaylı bakım tarihi bile belirsizdi ve üst mekanizma bileşenlerinin kontrol geçmişi takip edilmiyordu</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Tüm sarmal kapılar için kapsamlı üst mekanizma muayenesi yapılması - bağlantı noktaları sıkılık testi, aşınma ölçümü, NDT kontrolü ve gerekli onarımların tamamlanması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm sarmal kapılar muayene tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Sarmal kapı periyodik muayene programının revize edilmesi - üst mekanizma bağlantı noktaları kontrolü, aşınma ölçümü, sıkılık testi ve titreşim analizi dahil edilmesi</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Revize muayene programı onay ve uygulama %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Sarmal kapı kullanım prosedürüne anormal ses/titreşim durumunda acil durdurma talimatı eklenmesi ve çalışma öncesi görsel/işitsel kontrol adımlarının tanımlanması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Operasyon Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Prosedür revizyon ve onay %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Sarmal kapı risk değerlendirmesinin güncellenmesi - düşen parça senaryosu, üst mekanizma aşınma/kopma riski ve potansiyel sonuçlarının (baş/omurga yaralanması) analiz edilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">3 hafta</td>
+                        <td contenteditable="true">Risk değerlendirmesi güncelleme ve onay %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Tüm sarmal kapı operatörlerine anormal ses/titreşim durumunda işlem durdurma eğitimi verilmesi - 'Ses = Tehlike' refleksi geliştirilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Eğitim Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Yüksek kullanım sıklığına sahip ekipmanlar için risk temelli muayene frekansı belirleme sistemi kurulması - kullanım yoğunluğuna göre farklılaştırılmış muayene planı</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Risk temelli muayene sistemi kurulum %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Sarmal kapı güvenlik sensörlerine üst mekanizma mekanik arıza tespiti özelliği eklenmesi - titreşim sensörü, aşınma algılama sistemi kurulması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Teknik Müdür</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Sensör sistemi kurulum ve test %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Ekipman yaşam döngüsü performans izleme sistemi kurulması - devreye alma sonrası ilk 6-12 ay yoğun izleme, bozulma eğilimleri tespiti</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Performans izleme sistemi kurulum %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Sarmal kapı bakım kayıt sistemi iyileştirilmesi - üst mekanizma bileşenleri kontrol geçmişi detaylı takibi, bakım tarihleri ve bulgular kaydı</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Kayıt sistemi güncellik ve eksiksizlik %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Prosedür geliştirme sürecinin revize edilmesi - operasyonel deneyim ve arıza öncü belirtilerinin prosedüre entegrasyonu süreci tanımlanması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Operasyon Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Prosedür geliştirme süreci revizyon %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Risk değerlendirmesi dinamik güncelleme sistemi kurulması - operasyonel deneyim ve performans verilerinin düzenli entegrasyonu</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Dinamik güncelleme sistemi kurulum %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Tüm kritik ekipmanlar için erken uyarı sinyalleri (anormal ses, titreşim, aşınma) tanımlanması ve yönetim sistemlerine entegrasyonu</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Teknik Müdür</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Erken uyarı sistemi kapsam %100</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Anormal ses veya titreşim duyulduğunda derhal işlemi durdurun ve güvenli mesafeye çekilin - 'Ses = Tehlike' refleksini geliştirin. Ekipman normal çalışma sesinden farklı bir ses çıkarıyorsa, bu mekanik arızanın öncü belirtisidir ve göz ardı edilmemelidir. Bu olayda çalışan anormal sesi duymasına rağmen işlemi durdurmadı ve parça kopana kadar kapı çalıştırılmaya devam edildi.
+• Çalışma öncesi ekipman görsel ve işitsel kontrolü mutlaka yapın - kapı mekanizmasını gözle kontrol edin, anormal ses veya titreşim olup olmadığını dinleyin. Bu basit kontrol adımı, birçok mekanik arızanın erken tespitini sağlar ve olayları önler. Prosedürde bu adım tanımlanmalı ve operatörler tarafından rutin olarak uygulanmalıdır.
+• Yüksek kullanım sıklığına sahip ekipmanların periyodik muayenesinde üst mekanizma bağlantı noktalarını mutlaka kontrol edin - bağlantı elemanı sıkılığı, aşınma belirtileri, gevşeme işaretleri detaylı olarak değerlendirilmelidir. Bu olayda üst mekanizma bağlantı noktaları periyodik muayeneye dahil edilmemişti ve aşınma tespit edilemeden kritik seviyeye ulaştı.
+• Risk değerlendirmesinde 'yüksekten düşen cisim' tehlike kategorisini mutlaka değerlendirin - ekipmanın üst bölümlerinde bulunan parçaların koparak düşme senaryosunu ve potansiyel sonuçlarını (baş/omurga yaralanması, ölüm) analiz edin. Bu olayda düşen parça senaryosu hiç değerlendirilmemişti ve bu eksiklik tüm yönetim sistemlerinin (prosedür, muayene, eğitim) yetersiz kalmasına neden oldu.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Ekipman yaşam döngüsü performans izleme sistemi kurun - devreye alma sonrası ilk 6-12 ay boyunca yoğun izleme yapın ve bozulma eğilimlerini tespit edin. Aşınma hızı, gevşeme eğilimi, anormal ses/titreşim gibi erken uyarı sinyallerini sistematik olarak kaydedin ve bu verileri risk değerlendirmesi, muayene programı ve prosedür güncellemelerinde kullanın.
+• Risk değerlendirmesi, muayene programı ve prosedürleri dinamik hale getirin - operasyonel deneyim ve performans verileri düzenli olarak bu dokümanlara entegre edin. Statik dokümanlar operasyonel gerçeklikle uyumsuz hale gelir ve etkisiz kalır. Yılda en az bir kez bu dokümanları gözden geçirin ve saha gerçekliğiyle uyumlu olup olmadığını değerlendirin.
+• Prosedür geliştirme sürecini revize edin - saha operatörlerinin ve bakım personelinin operasyonel deneyimlerini (anormal sesler, titreşimler, geçmiş arıza kayıtları) prosedür tasarımına dahil edin. Prosedürler sadece ekipman üreticisinin genel talimatlarına dayanmamalı, saha gerçekliğini ve arıza öncü belirtilerini yansıtmalıdır.
+• Kritik ekipmanlar için erken uyarı sinyalleri tanımlayın ve yönetim sistemlerine entegre edin - anormal ses, titreşim, aşınma belirtileri gibi sinyallerin nasıl yönetileceğini risk değerlendirmesi, muayene programı, prosedür ve eğitim dokümanlarında açıkça belirtin. Çalışanlar bu sinyalleri tehlike olarak yorumlayacak ve derhal müdahale edecek şekilde eğitilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Bu ramak kala olayını tüm operasyon ve bakım personeline duyurun - olayın detaylarını, kök nedenlerini ve alınan dersleri paylaşın. 'Neredeyse ölümcül bir olay yaşandı' mesajını net bir şekilde verin ve benzer durumların tekrarlanmaması için herkesin sorumluluğunu vurgulayın.
+• Anormal ses/titreşim durumunda işlem durdurma talimatını tüm operatörlere iletişim kampanyası ile duyurun - posterler, e-postalar, vardiya toplantıları kullanarak 'Ses = Tehlike' mesajını güçlendirin. Çalışanların tehlike algısını geliştirmek için görsel ve işitsel materyaller kullanın.
+• Düzeltici önlemlerin ilerlemesini düzenli olarak tüm paydaşlara raporlayın - haftalık durum güncellemeleri yapın ve tamamlanan aksiyonları paylaşın. Şeffaf iletişim, güvenlik kültürünü güçlendirir ve çalışanların güvenini artırır.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm sarmal kapı operatörlerine 'Anormal Ses/Titreşim Durumunda İşlem Durdurma' eğitimi verin - teorik bilginin yanı sıra pratik senaryolar kullanarak 'Ses = Tehlike' refleksini geliştirin. Eğitimde gerçek olay videolarını ve fotoğraflarını kullanarak etki yaratın.
+• Bakım personeline 'Üst Mekanizma Bağlantı Noktaları Muayene Teknikleri' eğitimi verin - bağlantı elemanı sıkılık testi, aşınma ölçümü, NDT kontrolü gibi yöntemleri öğretin. Uygulamalı eğitim yaparak personelin yetkinliğini artırın.
+• Risk değerlendirmesi ekibine 'Ekipman Yaşam Döngüsü ve Arıza Modları Analizi' eğitimi verin - devreye alma sonrası performans izleme, bozulma eğilimleri tespiti ve dinamik risk güncelleme konularında yetkinlik geliştirin.
+• Tüm çalışanlara 'Ramak Kala Raporlama ve Erken Uyarı Sinyalleri' eğitimi verin - anormal durumları (ses, titreşim, aşınma) fark etme ve raporlama kültürünü güçlendirin. Raporlama yapan çalışanları ödüllendirerek pozitif davranışı teşvik edin.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">MPT test sahasında 20 Ocak 2026 tarihinde meydana gelen sarmal kapı düşen parça ramak kala olayı, potansiyel ölümcül sonuçlar doğurabilecek kritik bir güvenlik olayıdır. Olay, sarmal kapının üst mekanizmasından kopan ağır metal parçanın çalışanın 2 metre yakınına düşmesi şeklinde gerçekleşmiş, herhangi bir yaralanma olmamıştır. Ancak parçanın çalışanın baş, omuz veya sırt bölgesine düşmesi halinde kafatası kırığı, omurga hasarı, iç kanama veya ölüm gibi kritik sonuçlar doğurabilecek potansiyel taşıdığı tespit edilmiştir. Bu nedenle olay, Seviye 1 (Ölümcül/Ciddi Yaralanma) potansiyel risk kategorisinde değerlendirilmiş ve yüksek seviye araştırma gerektirmiştir.
+
+Kök neden analizi, HSG245 Hiyerarşik 5-Why metodolojisi kullanılarak üç ayrı dalda gerçekleştirilmiştir. Analiz sonucunda üç organizasyonel kök neden tespit edilmiştir: (1) Sarmal kapı üst mekanizması muayene ve kalibrasyon programı yetersizliği (D6.3) - yüksek kullanım sıklığından kaynaklanan bağlantı noktası aşınması ve gevşemesini tespit edecek kapsamda değildi; (2) Sarmal kapı risk değerlendirmesi yetersizliği (D4.1) - 3-4 metre yükseklikten düşen ağır metal parça senaryosu ve buna bağlı baş/omurga yaralanması riski hiç analiz edilmemişti; (3) Sarmal kapı prosedür geliştirme süreci yetersizliği (D9.2) - mekanik arıza öncü belirtilerini (anormal ses, titreşim) ve bu durumlarda uygulanacak acil durdurma adımlarını içermiyordu.
+
+Bu üç kök neden, daha derin bir sistemik zayıflığın belirtileridir: Ekipman yaşam döngüsü performans izleme ve erken uyarı sistemi yetersizliği (D5.6 - Meta Kök Neden). Sarmal kapı devreye alındıktan sonra yoğun kullanım koşullarında bozulma eğilimlerinin takip edilmemesi, hem risk değerlendirmesinin güncellenmemesine, hem muayene programının yetersiz kalmasına, hem de prosedürde arıza öncü belirtilerine yer verilmemesine yol açmıştır. Bu sistemik zayıflık, tüm yönetim sistemlerinin (risk, muayene, prosedür) statik kalmasına ve operasyonel gerçeklikle uyumsuz hale gelmesine neden olmuştur.
+
+Olayın meydana gelmesinde birden fazla faktör bir araya gelmiştir: Üst mekanizma bağlantı noktalarının periyodik muayenesi yapılmadı, aşınma ve gevşeme tespit edilemedi; risk değerlendirmesinde düşen parça senaryosu tanımlanmadı; prosedürde anormal ses durumunda acil durdurma talimatı yoktu; çalışan anormal sesi duymasına rağmen tehlike algısı gelişmedi ve işlemi durdurmadı. Bu faktörlerin tümü, ekipman yaşam döngüsü performans izleme sisteminin olmamasından kaynaklanmaktadır. Eğer devreye alma sonrası performans izleme yapılsaydı, aşınma eğilimleri tespit edilir, risk değerlendirmesi güncellenir, muayene programı bu kritik arıza modlarını kapsayacak şekilde tasarlanır ve prosedürde arıza öncü belirtileri tanımlanırdı.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm sarmal kapılar için acil kapsamlı üst mekanizma muayenesi tamamlanmalı (1 hafta) - bağlantı noktaları sıkılık testi, aşınma ölçümü, NDT kontrolü yapılmalı ve gerekli onarımlar derhal gerçekleştirilmelidir. Bu önlem, benzer olayların tekrarlanmasını önlemek için kritik öneme sahiptir.</li>
+<li contenteditable="true">Sarmal kapı periyodik muayene programı revize edilmeli (2 hafta) - üst mekanizma bağlantı noktaları kontrolü, aşınma ölçümü, sıkılık testi ve titreşim analizi programa dahil edilmelidir. Yüksek kullanım sıklığına sahip ekipmanlar için risk temelli muayene frekansı belirlenmelidir.</li>
+<li contenteditable="true">Sarmal kapı kullanım prosedürüne anormal ses/titreşim durumunda acil durdurma talimatı eklenmeli (2 hafta) - çalışma öncesi görsel/işitsel kontrol adımları tanımlanmalı ve operatörler bu prosedür değişikliği hakkında bilgilendirilmelidir.</li>
+<li contenteditable="true">Tüm sarmal kapı operatörlerine acil eğitim verilmeli (1 ay) - anormal ses/titreşim durumunda işlem durdurma, 'Ses = Tehlike' refleksi geliştirilmesi ve çalışma öncesi ekipman kontrolü konularında yetkinlik kazandırılmalıdır.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Ekipman yaşam döngüsü performans izleme sistemi kurulmalı (2 ay) - tüm kritik ekipmanlar için devreye alma sonrası ilk 6-12 ay boyunca yoğun izleme yapılmalı, bozulma eğilimleri tespit edilmeli ve bu veriler yönetim sistemlerine entegre edilmelidir.</li>
+<li contenteditable="true">Risk değerlendirmesi dinamik güncelleme sistemi kurulmalı (3-6 ay) - operasyonel deneyim ve performans verileri düzenli olarak risk değerlendirmesine entegre edilmeli, statik dokümanlar operasyonel gerçeklikle uyumlu hale getirilmelidir.</li>
+<li contenteditable="true">Prosedür geliştirme süreci revize edilmeli (3-6 ay) - saha operatörlerinin ve bakım personelinin operasyonel deneyimleri prosedür tasarımına dahil edilmeli, arıza öncü belirtileri ve anormal durum senaryoları prosedürlerde tanımlanmalıdır.</li>
+<li contenteditable="true">Kritik ekipmanlar için erken uyarı sinyalleri tanımlanmalı ve yönetim sistemlerine entegre edilmelidir (6 ay) - anormal ses, titreşim, aşınma belirtileri gibi sinyallerin nasıl yönetileceği risk değerlendirmesi, muayene programı, prosedür ve eğitim dokümanlarında açıkça belirtilmelidir.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Üst Mekanizma Muayene Kapsamı</td>
+                        <td class="current" contenteditable="true">Sadece genel fonksiyon testi</td>
+                        <td class="target" contenteditable="true">Bağlantı noktaları, aşınma, sıkılık, NDT kontrolü</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Değerlendirmesi Kapsamı</td>
+                        <td class="current" contenteditable="true">Sadece sıkışma/ezilme riski</td>
+                        <td class="target" contenteditable="true">Düşen parça senaryosu, baş/omurga yaralanması riski dahil</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Anormal Durum Talimatı</td>
+                        <td class="current" contenteditable="true">Yok - sadece normal çalışma</td>
+                        <td class="target" contenteditable="true">Anormal ses/titreşim durumunda acil durdurma talimatı</td>
+                    </tr>
+
+                    <tr>
+                        <td>Çalışan Tehlike Algısı</td>
+                        <td class="current" contenteditable="true">Düşük - 'Ses = Tehlike' refleksi yok</td>
+                        <td class="target" contenteditable="true">Yüksek - anormal ses/titreşim derhal işlem durdurma</td>
+                    </tr>
+
+                    <tr>
+                        <td>Performans İzleme Sistemi</td>
+                        <td class="current" contenteditable="true">Yok - statik yönetim sistemleri</td>
+                        <td class="target" contenteditable="true">Dinamik - operasyonel deneyim entegrasyonu</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            
+            <div style="background: #F8F9FA; padding: 12px; margin: 12px 0; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #555; font-size: 13px;">
+                    <strong>Açıklama:</strong> Aşağıdaki diagram, 5-Why analizinin görsel bir sunumudur. 
+                    Her dal, bir kök nedene ulaşmak için sorulan soruları ve alınan cevapları gösterir.
+                </p>
+            </div>
+            
+            <div id="decision-tree-diagram" style="background: white; padding: 20px; border: 1px solid #ddd; min-height: 500px; max-height: 600px; width: 100%; overflow: auto;">
+                <div class="mermaid" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Sarmal kapı kapatılması sırasında neden üst<br/>mekanizmadan metal parça koparak çalışanın 2 metre<br/>yakınına düştü?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Sarmal kapı üst mekanizmasında metal parçanın bağlantı<br/>noktasında aşınma/gevşeme nedeniyle beklenmeyen ekipman<br/>arızası oluştu ve parça koptu [B2.1]"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Sarmal kapı üst mekanizmasındaki metal parça bağlantı<br/>noktasında neden aşınma ve gevşeme oluştu?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["Kapının yüksek kullanım sıklığına rağmen üst mekanizma<br/>bağlantı noktalarının periyodik muayenesi<br/>yapılmadığından aşınma ve gevşeme zamanında tespit<br/>edilemedi"]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden üst mekanizma bağlantı noktalarının periyodik<br/>muayenesi yapılmadı ve aşınma tespit edilemedi?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Sarmal kapı periyodik bakım/muayene programı üst<br/>mekanizma bileşenlerini (bağlantı elemanları, aşınma<br/>noktaları) kapsamıyordu; son detaylı bakım tarihi bile<br/>belirsizdi"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden sarmal kapı periyodik bakım/muayene programı üst<br/>mekanizma bileşenlerini kapsamıyordu?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Sarmal kapı muayene/kalibrasyon programı, mekanik<br/>aşınma ve bağlantı gevşemesi gibi kritik arıza<br/>modlarını tespit edecek şekilde tasarlanmamıştı; kapı<br/>güvenlik sensörlerinde de mekanik arıza tespiti<br/>bulunmuyordu"]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden sarmal kapı muayene programı mekanik aşınma ve<br/>bağlantı gevşemesi gibi kritik arıza modlarını tespit<br/>edecek şekilde tasarlanmamıştı?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A8 --> Q9
+    A10["Sarmal kapı üst mekanizması için muayene programı,<br/>yüksek kullanım sıklığından kaynaklanan aşınma/gevşeme<br/>riskini ve düşen parça senaryosunu kapsayacak<br/>yeterlilikte değildi; NDT veya görsel bağlantı kontrolü<br/>gibi muayene yöntemleri programa dahil edilmemişti<br/>[D6.3]"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN (D6.3):</b><br/>Kök Neden<br/>MPT test sahasındaki sarmal kapı üst mekanizması<br/>için uygulanan muayene/kontrol programı, yüksek<br/>kullanım sıklığından kaynaklanan bağlantı noktası<br/>aşınması ve gevşemesini tespit edecek kapsamda<br/>değildi. Üst mekanizma bileşenlerinin<br/>görsel/fiziksel kontrolü, bağlantı elemanı sıkılık<br/>testi veya aşınma ölçümü gibi muayene yöntemleri<br/>periyodik programa dahil edilmemişti; bu nedenle<br/>metal parçadaki ilerleyen aşınma ve gevşeme tespit<br/>edilemeden kopma noktasına ulaştı."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Sarmal kapının üst mekanizmasından kopan metal parça<br/>neden çalışanın 2 metre yakınına düştü?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q11
+    A12["Sarmal kapı kullanım prosedüründe anormal ses<br/>durumunda acil durdurma talimatı bulunmaması nedeniyle<br/>çalışan işlemi durdurmadı ve parça kopana kadar kapı<br/>çalıştırılmaya devam edildi"]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Sarmal kapı kullanım prosedüründe neden anormal ses<br/>durumunda acil durdurma talimatı bulunmuyordu?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Sarmal kapı kullanım prosedürü geliştirilirken mekanik<br/>arıza belirtileri (anormal ses, titreşim) durumunda<br/>izlenecek adımlar prosedüre dahil edilmemişti; prosedür<br/>sadece normal çalışma koşullarını kapsıyordu"]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Sarmal kapı prosedürü neden sadece normal çalışma<br/>koşullarını kapsıyor ve mekanik arıza belirtileri<br/>senaryolarını içermiyordu?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Sarmal kapı üst mekanizmasından parça kopması ve<br/>düşmesi senaryosu risk değerlendirmesinde<br/>tanımlanmamıştı; bu nedenle prosedüre anormal durum<br/>talimatları eklenmemişti"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Sarmal kapı üst mekanizmasından parça kopması ve<br/>düşmesi senaryosu neden risk değerlendirmesinde<br/>tanımlanmamıştı?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A16 --> Q17
+    A18["Sarmal kapı mekanizması için yapılan risk<br/>değerlendirmesinde düşen parça tehlikesi ve mekanik<br/>aşınmaya bağlı kopma riski hiç değerlendirilmemişti;<br/>kapı sadece sıkışma/ezilme riski açısından ele<br/>alınmıştı"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Sarmal kapı risk değerlendirmesinde neden düşen parça<br/>tehlikesi ve mekanik aşınmaya bağlı kopma riski<br/>değerlendirilmemişti?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Sarmal kapı için yapılan risk değerlendirmesi<br/>yetersizdi; üst mekanizma bağlantı elemanlarının<br/>aşınma/gevşeme sonucu koparak düşme tehlikesi, kapı<br/>kullanım sıklığına bağlı aşınma riski ve yüksekten<br/>düşen parça senaryosu risk analizinde hiç<br/>tanımlanmamıştı"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN (D4.1):</b><br/>Kök Neden<br/>MPT test sahasındaki sarmal kapı için yapılan<br/>risk değerlendirmesinde, üst mekanizma bağlantı<br/>elemanlarının yoğun kullanıma bağlı aşınma/gevşeme<br/>sonucu koparak düşme tehlikesi tanımlanmamıştır.<br/>Kapı yalnızca sıkışma/ezilme riski açısından<br/>değerlendirilmiş, 3-4 metre yükseklikten düşen<br/>ağır metal parça senaryosu ve buna bağlı<br/>baş/omurga yaralanması riski hiç analiz<br/>edilmemiştir. Bu eksiklik, prosedüre anormal ses<br/>durumunda acil durdurma talimatının eklenmemesine<br/>ve periyodik üst mekanizma kontrolünün<br/>planlanmamasına doğrudan yol açmıştır."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A20 --> ROOT2
+
+    A21["Çalışan, kapı mekanizmasından gelen anormal sesi<br/>duymasına rağmen tehlike algısı gelişmemiş ve kapı<br/>kapatma işlemine devam etmiştir [A4.2]"]
+    style A21 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A21
+    Q22["<b>Neden 2:</b><br/>Çalışan neden anormal sesi duyduğu halde tehlike<br/>olarak algılayamadı ve işlemi durdurmadı?"]
+    style Q22 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A21 --> Q22
+    A23["Sarmal kapı kullanım prosedüründe anormal ses/titreşim<br/>durumunda acil durdurma talimatı bulunmadığından,<br/>çalışan bu sinyali tehlike olarak yorumlayacak bir<br/>referans çerçevesine sahip değildi"]
+    style A23 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q22 --> A23
+    A23 --> Q13
+    A24["Mevcut prosedür, kapının mekanik arıza belirtileri<br/>(anormal ses, titreşim, gevşeme) gibi uyarı<br/>sinyallerini kapsayacak şekilde geliştirilmemişti;<br/>prosedür saha gerçekliğiyle uyumsuzdu"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A24
+    Q25["<b>Neden 4:</b><br/>Sarmal kapı kullanım prosedürü neden mekanik arıza<br/>belirtilerini ve uyarı sinyallerini kapsayacak şekilde<br/>geliştirilmemişti?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A24 --> Q25
+    A26["Prosedür tasarımı sırasında sarmal kapının üst<br/>mekanizmasından parça kopması, aşınma kaynaklı gevşeme<br/>gibi arıza senaryoları ve bunların öncü belirtileri<br/>prosedüre dahil edilmemişti; prosedür sadece normal<br/>çalışma koşullarını kapsıyordu"]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q25 --> A26
+    Q27["<b>Neden 5:</b><br/>Prosedür tasarımında neden arıza senaryoları ve öncü<br/>belirtiler (anormal ses, gevşeme) dahil edilmemişti?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A26 --> Q27
+    A28["Sarmal kapı kullanım prosedürü, saha koşullarını ve<br/>potansiyel arıza modlarını yansıtacak şekilde değil,<br/>teorik/genel çerçevede hazırlanmıştı; prosedür<br/>geliştirme süreci saha gerçekliğiyle uyuşmuyordu [D9.2]"]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q27 --> A28
+    ROOT3["<b>KÖK NEDEN (D9.2):</b><br/>Kök Neden<br/>Sarmal kapı kullanım prosedürü, mekanik arıza<br/>öncü belirtilerini (anormal ses, titreşim, parça<br/>gevşemesi) ve bu durumlarda uygulanacak acil<br/>durdurma adımlarını içermiyordu. Prosedür sadece<br/>normal çalışma koşullarını kapsıyor, saha<br/>gerçekliğindeki arıza senaryolarını ve çalışanın<br/>tehlike algısını yönlendirecek kritik uyarı<br/>kriterlerini barındırmıyordu."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A28 --> ROOT3
+
+                </div>
+            </div>
+            
+            <div style="margin-top: 12px; padding: 10px; background: #FFF3CD; border: 1px solid #FFC107;">
+                <p style="margin: 0; color: #856404; font-weight: bold; font-size: 12px;">
+                    Lejant:
+                </p>
+                <ul style="margin: 6px 0 0 20px; color: #856404; font-size: 12px;">
+                    <li><strong>OLAY:</strong> İncelenen olay (kalın çerçeve)</li>
+                    <li><strong>NEDEN (Kesik çizgi):</strong> 5-Why soruları</li>
+                    <li><strong>CEVAP (Düz çizgi):</strong> Sorulara verilen yanıtlar</li>
+                    <li><strong>KÖK NEDEN (Kalın çerçeve):</strong> Analiz sonucunda ulaşılan kök nedenler</li>
+                </ul>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                // Mermaid initialization için bekle
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: true,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 15,
+                            nodeSpacing: 50,
+                            rankSpacing: 80,
+                            diagramPadding: 10
+                        },
+                        themeVariables: {
+                            fontSize: '11px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#333',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    // Mermaid yüklenene kadar bekle
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: true,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 15,
+                                    nodeSpacing: 50,
+                                    rankSpacing: 80,
+                                    diagramPadding: 10
+                                },
+                                themeVariables: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

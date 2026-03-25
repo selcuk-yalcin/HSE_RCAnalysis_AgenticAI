@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {size: A4 landscape; margin: 2mm; }
+        * {box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }
+        body {display: flex; flex-direction: column; padding: 2px; height: 100vh; }
+        header {text-align: center; flex-shrink: 0; padding: 2px 0; }
+        header .top-title {font-size: 12px; font-weight: bold; color: #333; margin-bottom: 1px; }
+        header h1 {font-size: 14px; font-weight: bold; color: #111; margin-bottom: 0px; }
+        header .subtitle {font-size: 11px; color: #666; margin-bottom: 1px; }
+        .legend {text-align: center; font-size: 9px; color: #555; padding: 1px 2px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; }
+        #diagram-wrap {flex: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 100vw; height: calc(100vh - 50px); }
+        #diagram-wrap .mermaid {width: 100%; height: 100%; }
+        #diagram-wrap svg {width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; }
+        .mermaid {display: flex !important; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Yüksekten Düşme - 011457</div>
+    </header>
+    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>İskele montaj işçisi Hasan Yıldız (32) 6 metre<br/>yükseklikteki iskeleden düşerek ağır yaralandı. L2<br/>omurga kırığı, pelvis çatlağı ve iç kanama ile<br/>yoğun"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden işçi emniyet kemeri takmamıştı?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Emniyet kemeri kullanımının zorunlu olduğunu biliyordu<br/>ancak rahatsız edici bulduğu için takmadı"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden kemersiz çalıştığı fark edilmedi veya müdahale<br/>edilmedi?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["Şantiyede sürekli gözetim yoktu, işçiler kendi<br/>başlarına çalışıyordu"]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden sürekli gözetim ve denetim yapılmıyordu?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Şantiye şefi ve ustabaşı aynı anda birden fazla<br/>noktayı kontrol etmeye çalışıyordu, yeterli denetim<br/>personeli yoktu"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden yeterli denetim personeli yoktu ve güvenlik<br/>kurallarına uymayanlar tespit edilemiyordu?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Yüksekte çalışma alanlarında düzenli denetim planı<br/>yoktu, gözetim sorumluluğu net tanımlanmamıştı"]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    ROOT1["<b>KÖK NEDEN (D1.2):</b><br/>Kök Neden<br/>Yüksekte Çalışmalarda Yetersiz Gözetim ve Denetim<br/>Sistemi"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A8 --> ROOT1
+
+    Q9["<b>Neden 1:</b><br/>Neden 6 metre yükseklikteki iskelede korkuluk ve<br/>güvenlik ağı bulunmuyordu?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q9
+    A10["İskele montajı tamamlandıktan sonra korkuluk ve<br/>güvenlik ağı takılmamış, eksik bırakılmıştı"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    Q11["<b>Neden 2:</b><br/>Neden iskele montajı eksik bırakılmıştı?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A10 --> Q11
+    A12["İskele montajının tamamlanıp tamamlanmadığı kontrol<br/>edilmemişti, işçiler eksik montajla çalışmaya<br/>başlamıştı"]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 3:</b><br/>Neden iskele montajı kontrol edilmemişti?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Yüksekte çalışma öncesi iskele güvenlik kontrolü<br/>yapılması için bir sistem veya prosedür yoktu"]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 4:</b><br/>Neden yüksekte çalışma için kontrol sistemi yoktu?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Yüksekte çalışma için iş izin sistemi uygulanmıyordu,<br/>risk kontrolleri takip edilmiyordu"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    ROOT2["<b>KÖK NEDEN (D4.4):</b><br/>Kök Neden<br/>Yüksekte Çalışma İçin İş İzin Sisteminin Olmaması<br/>ve Risk Kontrollerinin Takip Edilmemesi"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A16 --> ROOT2
+
+    Q17["<b>Neden 1:</b><br/>Neden işçi emniyet kemeri takmadan ve korkuluksuz<br/>alanda çalıştı?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q17
+    A18["İşçi yüksekte çalışma prosedürlerini bilmiyordu ve<br/>uygulamıyordu"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 2:</b><br/>Neden işçi yüksekte çalışma prosedürlerini bilmiyordu?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["İşçiye yüksekte çalışma konusunda yeterli eğitim<br/>verilmemişti"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    Q21["<b>Neden 3:</b><br/>Neden işçiye yüksekte çalışma eğitimi verilmemişti?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A20 --> Q21
+    A22["Şantiyede eğitim ihtiyaç analizi yapılmıyor, işçiler<br/>doğrudan işe başlatılıyordu"]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 4:</b><br/>Neden eğitim ihtiyaç analizi yapılmıyordu?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Şirketin sistematik bir eğitim programı ve yetkinlik<br/>değerlendirme sistemi yoktu"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    ROOT3["<b>KÖK NEDEN (D3.2):</b><br/>Kök Neden<br/>Yüksekte çalışacak işçiler için eğitim ihtiyaç<br/>analizi yapılmamış ve sistematik eğitim programı<br/>oluşturulmamış"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A24 --> ROOT3
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            flowchart: { 
+                curve: 'linear', 
+                padding: 10, 
+                nodeSpacing: 20, 
+                rankSpacing: 40, 
+                useMaxWidth: true,
+                htmlLabels: true 
+            }, 
+            themeVariables: { 
+                fontSize: '10px', 
+                fontFamily: 'Segoe UI' 
+            } 
+        });
+    </script>
+</body>
+</html>

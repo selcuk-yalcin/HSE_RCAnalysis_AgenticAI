@@ -145,6 +145,42 @@ class AnalysisCache:
             "money_saved": f"${self.stats['saved_cost']:.2f}"
         }
     
+    def get_by_key(self, cache_key: str) -> Optional[dict]:
+        """
+        Doğrudan key ile cache'den al (Granular caching için)
+        """
+        cache_file = self.cache_dir / f"{cache_key}.json"
+        
+        if not cache_file.exists():
+            return None
+        
+        # TTL kontrol et
+        file_age = datetime.now() - datetime.fromtimestamp(cache_file.stat().st_mtime)
+        if file_age > timedelta(days=self.ttl_days):
+            cache_file.unlink()
+            return None
+        
+        try:
+            with open(cache_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"   ⚠️ Cache okuma hatası: {e}")
+            return None
+    
+    def set_by_key(self, cache_key: str, data: dict) -> bool:
+        """
+        Doğrudan key ile cache'e kaydet (Granular caching için)
+        """
+        cache_file = self.cache_dir / f"{cache_key}.json"
+        
+        try:
+            with open(cache_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            return True
+        except Exception as e:
+            print(f"   ⚠️ Cache yazma hatası: {e}")
+            return False
+    
     def clear(self):
         """
         Tüm cache'i sil.

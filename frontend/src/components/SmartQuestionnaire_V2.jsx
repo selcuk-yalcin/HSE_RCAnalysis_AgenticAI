@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sun, Moon, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
+import { getTranslation } from '../utils/translations';
 import './SmartQuestionnaire_V2.css';
 
 /**
@@ -9,9 +10,10 @@ import './SmartQuestionnaire_V2.css';
  * - Detaylı Analiz sekmesi (koşullu, açılı-kapanabilir)
  * - Light/Dark Mode seçeneği
  * - Taxonomy otomatik bağlama
+ * - Multi-language support
  */
 
-const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
+const SmartQuestionnaire_V2 = ({ language = 'tr', incidentData, onComplete }) => {
   // ========================================================================
   // STATE
   // ========================================================================
@@ -22,172 +24,174 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
   const [expandedSections, setExpandedSections] = useState({});
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
 
+  const t = (key) => getTranslation(language, key);
+
   // ========================================================================
   // GENEL SORULAR (15 SORU - TÜM OLAYLAR)
   // ========================================================================
   const generalQuestions = [
     {
       id: 'g1',
-      question: 'Olayın Özeti Nedir?',
+      question: t('incident_summary'),
       type: 'textarea',
-      category: 'Temel',
-      description: 'Ne oldu, nerede, ne zaman, kim etkilendi?',
-      placeholder: 'Kısaca olayı özetleyin...'
+      category: t('category_basic'),
+      description: t('incident_summary_desc'),
+      placeholder: t('incident_summary_placeholder')
     },
     {
       id: 'g2',
-      question: 'Olay Ne Zaman Gerçekleşti?',
+      question: t('incident_when'),
       type: 'datetime',
-      category: 'Temel',
-      description: 'Tarih ve saat?'
+      category: t('category_basic'),
+      description: t('incident_when_desc')
     },
     {
       id: 'g3',
-      question: 'Olay Nerede Gerçekleşti?',
+      question: t('incident_where'),
       type: 'text',
-      category: 'Konum',
-      description: 'Tesis, bölüm, spesifik yer',
-      placeholder: 'Üretim hattı A, Depo 3, vb.'
+      category: t('category_location'),
+      description: t('incident_where_desc'),
+      placeholder: t('incident_where_placeholder')
     },
     {
       id: 'g4',
-      question: 'Etkilenen Personel Bilgileri',
+      question: t('affected_personnel'),
       type: 'text',
-      category: 'Personel',
-      description: 'Ad, ünvan, deneyim',
-      placeholder: 'Ahmet Çelik - Operatör - 2 yıl'
+      category: t('category_personnel'),
+      description: t('affected_personnel_desc'),
+      placeholder: t('affected_personnel_placeholder')
     },
     {
       id: 'g5',
-      question: 'Olayın Türü Nedir?',
+      question: t('incident_type'),
       type: 'select',
-      category: 'Sınıflandırma',
+      category: t('category_classification'),
       options: [
-        'İş Kazası',
-        'Ramak Kala (Near Miss)',
-        'Çevre Olayı',
-        'Mülkiyet Hasarı',
-        'Diğer'
+        t('incident_type_work_accident'),
+        t('incident_type_near_miss'),
+        t('incident_type_environmental'),
+        t('incident_type_property'),
+        t('incident_type_other')
       ]
     },
     {
       id: 'g6',
-      question: 'Yaralanma/Hasar Şiddeti',
+      question: t('injury_severity_level'),
       type: 'select',
-      category: 'Şiddet',
+      category: t('category_severity'),
       options: [
-        'İlk Yardım (Hafif)',
-        'Tedavi Gerektiren (Orta)',
-        'Hastaneye Yatış',
-        'Kalıcı Hasar',
-        'Ölümlü',
-        'Hasar Yok'
+        t('injury_first_aid'),
+        t('injury_medical'),
+        t('injury_lost_time'),
+        t('injury_permanent'),
+        t('injury_fatal'),
+        t('no') + ' ' + t('injury_type')
       ]
     },
     {
       id: 'g7',
-      question: 'Prosedür/İş Talimatı Var Mıydı?',
+      question: t('procedure_available'),
       type: 'select',
-      category: 'Sistem',
+      category: t('category_system'),
       options: [
-        'Hayır, yoktu',
-        'Vardı ama bilinmiyordu',
-        'Vardı ve biliniyordu',
-        'Vardı ama uygulanmıyordu'
+        t('procedure_no'),
+        t('procedure_unknown'),
+        t('procedure_known'),
+        t('procedure_not_followed')
       ],
       taxonomy: ['D9.1', 'D9.3', 'D9.5']
     },
     {
       id: 'g8',
-      question: 'Eğitim Verilmiş Miydi?',
+      question: t('training_provided'),
       type: 'select',
-      category: 'Personel',
+      category: t('category_personnel'),
       options: [
-        'Hayır',
-        'Genel eğitim var ama spesifik yoktu',
-        'Evet, spesifik eğitim vardı'
+        t('training_no'),
+        t('training_general'),
+        t('training_specific')
       ],
       taxonomy: ['D3.1', 'D3.2']
     },
     {
       id: 'g9',
-      question: 'Risk Değerlendirmesi Yapılmış Mıydı?',
+      question: t('risk_assessment'),
       type: 'select',
-      category: 'Yönetim',
+      category: t('category_management'),
       options: [
-        'Hayır',
-        'Yapıldı ama kontroller uygulanmadı',
-        'Yapıldı ve kontroller takip edildi'
+        t('risk_no'),
+        t('risk_not_applied'),
+        t('risk_applied')
       ],
       taxonomy: ['D4.1', 'D4.2']
     },
     {
       id: 'g10',
-      question: 'Denetim/Gözetim Var Mıydı?',
+      question: t('supervision'),
       type: 'select',
-      category: 'Yönetim',
+      category: t('category_management'),
       options: [
-        'Hayır',
-        'Kısmen',
-        'Evet, tam denetim vardı'
+        t('supervision_no'),
+        t('supervision_partial'),
+        t('supervision_full')
       ],
       taxonomy: ['D1.2']
     },
     {
       id: 'g11',
-      question: 'KKD (Kişisel Koruyucu Donanım) Yeterli Miydi?',
+      question: t('ppe_adequate'),
       type: 'select',
-      category: 'Koruma',
+      category: t('category_protection'),
       options: [
-        'Gerekli değildi',
-        'Gerekli ama sağlanmadı',
-        'Sağlandı ama kullanılmadı',
-        'Sağlandı ve kullanıldı'
+        t('ppe_not_needed'),
+        t('ppe_not_provided'),
+        t('ppe_not_used'),
+        t('ppe_used')
       ],
       taxonomy: ['A3.1', 'A3.2', 'A3.4']
     },
     {
       id: 'g12',
-      question: 'İletişim Sorun Var Mıydı?',
+      question: t('communication_issue'),
       type: 'select',
-      category: 'İletişim',
+      category: t('category_communication'),
       options: [
-        'Evet, önemli iletişim kopukluğu',
-        'Kısmen, talimatlar açık değildi',
-        'Hayır, iletişim açıktı'
+        t('communication_major'),
+        t('communication_unclear'),
+        t('communication_clear')
       ],
       taxonomy: ['D2.1', 'D2.2']
     },
     {
       id: 'g13',
-      question: 'Benzer Olay Daha Önce Yaşandı Mı?',
+      question: t('similar_incident'),
       type: 'select',
-      category: 'Sistem',
+      category: t('category_system'),
       options: [
-        'Evet, benzer olaylar yaşandı',
-        'Ramak kala (near miss) var',
-        'Hayır, bu ilk'
+        t('similar_yes'),
+        t('similar_near_miss'),
+        t('similar_first')
       ],
       taxonomy: ['D1.3']
     },
     {
       id: 'g14',
-      question: 'Acil Müdahale/Ilk Yardım Yeterli Miydi?',
+      question: t('emergency_response'),
       type: 'select',
-      category: 'Müdahale',
+      category: t('category_response'),
       options: [
-        'Hayır, yetersizdi',
-        'Kısmen yapıldı',
-        'Evet, profesyonel müdahale yapıldı'
+        t('emergency_inadequate'),
+        t('emergency_partial'),
+        t('emergency_professional')
       ]
     },
     {
       id: 'g15',
-      question: 'Ek Açıklamalar',
+      question: t('additional_comments'),
       type: 'textarea',
-      category: 'Diğer',
-      description: 'Önemli detaylar, tanık ifadeleri, vb.',
-      placeholder: 'Başka dikkat çeken noktalar...'
+      category: t('category_other'),
+      description: t('additional_comments_desc'),
+      placeholder: t('additional_comments_placeholder')
     }
   ];
 
@@ -310,8 +314,8 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
       {/* Header */}
       <div className="questionnaire-header">
         <div className="header-left">
-          <h1>🎯 Akıllı Soruşturma Sistemi</h1>
-          <p>Olay hakkında sistemli bilgi toplayarak kök nedene ulaşın</p>
+          <h1>🎯 {t('smart_investigation_system')}</h1>
+          <p>{t('systematic_info_collection')}</p>
         </div>
 
         <div className="header-right">
@@ -319,7 +323,7 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
           <button
             className="theme-toggle"
             onClick={() => setDarkMode(!darkMode)}
-            title={darkMode ? 'Aydınlık Mod' : 'Karanlık Mod'}
+            title={darkMode ? t('light_mode') : t('dark_mode')}
           >
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
@@ -327,7 +331,7 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
           {/* Progress */}
           <div className="progress-indicator">
             <span className="progress-text">
-              {questionsAnswered} / {generalQuestions.length} Soru
+              {questionsAnswered} / {generalQuestions.length} {t('questions_answered')}
             </span>
             <div className="progress-bar">
               <div
@@ -348,7 +352,7 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
           onClick={() => setActiveTab('general')}
         >
           <span className="tab-icon">📋</span>
-          <span className="tab-label">Genel Sorular</span>
+          <span className="tab-label">{t('general_questions')}</span>
           <span className="tab-badge">{generalQuestions.length}</span>
         </button>
 
@@ -357,7 +361,7 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
           onClick={() => setActiveTab('detailed')}
         >
           <span className="tab-icon">🔍</span>
-          <span className="tab-label">Detaylı Analiz</span>
+          <span className="tab-label">{t('detailed_analysis')}</span>
           <span className="tab-badge">{getVisibleDetailedSections().length}</span>
         </button>
       </div>
@@ -426,7 +430,7 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
                       value={answers[question.id] || ''}
                       onChange={(e) => handleGeneralAnswer(question.id, e.target.value)}
                     >
-                      <option value="">-- Seçiniz --</option>
+                      <option value="">{t('select_placeholder')}</option>
                       {question.options.map((option) => (
                         <option key={option} value={option}>
                           {option}
@@ -437,7 +441,7 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
 
                   {question.taxonomy && answers[question.id] && (
                     <div className="taxonomy-hint">
-                      🏷️ <strong>Kodlar:</strong> {question.taxonomy.join(', ')}
+                      🏷️ <strong>{t('auto_detected_codes').split(' ')[2]}:</strong> {question.taxonomy.join(', ')}
                     </div>
                   )}
                 </div>
@@ -447,7 +451,7 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
             {/* Detected Codes Summary */}
             {detectedCodes.size > 0 && (
               <div className="detected-codes-panel">
-                <h4>📌 Otomatik Tespit Edilen Kodlar</h4>
+                <h4>📌 {t('auto_detected_codes')}</h4>
                 <div className="codes-list">
                   {Array.from(detectedCodes)
                     .sort()
@@ -467,8 +471,8 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
           <div className="tab-content detailed-analysis">
             {getVisibleDetailedSections().length === 0 ? (
               <div className="no-sections">
-                <p>📋 Henüz detaylı analiz bölümü yok.</p>
-                <p>Genel sorularda daha fazla bilgi girerek detaylı seçenekler görün.</p>
+                <p>📋 {t('no_detailed_sections')}</p>
+                <p>{t('enter_more_info')}</p>
               </div>
             ) : (
               getVisibleDetailedSections().map((section) => (
@@ -544,10 +548,10 @@ const SmartQuestionnaire_V2 = ({ incidentData, onComplete }) => {
             setQuestionsAnswered(0);
           }}
         >
-          🔄 Sıfırla
+          🔄 {t('reset_form')}
         </button>
         <button className="btn-primary" onClick={handleComplete}>
-          ✅ Soruşturmayı Tamamla
+          ✅ {t('complete_investigation')}
         </button>
       </div>
     </div>

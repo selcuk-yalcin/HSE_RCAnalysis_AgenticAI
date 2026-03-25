@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 15mm;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: white;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .legend {
+            text-align: center;
+            font-size: 11px;
+            margin-bottom: 15px;
+            padding: 8px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        
+        @media print {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>5-WHY ANALİZ AĞACI (DECISION TREE)</h1>
+    <div class="subtitle">Forklift Sarmal Kapı Çarpışması - Kök Neden Analizi</div>
+    
+    <div class="legend">
+        <strong>Nasıl Okunur:</strong> Her dal OLAYDAN başlar → WHY-1 sorusu sorulur → Zincirleme derinleşme (WHY-2, 3, 4) → KÖK NEDEN bulunur
+    </div>
+    
+    <div class="mermaid">
+graph LR
+    OLAY["OLAY:<br/>Forklift geri manevra sırasında<br/>sarmal kapıya çarptı"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px
+
+    %% DAL 1 - Başlangıç
+    Q1_1["NEDEN 1?<br/>Forklift geri manevra<br/>sırasında neden sarmal<br/>kapıya çarptı?"]
+    style Q1_1 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    OLAY --> Q1_1
+
+    A1_1["CEVAP:<br/>Operatör geri manevra yaparken<br/>kapının kendiliğinden kapanmaya<br/>başladığını fark etmemiş,<br/>görüş açısında olmayan sarmal<br/>kapıyı kontrol etmemiştir"]
+    style A1_1 fill:#fff,stroke:#666,stroke-width:1px
+    Q1_1 --> A1_1
+
+    Q1_2["NEDEN 2?<br/>Operatör neden kapının<br/>kendiliğinden kapanmaya<br/>başladığını fark edemedi<br/>ve kontrol etmedi?"]
+    style Q1_2 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    A1_1 --> Q1_2
+
+    A1_2["CEVAP:<br/>Operatör, sarmal kapının 60 saniye<br/>sonra otomatik olarak kapandığını<br/>bilmiyordu ve kapıyı açık tutmak için<br/>kumanda üzerindeki stop tuşuna<br/>basması gerektiğinden habersizdi"]
+    style A1_2 fill:#fff,stroke:#666,stroke-width:1px
+    Q1_2 --> A1_2
+
+    Q1_3["NEDEN 3?<br/>Operatör neden sarmal kapının<br/>otomatik kapanma özelliğini<br/>ve stop tuşu kullanımını<br/>bilmiyordu?"]
+    style Q1_3 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    A1_2 --> Q1_3
+
+    %% ORTAK CEVAP - Dal 1 ve Dal 2 birleşiyor
+    A_COMMON["CEVAP:<br/>Operatöre sarmal kapı kumanda<br/>sistemi, otomatik kapanma süresi<br/>ve çalışma prensipleri hakkında<br/>sahaya özgü bir eğitim<br/>verilmemişti"]
+    style A_COMMON fill:#fff,stroke:#666,stroke-width:1px
+    Q1_3 --> A_COMMON
+
+    %% DAL 2 - Başlangıç
+    Q2_1["NEDEN 1?<br/>Forklift kabininin üst kısmı<br/>neden geri manevra sırasında<br/>sarmal kapıya çarptı?"]
+    style Q2_1 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    OLAY --> Q2_1
+
+    A2_1["CEVAP:<br/>Operatör, sarmal kapının 60 saniye<br/>sonra otomatik kapanacağını ve<br/>kapının açık kalması için kumanda<br/>sistemindeki stop tuşuna basılması<br/>gerektiğini bilmiyordu"]
+    style A2_1 fill:#fff,stroke:#666,stroke-width:1px
+    Q2_1 --> A2_1
+
+    Q2_2["NEDEN 2?<br/>Operatör neden sarmal kapının<br/>otomatik kapanma özelliğini<br/>ve stop tuşu kullanımını<br/>bilmiyordu?"]
+    style Q2_2 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    A2_1 --> Q2_2
+
+    %% Dal 2 ortak cevaba bağlanıyor
+    Q2_2 --> A_COMMON
+
+    %% ORTAK SORU - Dal 1 ve Dal 2'den sonra
+    Q_COMMON["NEDEN 4?<br/>Operatöre neden sarmal kapı<br/>kumanda sistemi ve çalışma<br/>prensipleri hakkında sahaya<br/>özgü eğitim verilmemişti?"]
+    style Q_COMMON fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    A_COMMON --> Q_COMMON
+
+    %% AYRILMA NOKTASI - Dal 1: Eğitim Programı
+    A1_4["CEVAP:<br/>1 aylık fabrika tecrübesine sahip<br/>operatör için forklift kullanacağı<br/>alandaki sarmal kapı sistemleri,<br/>otomatik kapanma süreleri ve<br/>kumanda kullanımını kapsayan<br/>göreve özel bir eğitim<br/>programı bulunmuyordu"]
+    style A1_4 fill:#fff,stroke:#666,stroke-width:1px
+    Q_COMMON --> A1_4
+
+    ROOT1["KÖK NEDEN:<br/>Eğitim Tasarımı Etkisiz<br/><br/>Forklift operatörü eğitim programı,<br/>operatörün saha içinde etkileşime<br/>gireceği sarmal kapı sistemini<br/>kapsamıyordu"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px
+    A1_4 --> ROOT1
+
+    %% AYRILMA NOKTASI - Dal 2: Saha Koçluğu
+    A2_4["CEVAP:<br/>Henüz 1 aylık fabrika tecrübesine<br/>sahip operatöre, çalışma alanındaki<br/>ekipmanların kullanımına yönelik<br/>saha oryantasyonu ve mentor<br/>eşliğinde pratik koçluk<br/>yapılmamıştı"]
+    style A2_4 fill:#fff,stroke:#666,stroke-width:1px
+    Q_COMMON --> A2_4
+
+    ROOT2["KÖK NEDEN:<br/>Beceri Koçluğu Yapılmadı<br/><br/>Yeni forklift operatörüne,<br/>çalışma alanındaki sarmal kapı<br/>sistemini aktaracak mentor<br/>eşliğinde saha koçluğu<br/>yapılmamıştır"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px
+    A2_4 --> ROOT2
+
+    %% DAL 3 - Tamamen bağımsız
+    Q3_1["NEDEN 1?<br/>Forklift geri manevra<br/>yaparken neden sarmal<br/>kapıya çarptı?"]
+    style Q3_1 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    OLAY --> Q3_1
+
+    A3_1["CEVAP:<br/>Sarmal kapının otomatik kapanma<br/>özelliği operatöre zamanında uyarı<br/>sağlayacak bir görsel veya sesli<br/>uyarı sistemi içermemektedir"]
+    style A3_1 fill:#fff,stroke:#666,stroke-width:1px
+    Q3_1 --> A3_1
+
+    Q3_2["NEDEN 2?<br/>Sarmal kapının otomatik<br/>kapanması sırasında neden<br/>operatöre görsel veya sesli<br/>uyarı sağlanmamıştır?"]
+    style Q3_2 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    A3_1 --> Q3_2
+
+    A3_2["CEVAP:<br/>Sarmal kapı sistemi 60 saniyelik<br/>otomatik kapanma zamanlayıcısıyla<br/>çalışmakta ancak kapanma başladığında<br/>çevreye uyarı veren herhangi bir<br/>ikaz mekanizması tasarımda<br/>bulunmamaktadır"]
+    style A3_2 fill:#fff,stroke:#666,stroke-width:1px
+    Q3_2 --> A3_2
+
+    Q3_3["NEDEN 3?<br/>Sarmal kapı tasarımında<br/>otomatik kapanma sırasında<br/>uyarı mekanizması neden<br/>bulunmamaktadır?"]
+    style Q3_3 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    A3_2 --> Q3_3
+
+    A3_3["CEVAP:<br/>Sarmal kapının forklift trafiğiyle<br/>etkileşimi ve geri manevra sırasında<br/>oluşan kör nokta riski, kapı<br/>sisteminin kurulumu veya devreye<br/>alınması aşamasında<br/>değerlendirilmemiştir"]
+    style A3_3 fill:#fff,stroke:#666,stroke-width:1px
+    Q3_3 --> A3_3
+
+    Q3_4["NEDEN 4?<br/>Sarmal kapı ile forklift trafiği<br/>arasındaki etkileşim ve kör nokta<br/>riski neden değerlendirilmemiştir?"]
+    style Q3_4 fill:#f9f9f9,stroke:#666,stroke-width:1px,stroke-dasharray: 5 5
+    A3_3 --> Q3_4
+
+    A3_4["CEVAP:<br/>Kapalı alanda forklift operasyonu<br/>ve sarmal kapı geçişi için<br/>forklift-kapı etkileşimine özgü<br/>bir risk değerlendirmesi yapılmamıştır;<br/>otomatik kapanma süresinin forklift<br/>manevra süresiyle uyumu gibi spesifik<br/>tehlikeler tanımlanmamıştır"]
+    style A3_4 fill:#fff,stroke:#666,stroke-width:1px
+    Q3_4 --> A3_4
+
+    ROOT3["KÖK NEDEN:<br/>Risk Değerlendirmesi Yetersiz<br/><br/>Sarmal kapı geçişlerinde forklift<br/>operasyonuna özgü bir risk<br/>değerlendirmesi yapılmamış,<br/>spesifik tehlikeler tanımlanmamış<br/>ve kontrol önlemleri<br/>belirlenmemiştir"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px
+    A3_4 --> ROOT3
+    </div>
+    
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: { 
+                curve: 'linear',
+                padding: 20,
+                nodeSpacing: 60,
+                rankSpacing: 60,
+                useMaxWidth: true
+            },
+            themeVariables: {
+                fontSize: '10px',
+                fontFamily: 'Arial, sans-serif'
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2327 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - TRANS-2026-001-DOOR";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">TRANS-2026-001-DOOR</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">19.03.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Kapalı Depo Alanı - Sarmal Kapı Girişi</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Hafif Yaralanma (İlk Yardım Seviyesi)</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Forklift operatörü paletli yük almak için sarmal kapıyı açtı, yükü kaldırıp geri manevra yaparken kapı otomatik olarak kapandı ve forklift kabininin üst kısmına çarptı. Operatör kapının 60 saniye sonra otomatik kapandığını ve açık tutmak için 'stop' tuşuna basılması gerektiğini bilmiyordu.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">Kapalı depo alanında forklift operatörü paletli yükü almak için sarmal kapıyı forkliftten inerek açmış, ardından kapalı alana girip yükü kaldırmıştır. Operatör geri manevrayla çıkış yapmaya çalışırken, 60 saniye sonra otomatik kapanan sarmal kapı forklift kabininin üst kısmına çarpmıştır. Kapı operatörün görüş açısı dışında kaldığı için çarpışma önlenememiştir.</div>
+<div class="paragraph" contenteditable="true">Kapalı Depo Alanı - Sarmal Kapı Girişi</div>
+<div class="paragraph" contenteditable="true">1 aylık tecrübeli forklift operatörü</div>
+<div class="paragraph" contenteditable="true">Olay malzeme hasarlı olarak kaydedilmiş, kaza defterine 078/26 referans numarasıyla işlenmiştir. Operatör ilk yardım seviyesinde müdahale görmüştür. HSE Yetkilisi tarafından orta seviye araştırma başlatılmış ve çok disiplinli araştırma ekibi oluşturulmuştur.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Operatöre sarmal kapının 60 saniyelik otomatik kapanma özelliği ve 'stop' tuşu kullanımı konusunda hiçbir eğitim verilmemiştir</li>
+<li contenteditable="true">Yeni operatöre sahaya özgü ekipman etkileşimleri konusunda deneyimli mentor eşliğinde saha koçluğu yapılmamıştır</li>
+<li contenteditable="true">Sarmal kapı-forklift etkileşimine yönelik görev bazlı risk değerlendirmesi hiç gerçekleştirilmemiştir</li>
+<li contenteditable="true">Sarmal kapıda otomatik kapanmayı operatöre bildirecek görsel veya sesli uyarı sistemi bulunmamaktadır</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Tüm forklift operatörlerine sarmal kapı kullanımı acil bilgilendirme eğitimi verilmesi</td>
+                        <td contenteditable="true">HSE Yetkilisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Sarmal kapı üzerine 'STOP TUŞU KULLANIMI ZORUNLU' uyarı levhası yerleştirilmesi</td>
+                        <td contenteditable="true">Depo Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Yeni operatörlere mentor eşliğinde saha koçluğu programı başlatılması</td>
+                        <td contenteditable="true">Operasyon Müdürü</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Sarmal kapıya sesli/görsel uyarı sistemi teknik fizibilite çalışması başlatılması</td>
+                        <td contenteditable="true">Bakım Mühendisi</td>
+                        <td contenteditable="true">Planlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">TRANS-2026-001-DOOR / Kaza Defteri: 078/26</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">19.03.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">14:35</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Kapalı Depo Alanı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Sarmal Kapı Girişi - Depo Giriş Noktası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Forklift Operatörü (1 aylık tecrübe)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Forklift ve Otomatik Sarmal Kapı Sistemi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Paletli Yük</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Kış Şartları (Kapının 60 saniye otomatik kapanma nedeni)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">İç Mekan Aydınlatması</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart Forklift Operatörü KKD</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Ekipman Çarpışması - Forklift/Sarmal Kapı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Hafif Yaralanma (İlk Yardım Seviyesi) + Malzeme Hasarı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 Kişi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Düşük - İlk Yardım Gerektiren Yaralanma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Vardiya Amiri</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Hayır - İlk Yardım Yeterli Oldu</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Yatış Gerektirmedi - İlk Yardım Sonrası İşe Dönüş</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:25</div>
+                    <div class="timeline-event" contenteditable="true">Operatör paletli yükü almak için sarmal kapıya yaklaşır, normal operasyon koşulları</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:27</div>
+                    <div class="timeline-event" contenteditable="true">Operatör forkliftten inerek sarmal kapıyı manuel olarak açar</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:28</div>
+                    <div class="timeline-event" contenteditable="true">Operatör forklift ile kapalı alana girer ve paletli yükü kaldırır</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:29</div>
+                    <div class="timeline-event" contenteditable="true">Operatör yüklü forklift ile geri manevra yaparak çıkış kapısına doğru hareket eder</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:30</div>
+                    <div class="timeline-event" contenteditable="true">Sarmal kapı 60 saniyelik otomatik kapanma süresini tamamlar ve kapanmaya başlar</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:30:15</div>
+                    <div class="timeline-event" contenteditable="true">Kapı operatörün görüş açısı dışında olduğu için forklift kabininin üst kısmına çarpar</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:32</div>
+                    <div class="timeline-event" contenteditable="true">Vardiya Amiri olay yerine gelir ve durumu değerlendirir</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:35</div>
+                    <div class="timeline-event" contenteditable="true">Olay Vardiya Amiri tarafından HSE birimine bildirilir</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:40</div>
+                    <div class="timeline-event" contenteditable="true">Operatöre ilk yardım uygulanır, malzeme hasarı tespit edilir</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:00</div>
+                    <div class="timeline-event" contenteditable="true">HSE Yetkilisi olay yerinde inceleme başlatır, kaza defterine kayıt yapılır</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why tekniği, bir olayın yüzeysel nedenlerinden derin organizasyonel kök nedenlere ulaşmak için sistematik olarak 'neden' sorusunu beş kez soran bir analiz yöntemidir. Bu olayda teknik şu şekilde uygulanmıştır: İlk olarak her dalda doğrudan neden (immediate cause) tanımlanmış ve kanıtlarla desteklenmiştir. Ardından 'Bu neden oldu?' sorusu sorularak bir sonraki seviyeye geçilmiştir. Her 'neden' sorusu, bir önceki yanıtın altında yatan nedeni araştırmıştır. Birinci dal davranışsal faktörden (operatörün kapıyı fark etmemesi) başlayarak organizasyonel faktöre (eğitim verilmemesi) ulaşmıştır. İkinci dal yine davranışsal faktörden (stop tuşunu kullanmaması) başlayarak kişisel faktöre (saha koçluğu yapılmaması) ilerlemiştir. Üçüncü dal koşulsal faktörden (uyarı sistemi eksikliği) başlayarak organizasyonel faktöre (risk değerlendirmesi yapılmaması) varmıştır. Her zincirde yanıtlar somut kanıtlarla desteklenmiş, varsayımlardan kaçınılmış ve mantıksal bağlantılar kurulmuştur. Beşinci 'neden' sorusunda artık daha derin bir neden bulunamadığında kök nedene ulaşılmış kabul edilmiştir.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışsal Faktörler</td>
+                        <td contenteditable="true">Bireyin eylemleri, kararları, tehlike algısı, prosedür uygulaması gibi doğrudan davranışsal faktörler. Örnek: tehlikeyi fark etmeme, koruyucu ekipman kullanmama, güvenli olmayan hareket</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşulsal Faktörler</td>
+                        <td contenteditable="true">Fiziksel çevre, ekipman durumu, tasarım özellikleri, uyarı sistemleri gibi çevresel ve teknik koşullar. Örnek: ekipman arızası, yetersiz aydınlatma, uyarı sistemi eksikliği</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Kişisel Faktörler</td>
+                        <td contenteditable="true">Bireyin yetenek, bilgi, beceri, deneyim düzeyi ve bunların geliştirilmesi. Örnek: eğitim eksikliği, deneyimsizlik, koçluk yapılmaması, yetkinlik değerlendirmesi eksikliği</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktörler</td>
+                        <td contenteditable="true">Yönetim sistemleri, politikalar, prosedürler, risk değerlendirmeleri, organizasyonel kültür ve karar alma süreçleri. Örnek: prosedür eksikliği, risk değerlendirmesi yapılmaması, yönetim gözetimi yetersizliği</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">HSE Yetkilisi</td>
+                        <td contenteditable="true">Baş Araştırmacı ve Analiz Lideri</td>
+                        <td contenteditable="true">19.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Depo/Operasyon Müdürü</td>
+                        <td contenteditable="true">Departman Temsilcisi ve Operasyonel Süreç Uzmanı</td>
+                        <td contenteditable="true">19.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Forklift Eğitim Süpervizörü</td>
+                        <td contenteditable="true">Eğitim ve Yetkinlik Değerlendirme Uzmanı</td>
+                        <td contenteditable="true">19.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Bakım/Teknik Uzman (Kapı Sistemleri)</td>
+                        <td contenteditable="true">Teknik Ekipman ve Tasarım Uzmanı</td>
+                        <td contenteditable="true">19.03.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İnsan Kaynakları Temsilcisi</td>
+                        <td contenteditable="true">İşe Alım ve Oryantasyon Süreç Temsilcisi</td>
+                        <td contenteditable="true">19.03.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. DAL 1 - DAVRANIŞSAL FAKTÖR: ÇEVRESEL TEHLİKENİN FARK EDİLMEMESİ</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Operatör paletli yükü almak için sarmal kapıyı açmış, kapalı alana girip yükü kaldırmış ve geri manevrayla çıkış yapmaya başlamıştır. Geri manevra sırasında sarmal kapı 60 saniyelik otomatik kapanma süresini tamamlamış ve kapanmaya başlamıştır. Ancak kapı, forkliftin geri hareket yönünde operatörün doğrudan görüş açısının dışında kaldığı için operatör kapının kapandığını fark edememiş ve forklift kabininin üst kısmı kapıya çarpmıştır. Bu dal, operatörün çevresel tehlikeyi (kapanan kapıyı) neden algılayamadığını ve bu algılama başarısızlığının altında yatan organizasyonel nedenleri araştırmaktadır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Operatör geri manevra sırasında görüş açısının dışında kalan sarmal kapının kapanmaya başladığını fark etmemiştir</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Operatör geri manevra sırasında sarmal kapının kapanmaya başladığını neden fark etmemiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı 60 saniyelik otomatik kapanma süresini tamamlayarak kendiliğinden kapanmaya başlamıştır ve kapı, forkliftin geri manevra yönünde operatörün görüş açısının dışında kalmaktadır. Operatör yüklü forklift ile geri geri hareket ederken önündeki yüke ve hareket yönüne odaklanmış, arkasında kalan kapının durumunu kontrol edememiştir.</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Operatör kapının otomatik kapanmasını neden önlememiştir (kapı kumanda sistemindeki 'stop' tuşuna basarak)?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör, sarmal kapının 60 saniye sonra otomatik kapandığını ve kapının açık kalması için kumanda üzerindeki 'stop' tuşuna basılması gerektiğini bilmemektedir. Olay raporunda açıkça 'operatör bu bilgiye sahip değildir' ifadesi yer almaktadır. Operatör kapıyı açtıktan sonra doğrudan yükleme işlemine geçmiş, kapının otomatik kapanacağını öngörememiş ve önleyici tedbir alamamıştır.</div>
+                    <span class="why-code">C - Kişisel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Henüz 1 aylık fabrika tecrübesine sahip operatöre sarmal kapı kullanım bilgisi neden verilmemiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatöre sarmal kapının otomatik kapanma özelliği, 60 saniyelik kapanma süresi ve 'stop' tuşu kullanımı gibi sahaya özgü ekipman bilgilerini içeren bir eğitim verilmemiştir. Yeni işe başlayan operatörler için standart forklift eğitimi verilmiş olabilir, ancak bu eğitim çalışma alanındaki spesifik ekipmanların (sarmal kapı kumanda sistemi gibi) kullanımını kapsamamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Yeni operatöre forklift çalışma alanındaki sarmal kapı gibi sahaya özgü ekipman riskleri hakkında eğitim neden planlanmamıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyon, yeni başlayan forklift operatörlerine çalışma alanlarındaki sarmal kapıların çalışma prensipleri ve güvenli kullanım prosedürleri gibi göreve özgü ekipman eğitimini tasarlamamış veya müfredata dahil etmemiştir. Eğitim programı genel forklift kullanımına odaklanmış, ancak operatörün çalışacağı spesifik depo alanının özellikleri, ekipman etkileşimleri ve potansiyel tehlikeler eğitim kapsamına alınmamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Organizasyon neden sahaya özgü ekipman etkileşimlerini kapsayan göreve özel eğitim programı geliştirmemiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonda yeni operatörlerin eğitim ihtiyaçları belirlenirken sadece genel forklift yetkinliği değerlendirilmiş, çalışma alanının spesifik özellikleri (sarmal kapı sistemleri, otomatik kapanma mekanizmaları, kumanda kullanımı gibi) sistematik olarak analiz edilmemiş ve eğitim müfredatına entegre edilmemiştir. Bu durum eğitim planlama sürecindeki bir boşluktur.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Sahaya Özgü Ekipman Riskleri Konusunda Eğitim Verilmemesi</div>
+                <div class="box-content" contenteditable="true">[ / ]
+
+1 aylık fabrika tecrübesine sahip forklift operatörüne, sarmal kapının 60 saniyelik otomatik kapanma özelliği, kapının açık tutulması için kumanda sistemindeki 'stop' tuşunun kullanımı ve geri manevra sırasında kapı durumunun kontrolü gibi sahaya özgü ekipman riskleri hakkında hiçbir eğitim verilmemiştir. Olay raporu açıkça 'operatör bu bilgiye sahip değildir' ifadesini kullanmaktadır. Operatörün 1 aylık tecrübesi olmasına rağmen sarmal kapının otomatik kapanma mekanizması ve 'stop' tuşu hakkında bilgilendirilmediği kesindir. Bu durum mevcut bir eğitimin kapsamının dar olması değil, doğrudan sarmal kapı kullanımına yönelik hiçbir eğitimin verilmemiş olmasıdır. Organizasyon yeni operatörlere genel forklift eğitimi vermiş olabilir, ancak çalışma alanının spesifik tehlikelerini (otomatik kapanan kapılar, kumanda sistemleri, görüş açısı kısıtlamaları) kapsayan göreve özel eğitim tasarlamamış ve uygulamamıştır.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yeni operatör oryantasyon programında sahaya özgü ekipman eğitimi modülü bulunmaması veya yetersiz olması</li>
+<li contenteditable="true">Forklift operatör eğitim müfredatının çalışma alanı spesifik tehlikelerini (sarmal kapı sistemleri gibi) kapsamaması</li>
+<li contenteditable="true">Eğitim ihtiyaç analizi sürecinde göreve özel ekipman etkileşimlerinin sistematik olarak değerlendirilmemesi</li>
+<li contenteditable="true">Yeni işe başlayan operatörlerin çalışma alanındaki tüm ekipmanlar hakkında bilgilendirilmesini sağlayan bir kontrol listesi veya prosedürün olmaması</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. DAL 2 - DAVRANIŞSAL FAKTÖR: KORUYUCU YÖNTEM İHTİYACININ FARK EDİLMEMESİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Operatör sarmal kapıyı açtıktan sonra doğrudan yükleme işlemine geçmiş ve geri manevrayla çıkış yapmaya başlamıştır. Sarmal kapının açık kalması için kumanda sistemindeki 'stop' tuşuna basılması gerektiği halde operatör bu koruyucu yöntemi uygulamamıştır. Operatör 'stop' tuşunun varlığından ve işlevinden haberdar değildir. Bu dal, operatörün koruyucu yöntemi neden bilmediğini ve bu bilgi eksikliğinin altında yatan kişisel ve organizasyonel nedenleri araştırmaktadır. Özellikle yeni operatörlere sahada pratik bilgi aktarımının nasıl yapılması gerektiği konusuna odaklanmaktadır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Operatör sarmal kapının otomatik kapanmasını önlemek için 'stop' tuşuna basılması gerektiğini bilmiyordu ve bu koruyucu yöntemi uygulamadı</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Operatör neden sarmal kapının otomatik kapanmasını önlemek için 'stop' tuşuna basmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör, sarmal kapının 60 saniye sonra otomatik kapandığını ve açık tutmak için kumanda üzerindeki 'stop' tuşuna basılması gerektiğini bilmiyordu. Bu bilgi eksikliği nedeniyle kapıyı açtıktan sonra herhangi bir önleyici tedbir almadan doğrudan yükleme işlemine geçmiştir.</div>
+                    <span class="why-code">C - Kişisel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Operatör neden sarmal kapının çalışma prensibi ve 'stop' tuşu hakkında bilgi sahibi değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatörün fabrika tecrübesi yalnızca 1 aydı ve sarmal kapının otomatik kapanma mekanizması ile kumanda sistemi kullanımı konusunda sahada pratik koçluk yapılmamıştı. Yeni operatör teorik eğitim almış olabilir, ancak gerçek çalışma ortamında sarmal kapı ile nasıl etkileşime gireceği, kumanda sistemini nasıl kullanacağı konusunda deneyimli bir çalışan eşliğinde pratik öğrenme fırsatı sunulmamıştır.</div>
+                    <span class="why-code">C - Kişisel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">1 aylık deneyime sahip yeni operatöre neden sarmal kapı kullanımı gibi sahaya özgü ekipman bilgileri koçluk yoluyla aktarılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Yeni operatöre forklift operasyonu sırasında karşılaşacağı sahaya özgü ekipmanlar (sarmal kapı kumandası, otomatik kapanma süresi, stop tuşu kullanımı vb.) konusunda deneyimli bir çalışan eşliğinde saha koçluğu yapılmamıştı. Operatör muhtemelen genel forklift eğitiminden sonra doğrudan bağımsız çalışmaya başlatılmış, sahada karşılaşacağı spesifik durumlar için mentor desteği sağlanmamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden yeni forklift operatörlerine sahaya özgü ekipman etkileşimleri konusunda bir saha koçluğu veya mentorluk süreci uygulanmıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonda yeni başlayan operatörlerin, forklift güzergahlarındaki sarmal kapı gibi ekipmanların kullanımını deneyimli bir mentor eşliğinde sahada öğrenmesini sağlayan yapılandırılmış bir koçluk süreci bulunmuyordu. Yeni operatörlerin bağımsız çalışmaya ne zaman hazır olduklarını değerlendiren, sahada pratik beceri kazanmalarını sağlayan ve kritik ekipman etkileşimlerini gözlemleyen bir mentorluk programı tasarlanmamış veya uygulanmamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Organizasyon neden yeni operatörler için yapılandırılmış bir saha koçluğu ve mentorluk programı geliştirmemiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonda yeni operatörlerin işe alım ve yetkinlik geliştirme sürecinde saha koçluğunun önemi ve gerekliliği sistematik olarak değerlendirilmemiş, sadece teorik eğitim yeterli görülmüştür. Sahada pratik öğrenme, deneyimli çalışanlardan bilgi aktarımı ve gerçek operasyonel koşullarda beceri geliştirme ihtiyacı organizasyonel süreçlere entegre edilmemiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Yeni Operatörlere Sahaya Özgü Ekipman Etkileşimleri Konusunda Saha Koçluğu Yapılmaması</div>
+                <div class="box-content" contenteditable="true">[ / ]
+
+1 aylık fabrika tecrübesine sahip yeni forklift operatörüne, sarmal kapının otomatik kapanma mekanizması ve 'stop' tuşu kullanımı gibi sahaya özgü ekipman etkileşimleri konusunda deneyimli bir çalışan eşliğinde saha koçluğu veya mentorluk yapılmamıştır. Operatör henüz 1 aylık deneyime sahip yeni bir çalışandı ve sarmal kapının 60 saniye sonra otomatik kapandığı, açık tutmak için 'stop' tuşuna basılması gerektiği gibi bilgiler ancak sahada deneyimli bir mentor eşliğinde pratik koçlukla aktarılabilecek operasyonel detaylardı. Teorik eğitimde bu bilgiler verilmiş olsa bile, gerçek çalışma ortamında ekipmanı kullanırken bu bilgilerin nasıl uygulanacağı, hangi durumlarda hangi işlemlerin yapılacağı ancak sahada pratik gösterim ve koçlukla öğrenilebilir. Organizasyonda yeni operatörlerin deneyimli bir mentor eşliğinde sahada çalışarak kritik ekipman etkileşimlerini öğrenmelerini sağlayan yapılandırılmış bir koçluk süreci bulunmamaktadır. Bu durum, teorik bilginin pratik uygulamaya dönüşmesini engellemekte ve yeni operatörlerin sahada karşılaşacakları spesifik durumlar için hazırlıksız kalmalarına neden olmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yeni operatörler için yapılandırılmış saha koçluğu ve mentorluk programının bulunmaması</li>
+<li contenteditable="true">Deneyimli operatörlerin mentor olarak atanması ve koçluk sorumluluklarının tanımlanmaması</li>
+<li contenteditable="true">Yeni operatörlerin bağımsız çalışmaya hazır olduklarını değerlendiren yetkinlik kontrol sürecinin olmaması</li>
+<li contenteditable="true">Sahada pratik öğrenme ve beceri geliştirme sürecinin organizasyonel prosedürlere entegre edilmemesi</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. DAL 3 - KOŞULSAL FAKTÖR: UYARI SİSTEMİNİN ETKİSİZ OLMASI</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Sarmal kapı 60 saniye sonra otomatik olarak kapanmaya başladığında, operatöre bu durumu bildiren herhangi bir görsel (yanıp sönen ışık) veya sesli (alarm, bip sesi) uyarı sistemi bulunmamaktadır. Operatör geri manevra yaparken kapı görüş açısının dışında kaldığı için kapının kapandığını fark edememiş ve çarpışma meydana gelmiştir. Eğer kapı kapanmaya başladığında operatörü uyaran bir sistem olsaydı, operatör durumu fark edip forklift hareketini durdurabilir veya kapıyı yeniden açabilirdi. Bu dal, uyarı sistemi eksikliğinin altında yatan tasarım ve risk değerlendirme başarısızlıklarını araştırmaktadır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Sarmal kapının otomatik kapanma özelliği operatöre zamanında uyarı sağlayacak görsel veya sesli bir sistem içermiyordu</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapının otomatik kapanmaya başladığını operatöre bildiren görsel veya sesli bir uyarı sistemi neden bulunmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapının 60 saniyelik otomatik kapanma mekanizması tasarlanırken, kapanma anında forklift operatörlerini uyaracak bir sinyal (sesli alarm, yanıp sönen ışık, bip sesi vb.) sisteme entegre edilmemişti. Kapı sadece mekanik olarak kapanmakta, ancak bu kapanmanın operatörlere bildirilmesi için herhangi bir uyarı mekanizması bulunmamaktadır.</div>
+                    <span class="why-code">B - Koşulsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapının otomatik kapanma özelliğine uyarı sistemi entegre edilmesi neden tasarım aşamasında değerlendirilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapının kış şartları nedeniyle 60 saniye sonra otomatik kapanma özelliğinin, geri manevra yapan forklift operatörü için oluşturacağı çarpışma tehlikesi bir risk senaryosu olarak tanımlanmamıştı. Kapının otomatik kapanması enerji tasarrufu veya ısı kaybını önleme amacıyla tasarlanmış, ancak bu özelliğin forklift trafiği ile etkileşiminde yaratacağı güvenlik riski öngörülmemiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Forklift ile sarmal kapının eş zamanlı kullanımında oluşabilecek çarpışma riski neden tanımlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı geçişlerinde forklift operasyonuna özgü bir risk değerlendirmesi yapılmamıştı. Özellikle geri manevra sırasında kapının görüş açısı dışında kalması ve otomatik kapanma süresiyle operasyon süresinin çakışması gibi spesifik tehlike senaryoları analiz edilmemişti. Risk değerlendirmesi genel olarak forklift kullanımını ve kapı kullanımını ayrı ayrı ele almış, ancak bu iki ekipmanın etkileşiminde oluşabilecek spesifik tehlikeleri değerlendirmemiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı-forklift etkileşimine yönelik spesifik tehlike senaryoları neden analiz edilmemişti?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı geçiş noktalarında forklift operasyonlarına ilişkin görev bazlı bir tehlike analizi (yükleme-boşaltma, geri manevra, kapı açma-kapanma süresi etkileşimi) hiç gerçekleştirilmemişti. Otomatik kapanma özelliğinin forklift trafiğiyle yarattığı risk kombinasyonu değerlendirilmemişti. Risk değerlendirmesi sürecinde ekipman etkileşimleri ve operasyonel görev adımları detaylı olarak analiz edilmemiş, sadece genel tehlikeler listelenmiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Organizasyon neden sarmal kapı-forklift etkileşimi gibi ekipman kombinasyonlarına yönelik görev bazlı risk değerlendirmesi yapmamıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonun risk değerlendirme metodolojisi ekipmanları ve operasyonları izole olarak değerlendirmekte, ekipman etkileşimlerini ve operasyonel görev adımlarını detaylı senaryolarla analiz etmemektedir. Sarmal kapı için ayrı, forklift operasyonu için ayrı risk değerlendirmeleri yapılmış olabilir, ancak bu ikisinin eş zamanlı kullanımında ortaya çıkan spesifik tehlike senaryoları (otomatik kapanma süresi vs. yükleme süresi, geri manevrada görüş kısıtlılığı, kumanda erişimi vb.) sistematik olarak tanımlanmamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Sarmal Kapı-Forklift Etkileşimine Yönelik Görev Bazlı Risk Değerlendirmesinin Yapılmaması</div>
+                <div class="box-content" contenteditable="true">[ / ]
+
+Sarmal kapı geçiş noktalarında forklift operasyonlarına yönelik görev bazlı risk değerlendirmesi yapılmamıştır. Özellikle otomatik kapanma süresinin (60 saniye) forklift yükleme ve geri manevra süresiyle çakışması, geri manevrada kapının operatör görüş açısı dışında kalması ve 'stop' tuşu kullanım gerekliliği gibi spesifik tehlike senaryoları hiç tanımlanmamıştır. 5-Why zinciri, doğrudan nedenin (uyarı sistemi eksikliği) arkasında sarmal kapı-forklift etkileşimine özgü tehlike senaryolarının hiç analiz edilmemiş olmasını ortaya koymaktadır. Uyarı sistemi ihtiyacı, kontrol önlemi ihtiyacı ve 'stop' tuşu bilgilendirme gerekliliği ancak bu etkileşimin risk olarak tanımlanmasıyla belirlenebilirdi. Otomatik kapanma süresi ile forklift operasyon süresi çakışması, geri manevrada görüş kısıtlılığı gibi spesifik tehlikeler planlama aşamasında değerlendirilmediği için bu tehlikelere yönelik mühendislik kontrolleri (uyarı sistemi) veya idari kontroller (eğitim, prosedür) tasarlanmamıştır. Organizasyonun risk değerlendirme yaklaşımı ekipmanları izole olarak ele almakta, gerçek operasyonel koşullarda ekipman etkileşimlerini ve görev adımlarını detaylı senaryolarla analiz etmemektedir.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk değerlendirme metodolojisinin ekipman etkileşimlerini ve operasyonel görev adımlarını detaylı senaryolarla analiz etmemesi</li>
+<li contenteditable="true">Sarmal kapı otomatik kapanma özelliğinin forklift trafiği ile etkileşiminde yaratacağı güvenlik riskinin öngörülmemesi</li>
+<li contenteditable="true">Yeni ekipman veya sistem değişikliklerinde (otomatik kapanma özelliği eklenmesi gibi) mevcut operasyonlarla etkileşim risklerinin değerlendirilmemesi</li>
+<li contenteditable="true">Görev bazlı risk analizi (Task-Based Risk Assessment) yaklaşımının organizasyonel risk yönetim sürecine entegre edilmemesi</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="meta-root-cause" style="page-break-before: always;">
+            <div class="section-header" style="background: linear-gradient(135deg, #C0392B 0%, #E74C3C 100%);">
+                5. META KÖK NEDEN ANALİZİ
+            </div>
+            
+            <div class="subsection">
+                <h3 style="color: #C0392B;">🎯 Stratejik Kök Neden (Tüm Dalların Ortak Paydası)</h3>
+                <div class="alert-box" style="background: linear-gradient(to right, #C0392B, #E74C3C); color: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                    <h4 contenteditable="true" style="color: white; font-size: 18px; margin-top: 0;">
+                        <strong>[D1.2]</strong> Yeni Operatör Entegrasyon ve Yetkinlik Geliştirme Sisteminin Yetersizliği
+                    </h4>
+                    <p contenteditable="true" style="font-size: 14px; line-height: 1.8;">
+                        Üç kök neden (D3.1 - Eğitim Verilmemesi, C3.3 - Saha Koçluğu Yapılmaması, D4.1 - Risk Değerlendirmesi Yetersizliği) analiz edildiğinde, bu nedenlerin ortak paydası organizasyonun yeni operatörleri işe entegre etme ve yetkinlik geliştirme sistemindeki kapsamlı yetersizlik olarak ortaya çıkmaktadır. Bu meta kök neden, organizasyonun yeni çalışanları güvenli ve yetkin operatörler haline getirme sürecindeki sistemik zayıflığı temsil etmektedir.
+
+Organizasyonda yeni forklift operatörlerinin işe alımından bağımsız çalışmaya hazır hale gelmelerine kadar olan süreç yapılandırılmamış ve eksiktir. Bu süreç şu kritik bileşenleri içermelidir: 1) Çalışma alanı spesifik tehlike analizi ve eğitim ihtiyaç belirleme, 2) Teorik eğitim (genel forklift kullanımı + sahaya özgü ekipman bilgileri), 3) Pratik eğitim ve saha koçluğu (deneyimli mentor eşliğinde gerçek operasyonel koşullarda öğrenme), 4) Yetkinlik değerlendirmesi (teorik ve pratik testler), 5) Sürekli gelişim ve performans takibi. Ancak mevcut sistemde bu bileşenler eksik veya yetersizdir.
+
+Bu sistemik yetersizlik, sadece bu olayda değil, organizasyonun genel güvenlik performansında da olumsuz etkilere yol açmaktadır. Yeni operatörler yeterli hazırlık olmadan sahada çalışmaya başladıklarında, güvenli olmayan durumlarla karşılaşma, hata yapma ve kaza geçirme riskleri artmaktadır. Ayrıca, deneyimli operatörlerin bilgi ve deneyimlerinin yeni nesle aktarılmaması, organizasyonel bilgi kaybına ve güvenlik kültürünün zayıflamasına neden olmaktadır.
+                    </p>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 style="color: #C0392B;">🔗 Sentezlenen Kök Nedenler</h3>
+                <p contenteditable="true" style="margin-bottom: 10px;">
+                    Bu meta kök neden aşağıdaki <strong>3</strong> kök nedeni birleştirerek 
+                    üst-seviye sistemik zayıflığı ortaya koymuştur:
+                </p>
+                <ul style="list-style: none; padding-left: 0;">
+
+                    <li style="background: #FFE6E6; padding: 10px; margin: 5px 0; border-left: 4px solid #C0392B; border-radius: 4px;">
+                        <strong style="color: #C0392B;">D3.1 - Sahaya özgü ekipman eğitimi verilmemesi</strong>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 10px; margin: 5px 0; border-left: 4px solid #C0392B; border-radius: 4px;">
+                        <strong style="color: #C0392B;">C3.3 - Saha koçluğu ve mentorluk yapılmaması</strong>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 10px; margin: 5px 0; border-left: 4px solid #C0392B; border-radius: 4px;">
+                        <strong style="color: #C0392B;">D4.1 - Ekipman etkileşimlerine yönelik risk değerlendirmesi yapılmaması</strong>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3 style="color: #C0392B;">⚠️ Sistemik Zayıflık</h3>
+                <p contenteditable="true" style="background: #FFF3E0; padding: 15px; border-left: 4px solid #E67E22; border-radius: 4px;">
+                    Organizasyonun yeni operatör entegrasyon ve yetkinlik geliştirme sürecinde yapılandırılmış bir sistem bulunmaması. Eğitim planlama, saha koçluğu, risk değerlendirmesi ve yetkinlik değerlendirmesi süreçlerinin birbirine entegre olmadığı ve yeni operatörlerin güvenli çalışma için gerekli tüm bilgi, beceri ve deneyimi kazanmalarını sağlayacak kapsamlı bir programın olmadığı tespit edilmiştir.
+                </p>
+            </div>
+
+            <div class="subsection">
+                <h3 style="color: #C0392B;">📊 Stratejik Sonuçlar ve Etkiler</h3>
+                <ul style="list-style: none; padding-left: 0;">
+
+                    <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
+                        <strong style="color: #C0392B;">1.</strong> <span contenteditable="true">Organizasyon genelinde yeni çalışan entegrasyon sürecinin gözden geçirilmesi ve yapılandırılmış bir 'Yeni Operatör Yetkinlik Geliştirme Programı' tasarlanması gereklidir</span>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
+                        <strong style="color: #C0392B;">2.</strong> <span contenteditable="true">Eğitim, saha koçluğu, risk değerlendirmesi ve yetkinlik değerlendirmesi süreçlerinin birbirine entegre edilmesi ve kapsamlı bir sistem oluşturulması kritiktir</span>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
+                        <strong style="color: #C0392B;">3.</strong> <span contenteditable="true">Deneyimli operatörlerin mentor olarak görevlendirilmesi ve koçluk becerilerinin geliştirilmesi için yatırım yapılmalıdır</span>
+                    </li>
+
+                    <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
+                        <strong style="color: #C0392B;">4.</strong> <span contenteditable="true">Risk değerlendirme metodolojisinin görev bazlı analiz yaklaşımını içerecek şekilde güncellenmesi ve ekipman etkileşimlerinin sistematik olarak değerlendirilmesi sağlanmalıdır</span>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Organizasyonel İletişim Eksikliği</td>
+                        <td contenteditable="true">Sarmal kapının otomatik kapanma özelliği ve 'stop' tuşu kullanımı gibi kritik güvenlik bilgilerinin yeni operatörlere etkin şekilde iletilmemesi. Operasyon yönetimi, bakım ekibi ve HSE departmanı arasında yeni operatörlere hangi bilgilerin verilmesi gerektiği konusunda koordinasyon eksikliği.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Program Tasarımı Yetersizliği</td>
+                        <td contenteditable="true">Forklift operatör eğitim programının sadece genel forklift kullanımına odaklanması, çalışma alanının spesifik özelliklerini ve ekipman etkileşimlerini kapsamaması. Eğitim ihtiyaç analizi sürecinde sahaya özgü tehlikelerin sistematik olarak belirlenmemesi.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Mentorluk ve Koçluk Sistemi Eksikliği</td>
+                        <td contenteditable="true">Yeni operatörler için yapılandırılmış bir saha koçluğu ve mentorluk programının bulunmaması. Deneyimli operatörlerin mentor olarak atanmaması ve koçluk sorumluluklarının tanımlanmaması. Teorik bilginin pratik uygulamaya dönüşmesini sağlayacak mekanizmaların olmaması.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Risk Değerlendirme Metodolojisi Zayıflığı</td>
+                        <td contenteditable="true">Risk değerlendirme sürecinin ekipmanları izole olarak ele alması, ekipman etkileşimlerini ve operasyonel görev adımlarını detaylı senaryolarla analiz etmemesi. Görev bazlı risk analizi (Task-Based Risk Assessment) yaklaşımının uygulanmaması.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Mühendislik Kontrolü Eksikliği</td>
+                        <td contenteditable="true">Sarmal kapının otomatik kapanma özelliğine operatörleri uyaracak sesli veya görsel uyarı sisteminin entegre edilmemesi. Kapı tasarımında güvenlik özelliklerinin (uyarı sistemi, acil durdurma, sensörler) yeterince değerlendirilmemesi.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür ve Çalışma Talimatı Eksikliği</td>
+                        <td contenteditable="true">Sarmal kapı kullanımı için yazılı bir prosedür veya çalışma talimatının bulunmaması. 'Stop' tuşu kullanımının zorunlu olduğunu belirten net bir talimatın olmaması. Forklift operatörlerinin sarmal kapıdan geçiş yaparken izlemesi gereken adımların tanımlanmaması.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Yetkinlik Değerlendirme Sistemi Yetersizliği</td>
+                        <td contenteditable="true">Yeni operatörlerin bağımsız çalışmaya hazır olduklarını değerlendiren kapsamlı bir yetkinlik kontrol sürecinin olmaması. Teorik bilgi ve pratik becerinin ayrı ayrı değerlendirilmemesi. Sahaya özgü ekipman kullanımının yetkinlik değerlendirmesine dahil edilmemesi.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim ve Denetim Eksikliği</td>
+                        <td contenteditable="true">Yeni operatörlerin ilk dönemlerinde yakın gözetim ve denetim yapılmaması. Vardiya amirleri veya süpervizörlerin yeni operatörlerin performansını düzenli olarak gözlemlemesi ve geri bildirim vermesi için bir sistemin olmaması.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Tüm forklift operatörlerine sarmal kapı kullanımı konusunda acil eğitim verilmesi: Otomatik kapanma özelliği, 60 saniyelik süre, 'stop' tuşu kullanımı, geri manevrada kapı kontrolü</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Yetkilisi & Forklift Eğitim Süpervizörü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm aktif forklift operatörlerinin eğitim tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Sarmal kapı üzerine ve yakınına görsel uyarı levhaları yerleştirilmesi: 'OTOMATIK KAPANMA 60 SANİYE', 'STOP TUŞU KULLANIMI ZORUNLU', 'GERİ MANEVRADA KAPI DURUMUNU KONTROL EDİN'</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Depo Müdürü & HSE Yetkilisi</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm sarmal kapılara uyarı levhası yerleştirilme oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Sarmal kapıya sesli ve görsel uyarı sistemi entegrasyonu için teknik fizibilite çalışması başlatılması ve uygulanması: Kapı kapanmaya başladığında bip sesi ve yanıp sönen ışık</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Bakım Mühendisi & Teknik Direktör</td>
+                        <td contenteditable="true">1 ay (fizibilite) + 3 ay (uygulama)</td>
+                        <td contenteditable="true">Uyarı sistemi kurulum tamamlanma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Sarmal kapı kullanımı için yazılı prosedür ve çalışma talimatı oluşturulması: Kapıya yaklaşma, kapıyı açma, 'stop' tuşuna basma, yükleme, geri manevra, çıkış adımları</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Operasyon Müdürü & HSE Yetkilisi</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Prosedür onaylanma ve dağıtım tamamlanma durumu</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Yeni forklift operatörleri için yapılandırılmış saha koçluğu ve mentorluk programı tasarlanması ve uygulanması: Deneyimli mentor atama, koçluk planı, yetkinlik kontrol listesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İK Müdürü & Operasyon Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Yeni operatörlerin mentorluk programından geçme oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Forklift operatör eğitim programının güncellenmesi: Sahaya özgü ekipman eğitimi modülü eklenmesi (sarmal kapı, diğer otomatik sistemler, alan düzeni, acil durum prosedürleri)</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Forklift Eğitim Süpervizörü & HSE Yetkilisi</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Güncellenmiş eğitim programının onaylanma ve uygulanma durumu</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Sarmal kapı-forklift etkileşimine yönelik detaylı görev bazlı risk değerlendirmesi yapılması: Tüm operasyon adımları, ekipman etkileşimleri, tehlike senaryoları, kontrol önlemleri</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Yetkilisi & Operasyon Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Risk değerlendirmesi tamamlanma ve kontrol önlemleri uygulama oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Yeni operatörler için kapsamlı yetkinlik değerlendirme sistemi oluşturulması: Teorik test, pratik test, sahaya özgü ekipman kullanımı değerlendirmesi, bağımsız çalışma onayı</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Forklift Eğitim Süpervizörü & İK Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Yetkinlik değerlendirme sisteminin uygulanma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Tüm depo alanında benzer ekipman etkileşimlerinin (otomatik kapılar, konveyörler, yükleme rampaları vb.) risk değerlendirmesinin yapılması ve kontrol önlemlerinin güncellenmesi</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Yetkilisi & Operasyon Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Tüm kritik ekipman etkileşimlerinin risk değerlendirmesi tamamlanma oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Deneyimli forklift operatörlerinin mentor olarak eğitilmesi: Koçluk becerileri, etkili iletişim, geri bildirim verme, yetkinlik değerlendirme</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">İK Müdürü & Forklift Eğitim Süpervizörü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Mentor eğitimi tamamlayan deneyimli operatör sayısı (hedef: en az 5 mentor)</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Yeni operatörlerin ilk 3 ay boyunca yakın gözetim ve düzenli performans değerlendirmesi sisteminin kurulması: Haftalık gözlem, aylık değerlendirme, geri bildirim toplantıları</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Vardiya Amiri & Operasyon Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Gözetim sisteminin uygulanma oranı ve düzenli raporlama sıklığı</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Organizasyon genelinde 'Yeni Çalışan Entegrasyon ve Yetkinlik Geliştirme Programı' tasarlanması ve uygulanması: Eğitim, koçluk, risk değerlendirmesi, yetkinlik değerlendirmesi entegrasyonu</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">İK Direktörü & HSE Direktörü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Program tasarımı tamamlanma ve pilot uygulama başlatılma durumu</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Yeni operatörlere mutlaka sahaya özgü ekipman eğitimi verilmeli: Yeni bir forklift operatörü işe başladığında, sadece genel forklift kullanımı değil, çalışacağı spesifik alanın özellikleri, bu alanda bulunan tüm ekipmanların (sarmal kapılar, konveyörler, otomatik sistemler vb.) çalışma prensipleri ve güvenli kullanım yöntemleri detaylı olarak anlatılmalıdır. Bu eğitim teorik bilgiyi içermeli ve mutlaka sahada pratik gösterimle desteklenmelidir.
+• Yeni operatörlere deneyimli mentor eşliğinde saha koçluğu yapılmalı: Teorik eğitimden sonra yeni operatör en az 2-4 hafta boyunca deneyimli bir mentor eşliğinde çalışmalıdır. Mentor, yeni operatöre gerçek operasyonel koşullarda nasıl çalışacağını göstermeli, kritik ekipman etkileşimlerini uygulamalı olarak öğretmeli ve yeni operatörün performansını gözlemleyerek geri bildirim vermelidir. Yeni operatör ancak mentor onayından sonra bağımsız çalışmaya başlamalıdır.
+• Ekipman etkileşimlerine yönelik detaylı görev bazlı risk değerlendirmesi yapılmalı: Risk değerlendirmesi yaparken ekipmanları izole olarak değil, gerçek operasyonel koşullarda nasıl etkileşime girdiklerini analiz etmek gerekir. Her operasyon adım adım incelenmeli, hangi ekipmanların kullanıldığı, hangi etkileşimlerin olduğu, hangi tehlikelerin ortaya çıkabileceği detaylı senaryolarla değerlendirilmelidir. Bu analiz sonucunda belirlenen kontrol önlemleri (mühendislik, idari, eğitim) mutlaka uygulanmalıdır.
+• Otomatik sistemlere uyarı mekanizmaları entegre edilmeli: Otomatik kapanan kapılar, otomatik hareket eden konveyörler gibi sistemlerde, sistemin harekete geçmeden önce veya hareket ederken çalışanları uyaracak sesli ve görsel uyarı mekanizmaları bulunmalıdır. Bu mühendislik kontrolü, insan hatasını telafi etmede en etkili yöntemdir ve mutlaka önceliklendirilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Kapsamlı 'Yeni Çalışan Entegrasyon ve Yetkinlik Geliştirme Programı' oluşturulmalı: Organizasyon genelinde yeni çalışanların işe alımından bağımsız çalışmaya hazır hale gelmelerine kadar olan tüm süreci kapsayan yapılandırılmış bir program tasarlanmalıdır. Bu program eğitim ihtiyaç analizi, teorik eğitim, pratik eğitim, saha koçluğu, yetkinlik değerlendirmesi ve sürekli gelişim bileşenlerini içermelidir. Program tüm departmanlar için standartlaştırılmalı ve düzenli olarak gözden geçirilmelidir.
+• Risk değerlendirme metodolojisi görev bazlı analiz yaklaşımını içerecek şekilde güncellenmelidir: Organizasyonun risk yönetim sistemi, ekipman etkileşimlerini ve operasyonel görev adımlarını detaylı senaryolarla analiz eden görev bazlı risk değerlendirmesi (Task-Based Risk Assessment) metodolojisini benimsemelidir. HSE ekibi bu metodoloji konusunda eğitilmeli ve tüm kritik operasyonlar için görev bazlı risk değerlendirmeleri yapılmalıdır.
+• Mentorluk kültürü geliştirilmeli ve deneyimli çalışanlar mentor olarak yetiştirilmelidir: Organizasyonda deneyimli çalışanların bilgi ve deneyimlerini yeni nesle aktarmasını teşvik eden bir kültür oluşturulmalıdır. Deneyimli operatörler mentor olarak görevlendirilmeli, koçluk becerileri konusunda eğitilmeli ve mentorluk performansları değerlendirilmelidir. Mentorluk başarılı performans göstergelerinden biri haline getirilmelidir.
+• Sürekli iyileştirme ve öğrenme kültürü güçlendirilmelidir: Organizasyonda olaylardan ders çıkarma, iyi uygulamaları paylaşma ve sürekli iyileştirme kültürü güçlendirilmelidir. Benzer olayların tekrarlanmaması için kök neden analizleri düzenli olarak yapılmalı, düzeltici önlemler etkin şekilde uygulanmalı ve etkinlikleri takip edilmelidir. Güvenlik toplantılarında öğrenilen dersler tüm çalışanlarla paylaşılmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Olay ve öğrenilen dersler tüm forklift operatörlerine ve ilgili personele iletilmeli: Bu olay ve analiz sonuçları, tüm forklift operatörlerine, vardiya amirlerine, depo personeline ve ilgili yöneticilere detaylı olarak anlatılmalıdır. Güvenlik toplantılarında olay senaryosu paylaşılmalı, kök nedenler açıklanmalı ve alınan önlemler duyurulmalıdır. Operatörler sarmal kapı kullanımı konusunda bilgilendirilmeli ve 'stop' tuşu kullanımının önemi vurgulanmalıdır.
+• Sarmal kapı kullanım prosedürü tüm operatörlere yazılı olarak dağıtılmalı ve imza karşılığı teslim alınmalıdır: Oluşturulan sarmal kapı kullanım prosedürü ve çalışma talimatı, tüm forklift operatörlerine yazılı olarak dağıtılmalı, operatörler prosedürü okuduklarını ve anladıklarını imzalayarak teyit etmelidir. Prosedür ayrıca sarmal kapı yakınına asılmalı ve operatörlerin kolayca erişebileceği şekilde görünür olmalıdır.
+• Yeni operatör eğitim ve koçluk programı tüm ilgili departmanlara duyurulmalı ve destek sağlanmalıdır: Oluşturulan yeni operatör eğitim ve koçluk programı, İK, Operasyon, HSE, Eğitim ve Vardiya Yönetimi departmanlarına detaylı olarak anlatılmalıdır. Her departmanın program içindeki rolleri ve sorumlulukları açıkça tanımlanmalı ve programın başarılı uygulanması için tüm departmanların desteği sağlanmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm forklift operatörlerine sarmal kapı kullanımı acil eğitimi verilmelidir: Mevcut tüm forklift operatörlerine sarmal kapının otomatik kapanma özelliği, 60 saniyelik kapanma süresi, 'stop' tuşu kullanımı, geri manevrada kapı kontrolü konularında acil eğitim verilmelidir. Eğitim teorik bilgi ve sahada pratik gösterim içermelidir. Eğitim sonunda operatörlerin bilgi düzeyi test edilmeli ve eğitim kayıtları tutulmalıdır.
+• Forklift operatör eğitim programı sahaya özgü ekipman modülü ile güncellenmelidir: Mevcut forklift operatör eğitim programına 'Sahaya Özgü Ekipman ve Güvenlik' modülü eklenmelidir. Bu modül çalışma alanındaki tüm kritik ekipmanları (sarmal kapılar, konveyörler, yükleme rampaları, otomatik sistemler vb.), bu ekipmanların çalışma prensiplerini, güvenli kullanım yöntemlerini ve acil durum prosedürlerini kapsamalıdır. Yeni operatörler bu modülü tamamlamadan sahada çalışmaya başlamamalıdır.
+• Deneyimli operatörlere mentorluk ve koçluk becerileri eğitimi verilmelidir: Mentor olarak görevlendirilecek deneyimli forklift operatörlerine mentorluk ve koçluk becerileri konusunda özel eğitim verilmelidir. Bu eğitim etkili iletişim, yapıcı geri bildirim verme, öğretim teknikleri, yetkinlik değerlendirme ve güvenlik liderliği konularını içermelidir. Mentor eğitimi tamamlayan operatörler sertifikalandırılmalı ve mentorluk sorumluluklarına başlamalıdır.
+• HSE ekibine görev bazlı risk değerlendirmesi metodolojisi eğitimi verilmelidir: HSE ekibi ve risk değerlendirmesi yapan personel, görev bazlı risk değerlendirmesi (Task-Based Risk Assessment) metodolojisi konusunda eğitilmelidir. Bu eğitim operasyonları adım adım analiz etme, ekipman etkileşimlerini tanımlama, detaylı tehlike senaryoları oluşturma ve etkili kontrol önlemleri belirleme konularını kapsamalıdır. Eğitim sonunda ekip pilot bir görev bazlı risk değerlendirmesi yaparak öğrendiklerini uygulamalıdır.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">Bu kök neden analizi, 19 Mart 2026 tarihinde kapalı depo alanında meydana gelen forklift-sarmal kapı çarpışması olayının altında yatan derin organizasyonel nedenleri ortaya koymuştur. Olay yüzeysel olarak operatörün dikkatsizliği veya kapının teknik arızası gibi görünse de, detaylı analiz organizasyonun yeni operatör entegrasyon ve yetkinlik geliştirme sistemindeki kapsamlı yetersizlikleri açığa çıkarmıştır.
+
+Üç ana kök neden belirlenmiştir: 1) Sahaya özgü ekipman riskleri konusunda eğitim verilmemesi (D3.1), 2) Yeni operatörlere saha koçluğu yapılmaması (C3.3), 3) Sarmal kapı-forklift etkileşimine yönelik görev bazlı risk değerlendirmesinin yapılmaması (D4.1). Bu üç kök neden, organizasyonun yeni çalışanları güvenli ve yetkin operatörler haline getirme sürecindeki sistemik zayıflığı işaret etmektedir. Meta kök neden olarak 'Yeni Operatör Entegrasyon ve Yetkinlik Geliştirme Sisteminin Yetersizliği' tanımlanmıştır.
+
+Olay hafif yaralanma ve malzeme hasarı ile sonuçlanmış olsa da, potansiyel olarak ciddi baş/boyun yaralanması veya ölümcül kaza riski taşımaktadır. Sarmal kapının ağırlığı ve kapanma kuvveti göz önüne alındığında, operatörün farklı pozisyonda olması durumunda sonuçlar çok daha ciddi olabilirdi. Bu nedenle, olayın potansiyel ciddiyeti göz önünde bulundurularak kapsamlı düzeltici önlemler alınması kritik önem taşımaktadır.
+
+Analiz, organizasyonun sadece bu spesifik olaya değil, genel güvenlik yönetim sistemine yönelik stratejik iyileştirmeler yapması gerektiğini göstermektedir. Eğitim programlarının güncellenmesi, mentorluk sisteminin kurulması, risk değerlendirme metodolojisinin geliştirilmesi ve mühendislik kontrollerinin uygulanması gibi çok katmanlı önlemler gereklidir.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Acil Eğitim ve Bilgilendirme (1 hafta): Tüm forklift operatörlerine sarmal kapı kullanımı konusunda acil eğitim verilmesi, otomatik kapanma özelliği ve 'stop' tuşu kullanımının anlatılması. Sarmal kapı üzerine ve yakınına görsel uyarı levhalarının yerleştirilmesi.</li>
+<li contenteditable="true">Prosedür Oluşturma ve Dağıtım (2 hafta): Sarmal kapı kullanımı için detaylı yazılı prosedür ve çalışma talimatının oluşturulması, tüm operatörlere dağıtılması ve imza karşılığı teslim alınması. Prosedürün sarmal kapı yakınına asılması.</li>
+<li contenteditable="true">Teknik Fizibilite Çalışması (1 ay): Sarmal kapıya sesli ve görsel uyarı sistemi entegrasyonu için teknik fizibilite çalışmasının başlatılması, uygun teknolojinin belirlenmesi ve uygulama planının hazırlanması.</li>
+<li contenteditable="true">Mentorluk Programı Başlatma (1 ay): Yeni forklift operatörleri için acil mentorluk programının başlatılması, deneyimli operatörlerin mentor olarak atanması ve yeni operatörlerin mentor eşliğinde çalışmaya başlaması.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kapsamlı Eğitim Programı Geliştirme (3 ay): Forklift operatör eğitim programının sahaya özgü ekipman modülü ile güncellenmesi, yeni operatörler için kapsamlı yetkinlik değerlendirme sisteminin oluşturulması ve uygulanması.</li>
+<li contenteditable="true">Mühendislik Kontrolü Uygulama (3 ay): Sarmal kapıya sesli ve görsel uyarı sisteminin kurulması, sistemin test edilmesi ve devreye alınması. Benzer otomatik sistemlerin de değerlendirilmesi ve gerekli güvenlik özelliklerinin eklenmesi.</li>
+<li contenteditable="true">Risk Değerlendirme Metodolojisi Güncelleme (3-6 ay): Organizasyonun risk değerlendirme metodolojisinin görev bazlı analiz yaklaşımını içerecek şekilde güncellenmesi, HSE ekibinin bu metodoloji konusunda eğitilmesi ve tüm kritik operasyonlar için görev bazlı risk değerlendirmelerinin yapılması.</li>
+<li contenteditable="true">Organizasyon Geneli Sistem Geliştirme (6-12 ay): 'Yeni Çalışan Entegrasyon ve Yetkinlik Geliştirme Programı'nın tasarlanması ve pilot uygulamasının başlatılması. Mentorluk kültürünün geliştirilmesi, deneyimli çalışanların mentor olarak eğitilmesi ve mentorluk sisteminin organizasyon geneline yaygınlaştırılması.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Yeni Operatör Eğitim Kapsamı</td>
+                        <td class="current" contenteditable="true">Sadece genel forklift kullanımı</td>
+                        <td class="target" contenteditable="true">Genel + Sahaya Özgü Ekipman + Pratik Koçluk</td>
+                    </tr>
+
+                    <tr>
+                        <td>Saha Koçluğu ve Mentorluk</td>
+                        <td class="current" contenteditable="true">Yok - Doğrudan bağımsız çalışma</td>
+                        <td class="target" contenteditable="true">2-4 hafta deneyimli mentor eşliğinde çalışma</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Değerlendirme Yaklaşımı</td>
+                        <td class="current" contenteditable="true">Ekipman bazlı - İzole analiz</td>
+                        <td class="target" contenteditable="true">Görev bazlı - Ekipman etkileşimleri analizi</td>
+                    </tr>
+
+                    <tr>
+                        <td>Sarmal Kapı Uyarı Sistemi</td>
+                        <td class="current" contenteditable="true">Yok - Sadece mekanik kapanma</td>
+                        <td class="target" contenteditable="true">Sesli + Görsel uyarı sistemi aktif</td>
+                    </tr>
+
+                    <tr>
+                        <td>Yetkinlik Değerlendirme</td>
+                        <td class="current" contenteditable="true">Temel - Sadece teorik test</td>
+                        <td class="target" contenteditable="true">Kapsamlı - Teorik + Pratik + Sahaya Özgü</td>
+                    </tr>
+
+                    <tr>
+                        <td>Sarmal Kapı Prosedürü</td>
+                        <td class="current" contenteditable="true">Yok - Tanımsız</td>
+                        <td class="target" contenteditable="true">Yazılı prosedür + Görsel talimat + İmzalı onay</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

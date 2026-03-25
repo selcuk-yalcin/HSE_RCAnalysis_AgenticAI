@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {size: A4 landscape; margin: 3mm; }
+        * {box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }
+        body {display: flex; flex-direction: column; padding: 3px; height: 100vh; }
+        header {text-align: center; flex-shrink: 0; padding: 3px 0; }
+        header .top-title {font-size: 11px; font-weight: bold; color: #333; margin-bottom: 1px; }
+        header h1 {font-size: 13px; font-weight: bold; color: #111; margin-bottom: 1px; }
+        header .subtitle {font-size: 10px; color: #666; margin-bottom: 1px; }
+        .legend {text-align: center; font-size: 9px; color: #555; padding: 2px 4px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; margin-bottom: 3px; }
+        #diagram-wrap {flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; width: 100%; height: calc(100vh - 60px); }
+        #diagram-wrap .mermaid {width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #diagram-wrap svg {max-width: 98% !important; max-height: 98% !important; height: auto !important; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">KAZA RAPORU - CONFINED SPACE (KAPALI ALAN) - OKSİJEN EKSİKLİ</div>
+    </header>
+    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>KAZA RAPORU - CONFINED SPACE (KAPALI ALAN) -<br/>OKSİJEN EKSİKLİ"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Çamur depolama tankı #3 içinde oksijen seviyesi neden<br/>%11'e düşmüş ve 45 ppm H2S gazı neden birikmiş durumda<br/>tespit edildi?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Tank içine giriş öncesinde atmosfer testi yapılmadığı<br/>için tehlikeli atmosfer koşulları (düşük O2, yüksek<br/>H2S) tespit edilemedi ve personel bu ölümcül ortama<br/>farkında olmadan girdi."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Atmosfer testi neden yapılmadı?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["Atmosfer test cihazı tesiste mevcut olmasına rağmen<br/>İSG uzmanının kilitli dolabında tutuluyordu ve anahtarı<br/>sadece İSG uzmanında bulunuyordu. Ahmet Çelik cihaza<br/>erişemedi, erişim için de girişimde bulunmadan doğrudan<br/>tanka girdi."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Atmosfer test cihazı neden kilitli dolapta erişilemez<br/>durumda tutuluyordu ve confined space giriş izin<br/>sistemi neden bu girişi engellemedi?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Confined space giriş izin (permit) sistemi kağıt<br/>üzerinde mevcut olmasına rağmen fiilen uygulanmıyordu.<br/>Ekip lideri Fatih Yılmaz sözlü onay verip permit<br/>doldurmadı, atmosfer testi ve gözcü atanması gibi<br/>zorunlu adımlar atlandı. Cihazın kilitli tutulması da<br/>permit sürecinin işletilmemesiyle birleşince hiçbir<br/>güvenlik bariyeri devreye girmedi."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Confined space giriş izin sistemi neden kağıt üzerinde<br/>kalıp fiilen uygulanmıyordu ve bu durumu kimse neden<br/>denetlemiyordu?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Tesiste confined space giriş izin prosedürünün sahada<br/>uygulanıp uygulanmadığını sistematik olarak denetleyen,<br/>izleyen veya doğrulayan herhangi bir mekanizma (düzenli<br/>denetim, uygunluk takip sistemi, saha doğrulama süreci)<br/>bulunmuyordu. 3 yıldır acil durum tatbikatı yapılmamış,<br/>risk değerlendirmesinde confined space riski tespit<br/>edilmiş ancak kontrollerin uygulanması hiç takip<br/>edilmemişti."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    ROOT1["<b>KÖK NEDEN (D9.5):</b><br/>Kök Neden<br/>DEF Atıksu Arıtma Tesisi'nde confined space giriş<br/>izin (permit) sistemi, atmosfer test protokolü ve<br/>kurtarma planı prosedür olarak kağıt üzerinde<br/>mevcuttu ancak bu prosedürlerin sahada uygulanıp<br/>uygulanmadığını sistematik olarak doğrulayan<br/>hiçbir denetim, izleme veya uygunluk takip<br/>mekanizması kurulmamıştı. Bu nedenle permit<br/>sistemi şekilsel kaldı, atmosfer test cihazı<br/>erişilemez biçimde kilitli tutuldu, havalandırma<br/>fanı 6 aydır arızalı bekledi ve sözlü onay kültürü<br/>yerleşti; tüm bu sapmalar hiçbir denetim<br/>mekanizması tarafından tespit edilemedi."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A8 --> ROOT1
+
+    Q9["<b>Neden 1:</b><br/>Ahmet Çelik neden atmosfer testi yapmadan, gözcü<br/>olmadan ve yazılı izin almadan tek başına tanka girdi?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q9
+    A10["Ekip lideri Fatih Yılmaz'dan sözlü onay aldı ve bu<br/>onayı yeterli gördü; permit doldurmayı ve atmosfer<br/>testini atlayarak 'hemen hallederim' yaklaşımıyla işi<br/>hızlıca bitirmek istedi."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    Q11["<b>Neden 2:</b><br/>Ekip lideri neden sözlü onayı yeterli gördü ve<br/>confined space giriş izin prosedürünü (permit)<br/>uygulatmadı?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A10 --> Q11
+    A12["Ekip lideri Fatih Yılmaz kendi ifadesinde 'permit<br/>doldurmadık, işi hızlı bitirmek istedik' demiştir;<br/>tesiste confined space permit sistemi kağıt üzerinde<br/>var olmasına rağmen fiilen uygulanmıyor ve sözlü izin<br/>kültürü yerleşmiş durumda."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 3:</b><br/>Confined space permit sistemi neden kağıt üzerinde<br/>kalıp fiilen uygulanmıyor ve sözlü izin kültürü neden<br/>yerleşmiş?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Permit atlamak ve sözlü onay vermek zaman kazandırdığı<br/>için bu davranış sürekli tekrarlanmış, yönetim bu<br/>duruma müdahale etmemiş ve güvenlik adımlarını atlayan<br/>çalışanlar hızlı iş bitirdikleri için<br/>ödüllendirilmiştir; prosedüre uyan çalışanlar ise<br/>'yavaş' olarak algılanmıştır."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 4:</b><br/>Güvenlik prosedürlerini atlayan çalışanlar neden hız<br/>nedeniyle ödüllendirilmiş ve prosedüre uyanlar neden<br/>'yavaş' olarak algılanmıştır?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Tesiste güvenlik adımlarını atlayarak hızlı iş<br/>bitirmek olumlu karşılanmış (Ahmet'in 'hemen<br/>hallederim' tavrına kimse itiraz etmemiş, ekip lideri<br/>'dikkatli ol' diyerek onaylamış), doğru davranış olan<br/>permit doldurma ve atmosfer testi yapma hiçbir zaman<br/>takdir edilmemiş veya teşvik edilmemiştir; bu durum<br/>güvenli davranışın değersizleşmesine yol açmıştır."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    ROOT2["<b>KÖK NEDEN (C3.5):</b><br/>Kök Neden<br/>DEF Atıksu Arıtma Tesisinde confined space giriş<br/>izin prosedürünü, atmosfer testini ve gözcü<br/>atamayı atlayarak doğrudan tanka girmek gibi<br/>güvensiz davranışlar, işin hızlı bitirilmesi<br/>olarak olumlu karşılanmış ve pekiştirilmiştir.<br/>Ahmet'in 'hemen hallederim' tavrına iş arkadaşları<br/>itiraz etmemiş, ekip lideri permit doldurmadan<br/>sözlü onay vererek bu davranışı onaylamıştır.<br/>Güvenlik adımlarını atlama davranışı zaman kazancı<br/>sağladığı için sistematik olarak<br/>ödüllendirilmiştir."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A16 --> ROOT2
+
+    Q17["<b>Neden 1:</b><br/>Hasan Öztürk ve Kemal Aydın neden SCBA veya herhangi<br/>bir solunum koruyucu donanım kullanmadan oksijen<br/>yetersiz tankın içine girdiler?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q17
+    A18["Her iki çalışan da oksijen yetersiz atmosferde<br/>kurtarma girişimi için SCBA kullanılması gerektiğini<br/>bilmiyorlardı; Hasan'ın SCBA kullanım bilgisi yoktu,<br/>Kemal ise kapalı alan tehlikelerinden habersizdi.<br/>Ayrıca tesiste zaten SCBA bulunmuyordu."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 2:</b><br/>Hasan Öztürk ve Kemal Aydın neden kapalı alanda<br/>eğitimsiz kurtarma girişiminde bulunmak yerine dışarıda<br/>kalıp profesyonel ekip çağırma refleksi gösteremediler?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Tesiste kapalı alan kurtarma planı hiç<br/>hazırlanmamıştı; kurtarma senaryosunda kimin ne<br/>yapacağı, dışarıda kalma zorunluluğu ve profesyonel<br/>ekip çağırma adımları tanımlanmamıştı. Çalışanlar<br/>'içeri girmeden kurtarma' prosedürünü hiç<br/>öğrenmemişlerdi."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    Q21["<b>Neden 3:</b><br/>Tesiste neden kapalı alan kurtarma planı hazırlanmamış<br/>ve kurtarma senaryoları tanımlanmamıştı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A20 --> Q21
+    A22["Raporda açıkça belirtildiği üzere kurtarma planı hiç<br/>hazırlanmamış ve acil durum tatbikatı 3 yıldır<br/>yapılmamıştı. Kapalı alan girişi için olası kurtarma<br/>senaryoları (oksijen yetersizliği, zehirli gaz<br/>maruziyeti) hiçbir zaman planlanıp prova edilmemişti."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 4:</b><br/>Kapalı alan kurtarma planı ve tatbikatları neden 3<br/>yıldır hiç yapılmadı ve kurtarma ekipmanları (SCBA,<br/>tripod) neden temin edilmedi?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Tesis müdürü Selim Demir'in ifadesine göre bütçe<br/>kısıtı nedeniyle SCBA ve tripod için onay alınamamış;<br/>acil durum tatbikatları 3 yıldır yapılmamış ve kurtarma<br/>planı hiç oluşturulmamıştı. Yönetim, kapalı alan acil<br/>durum hazırlığı için gerekli kaynakları ve planlamayı<br/>sağlamamıştı."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    ROOT3["<b>KÖK NEDEN (D10.1):</b><br/>Kök Neden<br/>DEF Atıksu Arıtma Tesisinde kapalı alan kurtarma<br/>planı hiç hazırlanmamış, kurtarma senaryoları<br/>(oksijen yetersiz atmosferde müdahale)<br/>tanımlanmamış ve acil durum tatbikatı 3 yıldır<br/>yapılmamıştır. Bu nedenle Hasan Öztürk ve Kemal<br/>Aydın, bayılan iş arkadaşlarını gördüklerinde<br/>'dışarıda kal, profesyonel ekip çağır' davranışını<br/>bilmeden eğitimsiz ve donanımsız şekilde oksijen<br/>yetersiz tanka girmişlerdir."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A24 --> ROOT3
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            flowchart: { 
+                curve: 'basis', 
+                padding: 15, 
+                nodeSpacing: 50, 
+                rankSpacing: 80, 
+                useMaxWidth: true,
+                htmlLabels: true,
+                diagramPadding: 10
+            }, 
+            themeVariables: { 
+                fontSize: '11px', 
+                fontFamily: 'Segoe UI',
+                primaryColor: '#fff',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            } 
+        });
+    </script>
+</body>
+</html>

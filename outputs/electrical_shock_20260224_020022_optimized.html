@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {size: A4 landscape; margin: 1mm; }
+        * {box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }
+        body {display: flex; flex-direction: column; padding: 1px; height: 100vh; }
+        header {text-align: center; flex-shrink: 0; padding: 1px 0; }
+        header .top-title {font-size: 11px; font-weight: bold; color: #333; margin-bottom: 0px; }
+        header h1 {font-size: 12px; font-weight: bold; color: #111; margin-bottom: 0px; }
+        header .subtitle {font-size: 9px; color: #666; margin-bottom: 0px; }
+        .legend {text-align: center; font-size: 8px; color: #555; padding: 0px 2px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; }
+        #diagram-wrap {flex: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 100vw; height: calc(100vh - 35px); }
+        #diagram-wrap .mermaid {width: 100%; height: 100%; }
+        #diagram-wrap svg {width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; }
+        .mermaid {display: flex !important; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Elektrik Şoku - 020022</div>
+    </header>
+    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>OLAY RAPORU - ELEKTRİK ÇARPMASI Tarih:<br/>20 Şubat 2026, Saat: 15:20 Lokasyon:<br/>Üretim Tesisi - Ana Elektrik Panosu<br/>(MDB-0"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:1px,font-size:10px,font-weight:bold
+
+    Q1["<b>N1:</b><br/>Neden elektrik bakım teknisyeni yüksek<br/>voltaj çalışması sırasında yalıtkan<br/>eldiven kullanmadı?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    OLAY --> Q1
+    A2["Teknisyen, işin kısa süreceğini<br/>düşünerek KKD kullanmadan çalışmaya<br/>başladı; bu davranış daha önce de<br/>tekrarlanmış ancak düzeltilmemişti"]
+    style A2 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q1 --> A2
+    Q3["<b>N2:</b><br/>Neden bu güvensiz davranış daha önce<br/>düzeltilmemişti?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A2 --> Q3
+    A4["Saha denetimlerinde KKD kullanımı<br/>yeterince kontrol edilmiyordu ve gözetim<br/>mekanizması etkisiz çalışıyordu"]
+    style A4 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q3 --> A4
+    Q5["<b>N3:</b><br/>Neden gözetim mekanizması etkisiz<br/>çalışıyordu ve KKD kullanımı<br/>denetlenmiyordu?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A4 --> Q5
+    A6["Elektrik bakım ekibinde düzenli saha<br/>gözlem turları ve davranış odaklı<br/>güvenlik denetimleri planlanmamıştı;<br/>yönetim saha görünürlüğü düşüktü"]
+    style A6 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q5 --> A6
+    Q7["<b>N4:</b><br/>Neden yönetimin saha görünürlüğü<br/>düşüktü ve davranış odaklı denetimler<br/>yapılmıyordu?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A6 --> Q7
+    A8["Üretim baskısı nedeniyle bakım işleri<br/>hızlı tamamlanmaya zorlanıyor, güvenlik<br/>sapmaları görmezden geliniyor ve KKD'siz<br/>çalışma zaman içinde kanıksanmıştı"]
+    style A8 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q7 --> A8
+    Q9["<b>N5:</b><br/>Neden KKD'siz çalışma gibi güvenlik<br/>sapmaları kanıksanmış ve normalleşmişti?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A8 --> Q9
+    A10["Organizasyonda güvenlik sapmalarının<br/>sistematik olarak tespit edilip<br/>düzeltilmesi için bir mekanizma yoktu;<br/>tekrarlayan kural ihlalleri tolere<br/>edilerek sapmaların normalleşmesi<br/>kültürel bir sorun haline gelmişti"]
+    style A10 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q9 --> A10
+    ROOT1["<b>RC-D1.5</b><br/>Kök Neden"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:1px,font-size:9px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>N1:</b><br/>Neden bakım teknisyeni elektrik<br/>çarpmasına maruz kaldı?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    OLAY --> Q11
+    A12["Ana elektrik panosu (MDB-02) enerji<br/>altındayken bakım çalışması başlatıldı<br/>ve uygun elektriksel izolasyon (LOTO)<br/>yapılmadı"]
+    style A12 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q11 --> A12
+    Q13["<b>N2:</b><br/>Neden pano enerjili durumdayken çalışma<br/>başlatıldı ve LOTO uygulanmadı?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A12 --> Q13
+    A14["Enerji izolasyon prosedürü<br/>(Kilitle-Etiketle) sahada etkin şekilde<br/>uygulanmıyordu; çalışma öncesi enerji<br/>kesme ve sıfır enerji doğrulama adımları<br/>atlandı"]
+    style A14 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q13 --> A14
+    Q15["<b>N3:</b><br/>Neden enerji izolasyon prosedürü sahada<br/>etkin uygulanmıyordu?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A14 --> Q15
+    A16["LOTO prosedürünün uygulanmasını zorunlu<br/>kılan iş izin sistemi ya işletilmiyordu<br/>ya da elektrik bakım işleri için yeterli<br/>kontrol noktaları içermiyordu"]
+    style A16 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q15 --> A16
+    Q17["<b>N4:</b><br/>Neden iş izin sistemi LOTO uygulamasını<br/>zorunlu kılacak şekilde işletilmiyordu?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A16 --> Q17
+    A18["Yönetim, enerji izolasyon süreçlerinin<br/>sahada takibini ve denetimini yeterince<br/>yapmıyordu; üretim sürekliliği baskısı<br/>nedeniyle izolasyon adımlarının<br/>atlanması kanıksanmış ve bu sapmalar<br/>düzeltilmemişti"]
+    style A18 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q17 --> A18
+    Q19["<b>N5:</b><br/>Neden enerji izolasyon süreçlerindeki<br/>sapmalar kanıksanmış ve yönetim<br/>tarafından düzeltilmemişti?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A18 --> Q19
+    A20["Tesiste enerji izolasyonu (LOTO)<br/>sistemi etkin şekilde tasarlanmamış,<br/>uygulanmamış ve sürdürülmemişti;<br/>izolasyon prosedürleri, kilit/etiket<br/>ekipmanları, doğrulama adımları ve<br/>periyodik denetimleri kapsayan<br/>bütünleşik bir LOTO yönetim sistemi<br/>mevcut değildi"]
+    style A20 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q19 --> A20
+    ROOT2["<b>RC-D4.5</b><br/>Kök Neden"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:1px,font-size:9px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>N1:</b><br/>Neden elektrik bakım teknisyeni LOTO<br/>prosedürünü uygulamadan enerjili sistem<br/>üzerinde çalışmaya başladı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    OLAY --> Q21
+    A22["Teknisyen, üretim hattının durmasını<br/>önlemek amacıyla zaman kazanmak için<br/>LOTO adımlarını atlayarak doğrudan<br/>müdahaleye geçti."]
+    style A22 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q21 --> A22
+    Q23["<b>N2:</b><br/>Neden teknisyen LOTO adımlarını<br/>atlayarak çalışmayı kabul edilebilir bir<br/>davranış olarak gördü?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A22 --> Q23
+    A24["Daha önceki bakım çalışmalarında da<br/>LOTO uygulanmadan işlem yapılmış ve bu<br/>durum amirler tarafından görülmesine<br/>rağmen düzeltilmemiş, herhangi bir<br/>yaptırım uygulanmamıştı."]
+    style A24 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q23 --> A24
+    Q25["<b>N3:</b><br/>Neden amirler bu güvensiz davranışı<br/>gördükleri halde düzeltmedi ve yaptırım<br/>uygulamadı?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A24 --> Q25
+    A26["Sahada yeterli gözetim ve denetim<br/>mekanizması bulunmuyordu; amirlerin<br/>güvenlik ihlallerini tespit edip<br/>müdahale etme sorumluluğu net<br/>tanımlanmamıştı ve üretim sürekliliği<br/>güvenliğin önünde tutuluyordu."]
+    style A26 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q25 --> A26
+    Q27["<b>N4:</b><br/>Neden güvenlik ihlallerine müdahale<br/>sorumluluğu net tanımlanmamıştı ve<br/>üretim baskısı güvenliğin önüne<br/>geçiyordu?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A26 --> Q27
+    A28["Yönetim, LOTO prosedürünün atlanmasını<br/>bilinen bir sapma olarak kabul etmiş ve<br/>bu sapmaya uzun süredir tolerans<br/>göstermişti; güvenlik kurallarından<br/>sapmaların zaman içinde normal iş yapış<br/>biçimi haline gelmesine izin verilmişti."]
+    style A28 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q27 --> A28
+    Q29["<b>N5:</b><br/>Neden yönetim bilinen sapmalara<br/>tolerans gösterdi ve LOTO ihlallerinin<br/>normalleşmesine izin verdi?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:0.5px,stroke-dasharray:3 2,font-size:9px
+    A28 --> Q29
+    A30["Organizasyonda sapmaların normalleşmesi<br/>(kanıksama) kültürü yerleşmişti; küçük<br/>kural ihlalleri kaza yaşanmadığı sürece<br/>kabul edilebilir görülüyor, güvenlik<br/>standartlarından sistematik sapmalar<br/>kurumsal düzeyde sorgulanmıyordu."]
+    style A30 fill:#fff,stroke:#666,stroke-width:0.5px,font-size:9px
+    Q29 --> A30
+    ROOT3["<b>RC-D1.5</b><br/>Kök Neden"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:1px,font-size:9px,font-weight:bold
+    A30 --> ROOT3
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            flowchart: { 
+                curve: 'linear', 
+                padding: 5, 
+                nodeSpacing: 12, 
+                rankSpacing: 30, 
+                useMaxWidth: true,
+                htmlLabels: true,
+                direction: 'TD'
+            }, 
+            themeVariables: { 
+                fontSize: '9px', 
+                fontFamily: 'Segoe UI',
+                primaryTextColor: '#000',
+                primaryBorderColor: '#333'
+            } 
+        });
+    </script>
+</body>
+</html>

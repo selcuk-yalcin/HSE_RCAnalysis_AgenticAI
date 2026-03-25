@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {size: A4 landscape; margin: 3mm; }
+        * {box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }
+        body {display: flex; flex-direction: column; padding: 3px; height: 100vh; }
+        header {text-align: center; flex-shrink: 0; padding: 3px 0; }
+        header .top-title {font-size: 11px; font-weight: bold; color: #333; margin-bottom: 1px; }
+        header h1 {font-size: 13px; font-weight: bold; color: #111; margin-bottom: 1px; }
+        header .subtitle {font-size: 10px; color: #666; margin-bottom: 1px; }
+        .legend {text-align: center; font-size: 9px; color: #555; padding: 2px 4px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; margin-bottom: 3px; }
+        #diagram-wrap {flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; width: 100%; height: calc(100vh - 60px); }
+        #diagram-wrap .mermaid {width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #diagram-wrap svg {max-width: 98% !important; max-height: 98% !important; height: auto !important; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">KAZA RAPORU - KİMYASAL YANMA (ASIT SIÇRAMASI)
+==============</div>
+    </header>
+    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>KAZA RAPORU - KİMYASAL YANMA (ASIT SIÇRAMASI)<br/>=============="]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Asit transfer hortumu bağlantısı neden gevşeyerek asit<br/>sıçramasına yol açtı?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Hortum bağlantısında orijinal üretici parçası yerine<br/>lokal imalat (standart dışı) bağlantı elemanı<br/>kullanılmıştı; bu parça sülfürik asit transfer<br/>koşullarındaki basınç ve titreşime dayanamayarak<br/>gevşedi."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Hortum bağlantısında neden orijinal parça yerine lokal<br/>imalat parça kullanılıyordu?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["Titreşim sensörü 2 haftadır arızalı olmasına rağmen<br/>bakımı yapılmamış, hortum titreşimi erken tespit<br/>edilememiş ve daha önce bağlantıda hasar oluştuğunda<br/>orijinal yedek parça tedarik edilmek yerine lokal<br/>imalat parça ile geçici çözüm uygulanmıştı. Bu geçici<br/>çözüm kalıcı hale dönmüştü."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Titreşim sensörünün 2 haftadır arızalı kalması ve<br/>lokal imalat parçanın kalıcı olarak kullanılması neden<br/>kabul edildi?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Kritik ekipman test programı kağıt üzerinde mevcut<br/>olmasına rağmen fiilen uygulanmıyordu. Sensör arızası<br/>ve standart dışı parça kullanımı gibi bakım iş emirleri<br/>birikmiş ve ertelenmiş durumdaydı; bu erteleme yönetim<br/>tarafından bilinen ve tolere edilen bir durum haline<br/>gelmişti."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Kritik güvenlik ekipmanlarının bakım ertelenmesi neden<br/>yönetim tarafından tolere ediliyordu?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Yüz siperi alım talebi 3 aydır bütçe onayı bekliyordu,<br/>KKD tedariğinde maliyet odaklı (ucuz/yetersiz)<br/>tercihler yapılıyordu ve güvenlik yatırımları<br/>sistematik olarak erteleniyordu. Vardiya şefinin<br/>ifadesine göre 'zaman yok' denilerek test programları<br/>uygulanmıyordu. Bu durum güvenlik bütçesi ve<br/>kaynaklarının üretim öncelikleri karşısında sistematik<br/>olarak ikinci plana atıldığını göstermektedir."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    ROOT1["<b>KÖK NEDEN (D1.1):</b><br/>Kök Neden<br/>ABC Kimya yönetimi, güvenlik kritik ekipman<br/>bakımı (titreşim sensörü 2 haftadır arızalı), KKD<br/>tedariki (yüz siperi talebi 3 aydır bütçe onayında<br/>bekliyor, mevcut KKD'ler sülfürik aside karşı<br/>yetersiz kalitede tedarik edilmiş), acil durum<br/>duşu test programı (14 aydır test edilmemiş) ve<br/>kritik ekipman test programının uygulanması için<br/>gerekli bütçe ve kaynakları sistematik olarak<br/>tahsis etmemiştir. Orijinal yedek parça yerine<br/>lokal imalat parça kullanımının sürmesi, güvenlik<br/>harcamalarının maliyet gerekçesiyle ertelenmesinin<br/>doğrudan sonucudur."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A8 --> ROOT1
+
+    Q9["<b>Neden 1:</b><br/>Titreşim sensörü arızalı olmasına rağmen neden<br/>operatör tehlikeyi önceden fark edemedi?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q9
+    A10["Titreşim sensörü 2 haftadır arızalıydı ve bakım<br/>beklemekteydi; bu süre boyunca hortum bağlantısındaki<br/>gevşeme otomatik olarak algılanamadı, operatör ancak<br/>titreşimi gözle fark ettiğinde (14:25) yaklaştı ama<br/>müdahale için çok geç kalmıştı."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    Q11["<b>Neden 2:</b><br/>Titreşim sensörü neden 2 haftadır arızalı olmasına<br/>rağmen tamir edilmeden bırakıldı?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A10 --> Q11
+    A12["Sensör arızası bildirilmiş ancak bakım talebi<br/>beklemede kalmıştır. Kritik ekipman test programı kağıt<br/>üzerinde mevcut olmasına rağmen fiilen uygulanmadığı<br/>için arızalı sensörle çalışmaya devam edilmesi bir<br/>sorun olarak görülmemiştir."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 3:</b><br/>Kritik ekipman test programı neden kağıt üzerinde<br/>kalıp fiilen uygulanmıyordu?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Vardiya şefi Ayşe Demir'in ifadesine göre 'kimse<br/>uygulamıyordu, zaman yok diyorlardı' şeklinde<br/>belirtilmiştir. Acil durum duşu dahil kritik güvenlik<br/>ekipmanlarının periyodik test ve bakımları sistematik<br/>olarak erteleniyor ve bu durum yönetim tarafından kabul<br/>ediliyordu (duş 14 aydır test edilmemiş, sensör 2<br/>haftadır arızalı bekliyor)."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 4:</b><br/>Güvenlik açısından kritik ekipmanların bakım ve<br/>testlerinin sistematik olarak ertelenmesi neden kabul<br/>edilebilir bir durum haline geldi?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Bakım gecikmeleri organizasyonel düzeyde<br/>normalleşmiştir. Acil durum duşunun 14 aydır test<br/>edilmemesi, titreşim sensörünün 2 haftadır arızalı<br/>beklemesi ve kritik ekipman test programının<br/>uygulanmaması birlikte değerlendirildiğinde, bakım<br/>ertelemelerinin kurum genelinde kabul gören bir norm<br/>haline geldiği görülmektedir. Bu ertelemeler yönetim<br/>bilgisi dahilinde gerçekleşmiş ve müdahale<br/>edilmemiştir."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    ROOT2["<b>KÖK NEDEN (D6.6):</b><br/>Kök Neden<br/>ABC Kimya'da güvenlik açısından kritik<br/>ekipmanların (titreşim sensörü, acil durum duşu)<br/>periyodik bakım ve testleri sistematik olarak<br/>ertelenmiş ve bu erteleme yönetim tarafından<br/>bilinen ancak müdahale edilmeyen bir norm haline<br/>gelmiştir. Titreşim sensörünün 2 haftadır arızalı<br/>beklemesi ve acil durum duşunun 14 aydır test<br/>edilmemesi, bakım erteleme kültürünün doğrudan<br/>sonuçlarıdır."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A16 --> ROOT2
+
+    Q17["<b>Neden 1:</b><br/>Kimyasal koruyucu gözlük neden yüze sıçrayan aside<br/>karşı yeterli koruma sağlayamadı?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q17
+    A18["Sağlanan gözlük CE belgeli olmakla birlikte yan koruma<br/>özelliği bulunmuyordu; %98 konsantrasyonlu sülfürik<br/>asit transferi gibi yüksek riskli bir işlem için<br/>gereken tam yüz koruma seviyesini karşılamıyordu."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 2:</b><br/>Risk değerlendirmesinde yüz siperi gerekli görülmesine<br/>rağmen neden yan korumasız gözlük kullanılıyordu?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["İSG uzmanı Fatma Yıldız'ın ifadesine göre yüz siperi<br/>alım talebi 3 ay önce verilmişti ancak bütçe onayı hâlâ<br/>bekleniyordu; bu süreçte operatörler mevcut yetersiz<br/>gözlüklerle çalışmaya devam etti."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    Q21["<b>Neden 3:</b><br/>Yüz siperi tedarik talebi neden 3 aydır bütçe onayında<br/>bekletildi?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A20 --> Q21
+    A22["Kuruluşun satın alma karar sürecinde güvenlik ekipmanı<br/>tedariki maliyet odaklı değerlendiriliyordu; KKD<br/>uygunluk ve kalite gereksinimleri bütçe kararlarında<br/>ikinci planda kalıyordu. Raporda 'tedarik/satın alma<br/>kararları maliyet odaklı, güvenlik ikinci planda'<br/>bulgusu doğrudan bunu teyit etmektedir."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 4:</b><br/>KKD satın alma kararlarında neden güvenlik<br/>gereksinimleri yerine maliyet kriteri baskın hale<br/>geldi?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Kuruluşta KKD seçim ve tedarik sürecinde tehlike bazlı<br/>uygunluk değerlendirmesi (asit tipi, konsantrasyon,<br/>sıçrama riski gibi kriterlere göre KKD spesifikasyonu<br/>belirleme) sistematik olarak yapılmıyordu. Mevcut<br/>eldiven de nitril olup sülfürik aside karşı sadece 10<br/>dakika koruma sağlıyordu; bu durum KKD seçiminin<br/>tehlikeye özgü teknik değerlendirmeye değil genel<br/>katalog ve fiyat kriterine dayandığını göstermektedir."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    ROOT3["<b>KÖK NEDEN (D8.1):</b><br/>Kök Neden<br/>Sülfürik asit (%98) transfer işlemi için KKD<br/>teknik spesifikasyonları tehlikeye özgü olarak<br/>belirlenmemiş; gözlük yan korumasız, eldiven<br/>yetersiz koruma süreli (nitril, 10 dk) ve yüz<br/>siperi hiç tedarik edilmemiştir. Satın alma<br/>sürecinde kimyasal tehlike parametrelerine (asit<br/>tipi, konsantrasyon, sıçrama senaryosu) uygun KKD<br/>spesifikasyonu tanımlanmamış, maliyet odaklı genel<br/>ürünler sipariş edilmiştir."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A24 --> ROOT3
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            flowchart: { 
+                curve: 'basis', 
+                padding: 15, 
+                nodeSpacing: 50, 
+                rankSpacing: 80, 
+                useMaxWidth: true,
+                htmlLabels: true,
+                diagramPadding: 10
+            }, 
+            themeVariables: { 
+                fontSize: '11px', 
+                fontFamily: 'Segoe UI',
+                primaryColor: '#fff',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            } 
+        });
+    </script>
+</body>
+</html>

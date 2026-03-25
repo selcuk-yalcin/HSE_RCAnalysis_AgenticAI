@@ -1,0 +1,2464 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İş Kazası Rapor Formu - HSG245</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+
+        /* Test Scenario Loader */
+        .test-loader {
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+            padding: 1.5rem 2rem;
+        }
+
+        .test-loader h3 {
+            color: #495057;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .test-loader h3::before {
+            content: "🧪";
+            font-size: 1.2rem;
+        }
+
+        .test-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .test-btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-btn.fall {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .test-btn.electrical {
+            background: linear-gradient(135deg, #ffd89b 0%, #ff6b6b 100%);
+        }
+
+        .test-btn.machine {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+
+        .test-btn.excavation {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+            color: #333;
+        }
+
+        .test-btn.clear {
+            background: #6c757d;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Form Content */
+        .form-content {
+            padding: 2rem;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #495057;
+            background: #f8f9fa;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-header h2 {
+            color: #495057;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-header p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-grid.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .required::after {
+            content: "*";
+            color: #dc3545;
+            margin-left: 0.25rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .checkbox-option:hover {
+            background: #e9ecef;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-option label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0056b3;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box p {
+            color: #004085;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        .warning-box p {
+            color: #856404;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Detailed Investigation Styles */
+        .investigation-section {
+            background: #f0f4f8;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .conditional-group {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .conditional-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .conditional-group label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .conditional-checkbox {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            margin-top: 0.2rem;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-label {
+            flex: 1;
+        }
+
+        .conditional-field {
+            margin-top: 0.75rem;
+            margin-left: 2.25rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .conditional-field.hidden {
+            display: none;
+        }
+
+        .radio-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #495057;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .radio-group textarea {
+            margin-top: 0.5rem;
+            margin-left: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Incident Type Specific Fields */
+        .incident-type-fields {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .incident-type-fields.active {
+            display: block;
+        }
+
+        .incident-type-fields h3 {
+            color: #495057;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Summary Box */
+        .summary-box {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .summary-box h3 {
+            color: #006064;
+            margin-bottom: 1rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 96, 100, 0.1);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            color: #00838f;
+        }
+
+        .summary-value {
+            color: #006064;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-content {
+                padding: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: nowrap;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .test-loader,
+            .tabs,
+            .button-group {
+                display: none !important;
+            }
+
+            .section {
+                display: block !important;
+                page-break-inside: avoid;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>İş Kazası Rapor Formu</h1>
+            <p>HSG245 Standartlarına Göre Detaylı Kaza/Ramak Kala Raporu</p>
+        </div>
+
+        <!-- Test Scenario Loader -->
+        <div class="test-loader">
+            <h3>Test Senaryosu Yükle (Test ve Eğitim Amaçlı)</h3>
+            <div class="test-buttons">
+                <button class="test-btn fall" onclick="loadTestScenario('fall')">
+                    ⬇️ Yüksekten Düşme
+                </button>
+                <button class="test-btn electrical" onclick="loadTestScenario('electrical')">
+                    ⚡ Elektrik Çarpması
+                </button>
+                <button class="test-btn machine" onclick="loadTestScenario('machine')">
+                    ⚙️ Makine Sıkışması
+                </button>
+                <button class="test-btn excavation" onclick="loadTestScenario('excavation')">
+                    🏗️ Kazı Göçüğü
+                </button>
+                <button class="test-btn clear" onclick="clearForm()">
+                    🗑️ Formu Temizle
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="form-content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="showSection(0)">📋 Temel Bilgiler</button>
+                <button class="tab" onclick="showSection(1)">📝 Olay Açıklaması</button>
+                <button class="tab" onclick="showSection(2)">🛡️ Güvenlik & KKD</button>
+                <button class="tab" onclick="showSection(3)">👥 Tanıklar</button>
+                <button class="tab" onclick="showSection(4)">🌍 Çevre & Koşullar</button>
+                <button class="tab" onclick="showSection(5)">💼 Çalışma Detayları</button>
+                <button class="tab" onclick="showSection(6)">🚑 Yaralanma & Hasar</button>
+                <button class="tab" onclick="showSection(7)">� Detaylı Araştırma</button>
+                <button class="tab" onclick="showSection(8)">�🔍 Kök Neden Analizi</button>
+                <button class="tab" onclick="showSection(9)">✅ Özet & Gönder</button>
+            </div>
+
+            <form id="incidentForm">
+                <!-- SECTION 1: BASIC INFORMATION -->
+                <div class="section active" data-section="0">
+                    <div class="section-header">
+                        <h2>📋 Temel Bilgiler</h2>
+                        <p>Bildirimi yapan kişi ve kaza/olay temel bilgileri</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Bildiren Kişi</label>
+                            <input type="text" name="reportedBy" placeholder="Ad Soyad - Görev" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Bildirim Tarihi</label>
+                            <input type="date" name="reportDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Bildirim Saati</label>
+                            <input type="time" name="reportTime" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Olay Tarihi</label>
+                            <input type="date" name="incidentDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Olay Saati</label>
+                            <input type="time" name="incidentTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Konum</label>
+                            <input type="text" name="location" placeholder="Tesis, bina, kat, alan" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Departman/Birim</label>
+                            <input type="text" name="department" placeholder="İnşaat, Üretim, Bakım vb.">
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Olay Kategorisi</label>
+                            <select name="eventCategory" required onchange="updateIncidentTypeFields()">
+                                <option value="">Seçiniz</option>
+                                <option value="incident">Kaza (Yaralanma/Hasar ile sonuçlandı)</option>
+                                <option value="near_miss">Ramak Kala (Potansiyel kaza)</option>
+                                <option value="unsafe_condition">Güvensiz Durum</option>
+                                <option value="property_damage">Sadece Maddi Hasar</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Olay Türü (Birincil)</label>
+                        <select name="incidentType" onchange="showIncidentTypeFields()">
+                            <option value="">Seçiniz</option>
+                            <option value="fall_from_height">Yüksekten Düşme</option>
+                            <option value="electrical_shock">Elektrik Çarpması</option>
+                            <option value="machine_entrapment">Makine Sıkışması/Ezilme</option>
+                            <option value="excavation_collapse">Kazı Göçüğü</option>
+                            <option value="chemical_exposure">Kimyasal Maruz Kalma</option>
+                            <option value="fire_explosion">Yangın/Patlama</option>
+                            <option value="vehicle_accident">Araç Kazası</option>
+                            <option value="struck_by_object">Cisim Çarpması</option>
+                            <option value="manual_handling">Manuel Taşıma/Kaldırma</option>
+                            <option value="slip_trip_fall">Kayma/Takılma/Düşme (aynı seviye)</option>
+                            <option value="other">Diğer</option>
+                        </select>
+                    </div>
+
+                    <!-- Incident Type Specific Fields -->
+                    <div id="fallFields" class="incident-type-fields">
+                        <h3>⬇️ Yüksekten Düşme Detayları</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Düşüş Yüksekliği (metre)</label>
+                                <input type="number" name="fallHeight" step="0.1" placeholder="Örn: 6.0">
+                            </div>
+                            <div class="form-group">
+                                <label>Çalışma Platformu Türü</label>
+                                <select name="platformType">
+                                    <option value="">Seçiniz</option>
+                                    <option value="scaffold">İskele</option>
+                                    <option value="ladder">Merdiven</option>
+                                    <option value="roof">Çatı</option>
+                                    <option value="lift">Platform/Lift</option>
+                                    <option value="other">Diğer</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Korkuluk Durumu</label>
+                                <select name="guardrailStatus">
+                                    <option value="">Seçiniz</option>
+                                    <option value="present">Mevcut ve uygun</option>
+                                    <option value="insufficient">Yetersiz</option>
+                                    <option value="missing">Yok</option>
+                                    <option value="removed">Söküldü/kaldırıldı</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="electricalFields" class="incident-type-fields">
+                        <h3>⚡ Elektrik Güvenliği Detayları</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Voltaj Seviyesi</label>
+                                <input type="text" name="voltage" placeholder="Örn: 380V, 24V">
+                            </div>
+                            <div class="form-group">
+                                <label>Akım Tipi</label>
+                                <select name="currentType">
+                                    <option value="">Seçiniz</option>
+                                    <option value="ac_single">AC Tek Faz</option>
+                                    <option value="ac_three">AC Üç Faz</option>
+                                    <option value="dc">DC</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>LOTO Prosedürü Uygulandı mı?</label>
+                                <select name="lotoApplied">
+                                    <option value="">Seçiniz</option>
+                                    <option value="yes">Evet, tam olarak</option>
+                                    <option value="partial">Kısmen</option>
+                                    <option value="no">Hayır</option>
+                                    <option value="not_required">Gerekli değildi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="electricalIsolation" id="electricalIsolation">
+                                <label for="electricalIsolation">Elektrik izolasyonu yapıldı</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="lockoutDevice" id="lockoutDevice">
+                                <label for="lockoutDevice">Kilitleme cihazı kullanıldı</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="tagoutApplied" id="tagoutApplied">
+                                <label for="tagoutApplied">Etiketleme yapıldı</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="voltageTest" id="voltageTest">
+                                <label for="voltageTest">Voltaj testi yapıldı</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="machineFields" class="incident-type-fields">
+                        <h3>⚙️ Makine Güvenliği Detayları</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Makine Türü</label>
+                                <input type="text" name="machineType" placeholder="Örn: Konveyör bandı, pres, testere">
+                            </div>
+                            <div class="form-group">
+                                <label>Koruyucu Kapak/Muhafaza Durumu</label>
+                                <select name="machineGuardStatus">
+                                    <option value="">Seçiniz</option>
+                                    <option value="present">Mevcut ve yerinde</option>
+                                    <option value="removed">Çıkarılmış</option>
+                                    <option value="missing">Yok</option>
+                                    <option value="defective">Arızalı</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Acil Durdurma Butonu</label>
+                                <select name="emergencyStopStatus">
+                                    <option value="">Seçiniz</option>
+                                    <option value="used">Kullanıldı ve çalıştı</option>
+                                    <option value="not_used">Kullanılmadı</option>
+                                    <option value="not_working">Çalışmadı</option>
+                                    <option value="not_accessible">Erişilemez konumda</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="machineRunning" id="machineRunning">
+                                <label for="machineRunning">Makine çalışır durumdaydı</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="interlock" id="interlock">
+                                <label for="interlock">İnterlock sistemi var</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="lightCurtain" id="lightCurtain">
+                                <label for="lightCurtain">Işık perdesi var</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="twoHandControl" id="twoHandControl">
+                                <label for="twoHandControl">İki el kumanda var</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="excavationFields" class="incident-type-fields">
+                        <h3>🏗️ Kazı Güvenliği Detayları</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Kazı Derinliği (metre)</label>
+                                <input type="number" name="excavationDepth" step="0.1" placeholder="Örn: 2.5">
+                            </div>
+                            <div class="form-group">
+                                <label>Toprak Tipi</label>
+                                <select name="soilType">
+                                    <option value="">Seçiniz</option>
+                                    <option value="stable_rock">Stabil kaya</option>
+                                    <option value="type_a">Tip A (Sağlam)</option>
+                                    <option value="type_b">Tip B (Orta)</option>
+                                    <option value="type_c">Tip C (Zayıf)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Şev Açısı (derece)</label>
+                                <input type="number" name="slopeAngle" placeholder="Örn: 45°">
+                            </div>
+                        </div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="shoringInstalled" id="shoringInstalled">
+                                <label for="shoringInstalled">Destek sistemi kurulu</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="slopingApplied" id="slopingApplied">
+                                <label for="slopingApplied">Şevleme uygulandı</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="groundwaterPresent" id="groundwaterPresent">
+                                <label for="groundwaterPresent">Yeraltı suyu mevcut</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" name="recentRainfall" id="recentRainfall">
+                                <label for="recentRainfall">Son 24 saatte yağış oldu</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: INCIDENT DESCRIPTION (5W1H) -->
+                <div class="section" data-section="1">
+                    <div class="section-header">
+                        <h2>📝 Olay Açıklaması (5W1H)</h2>
+                        <p>Ne, Nerede, Ne zaman, Kim, Nasıl, Neden - Detaylı açıklama</p>
+                    </div>
+
+                    <div class="info-box">
+                        <p><strong>💡 İpucu:</strong> Olayı kronolojik sırayla, objektif bir şekilde anlatın. Tahminlerden kaçının, sadece gözlemlenen gerçekleri yazın.</p>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label class="required">Genel Olay Açıklaması</label>
+                            <textarea name="incidentDescription" rows="6" placeholder="Kazayı/olayı genel olarak açıklayın..." required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Ne Oldu? (What)</label>
+                            <textarea name="whatHappened" rows="4" placeholder="Tam olarak ne gerçekleşti? Olay dizisini açıklayın..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Nerede Oldu? (Where)</label>
+                            <textarea name="whereHappened" rows="3" placeholder="Tam konum, çalışma alanı, ekipman/makine konumu..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Ne Zaman Oldu? (When)</label>
+                            <textarea name="whenHappened" rows="3" placeholder="Tarih, saat, vardiya, işin kaçıncı saatinde, hava durumu..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Kimler Dahil? (Who)</label>
+                            <textarea name="whoInvolved" rows="4" placeholder="Yaralanan, tanıklar, süpervizörler, diğer ilgili kişiler (isim, yaş, deneyim)..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Nasıl Oldu? (How)</label>
+                            <textarea name="howHappened" rows="4" placeholder="Olay nasıl gelişti? Mekanizma nedir? Adım adım açıklayın..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Neden Oldu? (Why - İlk Değerlendirme)</label>
+                            <textarea name="whyHappened" rows="4" placeholder="İlk görüşünüze göre neden oldu? (Detaylı kök neden analizi sonraki bölümde)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Acil Müdahale ve Önlemler</label>
+                            <textarea name="emergencyMeasures" rows="4" placeholder="Olay sonrası ne yapıldı? İlk yardım, 112 arama, tahliye, alan güvenliği..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: SAFETY EQUIPMENT & PPE -->
+                <div class="section" data-section="2">
+                    <div class="section-header">
+                        <h2>🛡️ Güvenlik Ekipmanları ve KKD</h2>
+                        <p>Kişisel koruyucu donanımlar, güvenlik sistemleri, eğitim durumu</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Düşme Koruması Mevcut muydu?</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" name="fallProtection" value="yes" id="fallProtYes">
+                                    <label for="fallProtYes">Evet</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="fallProtection" value="no" id="fallProtNo">
+                                    <label for="fallProtNo">Hayır</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="fallProtection" value="partial" id="fallProtPartial">
+                                    <label for="fallProtPartial">Kısmen</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="fallProtection" value="unknown" id="fallProtUnknown">
+                                    <label for="fallProtUnknown">Bilinmiyor</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Emniyet Kemeri Takılı mıydı?</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" name="safetyHarness" value="yes" id="harnessYes">
+                                    <label for="harnessYes">Evet</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="safetyHarness" value="no" id="harnessNo">
+                                    <label for="harnessNo">Hayır</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="safetyHarness" value="not_applicable" id="harnessNA">
+                                    <label for="harnessNA">İlgili Değil</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="safetyHarness" value="unknown" id="harnessUnknown">
+                                    <label for="harnessUnknown">Bilinmiyor</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Güvenlik Eğitimi Alınmış mıydı?</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" name="safetyTraining" value="yes" id="trainingYes">
+                                    <label for="trainingYes">Evet, tam</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="safetyTraining" value="partial" id="trainingPartial">
+                                    <label for="trainingPartial">Kısmen/Eski</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="safetyTraining" value="no" id="trainingNo">
+                                    <label for="trainingNo">Hayır</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="safetyTraining" value="unknown" id="trainingUnknown">
+                                    <label for="trainingUnknown">Bilinmiyor</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Kullanılan KKD'ler (Hepsi işaretleyin)</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_helmet" id="ppeHelmet">
+                                    <label for="ppeHelmet">🪖 Baret</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_gloves" id="ppeGloves">
+                                    <label for="ppeGloves">🧤 İş Eldiveni</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_safety_shoes" id="ppeSafetyShoes">
+                                    <label for="ppeSafetyShoes">👞 İş Ayakkabısı</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_safety_glasses" id="ppeSafetyGlasses">
+                                    <label for="ppeSafetyGlasses">🥽 Koruyucu Gözlük</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_ear_protection" id="ppeEarProtection">
+                                    <label for="ppeEarProtection">🎧 Kulak Koruyucu</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_respirator" id="ppeRespirator">
+                                    <label for="ppeRespirator">😷 Solunum Maskesi</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_vest" id="ppeVest">
+                                    <label for="ppeVest">🦺 İkaz Yeleği</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_insulated_gloves" id="ppeInsulatedGloves">
+                                    <label for="ppeInsulatedGloves">⚡ Yalıtımlı Eldiven</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_face_shield" id="ppeFaceShield">
+                                    <label for="ppeFaceShield">🛡️ Yüz Siperi</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="ppe_protective_clothing" id="ppeProtectiveClothing">
+                                    <label for="ppeProtectiveClothing">👔 Koruyucu Giysi</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>KKD Detayları ve Ek Bilgiler</label>
+                            <textarea name="ppeDetails" rows="3" placeholder="Hangi KKD'ler eksikti? Uygun kullanılmayan varsa belirtin..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Güvenlik Sistemleri ve Prosedürler</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="work_permit" id="workPermit">
+                                    <label for="workPermit">📋 İş İzin Sistemi</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="risk_assessment" id="riskAssessment">
+                                    <label for="riskAssessment">⚠️ Risk Değerlendirmesi</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="safety_briefing" id="safetyBriefing">
+                                    <label for="safetyBriefing">💬 Güvenlik Brifingi</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="jsa" id="jsa">
+                                    <label for="jsa">📊 JSA (İş Güvenlik Analizi)</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="confined_space_permit" id="confinedSpacePermit">
+                                    <label for="confinedSpacePermit">🚪 Kapalı Alan İzni</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="hot_work_permit" id="hotWorkPermit">
+                                    <label for="hotWorkPermit">🔥 Sıcak İş İzni</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: WITNESSES -->
+                <div class="section" data-section="3">
+                    <div class="section-header">
+                        <h2>👥 Tanıklar ve İfadeler</h2>
+                        <p>Olayı gören veya ilk müdahale eden kişiler</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tanık Var mı?</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" name="witnessesPresent" value="yes" id="witnessYes">
+                                    <label for="witnessYes">Evet</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="witnessesPresent" value="no" id="witnessNo">
+                                    <label for="witnessNo">Hayır</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Tanık İsimleri ve İletişim Bilgileri</label>
+                            <textarea name="witnessNames" rows="4" placeholder="Ad Soyad, Görev, Telefon/Email&#10;Örn: Ali Demir, İşçi, +90 555 123 4567"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Tanık İfadeleri (Her tanık için ayrı paragraf)</label>
+                            <textarea name="witnessStatements" rows="8" placeholder="Tanık 1 (Ali Demir): 'Ben olayı şöyle gördüm...'&#10;&#10;Tanık 2 (Ayşe Yılmaz): 'Benim gözlemim şu şekilde...'"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Süpervizör/Yönetici Görüşleri</label>
+                            <textarea name="supervisorComments" rows="4" placeholder="Hat şefi, formen, yöneticilerin olayla ilgili görüşleri..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: ENVIRONMENT & CONDITIONS -->
+                <div class="section" data-section="4">
+                    <div class="section-header">
+                        <h2>🌍 Çevresel Koşullar ve Ortam</h2>
+                        <p>Hava durumu, aydınlatma, gürültü, sıcaklık vb.</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hava Koşulları</label>
+                            <select name="weatherConditions">
+                                <option value="">Seçiniz</option>
+                                <option value="clear">Açık/Güneşli</option>
+                                <option value="cloudy">Bulutlu</option>
+                                <option value="rainy">Yağmurlu</option>
+                                <option value="stormy">Fırtınalı</option>
+                                <option value="snowy">Karlı</option>
+                                <option value="foggy">Sisli</option>
+                                <option value="windy">Rüzgarlı</option>
+                                <option value="indoor">İç Mekan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Aydınlatma Durumu</label>
+                            <select name="lightingConditions">
+                                <option value="">Seçiniz</option>
+                                <option value="excellent">Mükemmel</option>
+                                <option value="good">İyi</option>
+                                <option value="adequate">Yeterli</option>
+                                <option value="poor">Kötü</option>
+                                <option value="very_poor">Çok Kötü</option>
+                                <option value="dark">Karanlık</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Gürültü Seviyesi</label>
+                            <select name="noiseLevel">
+                                <option value="">Seçiniz</option>
+                                <option value="low">Düşük (&lt;70 dB)</option>
+                                <option value="moderate">Normal (70-85 dB)</option>
+                                <option value="high">Yüksek (85-100 dB)</option>
+                                <option value="very_high">Çok Yüksek (&gt;100 dB)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Sıcaklık</label>
+                            <input type="text" name="temperature" placeholder="Örn: 25°C, -5°C">
+                        </div>
+                        <div class="form-group">
+                            <label>Nem Oranı</label>
+                            <input type="text" name="humidity" placeholder="Örn: %65">
+                        </div>
+                        <div class="form-group">
+                            <label>Rüzgar Hızı</label>
+                            <input type="text" name="windSpeed" placeholder="Örn: 15 km/saat">
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Zemin/Yüzey Koşulları</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="surface_wet" id="surfaceWet">
+                                    <label for="surfaceWet">💧 Islak</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="surface_slippery" id="surfaceSlippery">
+                                    <label for="surfaceSlippery">🧊 Kaygan</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="surface_uneven" id="surfaceUneven">
+                                    <label for="surfaceUneven">⛰️ Engebeli</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="surface_cluttered" id="surfaceCluttered">
+                                    <label for="surfaceCluttered">📦 Dağınık</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="surface_oily" id="surfaceOily">
+                                    <label for="surfaceOily">🛢️ Yağlı</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Çevresel Tehlikeler</label>
+                            <textarea name="environmentalHazards" rows="3" placeholder="Diğer çevresel faktörler: vibrasyon, kimyasal buhar, radyasyon vb."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 6: WORK CONDITIONS -->
+                <div class="section" data-section="5">
+                    <div class="section-header">
+                        <h2>💼 Çalışma Koşulları ve Detayları</h2>
+                        <p>İş türü, deneyim, vardiya, çalışma süresi vb.</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>İş Türü/Aktivite</label>
+                            <input type="text" name="workType" placeholder="Örn: İskele montajı, elektrik bakımı, kazı">
+                        </div>
+                        <div class="form-group">
+                            <label>Çalışma Yüksekliği</label>
+                            <input type="text" name="workHeight" placeholder="Örn: 6 metre, zemin seviyesi">
+                        </div>
+                        <div class="form-group">
+                            <label>Deneyim Seviyesi</label>
+                            <input type="text" name="experienceLevel" placeholder="Örn: 8 ay, 4 yıl, yeni başlayan">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Vardiya/Shift</label>
+                            <select name="shiftTime">
+                                <option value="">Seçiniz</option>
+                                <option value="day">Gündüz (08:00-17:00)</option>
+                                <option value="evening">Akşam (16:00-00:00)</option>
+                                <option value="night">Gece (00:00-08:00)</option>
+                                <option value="rotating">Dönüşümlü</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Vardiya Başlangıcından İtibaren Süre</label>
+                            <input type="text" name="workDuration" placeholder="Örn: 2.5 saat, 45 dakika">
+                        </div>
+                        <div class="form-group">
+                            <label>Son Mola Zamanı</label>
+                            <input type="text" name="lastBreak" placeholder="Örn: 30 dakika önce, mola verilmedi">
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Çalışma Baskısı/Üretim Hedefi</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="time_pressure" id="timePressure">
+                                    <label for="timePressure">⏰ Zaman baskısı var</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="production_target" id="productionTarget">
+                                    <label for="productionTarget">📊 Üretim hedefi baskısı</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="deadline_pressure" id="deadlinePressure">
+                                    <label for="deadlinePressure">📅 Proje gecikmiş/termin yakın</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="understaffed" id="understaffed">
+                                    <label for="understaffed">👥 Eksik personel ile çalışılıyor</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="overtime" id="overtime">
+                                    <label for="overtime">⌛ Fazla mesai yapılıyor</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Çalışma Koşulları Ek Notlar</label>
+                            <textarea name="workConditionsNotes" rows="3" placeholder="Vardiya değişimi, yorgunluk, iletişim sorunları vb."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 7: INJURIES & DAMAGE -->
+                <div class="section" data-section="6">
+                    <div class="section-header">
+                        <h2>🚑 Yaralanma ve Hasar Bilgileri</h2>
+                        <p>Yaralanma türü, şiddeti, tıbbi müdahale, maddi hasar</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Yaralanma Türü</label>
+                            <select name="injuryType" multiple size="8">
+                                <option value="fracture">Kırık</option>
+                                <option value="cut">Kesik</option>
+                                <option value="bruise">Çürük/Ezilme</option>
+                                <option value="burn">Yanık</option>
+                                <option value="sprain">Burkulma/İncinme</option>
+                                <option value="amputation">Kopma/Amputasyon</option>
+                                <option value="electric_shock">Elektrik Çarpması</option>
+                                <option value="internal_injury">İç Kanama/Organ Hasarı</option>
+                                <option value="head_injury">Kafa Travması</option>
+                                <option value="spine_injury">Omurga/Boyun Yaralanması</option>
+                                <option value="eye_injury">Göz Yaralanması</option>
+                                <option value="inhalation">Soluma/Zehirlenme</option>
+                                <option value="none">Yaralanma Yok</option>
+                            </select>
+                            <small>Birden fazla seçim yapabilirsiniz (Ctrl/Cmd tuşu ile)</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Yaralanma Şiddeti</label>
+                            <select name="injurySeverity" required>
+                                <option value="">Seçiniz</option>
+                                <option value="none">Yaralanma Yok (Ramak Kala)</option>
+                                <option value="minor">Hafif (İlk yardım, işe devam)</option>
+                                <option value="moderate">Orta (Tıbbi müdahale, iş kaybı &lt;7 gün)</option>
+                                <option value="severe">Ciddi (Hastane, iş kaybı &gt;7 gün)</option>
+                                <option value="very_severe">Çok Ciddi (Yoğun bakım, kalıcı sakatlık)</option>
+                                <option value="fatal">Ölümcül</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Yaralanan Vücut Bölgeleri</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_head" id="bodyHead">
+                                    <label for="bodyHead">👤 Baş/Yüz</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_neck" id="bodyNeck">
+                                    <label for="bodyNeck">🦴 Boyun</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_spine" id="bodySpine">
+                                    <label for="bodySpine">🔙 Omurga/Sırt</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_chest" id="bodyChest">
+                                    <label for="bodyChest">🫁 Göğüs</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_abdomen" id="bodyAbdomen">
+                                    <label for="bodyAbdomen">🫃 Karın</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_arm" id="bodyArm">
+                                    <label for="bodyArm">💪 Kol</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_hand" id="bodyHand">
+                                    <label for="bodyHand">✋ El/Bilek</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_fingers" id="bodyFingers">
+                                    <label for="bodyFingers">👆 Parmaklar</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_leg" id="bodyLeg">
+                                    <label for="bodyLeg">🦵 Bacak</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_foot" id="bodyFoot">
+                                    <label for="bodyFoot">🦶 Ayak/Ayak Bileği</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_eyes" id="bodyEyes">
+                                    <label for="bodyEyes">👁️ Göz</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="body_internal" id="bodyInternal">
+                                    <label for="bodyInternal">🫀 İç Organlar</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Yaralanma Detayları</label>
+                            <textarea name="bodyPart" rows="3" placeholder="Örn: Sol el işaret parmağı, L2 omurga, sağ göz, dalak..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Tıbbi Müdahale ve Tedavi</label>
+                            <textarea name="medicalTreatment" rows="4" placeholder="İlk yardım, ambulans, hastane, ameliyat, yoğun bakım, iş göremezlik süresi..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>İş Kaybı Süresi (Tahmini)</label>
+                            <input type="text" name="workLossDays" placeholder="Örn: 30 gün, 4 ay, kalıcı">
+                        </div>
+                        <div class="form-group">
+                            <label>Maddi Hasar Var mı?</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" name="propertyDamageExists" value="yes" id="damageYes">
+                                    <label for="damageYes">Evet</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="propertyDamageExists" value="no" id="damageNo">
+                                    <label for="damageNo">Hayır</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Maddi Hasar Detayları</label>
+                            <textarea name="propertyDamage" rows="3" placeholder="Hasar gören ekipman, makine, yapı... ve tahmini maliyet"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 7: DETAILED INVESTIGATION -->
+                <div class="section" data-section="7">
+                    <div class="section-header">
+                        <h2>🔎 Detaylı Araştırma</h2>
+                        <p>Kapsamlı olay incelemesi - Soruları sırasıyla cevaplandırın</p>
+                    </div>
+
+                    <div class="warning-box">
+                        <p><strong>ℹ️ Bilgi:</strong> Aşağıdaki sorular kapsamlı bir araştırma için tasarlanmıştır. Lütfen her soruyu dikkatli bir şekilde cevaplandırınız. Bir sorunun cevabı "HAYIR" ise, sonraki ilişkili sorular otomatik olarak açılacaktır.</p>
+                    </div>
+
+                    <!-- NEREDE, NE ZAMAN VE KİM? -->
+                    <div class="investigation-section">
+                        <div class="section-title">📍 Nerede, Ne Zaman ve Kim?</div>
+                        
+                        <div class="form-group conditional-group">
+                            <label for="q1">
+                                <input type="checkbox" id="q1" name="q1" class="conditional-checkbox" data-shows="q1-detail">
+                                <span class="checkbox-label">1. Olumsuz olay nerede ve ne zaman gerçekleşti?</span>
+                            </label>
+                            <textarea id="q1-detail" name="q1_detail" rows="3" placeholder="Olay yeri (bölüm, makine, konum), tarih, saat ve olay ne kadar sürdü?" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q2">
+                                <input type="checkbox" id="q2" name="q2" class="conditional-checkbox" data-shows="q2-detail">
+                                <span class="checkbox-label">2. Olumsuz olayda kim yaralandı/hastalandı veya başka bir şekilde etkilendi?</span>
+                            </label>
+                            <textarea id="q2-detail" name="q2_detail" rows="3" placeholder="Etkilenen kişi(ler), adı, yaşı, deneyimi, vasıfı, çalışma durumu" class="conditional-field hidden"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- AYRINTI BİLGİ TOPLAMA: NEYİ VE NASIL? -->
+                    <div class="investigation-section">
+                        <div class="section-title">📋 Ayrıntılı Bilgi Toplama: Neyi ve Nasıl?</div>
+                        
+                        <div class="form-group conditional-group">
+                            <label for="q3">
+                                <input type="checkbox" id="q3" name="q3" class="conditional-checkbox" data-shows="q3-detail">
+                                <span class="checkbox-label">3. Olumsuz olay nasıl oldu? Olayla ilgili tüm ekipmanların not edilmesi</span>
+                            </label>
+                            <textarea id="q3-detail" name="q3_detail" rows="4" placeholder="Olay sırası (adım adım), kullanılan ekipmanlar, makine detayları, araçlar" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q4">
+                                <input type="checkbox" id="q4" name="q4" class="conditional-checkbox" data-shows="q4-detail">
+                                <span class="checkbox-label">4. O sırada hangi faaliyetler gerçekleştiriliyordu?</span>
+                            </label>
+                            <textarea id="q4-detail" name="q4_detail" rows="3" placeholder="İşin türü, başlangıç saati, süre, diğer eş zamanlı faaliyetler" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q5">
+                                <input type="checkbox" id="q5" name="q5" class="conditional-checkbox" data-shows="q5-detail">
+                                <span class="checkbox-label">5. Çalışma koşullarında olağandışı veya farklı bir şey var mıydı?</span>
+                            </label>
+                            <div id="q5-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q5_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q5_yes_detail" rows="2" placeholder="Olağandışı koşullar nelerdir?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q5_answer" value="no"> HAYIR - Normal koşullar</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q6">
+                                <input type="checkbox" id="q6" name="q6" class="conditional-checkbox" data-shows="q6-detail">
+                                <span class="checkbox-label">6. Güvenli çalışma prosedürleri (GÇP) yeterli miydi ve bu prosedürlere uyuluyor muydu?</span>
+                            </label>
+                            <div id="q6-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q6_answer" value="prosedur_yok"> Prosedür yoktu</label>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q6_answer" value="prosedur_yetersiz"> Prosedür yetersizdi - Açıklayın:</label>
+                                    <textarea name="q6_yetersiz_detail" rows="2" placeholder="Hangi kısımlar yetersizdi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q6_answer" value="uyulmadi"> Prosedüre uyulmadı - Neden?</label>
+                                    <textarea name="q6_uyulmadi_detail" rows="2" placeholder="Neden prosedüre uyulmadı?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q6_answer" value="uyuldu"> Prosedüre uyuldu ve yeterliydi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q7">
+                                <input type="checkbox" id="q7" name="q7" class="conditional-checkbox" data-shows="q7-detail">
+                                <span class="checkbox-label">7. Olumsuz olay ne tür yaralanmalara veya sağlık sorunlarına neden oldu?</span>
+                            </label>
+                            <textarea id="q7-detail" name="q7_detail" rows="3" placeholder="Yaralanma türü, sağlık etkileri, tedavi gereksinimleri, prognoz" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q8">
+                                <input type="checkbox" id="q8" name="q8" class="conditional-checkbox" data-shows="q8-detail">
+                                <span class="checkbox-label">8. Bir yaralanma varsa nasıl oldu ve buna ne sebep oldu?</span>
+                            </label>
+                            <textarea id="q8-detail" name="q8_detail" rows="3" placeholder="Yaralanmanın mekanizması, nedeni, zamanı, şiddeti" class="conditional-field hidden"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- RİSK DEĞERLENDİRME -->
+                    <div class="investigation-section">
+                        <div class="section-title">⚠️ Risk Değerlendirmesi</div>
+                        
+                        <div class="form-group conditional-group">
+                            <label for="q9">
+                                <input type="checkbox" id="q9" name="q9" class="conditional-checkbox" data-shows="q9-detail">
+                                <span class="checkbox-label">9. Risk biliniyor muydu? Öyleyse, neden kontrol edilmedi? Edilmediyse, neden edilmedi?</span>
+                            </label>
+                            <div id="q9-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q9_answer" value="unknown"> Risk bilinmiyordu - Neden?</label>
+                                    <textarea name="q9_unknown_detail" rows="2" placeholder="Neden risk bilinmiyordu?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q9_answer" value="known_not_controlled"> Risk biliniyordu ama kontrol edilmedi - Neden?</label>
+                                    <textarea name="q9_not_controlled_detail" rows="2" placeholder="Neden kontrol edilmedi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q9_answer" value="known_controlled"> Risk biliniyordu ve kontrol edilmişti</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q10">
+                                <input type="checkbox" id="q10" name="q10" class="conditional-checkbox" data-shows="q10-detail">
+                                <span class="checkbox-label">10. Organizasyon ve çalışmanın düzenlenmesi olumsuz olayı etkiledi mi?</span>
+                            </label>
+                            <div id="q10-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q10_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q10_yes_detail" rows="2" placeholder="Nasıl etkiledi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q10_answer" value="no"> HAYIR - Etkilemedi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q11">
+                                <input type="checkbox" id="q11" name="q11" class="conditional-checkbox" data-shows="q11-detail">
+                                <span class="checkbox-label">11. Bakım ve temizlik yeterli miydi? Eğer değilse, neden olmadığını açıklayın.</span>
+                            </label>
+                            <div id="q11-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q11_answer" value="sufficient"> Yeterli - Düzenli bakım/temizlik yapılıyordu</label>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q11_answer" value="insufficient"> Yetersiz - Neden?</label>
+                                    <textarea name="q11_insufficient_detail" rows="2" placeholder="Neden yetersizdi?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q12">
+                                <input type="checkbox" id="q12" name="q12" class="conditional-checkbox" data-shows="q12-detail">
+                                <span class="checkbox-label">12. Dâhil olan kişiler yetkin ve uygun muydu?</span>
+                            </label>
+                            <div id="q12-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q12_answer" value="yes"> EVET - Yetkin ve uygun</label>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q12_answer" value="no"> HAYIR - Açıklayın:</label>
+                                    <textarea name="q12_no_detail" rows="2" placeholder="Neden yetkin/uygun değildi?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q13">
+                                <input type="checkbox" id="q13" name="q13" class="conditional-checkbox" data-shows="q13-detail">
+                                <span class="checkbox-label">13. İşyeri düzeni olumsuz olayı etkiledi mi?</span>
+                            </label>
+                            <div id="q13-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q13_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q13_yes_detail" rows="2" placeholder="Nasıl etkiledi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q13_answer" value="no"> HAYIR - Etkilemedi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q14">
+                                <input type="checkbox" id="q14" name="q14" class="conditional-checkbox" data-shows="q14-detail">
+                                <span class="checkbox-label">14. Materyallerin / malzemelerin doğası veya şekli olumsuz olayı etkiledi mi?</span>
+                            </label>
+                            <div id="q14-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q14_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q14_yes_detail" rows="2" placeholder="Nasıl etkiledi?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q14_answer" value="no"> HAYIR - Etkilemedi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q15">
+                                <input type="checkbox" id="q15" name="q15" class="conditional-checkbox" data-shows="q15-detail">
+                                <span class="checkbox-label">15. Tesis ve ekipmanı kullanmada yaşanan zorluklar olumsuz olayı etkiledi mi?</span>
+                            </label>
+                            <div id="q15-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q15_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q15_yes_detail" rows="2" placeholder="Hangi zorluklar vardı?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q15_answer" value="no"> HAYIR - Zorluk yoktu</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q16">
+                                <input type="checkbox" id="q16" name="q16" class="conditional-checkbox" data-shows="q16-detail">
+                                <span class="checkbox-label">16. Güvenlik ekipmanı yeterli miydi?</span>
+                            </label>
+                            <div id="q16-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q16_answer" value="sufficient"> Yeterli - Uygun ve yeterli miktarda</label>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q16_answer" value="insufficient"> Yetersiz - Neler eksik?</label>
+                                    <textarea name="q16_insufficient_detail" rows="2" placeholder="Neler eksikti?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q16_answer" value="not_used"> Yeterli ama kullanılmadı - Neden?</label>
+                                    <textarea name="q16_not_used_detail" rows="2" placeholder="Neden kullanılmadı?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q17">
+                                <input type="checkbox" id="q17" name="q17" class="conditional-checkbox" data-shows="q17-detail">
+                                <span class="checkbox-label">17. Olumsuz olayı diğer koşullar etkiledi mi?</span>
+                            </label>
+                            <div id="q17-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q17_answer" value="yes"> EVET - Açıklayın:</label>
+                                    <textarea name="q17_yes_detail" rows="2" placeholder="Hangi diğer koşullar?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q17_answer" value="no"> HAYIR - Başka etkileyici koşul yoktu</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KÖK NEDEN VE ÇÖZÜMLER -->
+                    <div class="investigation-section">
+                        <div class="section-title">🎯 Kök Neden ve Çözümler</div>
+                        
+                        <div class="form-group conditional-group">
+                            <label for="q18">
+                                <input type="checkbox" id="q18" name="q18" class="conditional-checkbox" data-shows="q18-detail">
+                                <span class="checkbox-label">18. Doğrudan, altta yatan ve kök nedenler nelerdi?</span>
+                            </label>
+                            <textarea id="q18-detail" name="q18_detail" rows="4" placeholder="Doğrudan nedenler (immediate causes) ve kök nedenler (root causes) - Hierarchical olarak liste yapın" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q19">
+                                <input type="checkbox" id="q19" name="q19" class="conditional-checkbox" data-shows="q19-detail">
+                                <span class="checkbox-label">19. Hangi risk kontrol önlemlerine ihtiyaç var / tavsiye ediliyor?</span>
+                            </label>
+                            <textarea id="q19-detail" name="q19_detail" rows="4" placeholder="Hiyerarşik sırada: İnşaat/tasarım, teknik, yönetim, eğitim, KKD, diğer" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q20">
+                                <input type="checkbox" id="q20" name="q20" class="conditional-checkbox" data-shows="q20-detail">
+                                <span class="checkbox-label">20. Başka yerde benzer riskler var mı? Varsa ne ve nerede?</span>
+                            </label>
+                            <div id="q20-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q20_answer" value="yes"> EVET - Benzer riskler var:</label>
+                                    <textarea name="q20_yes_detail" rows="2" placeholder="Nerede, ne tür riskler?"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q20_answer" value="no"> HAYIR - Başka yerde benzer risk yok</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q21">
+                                <input type="checkbox" id="q21" name="q21" class="conditional-checkbox" data-shows="q21-detail">
+                                <span class="checkbox-label">21. Daha önce benzer olumsuz olaylar yaşandı mı? Detaylar nelerdir?</span>
+                            </label>
+                            <div id="q21-detail" class="conditional-field hidden">
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q21_answer" value="yes"> EVET - Benzer olaylar yaşandı:</label>
+                                    <textarea name="q21_yes_detail" rows="2" placeholder="Tarihler ve detaylar"></textarea>
+                                </div>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="q21_answer" value="no"> HAYIR - İlk kez yaşanıyor</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q22">
+                                <input type="checkbox" id="q22" name="q22" class="conditional-checkbox" data-shows="q22-detail">
+                                <span class="checkbox-label">22. Kısa ve uzun vadede hangi risk kontrol önlemleri uygulanmalıdır?</span>
+                            </label>
+                            <textarea id="q22-detail" name="q22_detail" rows="4" placeholder="Acil (0-1 ay), Orta vadeli (1-3 ay), Uzun vadeli (3+ ay) önlemler" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q23">
+                                <input type="checkbox" id="q23" name="q23" class="conditional-checkbox" data-shows="q23-detail">
+                                <span class="checkbox-label">23. Hangi risk değerlendirmeleri ve güvenli çalışma prosedürlerinin gözden geçirilmesi ve güncellenmesi gerekiyor?</span>
+                            </label>
+                            <textarea id="q23-detail" name="q23_detail" rows="4" placeholder="Risk assessment revizyonu, SOP güncelleme, HAZOP, LOPA, diğer" class="conditional-field hidden"></textarea>
+                        </div>
+
+                        <div class="form-group conditional-group">
+                            <label for="q24">
+                                <input type="checkbox" id="q24" name="q24" class="conditional-checkbox" data-shows="q24-detail">
+                                <span class="checkbox-label">24. Olumsuz olayın detayları ve araştırma bulguları kaydedilip analiz edildi mi?</span>
+                            </label>
+                            <textarea id="q24-detail" name="q24_detail" rows="4" placeholder="Olayın maliyeti, araştırma bulguları, analiz sonuçları, öneriler" class="conditional-field hidden"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 8: ROOT CAUSE ANALYSIS -->
+                <div class="section" data-section="8">
+                    <div class="section-header">
+                        <h2>🔍 Kök Neden Analizi ve Düzeltici Aksiyonlar</h2>
+                        <p>5 Neden Analizi, kök nedenler, düzeltici ve önleyici tedbirler</p>
+                    </div>
+
+                    <div class="warning-box">
+                        <p><strong>⚠️ Önemli:</strong> Kök neden analizi "kimin suçu" aramaz, "sistem nerede başarısız oldu" sorusuna cevap arar. Birden fazla kök neden olabilir.</p>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label class="required">İlk Kök Neden Değerlendirmesi (5 Neden Tekniği)</label>
+                            <textarea name="rootCauseInitial" rows="8" placeholder="1. Neden: İşçi iskele kenarında dengesini kaybetti ve düştü.&#10;   Neden böyle oldu? → Emniyet kemeri takılmamıştı.&#10;&#10;2. Neden: Emniyet kemeri neden takılmamıştı?&#10;   → Korkuluk montajı tamamlanmadan çalışma başlatıldı.&#10;&#10;3. Neden: Korkuluk montajı neden tamamlanmadı?&#10;   → İş izin sistemi eksik, risk değerlendirmesi yapılmadı.&#10;&#10;4. Neden: İş izin sistemi neden uygulanmadı?&#10;   → Üretim baskısı, proje gecikmiş, hızlı bitirme talimatı.&#10;&#10;5. Neden: Üretim baskısı neden güvenliğin önüne geçti?&#10;   → Güvenlik kültürü zayıf, denetim yetersiz, prosedürler uygulanmıyor." required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Kök Neden Kategorileri (Hepsi işaretleyin)</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_procedure" id="rcProcedure">
+                                    <label for="rcProcedure">📋 Prosedür/Talimat Eksikliği</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_training" id="rcTraining">
+                                    <label for="rcTraining">🎓 Eğitim Yetersizliği</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_equipment" id="rcEquipment">
+                                    <label for="rcEquipment">🔧 Ekipman/Araç Arızası</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_ppe" id="rcPPE">
+                                    <label for="rcPPE">🛡️ KKD Eksikliği/Uygunsuz</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_supervision" id="rcSupervision">
+                                    <label for="rcSupervision">👁️ Gözetim/Denetim Eksikliği</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_communication" id="rcCommunication">
+                                    <label for="rcCommunication">📞 İletişim Sorunu</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_design" id="rcDesign">
+                                    <label for="rcDesign">📐 Tasarım/Planlama Hatası</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_maintenance" id="rcMaintenance">
+                                    <label for="rcMaintenance">🔨 Bakım Yetersizliği</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_culture" id="rcCulture">
+                                    <label for="rcCulture">🏢 Güvenlik Kültürü Zayıf</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_time_pressure" id="rcTimePressure">
+                                    <label for="rcTimePressure">⏱️ Üretim/Zaman Baskısı</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_fatigue" id="rcFatigue">
+                                    <label for="rcFatigue">😴 Yorgunluk/Stres</label>
+                                </div>
+                                <div class="checkbox-option">
+                                    <input type="checkbox" name="rc_environment" id="rcEnvironment">
+                                    <label for="rcEnvironment">🌦️ Çevresel Faktörler</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label class="required">Düzeltici Aksiyonlar (Hemen Uygulanacak)</label>
+                            <textarea name="correctiveActions" rows="6" placeholder="1. Tüm yüksekte çalışmalarda emniyet kemeri zorunlu kontrolü başlatıldı&#10;2. İskele montajında aşama aşama onay sistemi kuruldu (korkuluk önce)&#10;3. İş izin sistemi güncellendi (yüksekte çalışma risk değerlendirmesi)&#10;4. Güvenlik brifinglərinin günlük yapılması kararlaştırıldı&#10;5. Proje takvimi güvenlik odaklı revize edildi" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Önleyici Tedbirler (Uzun Vadeli)</label>
+                            <textarea name="preventiveActions" rows="5" placeholder="Benzer olayların tekrarını önlemek için sistematik değişiklikler..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Sorumlu Kişi/Birim (Aksiyonlar için)</label>
+                            <input type="text" name="actionResponsible" placeholder="Örn: İSG Müdürü, Bakım Şefi">
+                        </div>
+                        <div class="form-group">
+                            <label>Tamamlanma Tarihi (Hedef)</label>
+                            <input type="date" name="actionDeadline">
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>Ek Notlar ve Öneriler</label>
+                            <textarea name="additionalNotes" rows="4" placeholder="Diğer önemli bilgiler, öneriler, gözlemler..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 9: SUMMARY & SUBMIT -->
+                <div class="section" data-section="9">
+                    <div class="section-header">
+                        <h2>✅ Form Özeti ve Gönderim</h2>
+                        <p>Girdiğiniz bilgileri kontrol edin ve raporu gönderin</p>
+                    </div>
+
+                    <div class="summary-box" id="formSummary">
+                        <h3>📊 Form Doluluk Oranı</h3>
+                        <div class="summary-item">
+                            <span class="summary-label">Doldurulma Oranı:</span>
+                            <span class="summary-value" id="completionRate">0%</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Zorunlu Alanlar:</span>
+                            <span class="summary-value" id="requiredFields">0/10</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Toplam Alan:</span>
+                            <span class="summary-value" id="totalFields">0/100</span>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <p><strong>📋 Son Kontrol Listesi:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; line-height: 1.8;">
+                            <li>Tüm zorunlu alanlar dolduruldu mu?</li>
+                            <li>5W1H açıklamaları detaylı mı?</li>
+                            <li>Tanık ifadeleri kaydedildi mi?</li>
+                            <li>Kök neden analizi yeterince derinlemesine mi?</li>
+                            <li>Düzeltici aksiyonlar somut ve ölçülebilir mi?</li>
+                        </ul>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Rapor Kategorisi</label>
+                            <select name="reportCategory">
+                                <option value="preliminary">Ön Rapor (İlk 24 saat)</option>
+                                <option value="detailed">Detaylı Rapor (İnceleme sonrası)</option>
+                                <option value="final">Nihai Rapor (Aksiyonlar ile)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Rapor Gizlilik Seviyesi</label>
+                            <select name="confidentialityLevel">
+                                <option value="internal">İç Kullanım</option>
+                                <option value="confidential">Gizli</option>
+                                <option value="restricted">Kısıtlı Erişim</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="button-group">
+                    <button type="button" class="btn btn-outline" id="prevBtn" onclick="previousSection()">
+                        ← Önceki
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                        💾 Taslak Kaydet
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextSection()">
+                        Sonraki →
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
+                        ✅ Analize Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 0;
+        const totalSections = 9;
+
+        // Test Scenarios Data
+        const testScenarios = {
+            fall: {
+                reportedBy: 'Mustafa Çelik - Şantiye Şefi',
+                reportDate: '2026-02-18',
+                reportTime: '11:00',
+                incidentDate: '2026-02-18',
+                incidentTime: '10:35',
+                location: 'Yapı İnşaat Şantiyesi - 4. Kat İskele Alanı',
+                department: 'İnşaat / İskele Montaj',
+                eventCategory: 'incident',
+                incidentType: 'fall_from_height',
+                fallHeight: '6.0',
+                platformType: 'scaffold',
+                guardrailStatus: 'missing',
+                incidentDescription: 'İskele montaj işçisi Hasan Yıldız (32) yaklaşık 6 metre yükseklikteki iskeleden düşerek zemine çakıldı. İşçi ağır yaralanarak ambulansla hastaneye kaldırıldı.',
+                whatHappened: 'İşçi iskele kenarında çalışırken dengesini kaybetti ve 6 metre yükseklikten zemine düştü. Omurga kırığı ve iç kanama tespit edildi.',
+                whereHappened: '4. Kat iskele alanı, platform kenarı (korkuluksuz taraf)',
+                whenHappened: '18 Şubat 2026, Saat 10:35, Gündüz vardiyası sırasında',
+                whoInvolved: 'Hasan Yıldız (32) - İskele Montaj İşçisi, 8 ay deneyim',
+                emergencyMeasures: 'İlk yardım uygulandı (10:42), 112 arandı (10:37), ambulansla hastaneye sevk (10:55)',
+                fallProtection: 'no',
+                safetyHarness: 'no',
+                safetyTraining: 'partial',
+                witnessesPresent: 'yes',
+                witnessNames: 'Ali Demir (İşçi)\nMehmet Kara (Usta)',
+                witnessStatements: 'Ali Demir: "Hasan kemersiz çalışıyordu. Herkes öyle yapıyor. Şef acele ediyor diye korkuluksuz tarafa geçtik."\n\nMehmet Kara: "Korkuluk yarın takılacaktı. Bugün platform montajı bitmeliydi."',
+                weatherConditions: 'clear',
+                lightingConditions: 'good',
+                noiseLevel: 'moderate',
+                temperature: '15°C',
+                workType: 'İskele platform montajı',
+                workHeight: '6 metre',
+                experienceLevel: '8 ay',
+                shiftTime: 'day',
+                workDuration: '2.5 saat',
+                injurySeverity: 'severe',
+                bodyPart: 'L2 omurga, pelvis, dalak',
+                medicalTreatment: 'Yoğun bakım, ameliyat (omurga stabilizasyonu)',
+                rootCauseInitial: '1. Emniyet kemeri takılmamış (prosedür ihlali)\n2. Korkuluk montajı tamamlanmadan çalışma başlatılmış\n3. İş izni sistemi eksik (risk değerlendirmesi yetersiz)\n4. Üretim baskısı (proje gecikmiş, hızlı bitirme talimatı)\n5. Güvenlik denetimi yetersiz',
+                correctiveActions: '1. Tüm yüksekte çalışmalarda emniyet kemeri zorunlu kontrolü\n2. İskele montajında aşama aşama onay sistemi (korkuluk önce)\n3. İş izin sistemi güncelleme (yüksekte çalışma risk değerlendirmesi)\n4. Güvenlik brifinglərinin günlük yapılması\n5. Proje takviminin güvenlik odaklı revize edilmesi'
+            },
+            electrical: {
+                reportedBy: 'İbrahim Aydın - Elektrik Bakım Sorumlusu',
+                reportDate: '2026-02-20',
+                reportTime: '16:00',
+                incidentDate: '2026-02-20',
+                incidentTime: '15:20',
+                location: 'Üretim Tesisi - Ana Elektrik Panosu (MDB-02)',
+                department: 'Bakım / Elektrik',
+                eventCategory: 'incident',
+                incidentType: 'electrical_shock',
+                voltage: '380V',
+                currentType: 'ac_three',
+                lotoApplied: 'no',
+                incidentDescription: 'Bakım teknisyeni Kemal Arslan (29) elektrik panosunda arıza giderme çalışması yaperken 380V yüksek voltaj akımına kapıldı. LOTO prosedürü uygulanmadan enerjili sistemde çalışıldı.',
+                whatHappened: 'Teknisyen elektrik panosuna enerjili halde müdahale etti, şalter bağlantısına dokunurken 380V akıma kapıldı. Kardiyak arrest yaşadı.',
+                whereHappened: 'Ana elektrik panosu (MDB-02), üretim tesisi zemin kat',
+                whenHappened: '20 Şubat 2026, Saat 15:20, Gündüz vardiyası',
+                whoInvolved: 'Kemal Arslan (29) - Elektrik Bakım Teknisyeni, 4 yıl deneyim',
+                emergencyMeasures: 'Ana şalter kapatıldı (15:21), CPR uygulandı, defibrilasyon (15:35), hastaneye sevk (15:50)',
+                fallProtection: 'unknown',
+                safetyHarness: 'not_applicable',
+                safetyTraining: 'yes',
+                witnessesPresent: 'yes',
+                witnessNames: 'Ali Yılmaz (Teknisyen)\nBakım Sorumlusu',
+                witnessStatements: 'Ali Yılmaz: "Kemal acele ediyordu. Üretim duracak diye enerjiyi kesmedi. Hep böyle yapıyoruz."\n\nÜretim Müdürü: "Elektrik kesilirse 2 saat üretim kaybı olur."',
+                weatherConditions: 'indoor',
+                lightingConditions: 'good',
+                noiseLevel: 'high',
+                temperature: '22°C',
+                workType: 'Elektrik panosu arıza giderme',
+                workHeight: 'Zemin seviyesi',
+                experienceLevel: '4 yıl',
+                shiftTime: 'day',
+                workDuration: '50 dakika',
+                injurySeverity: 'severe',
+                bodyPart: 'Sağ el, kol, kalp',
+                medicalTreatment: 'Yoğun bakım 2 gün, defibrilasyon, yanık tedavisi',
+                propertyDamage: 'Pano şalteri hasarlı',
+                rootCauseInitial: '1. LOTO (Lockout/Tagout) prosedürü uygulanmadı\n2. Üretim baskısı - "duruş olmasın" kültürü\n3. Risk normalleşmesi - "hızlıca hallederiz" anlayışı\n4. Gözetim eksikliği - tek kişi çalışması\n5. LOTO eğitimi yetersiz (2 yıl önce, tekrar yok)',
+                correctiveActions: '1. LOTO prosedürü tüm elektrik işlerinde zorunlu hale getirildi\n2. Elektrik işleri için çift kişi zorunluluğu\n3. İş izin sistemi başlatıldı (elektrik işleri)\n4. LOTO eğitimi tüm teknisyenlere verildi\n5. Üretim vs güvenlik politikası revize edildi'
+            },
+            machine: {
+                reportedBy: 'Ayşe Demir - Hat Şefi',
+                reportDate: '2026-02-22',
+                reportTime: '11:45',
+                incidentDate: '2026-02-22',
+                incidentTime: '11:15',
+                location: 'Ambalaj Hattı 3 - Konveyör Bandı Sistemi',
+                department: 'Üretim / Ambalaj',
+                eventCategory: 'incident',
+                incidentType: 'machine_entrapment',
+                machineType: 'Konveyör bandı',
+                machineGuardStatus: 'missing',
+                emergencyStopStatus: 'not_used',
+                incidentDescription: 'Konveyör bandı operatörü Fatma Yıldız (27) bantda takılan ürünü temizlerken sağ elini konveyör ruloları arasına soktu. Makine çalışır durumdayken müdahale edildi.',
+                whatHappened: 'Operatör çalışan konveyör bandına elle müdahale etti, eli rulo ile bant arasında sıkıştı. Üç parmak kırıldı ve ezildi.',
+                whereHappened: 'Ambalaj hattı 3, konveyör bandı sistemi',
+                whenHappened: '22 Şubat 2026, Saat 11:15, Gündüz vardiyası',
+                whoInvolved: 'Fatma Yıldız (27) - Konveyör Bandı Operatörü, 14 ay deneyim',
+                emergencyMeasures: 'Acil durdurma butonu basıldı (11:17), el çıkarıldı, ilk yardım (11:20), 112 arandı (11:25)',
+                safetyTraining: 'partial',
+                witnessesPresent: 'yes',
+                witnessNames: 'Elif Kaya (Operatör)\nBakım Teknisyeni',
+                witnessStatements: 'Elif Kaya: "Fatma hep öyle yapıyordu. Hepimiz yapıyoruz. Bandı durdurup tekrar başlatmak 5 dakika sürer. Şef acele ediyor."',
+                weatherConditions: 'indoor',
+                lightingConditions: 'good',
+                noiseLevel: 'high',
+                temperature: '20°C',
+                workType: 'Konveyör bandı operasyonu',
+                experienceLevel: '14 ay',
+                shiftTime: 'day',
+                workDuration: '4.25 saat',
+                injurySeverity: 'moderate',
+                bodyPart: 'Sağ el: işaret, orta, yüzük parmağı',
+                medicalTreatment: 'Acil cerrahi, 4 ay iş göremezlik',
+                propertyDamage: 'Konveyör bandı hasarlı',
+                rootCauseInitial: '1. Makine çalışır durumdayken elle müdahale\n2. Koruyucu kapak/sensör sistemi yok\n3. Üretim baskısı - "durdurmayalım" kültürü\n4. Sık sıkışma sorunu (kronik) - normalleşmiş risk\n5. Acil durdurma butonlarının konumu uygunsuz',
+                correctiveActions: '1. Konveyör bandına koruyucu kapak montajı\n2. İki el kumanda sistemi kurulumu\n3. "Makineyi durdur önce müdahale et" prosedürü zorunlu\n4. Sıkışma kök nedeninin çözümü (bakım/ayar)\n5. Acil durdurma butonları yeniden konumlandırıldı'
+            },
+            excavation: {
+                reportedBy: 'Niyazi Tanrıverdi - Alt İşveren Santiye Şefi',
+                reportDate: '2026-02-12',
+                reportTime: '17:30',
+                incidentDate: '2026-02-12',
+                incidentTime: '16:15',
+                location: 'MAOG Projesi, Mersin-Adana Kesimi KM 359+300',
+                department: 'Altyapı / Kazı-Boru Montaj',
+                eventCategory: 'incident',
+                incidentType: 'excavation_collapse',
+                excavationDepth: '2.5',
+                soilType: 'type_c',
+                incidentDescription: 'Plastik kaynakçısı Nuri Karakuş (50) kazı alanında boru montajı yaparken kazı yüzeyindeki ani toprak kayması sonucu göçük altında kaldı.',
+                whatHappened: 'Yağış sonrası kazı yüzeyinde çatlak oluştu, işçi kaçamadan göçük meydana geldi. Toprak altında kaldı, ekip tarafından kurtarıldı.',
+                whereHappened: 'KM 359+300 mevkii, atık-su hattı kazı alanı, ~2.5m derinlik',
+                whenHappened: '12 Şubat 2026, Saat 16:15, Yağışlı hava sonrası yetkisiz çalışma',
+                whoInvolved: 'Nuri Karakuş (50) - Plastik Kaynakçısı, 2 yıl 10 ay deneyim',
+                emergencyMeasures: 'Ekip tarafından kurtarma (16:15-16:20), 112 çağrısı, ambulansla sevk (16:40)',
+                safetyTraining: 'yes',
+                witnessesPresent: 'yes',
+                witnessNames: 'İbrahim Karademir (ekip)\nAdem Toslak (ekskavatör operatörü)',
+                witnessStatements: 'İbrahim Karademir: "Yüzeyde hareket gördüm, uyardım ama hızlı oldu."\n\nGürkan Demir: "Çalışma sonlandırılmıştı ama devam ettik."',
+                weatherConditions: 'rainy',
+                lightingConditions: 'poor',
+                temperature: '12°C',
+                workType: '600mm beton boru montajı ve dolgu',
+                workHeight: 'Kazı derinliği ~2.5m',
+                experienceLevel: '2 yıl 10 ay',
+                shiftTime: 'day',
+                workDuration: 'Yetkisiz yeniden başlatma (~5 dakika)',
+                injurySeverity: 'moderate',
+                bodyPart: 'Gövde, bacaklar (genel ezilme)',
+                medicalTreatment: 'Hastaneye sevk, muayene, gözlem',
+                rootCauseInitial: '1. Yağış sonrası kazı stabilitesi değerlendirilmeden çalışma\n2. Çalışma durdurulmuştu ancak yetkisiz yeniden başlatıldı\n3. Kazı şev açısı ve destek sistemi yetersiz\n4. Göçük tatbikatı bilgisi davranışa dönüşmemiş',
+                correctiveActions: '1. Yağış sonrası kazı güvenlik kontrolü zorunlu\n2. Yetkisiz çalışma başlatma engellenecek\n3. Kazı şev açılarının revize edilmesi\n4. Kazı destek sistemlerinin güçlendirilmesi\n5. Kazı tehlikeleri eğitiminin detaylandırılması'
+            }
+        };
+
+        // Load test scenario
+        function loadTestScenario(type) {
+            const scenario = testScenarios[type];
+            if (!scenario) return;
+
+            const form = document.getElementById('incidentForm');
+            
+            // Fill all matching fields
+            Object.keys(scenario).forEach(key => {
+                const input = form.elements[key];
+                if (input) {
+                    if (input.type === 'radio') {
+                        const radio = form.querySelector(`input[name="${key}"][value="${scenario[key]}"]`);
+                        if (radio) radio.checked = true;
+                    } else if (input.type === 'checkbox') {
+                        input.checked = scenario[key];
+                    } else {
+                        input.value = scenario[key];
+                    }
+                }
+            });
+
+            // Show incident type fields
+            showIncidentTypeFields();
+            
+            // Update form statistics
+            updateFormStats();
+            
+            alert(`✅ "${type}" test senaryosu yüklendi!`);
+        }
+
+        // Clear form
+        function clearForm() {
+            if (confirm('Tüm form verileri silinecek. Emin misiniz?')) {
+                document.getElementById('incidentForm').reset();
+                updateFormStats();
+                alert('Form temizlendi.');
+            }
+        }
+
+        // Show/hide incident type specific fields
+        function showIncidentTypeFields() {
+            const incidentType = document.querySelector('select[name="incidentType"]').value;
+            
+            // Hide all
+            document.querySelectorAll('.incident-type-fields').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected
+            const fieldMap = {
+                'fall_from_height': 'fallFields',
+                'electrical_shock': 'electricalFields',
+                'machine_entrapment': 'machineFields',
+                'excavation_collapse': 'excavationFields'
+            };
+            
+            const fieldId = fieldMap[incidentType];
+            if (fieldId) {
+                document.getElementById(fieldId).classList.add('active');
+            }
+        }
+
+        // Conditional Field Logic for Detailed Investigation
+        function initializeConditionalFields() {
+            const conditionalCheckboxes = document.querySelectorAll('.conditional-checkbox');
+            
+            conditionalCheckboxes.forEach(checkbox => {
+                const targetId = checkbox.dataset.shows;
+                
+                // Initial state
+                updateConditionalField(checkbox, targetId);
+                
+                // On change
+                checkbox.addEventListener('change', () => {
+                    updateConditionalField(checkbox, targetId);
+                });
+            });
+
+            // Radio button conditional fields
+            const radios = document.querySelectorAll('.radio-group input[type="radio"]');
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const parent = this.closest('.conditional-field');
+                    if (parent) {
+                        const textareas = parent.querySelectorAll('textarea');
+                        textareas.forEach(ta => {
+                            if (this.value === ta.name.split('_')[0] + '_' + ta.name.split('_')[1]) {
+                                ta.parentElement.style.display = 'block';
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        function updateConditionalField(checkbox, targetId) {
+            const field = document.getElementById(targetId);
+            if (!field) return;
+            
+            if (checkbox.checked) {
+                field.classList.remove('hidden');
+                // Mark as required if parent form-group has required attribute
+                const parent = checkbox.closest('.form-group');
+                if (parent) {
+                    const inputs = field.querySelectorAll('textarea, input[type="text"]');
+                    inputs.forEach(input => input.required = true);
+                }
+            } else {
+                field.classList.add('hidden');
+                // Clear values when hidden (optional)
+                const inputs = field.querySelectorAll('textarea, input');
+                // Uncomment below to clear on uncheck:
+                // inputs.forEach(input => input.value = '');
+            }
+        }
+
+        // Section navigation
+        function showSection(index) {
+            if (index < 0 || index >= totalSections) return;
+            
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            
+            // Show selected section
+            document.querySelector(`.section[data-section="${index}"]`).classList.add('active');
+            document.querySelectorAll('.tab')[index].classList.add('active');
+            
+            currentSection = index;
+            
+            // Update buttons
+            document.getElementById('prevBtn').style.display = index === 0 ? 'none' : 'flex';
+            document.getElementById('nextBtn').style.display = index === totalSections - 1 ? 'none' : 'flex';
+            document.getElementById('submitBtn').style.display = index === totalSections - 1 ? 'flex' : 'none';
+            
+            // Update progress bar
+            const progress = ((index + 1) / totalSections) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Update stats if on summary page
+            if (index === totalSections - 1) {
+                updateFormStats();
+            }
+        }
+
+        function nextSection() {
+            showSection(currentSection + 1);
+        }
+
+        function previousSection() {
+            showSection(currentSection - 1);
+        }
+
+        // Update form statistics
+        function updateFormStats() {
+            const form = document.getElementById('incidentForm');
+            const allInputs = form.querySelectorAll('input, select, textarea');
+            const requiredInputs = form.querySelectorAll('[required]');
+            
+            let filledCount = 0;
+            let requiredFilledCount = 0;
+            
+            allInputs.forEach(input => {
+                if (input.type === 'radio' || input.type === 'checkbox') {
+                    const name = input.name;
+                    const checked = form.querySelector(`input[name="${name}"]:checked`);
+                    if (checked && !input.dataset.counted) {
+                        filledCount++;
+                        // Mark as counted
+                        form.querySelectorAll(`input[name="${name}"]`).forEach(i => i.dataset.counted = 'true');
+                    }
+                } else if (input.value.trim() !== '') {
+                    filledCount++;
+                }
+            });
+            
+            // Clear counted markers
+            allInputs.forEach(input => delete input.dataset.counted);
+            
+            requiredInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    const name = input.name;
+                    const checked = form.querySelector(`input[name="${name}"]:checked`);
+                    if (checked && !input.dataset.countedReq) {
+                        requiredFilledCount++;
+                        form.querySelectorAll(`input[name="${name}"]`).forEach(i => i.dataset.countedReq = 'true');
+                    }
+                } else if (input.value.trim() !== '') {
+                    requiredFilledCount++;
+                }
+            });
+            
+            requiredInputs.forEach(input => delete input.dataset.countedReq);
+            
+            const totalRequired = new Set(Array.from(requiredInputs).map(i => i.name)).size;
+            const completionRate = Math.round((filledCount / allInputs.length) * 100);
+            
+            document.getElementById('completionRate').textContent = completionRate + '%';
+            document.getElementById('requiredFields').textContent = requiredFilledCount + '/' + totalRequired;
+            document.getElementById('totalFields').textContent = filledCount + '/' + allInputs.length;
+        }
+
+        // Save draft
+        function saveDraft() {
+            const formData = new FormData(document.getElementById('incidentForm'));
+            const data = Object.fromEntries(formData);
+            localStorage.setItem('incidentReportDraft', JSON.stringify(data));
+            alert('📁 Taslak kaydedildi! (Tarayıcı hafızasında)');
+        }
+
+        // Load draft on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Initialize conditional fields for detailed investigation
+            initializeConditionalFields();
+
+            const draft = localStorage.getItem('incidentReportDraft');
+            if (draft && confirm('Kaydedilmiş taslak bulundu. Yüklemek ister misiniz?')) {
+                const data = JSON.parse(draft);
+                const form = document.getElementById('incidentForm');
+                
+                Object.keys(data).forEach(key => {
+                    const input = form.elements[key];
+                    if (input) {
+                        if (input.type === 'radio') {
+                            const radio = form.querySelector(`input[name="${key}"][value="${data[key]}"]`);
+                            if (radio) radio.checked = true;
+                        } else if (input.type === 'checkbox') {
+                            input.checked = data[key] === 'on';
+                        } else {
+                            input.value = data[key];
+                        }
+                    }
+                });
+            }
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            if (!document.querySelector('input[name="reportDate"]').value) {
+                document.querySelector('input[name="reportDate"]').value = today;
+            }
+        });
+
+        // Form submission
+        document.getElementById('incidentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            console.log('Form Data:', data);
+            
+            alert('✅ Form başarıyla gönderildi!\n\n📊 Veriler AI analizine aktarılıyor...\n\n(Bu demo versiyonudur. Gerçek sistemde backend API\'ye gönderilir)');
+            
+            // Clear draft
+            localStorage.removeItem('incidentReportDraft');
+        });
+
+        // Auto-save every 2 minutes
+        setInterval(() => {
+            const form = document.getElementById('incidentForm');
+            const inputs = form.querySelectorAll('input, select, textarea');
+            let hasData = false;
+            
+            inputs.forEach(input => {
+                if (input.value.trim() !== '') hasData = true;
+            });
+            
+            if (hasData) {
+                saveDraft();
+                console.log('Auto-saved at', new Date().toLocaleTimeString());
+            }
+        }, 120000); // 2 minutes
+
+        // Update stats on input change
+        document.getElementById('incidentForm').addEventListener('input', () => {
+            if (currentSection === totalSections - 1) {
+                updateFormStats();
+            }
+        });
+    </script>
+</body>
+</html>

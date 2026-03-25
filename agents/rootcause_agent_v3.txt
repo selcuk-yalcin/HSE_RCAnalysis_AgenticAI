@@ -1,0 +1,1108 @@
+"""
+Root Cause Agent V2 - Hiyerarşik 5-Why Analizi
+================================================
+YAPISAL AKIŞ:
+1. OLAY ÖZETI → Incident tanımı
+2. A/B KATEGORİLERİNDEN → Immediate Causes (Doğrudan Nedenler)
+   - A: Davranışsal (Actions)
+   - B: Koşullar (Conditions)
+3. HER IMMEDIATE CAUSE için → 5-WHY ANALİZİ
+   - Why 1
+   - Why 2 (Underlying)
+   - Why 3 (Underlying)
+   - Why 4
+   - Why 5 → ROOT CAUSE (C veya D kategorisinden)
+4. C/D KATEGORİLERİNDEN → Root Causes
+   - C: Kişisel Faktörler (Personal)
+   - D: Organizasyonel Faktörler (Organizational)
+
+DEĞİŞİKLİK GEÇMİŞİ:
+─────────────────────────────────────────────
+V2.0 → V2.1 (Prompt & Diversity Fix):
+  - Prompt örnekleri kaldırıldı (model template olarak kullanıyordu)
+  - used_root_codes takibi eklendi (dallar arası tekrar engeli)
+  - Çeşitlilik ve spesifiklik kuralları eklendi
+  - Temperature artırıldı (0.2→0.4 / 0.3→0.6)
+  - "Risk değerlendirmesi" tuzağına karşı prompt güçlendirildi
+
+V2.1 → V2.2 (Incident Summary Fix):
+  - _prepare_incident_summary tamamen yeniden yazıldı
+  - Öncelik sırası: description > full_description > how_happened > alanlar
+  - "description" anahtarı artık okunuyor (test dosyası {"description": ...} gönderiyor)
+  - Model artık gerçek olay metnini görüyor, kafadan senaryo üretmiyor
+
+V2.2 → V2.3 (5-Why Chain Start Fix):
+  - 5-Why zinciri artık OLAYDAN başlıyor (immediate cause'tan değil)
+  - Why-1 sorusu: "Neden bu olay gerçekleşti?" (olaydan türetiliyor)
+  - Why-1 cevabı: Doğrudan neden [A/B kodu]
+  - Why-2-5: Zincirleme derinleşme
+  - ÖRNEK: "Operatör neden kapıya çarptı?" → Cevap: [B2.1] Görüş engeli
+
+V2.3 → V2.4 (Chain Continuity Fix):
+  - Zincirleme bağı kuralı eklendi
+  - Her Why sorusu artık BİR ÖNCEKİ CEVABI sorgulamalı
+  - ÖRNEK (DOĞRU):
+    * Why-1: Neden kapıya çarptı? → Kapı kapanırken göremedi
+    * Why-2: Neden kapının kapandığını göremedi? (Why-1 cevabını sorgula)
+  - ÖRNEK (YANLIŞ):
+    * Why-1: Neden kapıya çarptı? → Kapı kapanırken göremedi
+    * Why-2: Neden stop tuşuna basmadı? (❌ bağlantı koptu!)
+  - System message güçlendirildi: "Her soru önceki cevaptan türetilmeli"
+
+V2.4 → V2.5 (Anti-Repetition Layer):
+  ──────────────────────────────────────────
+  SORUN: Dal 1 ve Dal 2'nin Why-2/3 cevapları birebir aynıydı.
+  Örnek (forklift-kapı raporu):
+    Dal 1 N2: "sarmal kapı sistemi... eğitim verilmemişti. Ayrıca levha bulunmuyordu."
+    Dal 2 N2: "sarmal kapı sistemi... eğitim verilmemişti. Ayrıca levha bulunmuyordu."
+
+  ÇÖZÜM: DSPy veya yeni bağımlılık YOK. Saf Python + prompt mühendisliği.
+
+  Eklenen bileşenler:
+  1. _check_answer_overlap(new_text, existing_texts, threshold=0.60)
+     - Basit Jaccard benzerliği (kelime kesişimi / birleşimi)
+     - Embedding veya harici kütüphane gerektirmez
+     - threshold=0.60: %60'tan fazla kelime örtüşmesi "tekrar" sayılır
+
+  2. analyze_root_causes() → all_previous_why_answers: List[str]
+     - Dal döngüsü başlamadan önce boş liste açılır
+     - Her dal bittikten sonra o dalın Why cevapları listeye eklenir
+     - Bir sonraki dal bu listeyi "previous_answers" olarak alır
+
+  3. _perform_5why_chain() → previous_answers parametresi eklendi
+     - Örtüşen cevaplar tespit edilir, prompt'a TEKRAR YASAĞI bloğu eklenir
+     - Maksimum son 8 cevap gösterilir (token tasarrufu)
+     - Overlap tespit edildiğinde konsola uyarı basılır
+
+  Beklenen etki: Dal arası tekrar %40-50 azalır
+  ──────────────────────────────────────────
+─────────────────────────────────────────────
+"""
+
+from openai import OpenAI
+from typing import Dict, List, Optional
+import os
+import sys
+from pathlib import Path
+
+# Try different import paths for knowledge_base
+try:
+    from knowledge_base import HSG245_TAXONOMY, get_category_text
+except ImportError:
+    try:
+        from agents.knowledge_base import HSG245_TAXONOMY, get_category_text
+    except ImportError:
+        from .knowledge_base import HSG245_TAXONOMY, get_category_text
+
+# Import robust JSON parser
+try:
+    from .json_parser import extract_json_from_response, safe_json_parse
+except ImportError:
+    try:
+        from json_parser import extract_json_from_response, safe_json_parse
+    except ImportError:
+        from agents.json_parser import extract_json_from_response, safe_json_parse
+
+# Import RAG Analyzer for context augmentation
+try:
+    from rag_pipeline.retrieval import RAGAnalyzer
+    RAG_AVAILABLE = True
+except ImportError:
+    RAG_AVAILABLE = False
+    try:
+        project_root = Path(__file__).parent.parent
+        sys.path.insert(0, str(project_root))
+        from rag_pipeline.retrieval import RAGAnalyzer
+        RAG_AVAILABLE = True
+    except ImportError:
+        RAGAnalyzer = None
+        print("⚠️  RAG pipeline not available. Proceeding with static knowledge base.")
+
+
+class RootCauseAgentV2:
+    """
+    Part 3: Hiyerarşik Kök Neden Analizi
+    A/B → 5-Why → C/D yapısı
+
+    RAG Enhancement: MongoDB vector store ile taxonomy causes'lar retrieval yapılır
+    Anti-Repetition: Dallar arası Why cevabı tekrarı engellenir (V2.5)
+    """
+
+    def __init__(self, use_rag: bool = True, enable_meta_root_cause: bool = False):
+        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key
+        )
+
+        self.rag_analyzer = None
+        self.use_rag = use_rag
+        self.enable_meta_root_cause = enable_meta_root_cause
+        if use_rag and RAG_AVAILABLE:
+            try:
+                self.rag_analyzer = RAGAnalyzer()
+                meta_str = " + Meta Synthesis" if enable_meta_root_cause else ""
+                print(f"✅ Kök Neden Ajanı V2 başlatıldı (RAG enhanced{meta_str})")
+            except Exception as e:
+                print(f"⚠️  RAG initialization failed: {e}")
+                print("   Proceeding with static knowledge base")
+                self.rag_analyzer = None
+        else:
+            meta_str = " + Meta Synthesis" if enable_meta_root_cause else ""
+            print(f"✅ Kök Neden Ajanı V2 başlatıldı (static knowledge base{meta_str})")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # ★ YENİ METOT (V2.5) — CEVAP ÖRTÜŞME KONTROLÜ
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _check_answer_overlap(
+        self,
+        new_text: str,
+        existing_texts: List[str],
+        threshold: float = 0.60
+    ) -> List[str]:
+        """
+        Yeni bir cevap metni, önceki dalların cevaplarıyla semantik olarak
+        ne kadar örtüşüyor? Jaccard benzerliği kullanır — embedding yok,
+        harici kütüphane yok.
+
+        Args:
+            new_text      : Kontrol edilecek yeni cevap
+            existing_texts: Önceki dallardan birikmiş cevaplar listesi
+            threshold     : 0.60 → %60'tan fazla kelime örtüşmesi "tekrar" sayılır
+                            Düşürmek istersen: 0.50 (daha katı)
+                            Yükseltmek istersen: 0.72 (daha gevşek)
+
+        Returns:
+            Eşiği aşan, örtüşen cevapların listesi (boşsa tekrar yok)
+
+        Örnek:
+            new_text      = "eğitim verilmemişti, levha bulunmuyordu"
+            existing_texts = ["eğitim verilmemişti. Ayrıca levha bulunmuyordu"]
+            → Jaccard ≈ 0.75 → eşiği aşıyor → bu cevap döner
+        """
+        # Türkçe stop word'leri çıkar — bunlar her cümlede olduğu için
+        # anlamsız yüksek benzerlik skoru üretir
+        STOPWORDS_TR = {
+            "ve", "ile", "bir", "bu", "için", "de", "da", "ki",
+            "bu", "o", "şu", "ne", "ama", "veya", "ya", "gibi",
+            "daha", "en", "çok", "az", "hiç", "her", "olan", "olan",
+            "var", "yok", "bu", "şu", "hangi", "olan", "edilmiş",
+            "yapılmış", "bulunmuyor", "bulunmamış", "verilmemiş",
+        }
+
+        def tokenize(text: str) -> set:
+            words = text.lower().split()
+            # Noktalama temizle, stop word çıkar, min 4 karakter
+            cleaned = set()
+            for w in words:
+                w = w.strip(".,;:!?()[]\"'")
+                if len(w) >= 4 and w not in STOPWORDS_TR:
+                    cleaned.add(w)
+            return cleaned
+
+        new_tokens = tokenize(new_text)
+        if not new_tokens:
+            return []
+
+        overlapping = []
+        for existing in existing_texts:
+            existing_tokens = tokenize(existing)
+            if not existing_tokens:
+                continue
+
+            # Jaccard: kesişim / birleşim
+            intersection = len(new_tokens & existing_tokens)
+            union = len(new_tokens | existing_tokens)
+            jaccard = intersection / union if union > 0 else 0.0
+
+            if jaccard >= threshold:
+                overlapping.append(existing)
+
+        return overlapping
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # ANA GİRİŞ NOKTASI
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def analyze_root_causes(
+        self,
+        part1_data: Dict,
+        part2_data: Dict,
+        investigation_data: Dict = None,
+        synthesize_meta_root: bool = True
+    ) -> Dict:
+        print("\n" + "=" * 80)
+        print("🔴 BÖLÜM 3: HİYERARŞİK KÖK NEDEN ANALİZİ")
+        print("=" * 80)
+
+        incident_summary = self._prepare_incident_summary(
+            part1_data, part2_data, investigation_data
+        )
+        incident_summary = self._append_hitl_answers(incident_summary, investigation_data)
+
+        print(f"\n📋 OLAY ÖZETİ (ilk 300 karakter):\n{incident_summary[:300]}...\n")
+
+        rca_data = {
+            "incident_summary": incident_summary,
+            "analysis_branches": [],
+            "final_root_causes": [],
+            "analysis_method": "HSG245 Hierarchical 5-Why (A/B → C/D)"
+        }
+
+        # ADIM 1: Immediate Causes
+        print("\n🔍 ADIM 1: Doğrudan Nedenleri Belirleme (A/B Kategorileri)")
+        print("-" * 80)
+        immediate_causes = self._identify_immediate_causes_with_codes(incident_summary)
+
+        if not immediate_causes:
+            print("❌ Doğrudan neden bulunamadı!")
+            return rca_data
+
+        if len(immediate_causes) > 3:
+            print(f"⚠️  {len(immediate_causes)} neden bulundu, en önemlisi 3'ü seçildi (token tasarrufu)")
+            immediate_causes = sorted(
+                immediate_causes,
+                key=lambda x: x.get('confidence', 0.5),
+                reverse=True
+            )[:3]
+
+        print(f"✅ {len(immediate_causes)} doğrudan neden analiz edilecek\n")
+
+        # ADIM 2: 5-Why zinciri
+        print("\n🔗 ADIM 2: 5-Why Analizi (Her Dal için)")
+        print("-" * 80)
+
+        used_root_codes: List[str] = []
+
+        # ★ V2.5: Önceki dalların tüm Why cevaplarını biriktiren liste
+        # Her dal bu listeyi bir sonraki dale devreder
+        all_previous_why_answers: List[str] = []
+
+        for idx, immediate_cause in enumerate(immediate_causes, 1):
+            print(f"\n{'=' * 80}")
+            print(f"⚡ DAL {idx}: {immediate_cause.get('category_type', '???')}")
+            print(f"📌 Doğrudan Neden [{immediate_cause.get('code', '???')}]:")
+            print(f"   {immediate_cause.get('cause_tr', '')}")
+            print(f"{'=' * 80}\n")
+
+            # ★ V2.5: previous_answers parametresi eklendi
+            chain = self._perform_5why_chain(
+                immediate_cause,
+                incident_summary,
+                used_root_codes=used_root_codes,
+                previous_answers=all_previous_why_answers,   # ← YENİ
+            )
+
+            root_code = chain.get("root_cause", {}).get("code")
+            if root_code:
+                used_root_codes.append(root_code)
+
+            # ★ V2.5: Bu dalın cevaplarını bir sonraki dal için biriktir
+            for why in chain.get("whys", []):
+                answer = why.get("answer_tr", "").strip()
+                if answer:
+                    all_previous_why_answers.append(answer)
+
+            branch = {
+                "branch_number": idx,
+                "immediate_cause": immediate_cause,
+                "why_chain": chain.get("whys", []),
+                "root_cause": chain.get("root_cause", {})
+            }
+            rca_data["analysis_branches"].append(branch)
+            rca_data["final_root_causes"].append(chain.get("root_cause", {}))
+
+            self._print_branch_tree(branch)
+
+        print("\n" + "=" * 80)
+        print("✅ TÜM DALLAR TAMAMLANDI!")
+        print("=" * 80)
+
+        if synthesize_meta_root and len(rca_data["final_root_causes"]) > 1:
+            print("\n" + "=" * 80)
+            print("🔗 ADIM 3 (OPSİYONEL): META KÖK NEDEN SENTEZİ")
+            print("=" * 80)
+
+            meta_root = self._synthesize_meta_root_cause(
+                rca_data["final_root_causes"],
+                incident_summary
+            )
+
+            if meta_root:
+                rca_data["meta_root_cause"] = meta_root
+                print(f"\n✅ Meta Kök Neden: [{meta_root.get('code')}] {meta_root.get('standard_title_tr', '')}")
+                print(f"   {meta_root.get('cause_tr', '')}")
+            else:
+                print("\n⚠️  Meta kök neden sentezlenemedi")
+
+        rca_data["final_report_tr"] = self._generate_hierarchical_report(rca_data)
+        return rca_data
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # ADIM 1 — DOĞRUDAN NEDENLER (A / B KATEGORİLERİ)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _identify_immediate_causes_with_codes(self, incident_summary: str) -> List[Dict]:
+        """A/B kategorilerinden immediate causes bul (RAG-enhanced)"""
+
+        rag_context_a = get_category_text('A')
+        rag_context_b = get_category_text('B')
+
+        prompt = f"""Sen uzman bir İSG Müfettişisin. Görevin, aşağıdaki iş kazası / çevre olayı raporunu
+analiz etmek ve HSG245 standardına göre "Doğrudan Nedenleri" (Immediate Causes) belirlemektir.
+
+GİRDİLER:
+
+OLAY RAPORU (TAMAMI):
+{incident_summary}
+
+REFERANS LİSTESİ A (DAVRANIŞSAL KODLAR):
+{rag_context_a}
+
+REFERANS LİSTESİ B (KOŞULLAR KODLARI):
+{rag_context_b}
+
+─────────────────────────────────────────────
+KRİTİK KURALLAR:
+─────────────────────────────────────────────
+
+1. SADECE RAPORDA YAZANLARI KULLAN
+   Raporda açıkça geçen olgulara dayan. Raporda olmayan ekipman, kişi veya senaryoyu
+   ASLA ekleme. Kafadan senaryo üretme.
+
+2. FİLTRELEME
+   Olayı DOĞRUDAN tetikleyen, olay anında gerçekleşen nedenleri seç.
+   Dolaylı faktörleri (eğitim eksikliği, risk değerlendirmesi vb.) SEÇME —
+   bunlar root cause kategorisine aittir.
+
+3. LİMİT
+   Maksimum 5 (BEŞ) adet en kritik neden. Zorla doldurma.
+
+4. ÇEŞİTLİLİK
+   Mümkünse hem A (davranış) hem B (koşul) kategorisinden neden seç.
+
+5. SPESİFİKLİK
+   "Risk değerlendirmesi eksik", "eğitim yetersiz" gibi genel ifadeler
+   DOĞRUDAN NEDEN DEĞİLDİR. Rapordaki somut, gözlemlenebilir olay veya
+   koşulu kodla.
+
+6. FORMAT
+   Sadece saf JSON. Markdown etiketi (```json) KULLANMA.
+
+─────────────────────────────────────────────
+ALAN TANIMLARI:
+─────────────────────────────────────────────
+- "code"             : Referans listesinden uygun kod (örn: B2.1)
+- "standard_title_tr": O kodun referans listesindeki STANDART BAŞLIĞI (birebir al)
+- "category_type"    : "DAVRANIŞSAL" veya "KOŞUL"
+- "cause_tr"         : Bu olaya özgü somut açıklama
+- "evidence_tr"      : Olay raporundan bu kararı destekleyen SOMUT KANIT
+
+─────────────────────────────────────────────
+BEKLENEN ÇIKTI (JSON ŞEMASI):
+─────────────────────────────────────────────
+{{
+  "causes": [
+    {{
+      "code": "<A veya B kategorisinden uygun kod>",
+      "standard_title_tr": "<referans listesindeki orijinal Türkçe başlık>",
+      "category_type": "<DAVRANIŞSAL veya KOŞUL>",
+      "cause_tr": "<bu olaya özgü somut açıklama>",
+      "evidence_tr": "<olay raporundan alınan somut kanıt>"
+    }}
+  ]
+}}
+"""
+
+        if self.rag_analyzer and self.use_rag:
+            try:
+                rag_context = self.rag_analyzer.get_context_for_query(
+                    query=incident_summary[:500],
+                    k=3,
+                    language="tr",
+                    cause_type_filter="A"
+                )
+                if rag_context.get("status") == "success" and rag_context.get("retrieved_causes"):
+                    rag_excerpt = rag_context.get("knowledge_base_excerpt", "")
+                    prompt = f"""{prompt}
+
+─────────────────────────────────────────────
+📚 VECTOR SEARCH'TEN ALINAN İLGİLİ SEBEPLER
+(Incident'a benzer önceki vakalardan):
+─────────────────────────────────────────────
+{rag_excerpt}
+"""
+                    print("🔍 RAG context added to immediate causes analysis")
+            except Exception as e:
+                print(f"⚠️  RAG augmentation failed: {e}. Using static context.")
+
+        response = self.client.chat.completions.create(
+            model="anthropic/claude-sonnet-4.5",
+            temperature=0.4,
+            max_tokens=4000,
+            messages=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": (
+                                "Sen HSG245 uzmanısın. Sadece JSON döndür, Türkçe içerik kullan. "
+                                "Raporda olmayan senaryoları ASLA ekleme. "
+                                "Genel/jenerik kodlardan kaçın; olaya özgü, spesifik kodları seç."
+                            ),
+                            "cache_control": {"type": "ephemeral"}
+                        }
+                    ]
+                },
+                {"role": "user", "content": prompt}
+            ],
+            extra_headers={"anthropic-version": "2023-06-01"}
+        )
+
+        result = response.choices[0].message.content.strip()
+        data = safe_json_parse(
+            result,
+            context="Immediate Causes Identification",
+            default={"causes": []}
+        )
+        causes = data.get("causes", [])
+
+        for cause in causes:
+            code           = cause.get('code', '???')
+            standard_title = cause.get('standard_title_tr', '')
+            cause_desc     = cause.get('cause_tr', '')
+            if standard_title:
+                print(f"  [{code}] {standard_title}: {cause_desc}")
+            else:
+                print(f"  [{code}] {cause_desc}")
+
+        return causes
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # ADIM 2 — 5-WHY ZİNCİRİ  (★ V2.5: previous_answers eklendi)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _perform_5why_chain(
+        self,
+        immediate_cause: Dict,
+        incident_summary: str,
+        used_root_codes: List[str] = None,
+        previous_answers: List[str] = None,     # ★ V2.5 — YENİ PARAMETRE
+    ) -> Dict:
+        """
+        Bir immediate cause için 5-Why zinciri oluştur.
+
+        previous_answers: Önceki dalların birikmiş Why cevapları.
+            - İlk dal için boş liste gelir → TEKRAR YASAĞI bloğu eklenmez
+            - 2. ve 3. dallar için dolu gelir → örtüşen cevaplar tespit edilir
+              ve prompt'a "bu ifadeleri tekrarlama" talimatı eklenir
+        """
+
+        if used_root_codes is None:
+            used_root_codes = []
+        if previous_answers is None:
+            previous_answers = []
+
+        code     = immediate_cause.get("code", "")
+        cause_tr = immediate_cause.get("cause_tr", "")
+
+        rag_context_c = get_category_text('C')
+        rag_context_d = get_category_text('D')
+
+        if used_root_codes:
+            banned_codes_str = (
+                "YASAK KODLAR (önceki dallarda zaten seçildi, ROOT CAUSE olarak SEÇME):\n"
+                + ", ".join(used_root_codes)
+                + "\nFarklı, daha spesifik bir kod bul."
+            )
+        else:
+            banned_codes_str = "Henüz kullanılmış kod yok."
+
+        # ★ V2.5 — TEKRAR YASAĞI BLOĞU
+        # Önceki dalların cevaplarıyla örtüşen varsa prompt'a eklenir.
+        # İlk dal için previous_answers boş → bu blok hiç oluşmaz → sıfır token maliyeti.
+        repetition_block = ""
+        if previous_answers:
+            # Son 8 cevabı kontrol et (daha eskiler artık etkisiz)
+            recent = previous_answers[-8:]
+
+            # _check_answer_overlap: %60+ kelime örtüşmesi → "benzer" sayılır
+            # Burada tüm recent cevapları toplu gösteriyoruz çünkü model
+            # hangi ifadenin "yasaklı" olduğunu görmesi gerekiyor.
+            repetition_block = f"""
+─────────────────────────────────────────────
+⚠️ TEKRAR YASAĞI — FARKLI BİR AÇIDAN YAKLAŞ
+─────────────────────────────────────────────
+Aşağıdaki ifadeler önceki dallarda ZATEN kullanıldı.
+Bu cevapları AYNEN veya çok benzer şekilde YAZMA.
+Aynı gerçeği farklı bir mekanizma veya organizasyonel boyuttan ele al.
+
+YASAK İFADELER (önceki dallardan):
+{chr(10).join(f"  • {a[:150]}" for a in recent)}
+
+NASIL FARKLILAŞTIRILIR:
+  - Aynı eksikliği farklı bir organizasyonel katmandan sorgula
+    (prosedür eksikliği yerine → denetim eksikliği; eğitim eksikliği yerine → yetkinlik değerlendirme eksikliği)
+  - Farklı bir paydaş açısından bak
+    (operatör yerine → süpervizör; eğitim birimi yerine → satın alma / ekipman yönetimi)
+  - Farklı bir zaman boyutuna odaklan
+    (olay anı yerine → devreye alma aşaması; günlük operasyon yerine → periyodik denetim)
+─────────────────────────────────────────────
+"""
+            # Konsola bilgi ver — hangi cevapların örtüştüğünü göster
+            for answer in recent:
+                overlapping = self._check_answer_overlap(answer, previous_answers[:-len(recent)])
+                if overlapping:
+                    print(f"  ⚠️  [Anti-Repeat] Potansiyel tekrar tespit edildi: '{answer[:80]}...'")
+
+        prompt = f"""Sen İSG kök neden uzmanısın. 5-Why analizi yapıyorsun.
+
+OLAY RAPORU (TAMAMI):
+{incident_summary}
+
+DOĞRUDAN NEDEN [{code}]:
+{cause_tr}
+
+C KATEGORİSİ (KİŞİSEL FAKTÖRLER - ROOT CAUSES):
+{rag_context_c}
+
+D KATEGORİSİ (ORGANİZASYONEL FAKTÖRLER - ROOT CAUSES):
+{rag_context_d}
+
+─────────────────────────────────────────────
+GÖREV:
+─────────────────────────────────────────────
+
+5-Why zincirini şu şekilde kur:
+  - Why 1: OLAYDAN BAŞLA — "Neden bu olay gerçekleşti?" (Cevap: yukarıdaki doğrudan neden [{code}])
+  - Why 2: "Neden [{code}] oluştu?"
+  - Why 3: Why-2'nin nedenini sor
+  - Why 4: Why-3'ün nedenini sor
+  - Why 5: Root Cause (C veya D kategorisinden KOD ile)
+
+KRİTİK: Why-1'in CEVABI yukarıdaki doğrudan neden olmalı. Why-1'in SORUSU olay tanımından türetilmeli.
+
+─────────────────────────────────────────────
+KRİTİK KURALLAR:
+─────────────────────────────────────────────
+
+A) WHY-1 ÖZEL KURAL ⚠️
+   Why-1'in SORUSU: Olayın kendisinden başla (örn: "Operatör neden kapıya çarptı?")
+   Why-1'in CEVABI: Yukarıda verilen doğrudan neden [{code}]: {cause_tr}
+
+B) SADECE RAPORDA YAZANLARA DAYAN
+   Raporda geçmeyen ekipman, kişi, sistem veya senaryo EKLEME.
+
+C) {banned_codes_str}
+
+D) SPESİFİKLİK KURALI
+   "Risk değerlendirmesi eksikliği" (D1.x), "eğitim eksikliği" (D2.x) gibi
+   kodlar HER KAZAYA uygulanabilecek jenerik kodlardır.
+   Bu olay için DAHA SPESİFİK bir root cause varsa onu seç.
+
+E) ZİNCİR TUTARLILIĞI
+   Root cause, 5-Why zincirinin mantıksal sonucu olmalı.
+
+F) ⚠️ ZİNCİRLEME BAĞI KURALI - ÇOK ÖNEMLİ:
+   Her "Why" sorusu, BİR ÖNCEKİ CEVABI sorgulamalı!
+
+   ÖRNEK (DOĞRU):
+   Why-1: Operatör neden kapıya çarptı?
+     → Cevap: Kapı kapanırken göremedi
+   Why-2: Operatör neden kapının kapandığını göremedi?  ✅
+     → Cevap: Görüş açısı dışındaydı
+   Why-3: Neden görüş açısı dışındaydı?  ✅
+     → Cevap: Geri giderken kapı arkasında kaldı
+
+   YANLIŞ ÖRNEK:
+   Why-2: Neden stop tuşuna basmadı?  ❌ (Why-1 cevabını sorgulamıyor!)
+{repetition_block}
+─────────────────────────────────────────────
+DÖNDÜR (JSON ŞEMASI):
+─────────────────────────────────────────────
+{{
+  "whys": [
+    {{
+      "level": 1,
+      "question_tr": "Operatör neden geri manevrada kapıya çarptı?",
+      "answer_tr": "Kapı otomatik kapanırken görüş açısı dışındaydı [{code}]"
+    }},
+    {{
+      "level": 2,
+      "question_tr": "Operatör neden kapının kapandığını fark edemedi?",
+      "answer_tr": "Geri manevrada kapı görüş açısı dışında kaldı"
+    }},
+    {{
+      "level": 3,
+      "question_tr": "Neden geri manevrada görüş açısı dışında kaldı?",
+      "answer_tr": "Forklift tasarımı geri manevrада kör nokta oluşturuyor"
+    }},
+    {{
+      "level": 4,
+      "question_tr": "Neden kör nokta riski değerlendirilmemiş?",
+      "answer_tr": "Forklift-kapı etkileşimi için JHA yapılmamış"
+    }}
+  ],
+  "root_cause": {{
+    "code": "<C veya D kategorisinden uygun kod>",
+    "standard_title_tr": "<HSG245 orijinal Türkçe başlık>",
+    "category_type": "<KİŞİSEL veya ORGANİZASYONEL>",
+    "cause_tr": "<bu olaya özgü kök neden açıklaması>",
+    "explanation_tr": "<neden bu kod seçildi, 5-why zinciriyle bağlantısı>"
+  }}
+}}
+
+KRİTİK:
+- Why-1'in cevabı yukarıdaki [{code}] kodlu doğrudan neden olmalı
+- Why-1'in sorusu olayın tanımından gelmeli
+- Tüm içerik %100 TÜRKÇE
+- Geçerli JSON döndür
+- Markdown etiketi kullanma"""
+
+        if self.rag_analyzer and self.use_rag:
+            try:
+                rag_context_root = self.rag_analyzer.get_context_for_query(
+                    query=f"{cause_tr} {incident_summary[:300]}",
+                    k=2,
+                    language="tr",
+                    cause_type_filter=None
+                )
+                if rag_context_root.get("status") == "success" and rag_context_root.get("retrieved_causes"):
+                    rag_excerpt = rag_context_root.get("knowledge_base_excerpt", "")
+                    prompt = f"""{prompt}
+
+─────────────────────────────────────────────
+📚 VECTOR SEARCH'TEN ALINAN KÖK SEBEP ÖRNEKLERİ
+(Benzer incident'lardan):
+─────────────────────────────────────────────
+{rag_excerpt}
+"""
+                    print("🔍 RAG context added to 5-Why analysis")
+            except Exception as e:
+                print(f"⚠️  RAG augmentation failed for 5-Why: {e}")
+
+        response = self.client.chat.completions.create(
+            model="anthropic/claude-opus-4.6",
+            temperature=0.6,
+            max_tokens=4000,
+            messages=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": (
+                                "Sen 5-Why uzmanısın. Sadece JSON, Türkçe içerik. "
+                                "Her kaza için özgün, spesifik kök nedenler üret. "
+                                "Raporda olmayan senaryoları ASLA ekleme. "
+                                "Jenerik/genel kodlardan kaçın. "
+                                "KRİTİK: Her Why sorusu BİR ÖNCEKİ CEVABI sorgulamalı! "
+                                "Zincirleme bağı kırma - her soru önceki cevaptan türetilmeli."
+                            ),
+                            "cache_control": {"type": "ephemeral"}
+                        }
+                    ]
+                },
+                {"role": "user", "content": prompt}
+            ],
+            extra_headers={"anthropic-version": "2023-06-01"}
+        )
+
+        result = response.choices[0].message.content.strip()
+        chain = safe_json_parse(
+            result,
+            context=f"5-Why Chain for {code}",
+            default={"whys": [], "root_cause": {}}
+        )
+
+        for why in chain.get("whys", []):
+            level    = why.get("level", "?")
+            question = why.get("question_tr", "")
+            answer   = why.get("answer_tr", "")
+            print(f"  ❓ Neden {level}? {question}")
+            print(f"     → {answer}\n")
+
+        root             = chain.get("root_cause", {})
+        root_code        = root.get('code', '???')
+        root_standard    = root.get('standard_title_tr', '')
+        root_cause_desc  = root.get('cause_tr', '')
+        root_explanation = root.get('explanation_tr', '')
+
+        if root_standard:
+            print(f"  🎯 KÖK NEDEN [{root_code}] {root_standard}: {root_cause_desc}")
+        else:
+            print(f"  🎯 KÖK NEDEN [{root_code}]: {root_cause_desc}")
+        print(f"     ({root_explanation})\n")
+
+        return chain
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # YARDIMCI — DAL AĞACI
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _print_branch_tree(self, branch: Dict):
+        immediate = branch["immediate_cause"]
+        whys      = branch.get("why_chain", [])
+        root      = branch.get("root_cause", {})
+
+        print(f"\n🌳 DAL AĞACI #{branch['branch_number']}:")
+        print("│")
+
+        imm_code     = immediate.get('code', '')
+        imm_standard = immediate.get('standard_title_tr', '')
+        imm_cause    = immediate.get('cause_tr', '')
+        imm_evidence = immediate.get('evidence_tr', '')
+
+        if imm_standard:
+            print(f"├── 📌 DOĞRUDAN NEDEN [{imm_code}] {imm_standard}")
+            print(f"│      └── {imm_cause}")
+        else:
+            print(f"├── 📌 DOĞRUDAN NEDEN [{imm_code}]")
+            print(f"│      └── {imm_cause}")
+
+        if imm_evidence:
+            print(f"│      📎 Kanıt: {imm_evidence}")
+        print("│")
+
+        for idx, why in enumerate(whys, 1):
+            print(f"├── ❓ Neden {idx}? {why.get('question_tr', '')}")
+            print(f"│      └── {why.get('answer_tr', '')}")
+            print("│")
+
+        root_code        = root.get('code', '')
+        root_standard    = root.get('standard_title_tr', '')
+        root_cause       = root.get('cause_tr', '')
+        root_explanation = root.get('explanation_tr', '')
+
+        if root_standard:
+            print(f"└── 🎯 KÖK NEDEN [{root_code}] {root_standard}")
+            print(f"       └── {root_cause}")
+        else:
+            print(f"└── 🎯 KÖK NEDEN [{root_code}]")
+            print(f"       └── {root_cause}")
+
+        if root_explanation:
+            print(f"       💡 {root_explanation}")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # YARDIMCI — HİYERARŞİK RAPOR
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _generate_hierarchical_report(self, rca_data: Dict) -> str:
+        report = []
+        report.append("=" * 80)
+        report.append("KÖK NEDEN ANALİZİ RAPORU (HSG245 - 5 Why Metodolojisi)")
+        report.append("=" * 80)
+        report.append("")
+        report.append(f"OLAY: {rca_data['incident_summary'][:500]}...")
+        report.append("")
+        report.append("-" * 80)
+
+        for branch in rca_data["analysis_branches"]:
+            immediate = branch["immediate_cause"]
+            whys      = branch.get("why_chain", [])
+            root      = branch.get("root_cause", {})
+
+            report.append("")
+            report.append(f"⚡ DAL {branch['branch_number']}: {immediate.get('category_type', '')}")
+            report.append("")
+
+            imm_code     = immediate.get('code', '')
+            imm_standard = immediate.get('standard_title_tr', '')
+            imm_cause    = immediate.get('cause_tr', '')
+            imm_evidence = immediate.get('evidence_tr', '')
+
+            if imm_standard:
+                report.append(f"📌 Doğrudan Neden [{imm_code}] {imm_standard}:")
+            else:
+                report.append(f"📌 Doğrudan Neden [{imm_code}]:")
+            report.append(f"   {imm_cause}")
+            if imm_evidence:
+                report.append(f"   Kanıt: {imm_evidence}")
+            report.append("")
+
+            for idx, why in enumerate(whys, 1):
+                report.append(f"❓ Neden {idx}? {why.get('question_tr', '')}")
+                report.append(f"   → {why.get('answer_tr', '')}")
+                report.append("")
+
+            root_code        = root.get('code', '')
+            root_standard    = root.get('standard_title_tr', '')
+            root_category    = root.get('category_type', '')
+            root_cause       = root.get('cause_tr', '')
+            root_explanation = root.get('explanation_tr', '')
+
+            if root_standard:
+                report.append(f"🎯 KÖK NEDEN [{root_code}] {root_standard} — {root_category}:")
+            else:
+                report.append(f"🎯 KÖK NEDEN [{root_code}] — {root_category}:")
+            report.append(f"   {root_cause}")
+            if root_explanation:
+                report.append(f"   💡 {root_explanation}")
+            report.append("")
+            report.append("-" * 80)
+
+        report.append("")
+        report.append("📊 ROOT CAUSE ÖZETİ:")
+        for i, rc in enumerate(rca_data.get("final_root_causes", []), 1):
+            rc_code     = rc.get('code', '')
+            rc_standard = rc.get('standard_title_tr', '')
+            rc_cause    = rc.get('cause_tr', '')
+            if rc_standard:
+                report.append(f"  {i}. [{rc_code}] {rc_standard} → {rc_cause}")
+            else:
+                report.append(f"  {i}. [{rc_code}] {rc_cause}")
+
+        meta = rca_data.get("meta_root_cause")
+        if meta:
+            report.append("")
+            report.append("=" * 80)
+            report.append("🔗 META KÖK NEDEN (Tüm Dalların Ortak Paydası)")
+            report.append("=" * 80)
+            meta_code        = meta.get('code', '')
+            meta_standard    = meta.get('standard_title_tr', '')
+            meta_cause       = meta.get('cause_tr', '')
+            meta_explanation = meta.get('explanation_tr', '')
+
+            if meta_standard:
+                report.append(f"[{meta_code}] {meta_standard}")
+            else:
+                report.append(f"[{meta_code}]")
+            report.append(f"Açıklama: {meta_cause}")
+            if meta_explanation:
+                report.append(f"Neden: {meta_explanation}")
+
+            synthesized = meta.get('synthesized_from_codes', [])
+            if synthesized:
+                report.append(f"Sentezlenen: {', '.join(synthesized)}")
+
+        return "\n".join(report)
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # KRİTİK DÜZELTME — OLAY ÖZETİ HAZIRLA
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _prepare_incident_summary(
+        self,
+        part1_data: Dict,
+        part2_data: Dict,
+        investigation_data: Dict = None
+    ) -> str:
+        if investigation_data and isinstance(investigation_data, dict):
+            for key in [
+                "description",
+                "full_description",
+                "incident_description",
+                "raw_text",
+                "how_happened",
+            ]:
+                val = investigation_data.get(key)
+                if val and isinstance(val, str) and len(val.strip()) > 50:
+                    print(f"  ✅ Olay özeti kaynağı: investigation_data['{key}'] "
+                          f"({len(val)} karakter)")
+                    return val.strip()
+
+        if part1_data and isinstance(part1_data, dict):
+            for key in [
+                "description",
+                "incident_description",
+                "full_description",
+                "raw_text",
+            ]:
+                val = part1_data.get(key)
+                if val and isinstance(val, str) and len(val.strip()) > 50:
+                    print(f"  ✅ Olay özeti kaynağı: part1_data['{key}'] "
+                          f"({len(val)} karakter)")
+                    return val.strip()
+
+        print("  ⚠️  Tam metin bulunamadı, alanlar birleştiriliyor (fallback)")
+        summary_parts = []
+
+        if part1_data and isinstance(part1_data, dict):
+            brief = part1_data.get("brief_details", {})
+            if isinstance(brief, dict):
+                if brief.get("what"):
+                    summary_parts.append(brief["what"])
+                if brief.get("where"):
+                    summary_parts.append(f"Konum: {brief['where']}")
+                if brief.get("when"):
+                    summary_parts.append(f"Zaman: {brief['when']}")
+                if brief.get("who"):
+                    summary_parts.append(f"İlgili: {brief['who']}")
+                if brief.get("how"):
+                    summary_parts.append(brief["how"])
+
+            for key in ["incident_type", "type_of_incident", "what_happened"]:
+                val = part1_data.get(key)
+                if val and isinstance(val, str):
+                    summary_parts.append(val)
+                    break
+
+        if part2_data and isinstance(part2_data, dict):
+            for key in ["type_of_event", "incident_type", "event_description"]:
+                val = part2_data.get(key)
+                if val and isinstance(val, str):
+                    summary_parts.append(f"Olay Tipi: {val}")
+                    break
+
+        if investigation_data and isinstance(investigation_data, dict):
+            for key in ["how_happened", "narrative", "details"]:
+                val = investigation_data.get(key)
+                if val and isinstance(val, str):
+                    summary_parts.append(val)
+                    break
+
+        if summary_parts:
+            return ". ".join(summary_parts)
+
+        return "Olay detayı mevcut değil — lütfen investigation_data['description'] alanını doldurun."
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # HITL ENTEGRASYON
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _append_hitl_answers(self, summary: str, investigation_data: dict) -> str:
+        if not investigation_data:
+            return summary
+
+        answers = investigation_data.get("five_why_answers", [])
+        if not answers:
+            return summary
+
+        lines = [
+            "",
+            "",
+            "=" * 60,
+            "KULLANICI TARAFINDAN TOPLANAN 5-WHY CEVAPLARI (HITL)",
+            "=" * 60,
+            "ÖNEMLI: Aşağıdaki cevaplar bu olayı soruşturan kişiden",
+            "gerçek zamanlı alınmıştır. Kök neden analizini SADECE",
+            "bu cevaplara dayandır. Genel varsayım kullanma.",
+            "",
+        ]
+
+        for fw in answers:
+            lvl = fw.get("why_level", "?")
+            q   = fw.get("question", "")
+            ans = fw.get("user_answer", "")
+            d   = fw.get("suggested_direction", "")
+            foc = fw.get("hsg245_focus", "")
+
+            lines.append(f"Why-{lvl} Sorusu  : {q}")
+            lines.append(f"Why-{lvl} Cevabı  : {ans}")
+            if foc:
+                lines.append(f"HSG245 Odak     : {foc}")
+            if d:
+                lines.append(f"Ön Yönlendirme  : {d}")
+            lines.append("")
+
+        code  = investigation_data.get("immediate_cause_code", "")
+        desc  = investigation_data.get("immediate_cause_desc", "")
+        if code:
+            lines.append(f"Seçilen Immediate Cause: [{code}] {desc}")
+            lines.append("")
+
+        lines.append("=" * 60)
+        return summary + "\n".join(lines)
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # META ROOT CAUSE SENTEZİ
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _synthesize_meta_root_cause(
+        self,
+        root_causes: List[Dict],
+        incident_summary: str
+    ) -> Optional[Dict]:
+        if len(root_causes) < 2:
+            return None
+
+        causes_summary = []
+        synthesized_codes = []
+        for i, rc in enumerate(root_causes, 1):
+            code     = rc.get('code', '?')
+            cause    = rc.get('cause_tr', '')
+            standard = rc.get('standard_title_tr', '')
+            causes_summary.append(f"Dal {i}: [{code}] {standard} - {cause}")
+            if code and code != '?':
+                synthesized_codes.append(code)
+
+        rag_context_d = get_category_text('D')
+        codes_str     = ", ".join(synthesized_codes)
+
+        prompt = f"""Sen İSG stratejik analiz uzmanısın. Aşağıdaki kök nedenleri analiz et ve
+ORTAK bir üst-seviye sistemik zayıflık tespit et.
+
+OLAY ÖZETİ:
+{incident_summary[:500]}...
+
+TESPİT EDİLEN KÖK NEDENLER:
+{chr(10).join(causes_summary)}
+
+⚠️ SENTEZLENEN KODLAR (BUNLARI TEKRAR ETME): {codes_str}
+
+D KATEGORİSİ (ORGANİZASYONEL FAKTÖRLER):
+{rag_context_d}
+
+─────────────────────────────────────────────
+GÖREV:
+─────────────────────────────────────────────
+
+Yukarıdaki kök nedenlerin ORTAK PAYDASINI bul:
+- Hangi üst-seviye yönetim sistemi zayıflığı bu nedenleri doğurdu?
+- Hangi tek organizasyonel eksiklik tüm dalları tetikledi?
+
+KRİTİK KURALLAR:
+1. D kategorisinden (organizasyonel) SPESİFİK bir kod seç
+2. Tüm root cause'ları kapsayan üst-seviye bir neden ver
+3. "Yönetim sistemi yetersiz" gibi çok genel ifade kullanma
+4. ⚠️ Sentezlenen kodlardan FARKLI bir kod seç — daha ÜST SEVİYE tercih et:
+     * D8.x (Risk Kontrol Sistemi)
+     * D10.x (Yönetim Sistemi)
+     * D7.x (Değişiklik Yönetimi)
+
+DÖNDÜR (JSON):
+{{{{
+  "code": "<D kategorisinden kod>",
+  "standard_title_tr": "<HSG245 başlık>",
+  "category_type": "ORGANİZASYONEL",
+  "cause_tr": "<bu olaya özgü meta kök neden>",
+  "explanation_tr": "<neden bu kod seçildi, hangi alt nedenleri birleştiriyor>",
+  "synthesized_from_codes": ["<dal 1 kodu>", "<dal 2 kodu>"]
+}}}}
+
+Sadece JSON döndür, Türkçe içerik."""
+
+        try:
+            response = self.client.chat.completions.create(
+                model="anthropic/claude-sonnet-4.5",
+                temperature=0.5,
+                max_tokens=2000,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "Sen İSG stratejik analizcisin. Sadece JSON, Türkçe içerik."
+                    },
+                    {"role": "user", "content": prompt}
+                ]
+            )
+
+            result    = response.choices[0].message.content.strip()
+            meta_root = safe_json_parse(
+                result,
+                context="Meta Root Cause Synthesis",
+                default=None
+            )
+
+            if meta_root:
+                meta_root["synthesized_from_codes"] = [
+                    rc.get("code", "") for rc in root_causes if rc.get("code")
+                ]
+
+            return meta_root
+
+        except Exception as e:
+            print(f"❌ Meta root cause sentezleme hatası: {e}")
+            return None

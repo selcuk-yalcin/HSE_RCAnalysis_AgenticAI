@@ -24,6 +24,7 @@ const IncidentForm = ({ language, onSubmit }) => {
     
     // Incident Description
     incidentDescription: '',
+    emergencyMeasures: '',
     
     // Safety Equipment
     fallProtection: '',
@@ -128,21 +129,21 @@ const IncidentForm = ({ language, onSubmit }) => {
     onSubmit(formData);
   };
 
-  const eventCategories = [
+  const eventCategories = React.useMemo(() => [
     { value: 'incident', label: t('incident') },
     { value: 'near_miss', label: t('near_miss') },
     { value: 'unsafe_condition', label: t('unsafe_condition') },
     { value: 'property_damage', label: t('property_damage') },
-  ];
+  ], [language]);
 
-  const yesNoOptions = [
+  const yesNoOptions = React.useMemo(() => [
     { value: 'yes', label: t('yes') },
     { value: 'no', label: t('no') },
     { value: 'unknown', label: t('unknown') },
-  ];
+  ], [language]);
 
-  // Section configurations for left navigation
-  const sections = [
+  // Section configurations for left navigation - UPDATED WHEN LANGUAGE CHANGES
+  const sections = React.useMemo(() => [
     { id: 'reporter', title: t('section_reporter'), icon: User },
     { id: 'incident', title: t('section_incident_details'), icon: AlertTriangle },
     { id: 'description', title: t('section_description'), icon: FileText },
@@ -152,7 +153,7 @@ const IncidentForm = ({ language, onSubmit }) => {
     { id: 'work', title: t('section_work_conditions'), icon: Briefcase },
     { id: 'injuries', title: t('section_injuries'), icon: Heart },
     { id: 'rootcause', title: t('section_root_cause'), icon: Search },
-  ];
+  ], [language]);
 
   // Scroll spy effect
   useEffect(() => {
@@ -356,7 +357,10 @@ const IncidentForm = ({ language, onSubmit }) => {
           
           <div className="info-box">
             <AlertTriangle size={16} />
-            <span><strong>Lütfen belirtin:</strong> Ne oldu? Nerede oldu? Ne zaman oldu? Kim katılı?</span>
+            <span>
+              <strong>{t('report_content_hint_title')}</strong>{' '}
+              {t('report_content_hint_body')}
+            </span>
           </div>
           
           <div className="form-field full-width">
@@ -491,13 +495,13 @@ const IncidentForm = ({ language, onSubmit }) => {
                 onChange={(e) => handleChange('weatherConditions', e.target.value)}
               >
                 <option value="">{t('select_option')}</option>
-                <option value="sunny">Güneşli</option>
-                <option value="cloudy">Bulutlu</option>
-                <option value="rainy">Yağmurlu</option>
-                <option value="snowy">Karlı</option>
-                <option value="windy">Rüzgarlı</option>
-                <option value="foggy">Sisli</option>
-                <option value="stormy">Fırtınalı</option>
+                <option value="sunny">{t('weather_sunny')}</option>
+                <option value="cloudy">{t('weather_cloudy')}</option>
+                <option value="rainy">{t('weather_rainy')}</option>
+                <option value="snowy">{t('weather_snowy')}</option>
+                <option value="windy">{t('weather_windy')}</option>
+                <option value="foggy">{t('weather_foggy')}</option>
+                <option value="stormy">{t('weather_stormy')}</option>
               </select>
             </div>
             
@@ -508,28 +512,27 @@ const IncidentForm = ({ language, onSubmit }) => {
                 onChange={(e) => handleChange('lightingConditions', e.target.value)}
               >
                 <option value="">{t('select_option')}</option>
-                <option value="excellent">Mükemmel</option>
-                <option value="good">İyi</option>
-                <option value="adequate">Yeterli</option>
-                <option value="poor">Zayıf</option>
-                <option value="very_poor">Çok Zayıf</option>
+                <option value="excellent">{t('lighting_excellent')}</option>
+                <option value="good">{t('lighting_good')}</option>
+                <option value="adequate">{t('lighting_adequate')}</option>
+                <option value="poor">{t('lighting_poor')}</option>
+                <option value="very_poor">{t('lighting_very_poor')}</option>
               </select>
             </div>
           </div>
           
           <div className="form-row">
             <div className="form-field">
-              <label>{t('noise_level')}
-              </label>
+              <label>{t('noise_level')}</label>
               <select
                 value={formData.noiseLevel}
                 onChange={(e) => handleChange('noiseLevel', e.target.value)}
               >
                 <option value="">{t('select_option')}</option>
-                <option value="quiet">Sessiz - 50 dB altı</option>
-                <option value="normal">Normal - 50-70 dB</option>
-                <option value="loud">Yüksek - 70-85 dB</option>
-                <option value="very_loud">Çok Yüksek - 85 dB üstü</option>
+                <option value="quiet">{t('noise_quiet')}</option>
+                <option value="normal">{t('noise_normal')}</option>
+                <option value="loud">{t('noise_loud')}</option>
+                <option value="very_loud">{t('noise_very_loud')}</option>
               </select>
             </div>
             
@@ -540,12 +543,12 @@ const IncidentForm = ({ language, onSubmit }) => {
                 onChange={(e) => handleChange('temperature', e.target.value)}
               >
                 <option value="">{t('select_option')}</option>
-                <option value="very_cold">Çok Soğuk - 0°C altı</option>
-                <option value="cold">Soğuk - 0-10°C</option>
-                <option value="cool">Serin - 10-15°C</option>
-                <option value="comfortable">Rahat - 15-25°C</option>
-                <option value="warm">Sıcak - 25-35°C</option>
-                <option value="hot">Çok Sıcak - 35°C üstü</option>
+                <option value="very_cold">{t('temp_very_cold')}</option>
+                <option value="cold">{t('temp_cold')}</option>
+                <option value="cool">{t('temp_cool')}</option>
+                <option value="comfortable">{t('temp_comfortable')}</option>
+                <option value="warm">{t('temp_warm')}</option>
+                <option value="hot">{t('temp_hot')}</option>
               </select>
             </div>
           </div>
@@ -566,15 +569,15 @@ const IncidentForm = ({ language, onSubmit }) => {
                 onChange={(e) => handleChange('workType', e.target.value)}
               >
                 <option value="">{t('select_option')}</option>
-                <option value="manual_labor">Elle İşçilik</option>
-                <option value="machine_operation">Makine Operasyon</option>
-                <option value="assembly">Montaj</option>
-                <option value="construction">İnşaat</option>
-                <option value="maintenance">Bakım/Onarım</option>
-                <option value="cleaning">Temizlik</option>
-                <option value="driving">Araç Kullanma</option>
-                <option value="admin_work">İdari İş</option>
-                <option value="other">Diğer</option>
+                <option value="manual_labor">{t('work_manual_labor')}</option>
+                <option value="machine_operation">{t('work_machine_operation')}</option>
+                <option value="assembly">{t('work_assembly')}</option>
+                <option value="construction">{t('work_construction')}</option>
+                <option value="maintenance">{t('work_maintenance')}</option>
+                <option value="cleaning">{t('work_cleaning')}</option>
+                <option value="driving">{t('work_driving')}</option>
+                <option value="admin_work">{t('work_admin')}</option>
+                <option value="other">{t('work_other')}</option>
               </select>
             </div>
             
@@ -585,12 +588,12 @@ const IncidentForm = ({ language, onSubmit }) => {
                 onChange={(e) => handleChange('workHeight', e.target.value)}
               >
                 <option value="">{t('select_option')}</option>
-                <option value="ground_level">Yer Seviyesi (0 m)</option>
-                <option value="low_height">Düşük Yükseklik (1-2 m)</option>
-                <option value="medium_height">Orta Yükseklik (2-5 m)</option>
-                <option value="high">Yüksek (5-10 m)</option>
-                <option value="very_high">Çok Yüksek (10 m üstü)</option>
-                <option value="confined_space">Kapalı Alan</option>
+                <option value="ground_level">{t('height_ground_level')}</option>
+                <option value="low_height">{t('height_low')}</option>
+                <option value="medium_height">{t('height_medium')}</option>
+                <option value="high">{t('height_high')}</option>
+                <option value="very_high">{t('height_very_high')}</option>
+                <option value="confined_space">{t('height_confined_space')}</option>
               </select>
             </div>
           </div>
@@ -603,12 +606,12 @@ const IncidentForm = ({ language, onSubmit }) => {
                 onChange={(e) => handleChange('experienceLevel', e.target.value)}
               >
                 <option value="">{t('select_option')}</option>
-                <option value="new_employee">Yeni Çalışan (1 ay altı)</option>
-                <option value="trainee">Stajyer/Eğitimdeki (1-3 ay)</option>
-                <option value="junior">Acemi (3-6 ay)</option>
-                <option value="experienced">Tecrübeli (6-12 ay)</option>
-                <option value="senior">Kıdemli (1-5 yıl)</option>
-                <option value="expert">Uzman (5 yıl üstü)</option>
+                <option value="new_employee">{t('exp_new_employee')}</option>
+                <option value="trainee">{t('exp_trainee')}</option>
+                <option value="junior">{t('exp_junior')}</option>
+                <option value="experienced">{t('exp_experienced')}</option>
+                <option value="senior">{t('exp_senior')}</option>
+                <option value="expert">{t('exp_expert')}</option>
               </select>
             </div>
             
@@ -619,13 +622,13 @@ const IncidentForm = ({ language, onSubmit }) => {
                 onChange={(e) => handleChange('shiftTime', e.target.value)}
               >
                 <option value="">{t('select_option')}</option>
-                <option value="morning_shift">Sabah Vardiyası (06:00-14:00)</option>
-                <option value="afternoon_shift">Öğle Vardiyası (14:00-22:00)</option>
-                <option value="night_shift">Gece Vardiyası (22:00-06:00)</option>
-                <option value="early_morning">Erken Sabah (04:00-12:00)</option>
-                <option value="late_evening">Geç Akşam (20:00-04:00)</option>
-                <option value="overtime">Fazla Mesai</option>
-                <option value="not_applicable">N/A Uygulanmaz</option>
+                <option value="morning_shift">{t('shift_morning')}</option>
+                <option value="afternoon_shift">{t('shift_afternoon')}</option>
+                <option value="night_shift">{t('shift_night')}</option>
+                <option value="early_morning">{t('shift_early_morning')}</option>
+                <option value="late_evening">{t('shift_late_evening')}</option>
+                <option value="overtime">{t('shift_overtime')}</option>
+                <option value="not_applicable">{t('shift_not_applicable')}</option>
               </select>
             </div>
           </div>

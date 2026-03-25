@@ -1,0 +1,2291 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - 03-26";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">03-26</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">21.01.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">MPT Atölye - Kaynak Atölyesi, Taşlama İşlemi Bölgesi</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Ramak Kala - Yangın (Potansiyel Patlama ve Çoklu Ölüm Riski)</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Kaynak atölyesinde taşlama işlemi sırasında oluşan kıvılcımlar, manometre bağlantı noktasında gaz kaçağı bulunan oksi-asetilen tüpüne temas ederek yangına neden oldu. Çalışan 4 dakika sonra yangını fark etti ve boğma yöntemiyle söndürdü. Yaralanma olmadı ancak patlama ve çoklu ölüm riski taşıyan kritik ramak kala olay.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">21 Ocak 2026 tarihinde gece vardiyası sırasında MPT Atölyesi kaynak bölümünde gerçekleştirilen taşlama işlemi esnasında, aynı kapalı alanda bulunan seyyar oksi-asetilen tüpünün manometre bağlantı noktasındaki gaz kaçağına kıvılcımlar temas etti ve tüp üzerinde alevlenme meydana geldi. Yangın yaklaşık 4 dakika sonra fark edildi ve çalışanın hızlı müdahalesiyle boğma yöntemi kullanılarak söndürüldü.</div>
+<div class="paragraph" contenteditable="true">MPT Atölye - Kaynak Atölyesi, Taşlama İşlemi Bölgesi (kapalı alan)</div>
+<div class="paragraph" contenteditable="true">Taşlama işlemini gerçekleştiren çalışan (yangını söndüren), vardiya arkadaşları (3 tanık), güvenlik ekibi ve vardiya amiri</div>
+<div class="paragraph" contenteditable="true">Çalışan yangını fark eder etmez boğma yöntemi kullanarak müdahale etti (22:08). Yangın 2 dakika içinde kontrol altına alınarak söndürüldü (22:10). Olay rapor edildi (22:12). Güvenlik ekibi ve vardiya amiri olay yerine geldi (22:30). Hasarlı tüp izole edildi ve imha için işaretlendi. Operasyon geçici durduruldu ve ekipman değiştirildi.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sıcak işlem çalışma izin sistemi (Hot Work PTW) tasarlanmamış ve uygulanmamış</li>
+<li contenteditable="true">Taşlama + basınçlı gaz tüpü + kapalı alan etkileşim riski değerlendirilmemiş</li>
+<li contenteditable="true">Ekipman kontrol listesi ve denetim süreci sistematik olarak uygulanmamış</li>
+<li contenteditable="true">Erken tespit sistemi (duman/alev dedektörü) ve gözetmen ataması mevcut değil</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Hasarlı oksi-asetilen tüpü izole edildi ve imha için işaretlendi</td>
+                        <td contenteditable="true">Güvenlik Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Kaynak atölyesi operasyonu geçici durduruldu ve ekipman değiştirildi</td>
+                        <td contenteditable="true">Vardiya Amiri</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm oksi-asetilen tüplerinin acil gaz kaçağı kontrolü başlatıldı</td>
+                        <td contenteditable="true">Bakım Ekibi</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Olay raporu hazırlandı ve üst yönetime bildirim yapıldı</td>
+                        <td contenteditable="true">Bölge Sorumlusu</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">03-26</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">21.01.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">22:03 (gece vardiyası)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">MPT Atölye - Kaynak Atölyesi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Taşlama İşlemi Bölgesi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Taşlama operatörü (isim gizli)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gece vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Taşlama makinesi, seyyar oksi-asetilen tüpü (manometre bağlantı noktası hasarlı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Oksi-asetilen gazı (kaçak), taşlama kıvılcımları</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Kapalı alan - yetersiz havalandırma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Atölye standart aydınlatma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart KKD (detay belirtilmemiş)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Ramak Kala - Yangın (Potansiyel Patlama)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Yaralanma yok, ekipman hasarı var (tüp + çevre ekipmanları)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">Doğrudan 1 (operatör), dolaylı 3 (tanıklar)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Orta (tüp hasarı, çevre ekipmanlarında yanma/is lekeleri)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Taşlama operatörü (4 dakika sonra fark etti)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Hayır (yaralanma olmadı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Gerekli değil</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">22:00</div>
+                    <div class="timeline-event" contenteditable="true">Taşlama işlemi başlatıldı, oksi-asetilen tüpü aynı kapalı alanda konumlandırılmış durumda</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">22:01</div>
+                    <div class="timeline-event" contenteditable="true">Taşlama kıvılcımları oksi-asetilen tüpüne doğru yayılmaya başladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">22:03</div>
+                    <div class="timeline-event" contenteditable="true">Kıvılcımlar manometre bağlantı noktasındaki gaz kaçağı ile temas etti, tüp üzerinde alevlenme meydana geldi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">22:07</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan alevlenmeyi fark etti (4 dakika gecikmeli tespit)</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">22:08</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan boğma yöntemi ile yangını söndürmeye başladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">22:10</div>
+                    <div class="timeline-event" contenteditable="true">Yangın kontrol altına alındı ve tamamen söndürüldü</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">22:12</div>
+                    <div class="timeline-event" contenteditable="true">Olay rapor edildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">22:30</div>
+                    <div class="timeline-event" contenteditable="true">Güvenlik ekibi ve vardiya amiri olay yerine geldi, hasarlı tüp izole edildi</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why tekniği, her doğrudan nedenden başlayarak 'Neden bu oldu?' sorusunu tekrarlayarak daha derin organizasyonel nedenlere ulaşmayı sağlar. Bu olayda teknik şu şekilde uygulanmıştır: İlk olarak, oksi-asetilen tüpündeki gaz kaçağının kıvılcımlarla temas etmesi doğrudan neden olarak belirlendi. Ardından 'Neden gaz kaçağı kıvılcımlarla temas etti?' sorusu soruldu ve tüpün güvensiz konumlandırılması yanıtı alındı. İkinci 'Neden' sorusu, çalışma öncesi ekipman kontrolünün yapılmadığını ortaya çıkardı. Üçüncü 'Neden' sorusu, sıcak işlem alan izolasyonu standardının bulunmadığını gösterdi. Dördüncü 'Neden' sorusu ise sıcak işlem çalışma izin sisteminin hiç tasarlanmamış olduğunu (kök neden) ortaya koydu. Her dal için bu süreç tekrarlandı ve üç farklı organizasyonel kök neden tespit edildi: Çalışma İzin Sistemi Yetersizliği (D4.4), Risk Değerlendirmesi Yetersizliği (D4.1) ve İzleme/Denetim Yetersizliği (D9.5).</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışsal Faktör</td>
+                        <td contenteditable="true">Çalışanların bireysel eylemleri, kararları ve davranışları: Uygunsuz konumlandırma, çevresel tehlikelerin fark edilmemesi, prosedür ihlali gibi doğrudan insan eylemleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşul Faktörü</td>
+                        <td contenteditable="true">Ekipman, malzeme ve fiziksel çevre koşulları: Ekipman bütünlüğü kaybı (gaz kaçağı), yetersiz havalandırma, erken tespit sistemi eksikliği gibi fiziksel durumlar</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">İşin tasarımı, görev gereksinimleri ve iş yükü: Eş zamanlı işlemler, ergonomi sorunları, iş karmaşıklığı gibi görev bazlı faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Yönetim sistemleri, politikalar, prosedürler ve organizasyonel kararlar: Çalışma izin sistemi yetersizliği, risk değerlendirmesi eksikliği, denetim yetersizliği gibi sistemik faktörler</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">Baş Araştırmacı</td>
+                        <td contenteditable="true">22.01.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Yangın Güvenliği Uzmanı</td>
+                        <td contenteditable="true">Teknik Danışman</td>
+                        <td contenteditable="true">23.01.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Basınçlı Ekipman/Gaz Sistemleri Uzmanı</td>
+                        <td contenteditable="true">Ekipman Analisti</td>
+                        <td contenteditable="true">23.01.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Atölye Müdürü</td>
+                        <td contenteditable="true">Operasyonel Temsilci</td>
+                        <td contenteditable="true">22.01.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Bakım Mühendisi</td>
+                        <td contenteditable="true">Ekipman Bakım Sorumlusu</td>
+                        <td contenteditable="true">24.01.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Eğitim Koordinatörü</td>
+                        <td contenteditable="true">Eğitim ve Yetkinlik Analisti</td>
+                        <td contenteditable="true">25.01.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Üst Yönetim Temsilcisi</td>
+                        <td contenteditable="true">26.01.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Bağımsız Teknik Araştırmacı</td>
+                        <td contenteditable="true">Dış Denetçi</td>
+                        <td contenteditable="true">27.01.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - EKIPMAN BÜTÜNLÜĞÜ KAYBI (GAZ KAÇAĞI)</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Kaynak atölyesinde taşlama işlemi sırasında kullanılan seyyar oksi-asetilen tüpünün manometre bağlantı noktasında gaz kaçağı mevcuttu. Bu kaçak, tüpün periyodik bakım ve kontrol sisteminin eksik olması nedeniyle önceden tespit edilememiş ve tüp operasyonel kullanımda kalmıştır. Taşlama işlemi başlatıldığında, oluşan kıvılcımlar ve sıcak partiküller kapalı alan içerisinde yayılmış ve gaz kaçağı bulunan manometre bağlantı noktasına temas etmiştir. Bu temas sonucu tüp üzerinde alevlenme meydana gelmiş ve yangın başlamıştır. Çalışan yangını yaklaşık 4 dakika sonra fark etmiş ve hızlı müdahalesi sayesinde boğma yöntemiyle söndürmüştür.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Oksi-asetilen tüpünün manometre bağlantı noktasında gaz kaçağı mevcuttu ve bu kaçak noktası kıvılcımlarla temas ederek alevlenmeye neden oldu</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Oksi-asetilen tüpünün manometre bağlantı noktasındaki gaz kaçağı neden kıvılcımlarla temas ederek alevlenmeye neden oldu?</div>
+                    <div class="why-answer" contenteditable="true">→ Seyyar oksi-asetilen tüpü, taşlama işleminin yapıldığı aynı kapalı alanda, kıvılcımların ulaşabileceği mesafede konumlandırılmıştı ve iki işlem arasında herhangi bir fiziksel bariyerleme bulunmuyordu. Taşlama kıvılcımları serbestçe yayılarak gaz kaçağı noktasına ulaşabildi.</div>
+                    <span class="why-code">B - Koşul</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Gaz kaçağı bulunan oksi-asetilen tüpü neden taşlama işlemi alanında bariyersiz şekilde konumlandırıldı?</div>
+                    <div class="why-answer" contenteditable="true">→ Taşlama işlemi başlatılmadan önce çalışma alanındaki ekipmanların (özellikle tüpün) kontrolü yapılmadı; manometre bağlantı noktasındaki gaz kaçağı fark edilemedi ve çalışma öncesi alet/ekipman kontrol listesi sistematik olarak uygulanmıyordu. Tüpün sağlamlık durumu ve konumu değerlendirilmeden işlem başlatıldı.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Sıcak işlem (taşlama) öncesinde neden çalışma alanı ekipman kontrolü ve güvenli mesafe/bariyerleme uygulaması yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kaynak atölyesinde sıcak işlemler için alan izolasyonu standardı ve sıcak işlem izin sistemi (PTW) kontrolü mevcut değildi; taşlama işlemi başlatılırken çevredeki yanıcı/patlayıcı kaynakların tespitini ve izolasyonunu zorunlu kılan bir çalışma izin süreci uygulanmıyordu. Çalışanlar sıcak işlem başlatmadan önce hangi kontrolleri yapmaları gerektiğini bilmiyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Kaynak atölyesinde sıcak işlemler için alan izolasyonu standardı ve çalışma izin sistemi neden mevcut değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Sıcak işlem yapılan kapalı alanda oksi-asetilen tüplerinin bulunması senaryosu risk değerlendirmesinde ele alınmamıştı; taşlama + kapalı alan + gaz kaçağı kombinasyonunu kapsayan bir iş izin sistemi tasarlanmamış ve uygulamaya konulmamıştı. Organizasyon bu spesifik tehlike senaryosunu hiç tanımlamamış ve kontrol altına almamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Sıcak işlem yapılan kapalı alanda oksi-asetilen tüplerinin bulunması senaryosu neden risk değerlendirmesinde ele alınmamış ve bir iş izin sistemi tasarlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kuruluşta sıcak işlemler için kapsamlı bir çalışma izin sistemi (Hot Work PTW) tasarımı ve uygulaması hiç yapılmamıştı. Sıcak işlem öncesi çalışma alanındaki yanıcı/patlayıcı kaynakların sistematik olarak tanımlanması, güvenli mesafe kontrolü, bariyerleme gereksinimleri ve ekipman sağlamlık kontrollerini zorunlu kılan bir süreç mevcut değildi. Bu sistemik eksiklik, gaz kaçaklı tüpün kıvılcım mesafesinde bariyersiz kalmasına yol açtı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Sıcak İşlem Çalışma İzin Sistemi (Hot Work PTW) Tasarlanmamış ve Uygulanmamış</div>
+                <div class="box-content" contenteditable="true">[ / ]
+
+Kaynak atölyesinde sıcak işlemler (taşlama, kaynak, kesme vb.) için, çalışma alanındaki yanıcı ve patlayıcı kaynakların (oksi-asetilen tüpleri, yanıcı malzemeler, gaz kaçakları) sistematik olarak tespitini, güvenli mesafe kontrolünü, fiziksel bariyerleme gereksinimini ve ekipman sağlamlık kontrolünü zorunlu kılan bir sıcak işlem çalışma izin sistemi (Hot Work Permit to Work - PTW) hiçbir zaman tasarlanmamış ve uygulamaya konulmamıştır. Bu sistemik eksiklik nedeniyle, manometre bağlantı noktasında gaz kaçağı bulunan seyyar oksi-asetilen tüpü, taşlama kıvılcımlarının ulaşabileceği mesafede bariyersiz olarak konumlandırılmış ve çalışma öncesi ekipman kontrolü yapılmadan işlem başlatılmıştır. Sıcak işlem izin sistemi, çalışma öncesi tehlike tanımlama, risk değerlendirme, kontrol önlemleri belirleme ve uygulama doğrulama adımlarını içermesi gereken kritik bir güvenlik bariyeridir ve bu bariyerin tamamen yokluğu olayın temel organizasyonel nedenidir.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sıcak işlem çalışma izin sistemi (Hot Work PTW) prosedürü hiç oluşturulmamış ve dokümante edilmemiş</li>
+<li contenteditable="true">Sıcak işlem öncesi çalışma alanı tehlike tanımlama ve kontrol listesi tasarlanmamış</li>
+<li contenteditable="true">Yanıcı/patlayıcı kaynakların tespiti, güvenli mesafe belirleme ve bariyerleme standartları tanımlanmamış</li>
+<li contenteditable="true">Sıcak işlem izin formları, onay süreçleri ve sorumluluk matrisi oluşturulmamış</li>
+<li contenteditable="true">Çalışanlar ve yöneticiler sıcak işlem izin sistemi gereklilikleri konusunda eğitilmemiş</li>
+<li contenteditable="true">Sıcak işlem öncesi ekipman sağlamlık kontrolü (gaz kaçağı tespiti dahil) zorunlu kılınmamış</li>
+<li contenteditable="true">Üst yönetim sıcak işlem risklerini yönetmek için sistematik bir kontrol mekanizması kurmamış</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - EKIPMANIN UYGUNSUZ KONUMLANDIRILMASI</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Kaynak atölyesinde taşlama işlemi planlanırken, seyyar oksi-asetilen tüpü taşlama ekipmanı ile aynı kapalı alan içerisinde konumlandırılmıştır. Tüp, taşlama işlemi sırasında oluşacak kıvılcımların ulaşabileceği mesafede yerleştirilmiş ve iki ekipman arasında herhangi bir fiziksel bariyerleme (perde, panel, güvenli mesafe ayrımı) sağlanmamıştır. Bu güvensiz konumlandırma, taşlama kıvılcımlarının doğrudan tüpe ulaşmasına ve manometre bağlantı noktasındaki gaz kaçağı ile temas etmesine olanak tanımıştır. Çalışan, tüpün konumunun güvensiz olduğunu fark etmemiş veya bu durumu düzeltme sorumluluğunu üstlenmemiştir. Atölyede sıcak işlemler ile basınçlı gaz tüpleri arasında güvenli mesafe ve alan izolasyonu gereklilikleri tanımlanmamış olduğundan, bu tür güvensiz konumlandırmalar rutin hale gelmiştir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Seyyar oksi-asetilen tüpü, taşlama işleminin yapıldığı kapalı alan içerisinde kıvılcımların ulaşabileceği mesafede konumlandırılmıştı</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Seyyar oksi-asetilen tüpü neden taşlama işleminin yapıldığı kapalı alanda kıvılcımların ulaşabileceği mesafede konumlandırılmıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kaynak atölyesinde sıcak işlemler (taşlama) ile basınçlı gaz tüpleri arasında fiziksel bariyerleme veya güvenli mesafe ayrımı sağlayan bir alan izolasyonu standardı bulunmuyordu; tüp ve taşlama ekipmanı aynı kapalı alanda serbestçe konumlandırılıyordu. Çalışanlar hangi mesafenin güvenli olduğunu bilmiyordu.</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Sıcak işlemler ile basınçlı gaz tüpleri arasında alan izolasyonu standardı neden bulunmuyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Taşlama işlemi öncesinde sıcak işlem izin sistemi kontrolü yapılmamış ve çalışma alanındaki kıvılcım yayılma mesafesi ile gaz tüpü konumu birlikte değerlendirilmemişti; kapalı alanda taşlama + gaz kaçağı senaryosu risk değerlendirmesinde ele alınmamıştı. Planlama aşamasında bu tehlike hiç tanımlanmamıştı.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Kapalı alanda taşlama işlemi ile oksi-asetilen tüpünün bir arada bulunması senaryosu neden risk değerlendirmesinde ele alınmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kaynak atölyesinde eş zamanlı yapılan işlemlerin (taşlama kıvılcımları + basınçlı gaz tüpü + kapalı alan) birbirleriyle etkileşim risklerini değerlendiren bir SIMOPS (Simultaneous Operations) veya görev bazlı tehlike analizi (JHA - Job Hazard Analysis) süreci mevcut değildi. Organizasyon eş zamanlı işlem risklerini sistematik olarak analiz etmiyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Atölyede eş zamanlı işlemlerin etkileşim risklerini değerlendiren görev bazlı bir tehlike analizi süreci neden mevcut değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Kuruluşta kapalı alanda sıcak işlem yapılırken çevredeki yanıcı/patlayıcı kaynakların (gaz tüpleri, gaz kaçakları) sistematik olarak tanımlanıp kontrol altına alınmasını gerektiren bir risk değerlendirme prosedürü oluşturulmamıştı; taşlama ve oksi-asetilen tüpünün aynı alanda bulunması planlama aşamasında bir tehlike olarak hiç tanımlanmamıştı. Risk değerlendirmesi genel ve yüzeysel kalmış, spesifik senaryolar analiz edilmemişti.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Kapalı alanda sıcak işlem yapılırken çevredeki yanıcı/patlayıcı kaynakların sistematik olarak tanımlanıp kontrol altına alınmasını gerektiren bir risk değerlendirme prosedürü neden oluşturulmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kaynak atölyesinde taşlama işlemi planlanırken, kapalı alanda kıvılcım yayılma mesafesi içinde bulunan seyyar oksi-asetilen tüpünün konumu ve manometre bağlantı noktasındaki potansiyel gaz kaçağı senaryosu tehlike olarak tanımlanmamış; taşlama + basınçlı gaz tüpü + kapalı alan etkileşim riski hiçbir JHA veya risk değerlendirmesinde ele alınmamıştır. Organizasyon, iş planlama aşamasında spesifik tehlike senaryolarını tanımlama ve risk hesaplama yetkinliğine sahip değildi veya bu süreci sistematik olarak uygulamıyordu.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Risk Değerlendirmesi Yetersiz - İş Planlama Aşamasında Spesifik Tehlike Senaryosu Tanımlanmamış</div>
+                <div class="box-content" contenteditable="true">[ / ]
+
+Kaynak atölyesinde taşlama işlemi planlanırken, kapalı alanda kıvılcım yayılma mesafesi içinde bulunan seyyar oksi-asetilen tüpünün konumu ve manometre bağlantı noktasındaki potansiyel gaz kaçağı senaryosu tehlike olarak tanımlanmamış; taşlama + basınçlı gaz tüpü + kapalı alan etkileşim riski hiçbir görev bazlı tehlike analizi (JHA) veya risk değerlendirmesinde ele alınmamıştır. Organizasyonun risk değerlendirme süreci, genel ve yüzeysel kalmış, spesifik iş senaryolarını (özellikle eş zamanlı işlemler ve kapalı alan çalışmaları) detaylı olarak analiz etmemiştir. İş planlama aşamasında, taşlama kıvılcımlarının yayılma mesafesi, çevredeki yanıcı/patlayıcı kaynaklar (gaz tüpleri), kapalı alan havalandırma yetersizliği ve gaz kaçağı potansiyeli gibi kritik tehlike faktörleri birlikte değerlendirilmemiş ve bu senaryoya özgü kontrol önlemleri (güvenli mesafe, bariyerleme, ekipman kontrolü, erken tespit sistemi) tanımlanmamıştır. Bu sistemik risk değerlendirme yetersizliği, güvensiz konumlandırmanın ve diğer kontrol eksikliklerinin temel nedenidir.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Görev bazlı tehlike analizi (JHA) prosedürü oluşturulmamış veya etkin uygulanmamış</li>
+<li contenteditable="true">Eş zamanlı işlemler (SIMOPS) risk değerlendirme metodolojisi tanımlanmamış</li>
+<li contenteditable="true">Kapalı alan çalışmaları için spesifik risk değerlendirme gereklilikleri belirlenmemiş</li>
+<li contenteditable="true">Sıcak işlem + yanıcı/patlayıcı kaynak etkileşim senaryoları risk matrisinde yer almamış</li>
+<li contenteditable="true">Risk değerlendirme ekibi çok disiplinli değil ve saha deneyimi eksik</li>
+<li contenteditable="true">İş planlama aşamasında risk değerlendirmesi zorunlu kılınmamış veya yüzeysel yapılmış</li>
+<li contenteditable="true">Üst yönetim risk değerlendirme sürecinin kalitesini ve kapsamını denetlememekte</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - ÇEVRESEL TEHLİKELERİN GEÇ FARK EDİLMESİ</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Taşlama işlemini gerçekleştiren çalışan, tüp üzerinde meydana gelen alevlenmeyi yaklaşık 4 dakika boyunca fark etmemiştir. Bu gecikme, yangının büyüme ve kontrolden çıkma riskini önemli ölçüde artırmıştır. Çalışan taşlama işlemi sırasında tüm dikkatini taşlama noktasına yoğunlaştırmış olup, arkasında/yanında bulunan oksi-asetilen tüpü ve çevresini sürekli gözlemleme imkânı bulamamıştır. Kapalı alanda taşlama gürültüsü ve kıvılcım parlaması, alevlenmenin görsel ve işitsel sinyallerini maskelemiştir. Atölyede duman dedektörü veya alev dedektörü gibi otomatik erken tespit sistemi bulunmamakta ve taşlama işlemi sırasında çevre gözetimi yapacak ikinci bir gözetmen (buddy) atanmamaktadır. Bu durum, çalışanın tek başına hem işlemi gerçekleştirmesi hem de çevre güvenliğini izlemesi gibi çelişkili bir sorumluluğa sahip olmasına yol açmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Taşlama işlemini gerçekleştiren çalışan, tüp üzerinde meydana gelen alevlenmeyi yaklaşık 4 dakika boyunca fark etmedi ve bu süre zarfında yangın büyüme riski devam etti</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Taşlama işlemini gerçekleştiren çalışan, tüp üzerindeki alevlenmeyi neden yaklaşık 4 dakika boyunca fark edemedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışan taşlama işlemi sırasında tüm dikkatini taşlama noktasına yoğunlaştırmış olup, arkasında/yanında bulunan oksi-asetilen tüpü ve çevresini sürekli gözlemleme imkânı bulamamıştır; ayrıca kapalı alanda taşlama gürültüsü ve kıvılcım parlaması, alevlenmenin görsel ve işitsel sinyallerini maskelemiştir. Çalışan hem işlemi yapmak hem de çevreyi izlemek gibi çelişkili görevleri aynı anda yerine getirmeye çalışmıştır.</div>
+                    <span class="why-code">A - Davranışsal</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Çalışanın çevre alanını sürekli gözlemlemesini sağlayacak bir erken uyarı mekanizması neden mevcut değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Raporda belirtildiği üzere kaynak atölyesinde duman dedektörü veya alev dedektörü gibi otomatik erken tespit sistemi bulunmamaktaydı; ayrıca taşlama işlemi sırasında çevre gözetimi yapacak ikinci bir gözetmen/buddy atanmamıştı. Çalışan tek başına hem işlemi gerçekleştirmek hem de güvenliği sağlamak zorunda kalmıştır.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Sıcak işlem yapılan kapalı alanda neden alev/duman dedektörü veya gözetmen ataması gibi erken tespit önlemleri planlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sıcak işlem izin sistemi kontrolü eksik olup, taşlama işlemi ile aynı kapalı alanda bulunan basınçlı gaz tüpü senaryosu risk değerlendirmesinde ele alınmamış; dolayısıyla bu senaryoya özgü erken tespit kontrolleri (dedektör, gözetmen, bariyerleme) tanımlanmamıştır. Risk değerlendirmesi yapılmadığı için kontrol önlemleri de belirlenememiştir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Sıcak işlem izin sistemi ve risk değerlendirmesinde belirlenmesi gereken bu kontrollerin sahada uygulanıp uygulanmadığını doğrulayan sistematik bir denetim/izleme mekanizması neden yoktu?</div>
+                    <div class="why-answer" contenteditable="true">→ Raporda belirtildiği üzere çalışma öncesi alet/ekipman kontrol listesi uygulanmıyor, sıcak işlemler için alan izolasyonu standardı bulunmuyor ve tüp periyodik kontrol/bakım sistemi eksikti; bu durum, mevcut prosedürlerin (varsa) sahada uygulanıp uygulanmadığını sistematik olarak izleyen bir denetim sürecinin kurulmamış olduğunu göstermektedir. Organizasyon, belirlenen kontrollerin fiilen uygulanıp uygulanmadığını doğrulamamaktadır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Mevcut prosedürlerin sahada uygulanıp uygulanmadığını sistematik olarak izleyen bir denetim süreci neden kurulmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Kaynak atölyesinde sıcak işlem öncesi ekipman kontrol listesi uygulaması, tüp-taşlama güvenli mesafe/bariyerleme kontrolü, gaz kaçağı tespiti ve erken uyarı sistemi gereklilikleri gibi kritik güvenlik kontrollerinin sahada fiilen yerine getirilip getirilmediğini sistematik olarak doğrulayan bir denetim/izleme süreci mevcut değildi. Organizasyon, güvenlik kontrollerinin uygulanmasını izlemek ve sapmaları tespit etmek için sistematik bir mekanizma tasarlamamış ve uygulamaya koymamıştır.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: İzleme/Denetim Yetersizliği - Kritik Güvenlik Kontrollerinin Sahada Uygulanması Doğrulanmamış</div>
+                <div class="box-content" contenteditable="true">[ / ]
+
+Kaynak atölyesinde sıcak işlem öncesi ekipman kontrol listesi uygulaması, tüp-taşlama güvenli mesafe/bariyerleme kontrolü, gaz kaçağı tespiti ve erken uyarı sistemi gereklilikleri gibi kritik güvenlik kontrollerinin sahada fiilen yerine getirilip getirilmediğini sistematik olarak doğrulayan bir denetim/izleme süreci mevcut değildi. Bu nedenle manometre bağlantı noktasındaki gaz kaçağı tespit edilemedi, tüp güvensiz konumda kaldı ve alevlenme 4 dakika boyunca fark edilemedi. Organizasyon, prosedürlerin ve standartların varlığını sağlamakla yetinmiş, ancak bu prosedürlerin sahada etkin şekilde uygulanıp uygulanmadığını izlemek için sistematik bir uygunluk doğrulama mekanizması kurmamıştır. Denetim ve izleme faaliyetleri reaktif (olay sonrası) kalmış, proaktif (sürekli izleme ve erken müdahale) bir yaklaşım benimsenmemiştir. Bu sistemik izleme/denetim yetersizliği, çalışma öncesi kontrol listelerinin uygulanmaması, tüp periyodik kontrol sisteminin eksik kalması, sıcak işlem alan izolasyonu standardının sahada uygulanmaması ve erken tespit sistemlerinin kurulmaması gibi çoklu kontrol başarısızlıklarına yol açmıştır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Saha denetim ve gözetim programı oluşturulmamış veya sistematik uygulanmamış</li>
+<li contenteditable="true">Çalışma öncesi kontrol listelerinin uygulanması izlenmemiş ve doğrulanmamış</li>
+<li contenteditable="true">Ekipman periyodik kontrol ve bakım kayıtları tutulmamış veya takip edilmemiş</li>
+<li contenteditable="true">Sıcak işlem izin sistemi uygulaması (varsa) denetlenmemiş ve sapmalara müdahale edilmemiş</li>
+<li contenteditable="true">Güvenlik performans göstergeleri (KPI) tanımlanmamış veya raporlanmamış</li>
+<li contenteditable="true">Yönetici ve süpervizörlere saha denetim sorumlulukları atanmamış veya eğitim verilmemiş</li>
+<li contenteditable="true">Üst yönetim güvenlik denetim sonuçlarını gözden geçirmemiş ve iyileştirme talep etmemiş</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. KATKIDA BULUNAN FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Eksikliği</td>
+                        <td contenteditable="true">Sıcak işlem çalışma izin sistemi (Hot Work PTW) prosedürü hiç oluşturulmamış ve dokümante edilmemiş; çalışanlar sıcak işlem öncesi hangi kontrolleri yapmaları gerektiğini bilmemekte</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Risk Değerlendirmesi Yetersizliği</td>
+                        <td contenteditable="true">Taşlama + basınçlı gaz tüpü + kapalı alan etkileşim riski hiçbir JHA veya risk değerlendirmesinde ele alınmamış; spesifik tehlike senaryoları tanımlanmamış</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Denetim/İzleme Eksikliği</td>
+                        <td contenteditable="true">Çalışma öncesi kontrol listesi uygulaması, ekipman periyodik kontrolü ve saha denetimi sistematik olarak yapılmamış; sapmalara zamanında müdahale edilememiş</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman Bakım Yetersizliği</td>
+                        <td contenteditable="true">Oksi-asetilen tüpü periyodik kontrol ve bakım sistemi eksik; manometre bağlantı noktasındaki gaz kaçağı önceden tespit edilememiş</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Eksikliği</td>
+                        <td contenteditable="true">Çalışanlar sıcak işlem güvenlik gereklilikleri, gaz kaçağı tespiti, güvenli mesafe/bariyerleme ve erken müdahale konularında yeterli eğitim almamış</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Erken Tespit Sistemi Yokluğu</td>
+                        <td contenteditable="true">Kaynak atölyesinde duman/alev dedektörü gibi otomatik erken tespit sistemi bulunmamakta; yangın 4 dakika gecikmeli fark edilmiş</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim Eksikliği</td>
+                        <td contenteditable="true">Taşlama işlemi sırasında çevre gözetimi yapacak ikinci bir gözetmen (buddy) atanmamış; çalışan tek başına hem işlemi yapmak hem de güvenliği sağlamak zorunda kalmış</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Alan Düzeni Yetersizliği</td>
+                        <td contenteditable="true">Sıcak işlemler ile basınçlı gaz tüpleri arasında fiziksel bariyerleme veya güvenli mesafe ayrımı sağlayan bir alan izolasyonu standardı bulunmamakta</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Sıcak işlem çalışma izin sistemi (Hot Work PTW) prosedürü tasarlanması, dokümante edilmesi ve tüm sıcak işlemlerde zorunlu uygulanması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Hot Work PTW uygulama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Tüm oksi-asetilen tüplerinin acil gaz kaçağı kontrolü ve hasarlı tüplerin derhal hizmet dışı bırakılması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüp kontrol tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Kaynak atölyesinde duman/alev dedektörü kurulması ve acil müdahale ekipmanlarının (yangın söndürücü, yangın battaniyesi) temini</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Dedektör kurulum tamamlanma %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Sıcak işlemler ile basınçlı gaz tüpleri arasında fiziksel bariyerleme ve güvenli mesafe standardı belirlenmesi ve sahada uygulanması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Atölye Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Bariyerleme uygulama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Taşlama + basınçlı gaz tüpü + kapalı alan senaryosu için detaylı görev bazlı tehlike analizi (JHA) yapılması ve kontrol önlemlerinin güncellenmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">JHA tamamlanma ve onay</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Oksi-asetilen tüpleri için periyodik kontrol ve bakım sistemi kurulması, kontrol kayıtlarının tutulması ve takip edilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Periyodik kontrol uyum oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Sıcak işlem güvenliği, gaz kaçağı tespiti ve acil müdahale konularında tüm atölye çalışanlarına zorunlu eğitim verilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Eğitim Koordinatörü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Sıcak işlemlerde gözetmen (buddy) ataması zorunluluğu getirilmesi ve gözetmen sorumlulukları tanımlanması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Atölye Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Gözetmen atama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Çalışma öncesi ekipman kontrol listesi tasarlanması ve sistematik uygulanmasının sağlanması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Kontrol listesi uygulama oranı %95</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Saha güvenlik denetim programı oluşturulması ve yönetici/süpervizörlere denetim sorumlulukları atanması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Planlı denetim tamamlanma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Eş zamanlı işlemler (SIMOPS) risk değerlendirme metodolojisi geliştirilmesi ve uygulamaya konulması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">SIMOPS prosedür onayı ve uygulama</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Güvenlik performans göstergeleri (KPI) tanımlanması, izlenmesi ve üst yönetime düzenli raporlanması</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">HSE Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">KPI raporlama sıklığı aylık</td>
+                    </tr>
+
+                    <tr>
+                        <td>13</td>
+                        <td contenteditable="true">Kaynak atölyesi havalandırma sisteminin değerlendirilmesi ve iyileştirilmesi</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Teknik Müdür</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Havalandırma yeterliliği testi</td>
+                    </tr>
+
+                    <tr>
+                        <td>14</td>
+                        <td contenteditable="true">Ramak kala olayların raporlanması ve paylaşılması kültürünün güçlendirilmesi için teşvik programı oluşturulması</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Ramak kala raporlama oranı artışı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Sıcak işlem başlatmadan önce MUTLAKA çalışma izni alınmalı: Çalışma alanındaki yanıcı/patlayıcı kaynaklar tespit edilmeli, güvenli mesafe ve bariyerleme sağlanmalı, ekipman kontrolleri yapılmalı ve gözetmen atanmalıdır
+• Basınçlı gaz tüpleri periyodik olarak kontrol edilmeli: Manometre bağlantı noktaları, vana contaları ve hortum bağlantıları düzenli olarak gaz kaçağı açısından test edilmeli, hasarlı ekipman derhal hizmet dışı bırakılmalıdır
+• Kapalı alanlarda sıcak işlem yapılırken erken tespit sistemleri kurulmalı: Duman/alev dedektörleri, yeterli havalandırma ve acil müdahale ekipmanları sağlanmalı, çevre gözetimi için gözetmen atanmalıdır
+• Risk değerlendirmesi spesifik senaryoları kapsamalı: Genel tehlike listeleri yerine, taşlama + gaz tüpü + kapalı alan gibi spesifik iş senaryoları detaylı olarak analiz edilmeli ve kontrol önlemleri belirlenmelidir</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Sıcak işlem yönetim sistemi kurulmalı: Hot Work PTW prosedürü, eğitim programı, denetim mekanizması ve sürekli iyileştirme döngüsü içeren kapsamlı bir sistem oluşturulmalıdır
+• Ekipman bakım ve kontrol sistemleri güçlendirilmeli: Tüm basınçlı ekipmanlar için periyodik kontrol takvimi, bakım kayıtları ve takip mekanizması kurulmalı, bakım sorumluluğu net olarak atanmalıdır
+• Güvenlik kültürü geliştirilmeli: Çalışanların güvensiz durumları raporlama, iş durdurma yetkisini kullanma ve güvenlik önceliğini benimseme kültürü güçlendirilmelidir
+• Proaktif denetim ve izleme sistemleri kurulmalı: Reaktif (olay sonrası) yaklaşım yerine, planlı saha denetimleri, performans göstergeleri izleme ve erken müdahale mekanizmaları içeren proaktif bir sistem benimsenmelidir</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Olay tüm atölye çalışanlarına paylaşılmalı: Ramak kala olayın detayları, kök nedenleri ve alınan dersler tüm vardiyalarda toolbox meeting ile anlatılmalı, benzer olayların tekrarı önlenmelidir
+• Sıcak işlem güvenlik gereklilikleri görsel olarak hatırlatılmalı: Atölye girişine ve sıcak işlem alanlarına güvenlik posterleri, kontrol listeleri ve acil müdahale talimatları asılmalıdır
+• Üst yönetime düzenli güvenlik performans raporları sunulmalı: Sıcak işlem izin uygulaması, ekipman kontrol tamamlanma oranı, denetim bulguları ve düzeltici faaliyet durumu aylık olarak raporlanmalıdır</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Sıcak işlem güvenliği eğitimi: Tüm atölye çalışanlarına Hot Work PTW prosedürü, çalışma öncesi kontroller, güvenli mesafe/bariyerleme, yangın önleme ve acil müdahale konularında kapsamlı eğitim verilmelidir
+• Gaz kaçağı tespiti ve basınçlı ekipman güvenliği eğitimi: Oksi-asetilen tüplerinin güvenli kullanımı, gaz kaçağı tespit yöntemleri, periyodik kontrol gereklilikleri ve acil durum prosedürleri konularında özel eğitim düzenlenmelidir
+• Gözetmen (buddy) eğitimi: Sıcak işlemlerde gözetmen olarak atanacak çalışanlara, çevre gözetimi, erken tespit, acil müdahale ve iletişim konularında özel eğitim verilmelidir
+• Yönetici ve süpervizör denetim eğitimi: Saha denetimi teknikleri, sapma tespiti, düzeltici faaliyet başlatma ve güvenlik performansı izleme konularında yönetici ve süpervizörlere eğitim verilmelidir</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">21 Ocak 2026 tarihinde MPT Atölyesi kaynak bölümünde meydana gelen oksi-asetilen tüp yangını, potansiyel olarak çoklu ölüm ve ciddi tesis hasarına yol açabilecek kritik bir ramak kala olayıdır. Olay, taşlama işlemi sırasında oluşan kıvılcımların, manometre bağlantı noktasında gaz kaçağı bulunan seyyar oksi-asetilen tüpüne temas etmesi sonucu meydana gelmiştir. Çalışanın hızlı ve doğru müdahalesi sayesinde yangın 2 dakika içinde söndürülmüş ve yaralanma olmamıştır; ancak olayın potansiyel sonuçları son derece ciddidir.
+
+Kök neden analizi, olayın arkasında üç temel organizasyonel eksiklik olduğunu ortaya koymuştur: (1) Sıcak işlem çalışma izin sistemi (Hot Work PTW) hiç tasarlanmamış ve uygulanmamış, (2) Risk değerlendirmesi yüzeysel kalmış ve spesifik tehlike senaryoları (taşlama + gaz tüpü + kapalı alan) tanımlanmamış, (3) Kritik güvenlik kontrollerinin sahada uygulanmasını doğrulayan sistematik bir denetim/izleme süreci kurulmamıştır. Bu üç kök neden, birbirini destekleyen ve güçlendiren sistemik eksikliklerdir.
+
+Olay, organizasyonun yüksek riskli sıcak işlemleri yönetme yetkinliğinin yetersiz olduğunu ve güvenlik yönetim sistemlerinde ciddi boşluklar bulunduğunu göstermektedir. Sıcak işlem izin sistemi, risk değerlendirmesi ve denetim/izleme gibi temel güvenlik yönetim araçlarının yokluğu veya yetersizliği, benzer olayların tekrarı için yüksek bir risk oluşturmaktadır. Acil ve kapsamlı düzeltici faaliyetler başlatılmadığı takdirde, gelecekte çok daha ciddi sonuçlara yol açabilecek olaylar kaçınılmazdır.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm oksi-asetilen tüplerinin acil gaz kaçağı kontrolü yapılması ve hasarlı tüplerin derhal hizmet dışı bırakılması (1 hafta içinde tamamlanmalı)</li>
+<li contenteditable="true">Kaynak atölyesinde duman/alev dedektörü kurulması, acil müdahale ekipmanlarının (yangın söndürücü, yangın battaniyesi) temini ve çalışanların acil müdahale eğitimi (2 hafta içinde tamamlanmalı)</li>
+<li contenteditable="true">Sıcak işlem çalışma izin sistemi (Hot Work PTW) prosedürünün acil olarak tasarlanması, dokümante edilmesi ve tüm sıcak işlemlerde zorunlu uygulanması (2 hafta içinde başlatılmalı, 1 ay içinde tam uygulamaya geçilmeli)</li>
+<li contenteditable="true">Sıcak işlemler ile basınçlı gaz tüpleri arasında fiziksel bariyerleme ve güvenli mesafe standardının belirlenmesi ve sahada derhal uygulanması (1 ay içinde tamamlanmalı)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kapsamlı sıcak işlem yönetim sistemi kurulması: Hot Work PTW prosedürü, eğitim programı, denetim mekanizması ve sürekli iyileştirme döngüsü içeren entegre bir sistem oluşturulmalı (3-6 ay)</li>
+<li contenteditable="true">Tüm yüksek riskli işlemler için görev bazlı tehlike analizi (JHA) yapılması ve spesifik kontrol önlemlerinin belirlenmesi; eş zamanlı işlemler (SIMOPS) risk değerlendirme metodolojisinin geliştirilmesi (3-6 ay)</li>
+<li contenteditable="true">Ekipman bakım ve kontrol sistemlerinin güçlendirilmesi: Tüm basınçlı ekipmanlar için periyodik kontrol takvimi, bakım kayıtları, takip mekanizması ve sorumluluk atamalarının yapılması (3-6 ay)</li>
+<li contenteditable="true">Proaktif denetim ve izleme sistemlerinin kurulması: Planlı saha denetimleri, güvenlik performans göstergeleri (KPI) izleme, sapma tespiti ve düzeltici faaliyet takip mekanizmalarının oluşturulması (6-12 ay)</li>
+<li contenteditable="true">Güvenlik kültürü geliştirme programı: Çalışanların güvensiz durumları raporlama, iş durdurma yetkisini kullanma ve güvenlik önceliğini benimseme kültürünün güçlendirilmesi için eğitim, teşvik ve liderlik programları (6-12 ay)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Sıcak İşlem İzin Sistemi</td>
+                        <td class="current" contenteditable="true">Yok</td>
+                        <td class="target" contenteditable="true">Hot Work PTW %100 uygulanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Değerlendirmesi Kapsamı</td>
+                        <td class="current" contenteditable="true">Genel/Yüzeysel</td>
+                        <td class="target" contenteditable="true">Spesifik senaryolar detaylı analiz ediliyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Ekipman Periyodik Kontrol</td>
+                        <td class="current" contenteditable="true">Sistematik değil</td>
+                        <td class="target" contenteditable="true">Periyodik kontrol %100 uyumlu</td>
+                    </tr>
+
+                    <tr>
+                        <td>Erken Tespit Sistemi</td>
+                        <td class="current" contenteditable="true">Yok</td>
+                        <td class="target" contenteditable="true">Duman/alev dedektörü kurulu ve aktif</td>
+                    </tr>
+
+                    <tr>
+                        <td>Saha Denetim Sıklığı</td>
+                        <td class="current" contenteditable="true">Reaktif/Düzensiz</td>
+                        <td class="target" contenteditable="true">Planlı haftalık denetim %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>Çalışan Eğitim Durumu</td>
+                        <td class="current" contenteditable="true">Temel/Yetersiz</td>
+                        <td class="target" contenteditable="true">Sıcak işlem güvenliği eğitimi %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Performans İzleme</td>
+                        <td class="current" contenteditable="true">Yok</td>
+                        <td class="target" contenteditable="true">KPI aylık raporlanıyor</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>
