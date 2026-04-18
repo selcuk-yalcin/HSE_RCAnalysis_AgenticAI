@@ -1,7 +1,7 @@
 """
 Root Cause Agent V3.1 - DSPy-Powered 5-Why Analysis
 =====================================================
-STATUS: INACTIVE (Test için hazır, production'da kullanılmıyor)
+STATUS:  ACTIVE (Production'da kullanılıyor - Fallback: V2)
 
 ÜSTÜNLÜKLER (V2.5'e karşı):
 ────────────────────────────
@@ -15,14 +15,15 @@ ENTEGRASYON NOTU:
 ────────────────
 - DSPy module-based architecture
 - Backward compatible ile V2.5 veri yapıları
-- Gradual migration mümkün
-- Production transition: 2 hafta testing sonrası
+- Orchestrator'da try-except ile fallback (V2'ye düşer)
+- DSPy yoksa otomatik V2 kullanılır
 
-AKTIVASYON TALIMATLARI:
-──────────────────────
-1. Gerekli paketleri kur: pip install dspy-ai
-2. test_rootcause_v3_1.py ile end-to-end test et
-3. Başarılı ise: app.py'de RootCauseAgentV2 yerine v3_1 kullan
+AKTİVASYON DURUMU:
+──────────────────
+orchestrator.py'de aktif
+agents/__init__.py'de export ediliyor
+ DSPy gerekli (pip install dspy-ai)
+Fallback mekanizması mevcut
 """
 
 from openai import OpenAI
@@ -57,14 +58,15 @@ except ImportError:
 try:
     from rag_pipeline.retrieval import RAGAnalyzer
     RAG_AVAILABLE = True
-except ImportError:
+except Exception:
+    # Catch ALL errors (ImportError, NameError, AttributeError, dependency issues, etc.)
     RAG_AVAILABLE = False
     try:
         project_root = Path(__file__).parent.parent
         sys.path.insert(0, str(project_root))
         from rag_pipeline.retrieval import RAGAnalyzer
         RAG_AVAILABLE = True
-    except ImportError:
+    except Exception:
         RAGAnalyzer = None
         print("⚠️  RAG pipeline not available (V3.1 static mode)")
 
@@ -185,7 +187,12 @@ class ImmediateCauseFinder(dspy.Module):
             causes = json.loads(result.causes)
             if not isinstance(causes, list):
                 causes = causes.get("causes", [])
-        except:
+        except Exception as e:
+            print(f"❌ ImmediateCauseFinder JSON parse error: {e}")
+            print(f"   Raw result: {str(result)[:300]}")
+            if hasattr(result, 'causes'):
+                print(f"   result.causes type: {type(result.causes)}")
+                print(f"   result.causes: {str(result.causes)[:500]}")
             causes = []
         
         # Max 5 cause
@@ -436,14 +443,14 @@ class RootCauseAgentV3_1:
             api_key=api_key
         )
         
-        # DSPy LM configuration
-        dspy_lm = dspy.OpenAI(
-            model="anthropic/claude-sonnet-4.5",
+        # DSPy LM configuration (v3+ API)
+        dspy_lm = dspy.LM(
+            model="openrouter/anthropic/claude-sonnet-4.5",
             api_base="https://openrouter.ai/api/v1",
             api_key=api_key,
             max_tokens=4000
         )
-        dspy.settings.configure(lm=dspy_lm)
+        dspy.configure(lm=dspy_lm)
         
         # DSPy modules
         self.immediate_cause_finder = ImmediateCauseFinder()

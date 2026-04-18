@@ -1053,7 +1053,7 @@ class SkillBasedDocxAgent:
         # 5-Why Decision Tree HTML'ini oluştur
         decision_tree_path = str(output_file).replace('.docx', '_decision_tree.html')
         print(f"\n 5-Why Decision Tree oluşturuluyor...")
-        self._build_decision_tree(data, decision_tree_path)
+        self._build_decision_tree(investigation_data, decision_tree_path)
         if Path(decision_tree_path).exists():
             dt_size_kb = Path(decision_tree_path).stat().st_size / 1024
             print(f" Decision Tree başarıyla oluşturuldu!")
