@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - MPT-2026-001-NM";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">MPT-2026-001-NM</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">18.04.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">MPT Test Sahası Test Hücresi 3</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Ramak Kala Olayı (Near-Miss)</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Test hücresi sarmal kapısından 150 gramlık metal klips düşerek operatörün 30 cm yakınına isabet etti. Operatör son anda geri çekilerek fiziksel yaralanmadan kurtuldu ancak şok yaşadı.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">MPT Test Sahası Test Hücresi 3'te test sonrası ekipman kaldırma işlemi sırasında sarmal kapının alt bölümündeki metal bağlantı klipsi (10x5 cm, 150 gram) gevşeyerek düştü ve operatörün 30 cm yakınına isabet etti. Operatör eğilmiş pozisyonda kablo toplarken anormal ses duyarak refleks ile geri çekildi ve yaralanmadan kurtuldu.</div>
+<div class="paragraph" contenteditable="true">MPT Test Sahası Test Hücresi 3, sarmal kapı altı çalışma alanı</div>
+<div class="paragraph" contenteditable="true">1 operatör doğrudan etkilendi (şok yaşadı), 1 operatör kontrol panelinde tanık oldu</div>
+<div class="paragraph" contenteditable="true">Olay anında acil durdurma prosedürü devreye alındı ve tüm test hücresi ekipmanları güvenli konuma getirildi. Operatörün sağlık durumu kontrol edildi ve fiziksel yaralanma olmadığı teyit edildi. Olay derhal güvenlik ekibine bildirildi ve alan geçici olarak kullanım dışı bırakıldı. Sarmal kapının detaylı incelemesinde 4 farklı bağlantı noktasında gevşeme ve yıpranma tespit edildi.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sarmal kapı son 3 aydır periyodik bakım görmemiş ve bakım kayıtları tutulmamış</li>
+<li contenteditable="true">Kapının 4 bağlantı noktasında kritik seviyede gevşeme ve yıpranma mevcut</li>
+<li contenteditable="true">Operatörlere sarmal kapı altında çalışma riskleri konusunda yeterli eğitim verilmemiş</li>
+<li contenteditable="true">Bakım planlama ve takip sistemi yetersiz, manuel kayıt sistemi etkin çalışmıyor</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Sarmal kapının tüm bağlantı noktaları sıkılaştırıldı ve yıpranmış parçalar değiştirildi</td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm test hücrelerindeki sarmal kapılar acil güvenlik kontrolünden geçirildi</td>
+                        <td contenteditable="true">Tesis Mühendisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Operatörlere sarmal kapı güvenliği ve risk farkındalığı acil eğitimi verildi</td>
+                        <td contenteditable="true">HSE Sorumlusu</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Kapı altı çalışma alanına uyarı işaretleri ve güvenlik bariyerleri yerleştirildi</td>
+                        <td contenteditable="true">Hat Yöneticisi</td>
+                        <td contenteditable="true">Planlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">MPT-2026-001-NM</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">18.04.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">17:15</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">MPT Test Sahası Test Hücresi 3</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Test Operasyonları Bölümü</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">İsim belirtilmemiş (Test Operatörü)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Sarmal kapı (rolling shutter door) - 10 yıllık</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Metal bağlantı klipsi (10x5 cm, 150 gram)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">İç mekan - Kontrollü ortam</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Normal iç mekan aydınlatması</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart test operatörü KKE (baret, iş ayakkabısı, iş elbisesi)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Ramak Kala (Near-Miss) - Düşen Nesne</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Fiziksel yaralanma yok, psikolojik şok</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 kişi doğrudan, 1 kişi dolaylı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Potansiyel: Ciddi yaralanma (baş travması, kırık)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Kontrol panelindeki ikinci operatör (ses üzerine fark etti)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Hayır (fiziksel yaralanma olmadı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Uygulanamaz</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">17:00</div>
+                    <div class="timeline-event" contenteditable="true">Test tamamlandı, operatör ekipman kaldırma işlemine başladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">17:10</div>
+                    <div class="timeline-event" contenteditable="true">Operatör sarmal kapı altında eğilerek ekipman kablosunu toplamaya başladı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">17:15</div>
+                    <div class="timeline-event" contenteditable="true">Metal klips gevşeyerek düştü, operatör anormal ses duydu ve refleks ile geri çekildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">17:16</div>
+                    <div class="timeline-event" contenteditable="true">Parça beton zemine çarparak sert ses çıkardı, operatör şoke oldu</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">17:17</div>
+                    <div class="timeline-event" contenteditable="true">İkinci operatör ses üzerine fark etti, acil durdurma yapıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">17:20</div>
+                    <div class="timeline-event" contenteditable="true">Operatörün sağlık durumu kontrol edildi, güvenlik ekibine bildirim yapıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">17:30</div>
+                    <div class="timeline-event" contenteditable="true">Alan güvenlik şeridi ile kapatıldı, kapı detaylı incelemeye alındı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">18:00</div>
+                    <div class="timeline-event" contenteditable="true">4 bağlantı noktasında gevşeme ve yıpranma tespit edildi, olay raporu hazırlandı</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why tekniği, bir olayın kök nedenine ulaşmak için ardışık 'Neden?' soruları sorarak derinlemesine analiz yapma yöntemidir. Bu olayda teknik iki ayrı dal için uygulanmıştır. Birinci dalda 'Neden metal klips düştü?' sorusuyla başlanmış ve her yanıt bir sonraki 'Neden?' sorusunun konusu olmuştur. Beşinci seviyede 'Yetersiz bakım ve inceleme sistemleri' organizasyonel kök nedenine ulaşılmıştır. İkinci dalda 'Neden operatör kapının altında eğildi?' sorusuyla başlanmış ve beşinci seviyede 'Yetersiz eğitim veya bilgi' kök nedenine ulaşılmıştır.
+
+Her 'Neden?' sorusu için verilen yanıtlar fiziksel kanıtlar, dokümantasyon ve tanık ifadeleriyle desteklenmiştir. Örneğin 'Son 3 aydır periyodik bakım kaydı yok' yanıtı bakım kayıt sisteminin incelenmesiyle doğrulanmıştır. Teknik, semptomları değil gerçek nedenleri bulmaya odaklanmıştır. Beşinci seviyede ulaşılan kök nedenler organizasyonel seviyede olup, düzeltildiğinde benzer olayların tekrarını önleyecek sistemik iyileştirmeler sağlayacaktır. Bu metodoloji sayesinde 'kimin suçu' yerine 'hangi sistem zayıflığı' sorusuna yanıt bulunmuştur.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Davranışlar (Actions)</td>
+                        <td contenteditable="true">Çalışanların yaptığı eylemler veya yapmadığı eylemler: Uygunsuz pozisyon, prosedür ihlali, güvensiz davranış, dikkatsizlik, acele etme gibi bireysel davranış faktörleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Koşullar (Conditions)</td>
+                        <td contenteditable="true">Fiziksel çevre ve ekipman durumu: Ekipman arızası, tasarım hatası, yıpranma, yetersiz aydınlatma, gürültü, sıcaklık, alan düzeni, malzeme kusuru gibi çevresel ve teknik faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Kişisel Faktörler (Personal Factors)</td>
+                        <td contenteditable="true">Bireyin yetkinliği ve durumu: Eğitim eksikliği, deneyimsizlik, yorgunluk, stres, sağlık durumu, iletişim yetersizliği, risk algısı eksikliği gibi kişisel yeterlilik faktörleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktörler (Organizational Factors)</td>
+                        <td contenteditable="true">Yönetim sistemleri ve organizasyonel kararlar: Bakım sistemi yetersizliği, prosedür eksikliği, kaynak yetersizliği, iş yükü, yönetim kararları, politika zayıflıkları, kültür sorunları gibi sistemik faktörler</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">HSE Sorumlusu</td>
+                        <td contenteditable="true">Baş Araştırmacı ve Analiz Lideri</td>
+                        <td contenteditable="true">18.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Teknik Uzman ve Bakım Sistemi Temsilcisi</td>
+                        <td contenteditable="true">18.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hat Yöneticisi</td>
+                        <td contenteditable="true">Operasyonel Süreç Temsilcisi</td>
+                        <td contenteditable="true">18.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tesis/Mühendislik Uzmanı</td>
+                        <td contenteditable="true">Ekipman ve Tasarım Uzmanı</td>
+                        <td contenteditable="true">19.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Çalışan Temsilcisi</td>
+                        <td contenteditable="true">Operatör Perspektifi ve İşçi Güvenliği Temsilcisi</td>
+                        <td contenteditable="true">19.04.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - EKİPMAN ARIZASI VE BAKIM YETERSİZLİĞİ</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">MPT Test Sahası Test Hücresi 3'te kullanılan sarmal kapı yaklaşık 10 yıldır hizmette olup, günlük operasyonlarda sık kullanılmaktadır. Kapı, test ekipmanlarının hücreye girişi ve çıkışı için kritik bir bileşendir ve günde ortalama 15-20 kez açılıp kapatılmaktadır. Normal kullanım koşullarında kapının mekanik bileşenlerinde doğal yıpranma beklenmektedir. Ancak olay öncesinde kapının performansında herhangi bir anormallik raporlanmamış ve operatörler tarafından sorun bildirilmemiştir. Bu durum, görünür semptomların olmadığı ancak altta yatan mekanik bozulmanın sessizce ilerlediği bir senaryo oluşturmuştur.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Sarmal kapının alt bölümündeki metal bağlantı klipsi (10x5 cm, 150 gram) gevşeyerek yerinden çıktı ve operatörün çalıştığı alana düştü</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden metal klips düştü?</div>
+                    <div class="why-answer" contenteditable="true">→ Klips bağlantı noktasında gevşemiş ve yıpranmış durumda olduğu için tutma gücünü kaybetmiş ve kapının hareketi sırasında yerinden çıkmıştır. Olay sonrası yapılan detaylı incelemede klipsin monte edildiği yuvada aşınma ve deformasyon tespit edilmiştir.</div>
+                    <span class="why-code">B - Koşullar - Ekipman Bozulması</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden klips gevşedi ve bağlantı noktası yıprandı?</div>
+                    <div class="why-answer" contenteditable="true">→ Klips ve bağlantı noktası düzenli olarak sıkılaştırılmamış ve kontrol edilmemiştir. Normal kullanım sırasında oluşan titreşim ve mekanik stres nedeniyle zamanla gevşeme meydana gelmiştir. Periyodik bakım yapılsaydı bu gevşeme erken tespit edilip önlenebilirdi.</div>
+                    <span class="why-code">D - Organizasyonel - Bakım Uygulaması</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden düzenli kontrol ve sıkılaştırma yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı için son 3 aydır periyodik bakım kaydı bulunmamaktadır. Bakım planında kapı için aylık kontrol öngörülmesine rağmen bu kontroller yapılmamış veya kayıt altına alınmamıştır. Bakım ekibi diğer öncelikli işlerle meşgul olmuş ve kapı bakımı atlanmıştır.</div>
+                    <span class="why-code">D - Organizasyonel - Bakım Planı Takibi</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden bakım planı takip edilmedi ve kayıt tutulmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Bakım planlama ve takip sistemi yetersizdir. Manuel kayıt sistemi kullanılmakta olup, hangi ekipmanın ne zaman bakım göreceği net takip edilememektedir. Bakım ekibi iş yükü nedeniyle önceliklendirme yapmakta ve kritik olmayan ekipmanların bakımı ertelenmektedir. Dijital bakım yönetim sistemi bulunmamaktadır.</div>
+                    <span class="why-code">D - Organizasyonel - Sistem Yetersizliği</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden bakım planlama ve takip sistemi yetersiz?</div>
+                    <div class="why-answer" contenteditable="true">→ [D1.3] Yetersiz Bakım ve İnceleme Sistemleri - Organizasyonda periyodik bakım sistemleri yeterince geliştirilmemiş ve uygulanmamaktadır. Bakım planları güncel değil, kaynak tahsisi yetersiz, dijital takip araçları yok ve bakım performansı ölçülmemektedir. Ekipman durumu proaktif değil reaktif olarak yönetilmektedir. Bu sistemik zayıflık tüm tesiste benzer risklere yol açmaktadır.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Yetersiz Bakım ve İnceleme Sistemleri)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Yetersiz Bakım ve İnceleme Sistemleri</div>
+                <div class="box-content" contenteditable="true">Organizasyonun bakım yönetim sistemi, ekipmanların güvenli ve güvenilir çalışmasını sağlamak için gerekli yapıyı sağlamamaktadır. Periyodik bakım planları ya mevcut değildir ya da sistematik olarak uygulanmamaktadır. Manuel kayıt sistemi bakım geçmişinin izlenmesini zorlaştırmakta ve hangi ekipmanın ne zaman bakım göreceği net takip edilememektedir. Bakım ekibi kaynak ve iş yükü kısıtları nedeniyle önceliklendirme yapmakta ve kritik olmayan ekipmanların bakımı sürekli ertelenmektedir. Dijital bakım yönetim sistemi (CMMS) bulunmaması planlama, takip ve raporlama süreçlerini verimsiz hale getirmektedir. Ekipman durumu proaktif değil reaktif olarak yönetilmekte, arıza olduktan sonra müdahale edilmektedir. Bu sistemik zayıflık sadece sarmal kapıyı değil, tüm tesisteki ekipmanları risk altına sokmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Bakım bütçesi ve kaynak tahsisi yetersizdir. Bakım ekibi mevcudu tüm ekipmanların periyodik bakımını gerçekleştirmek için yeterli değildir ve dış kaynak kullanımı sınırlıdır.</li>
+<li contenteditable="true">Bakım performans göstergeleri (KPI) tanımlanmamış ve ölçülmemektedir. Bakım etkinliği, ekipman kullanılabilirliği ve arıza oranları sistematik olarak takip edilmemektedir.</li>
+<li contenteditable="true">Üst yönetim bakım fonksiyonuna yeterli öncelik vermemekte ve bakım bütçesi maliyet azaltma baskısı altında kısıtlanmaktadır. Bakım 'maliyet merkezi' olarak görülmekte, 'risk yönetimi aracı' olarak değerlendirilmemektedir.</li>
+<li contenteditable="true">Bakım ekibi ile operasyon ekibi arasında koordinasyon ve iletişim yetersizdir. Operatörler ekipmanlardaki anormallikleri sistematik olarak raporlamamakta, bakım ekibi de saha gözlemlerini düzenli yapmamaktadır.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - OPERATÖR DAVRANIŞI VE EĞİTİM EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Test operatörleri, test tamamlandıktan sonra ekipmanları test hücresinden çıkarma ve kablolama işlemlerini düzenli olarak gerçekleştirmektedir. Bu rutin işlem sırasında operatörler sarmal kapının altında ve yakınında çalışmak zorunda kalmaktadır. Ekipman kabloları genellikle kapıya yakın alanlarda bulunmakta ve toplanmaları için operatörlerin eğilmesi gerekmektedir. Operatörler bu işlemi günlük olarak gerçekleştirmekte ve herhangi bir risk algılamamaktadır. Sarmal kapı altında çalışmanın potansiyel tehlikeleri konusunda özel bir eğitim verilmemiş ve risk değerlendirmesi yapılmamıştır. Operatörler kapının mekanik bir ekipman olduğunu bilmekte ancak düşen parça riskini öngörememektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Operatör sarmal kapının hemen altında eğilmiş pozisyonda ekipman kablosunu toplarken düşen parçanın potansiyel yörüngesinde bulunuyordu</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden operatör kapının altında eğildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör test sonrası ekipman kablosunu toplamak için eğilmesi gerekiyordu. Kablo kapıya yakın alanda zemin seviyesinde bulunmaktaydı ve toplanması için operatörün o pozisyonda çalışması gerekiyordu. Alternatif bir çalışma yöntemi veya ekipman düzenlemesi mevcut değildi.</div>
+                    <span class="why-code">A - Davranışlar - Çalışma Pozisyonu</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden kapının altında çalışmak zorunda kaldı?</div>
+                    <div class="why-answer" contenteditable="true">→ Ekipman kablolarının düzeni ve test hücresi yerleşimi nedeniyle kablolara kapı yakınından ulaşılması gerekiyordu. Kabloları başka bir konumdan toplamak mümkün değildi. İş prosedürü bu çalışma şeklini gerektiriyordu ve alternatif bir yöntem tanımlanmamıştı.</div>
+                    <span class="why-code">B - Koşullar - İş Düzeni</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden operatör bu pozisyonda çalışmanın tehlikeli olduğunu fark etmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör sarmal kapıdan parça düşme riskinin olduğunu bilmiyordu. Kapının mekanik bir ekipman olduğunu ve bağlantı parçalarının gevşeyebileceğini düşünmemişti. Risk algısı oluşmamıştı çünkü daha önce benzer bir olay yaşanmamış ve uyarı yapılmamıştı.</div>
+                    <span class="why-code">C - Kişisel - Risk Algısı</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden operatör riski bilmiyordu ve risk algısı oluşmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı için risk değerlendirmesi yapılmamış veya operatörlere iletilmemiştir. Operatörlere kapı altında çalışmanın potansiyel tehlikeleri, düşen parça riski ve güvenli çalışma prosedürleri öğretilmemiştir. İş güvenliği eğitimlerinde bu spesifik risk ele alınmamıştır.</div>
+                    <span class="why-code">C - Kişisel - Eğitim Eksikliği</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden risk değerlendirmesi yapılmamış ve eğitim verilmemiş?</div>
+                    <div class="why-answer" contenteditable="true">→ [C2.1] Yetersiz Eğitim veya Bilgi - Organizasyonda operatörlere ekipman riskleri ve güvenli çalışma prosedürleri konusunda yeterli eğitim verilmemektedir. Risk değerlendirme süreci tüm ekipmanları ve çalışma senaryolarını kapsamıyor. Eğitim programları genel güvenlik konularına odaklanıyor, spesifik ekipman riskleri detaylı ele alınmıyor. Operatörlerin risk farkındalığı düşük ve güvenli davranış kültürü yeterince gelişmemiş.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Yetersiz Eğitim ve Risk Farkındalığı)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Yetersiz Eğitim ve Risk Farkındalığı</div>
+                <div class="box-content" contenteditable="true">Organizasyonun eğitim sistemi, operatörlere ekipman riskleri ve güvenli çalışma prosedürleri konusunda yeterli bilgi ve beceri kazandırmamaktadır. Risk değerlendirme süreci tüm ekipmanları, çalışma senaryolarını ve potansiyel tehlikeleri kapsamlı şekilde ele almamaktadır. Sarmal kapı gibi rutin kullanılan ekipmanların mekanik riskleri göz ardı edilmekte ve 'alışılmış' ekipmanlar tehlikesiz kabul edilmektedir. Eğitim programları genel güvenlik konularına odaklanmakta, spesifik ekipman riskleri ve çalışma alanı tehlikeleri detaylı olarak işlenmemektedir. Operatörlere verilen eğitimler teorik düzeyde kalmakta, pratik risk senaryoları ve vaka çalışmaları yeterince kullanılmamaktadır. Operatörlerin risk algısı ve farkındalığı düşük seviyededir ve güvenli davranış kültürü yeterince gelişmemiştir. Eğitim etkinliği ölçülmemekte ve operatörlerin öğrenme düzeyi test edilmemektedir.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk değerlendirme süreci reaktif ve yüzeyseldir. Tüm ekipmanlar ve çalışma senaryoları için detaylı risk analizi yapılmamaktadır. Özellikle rutin kullanılan ekipmanların riskleri göz ardı edilmektedir.</li>
+<li contenteditable="true">Eğitim programları standart ve genel içeriklidir. İş alanına özel, ekipman bazlı ve senaryo bazlı eğitimler geliştirilmemiştir. Eğitim ihtiyaç analizi sistematik yapılmamaktadır.</li>
+<li contenteditable="true">Operatör yetkinlik değerlendirmesi ve sertifikasyon sistemi yoktur. Operatörlerin güvenli çalışma bilgi ve becerilerinin yeterli olup olmadığı ölçülmemektedir.</li>
+<li contenteditable="true">Güvenlik kültürü zayıftır. Operatörler risk almayı normal karşılamakta, güvensiz durumları raporlamamakta ve 'her zamanki gibi' çalışma eğilimindedir. Yönetim güvenlik kültürünü güçlendirmek için yeterli liderlik göstermemektedir.</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Bakım ekibi ile operasyon ekibi arasında ekipman durumu ve anormallikler konusunda etkin iletişim bulunmamaktadır. Operatörler ekipmanlardaki küçük sorunları raporlamamakta, bakım ekibi de saha gözlemlerini düzenli yapmamaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kaynak Yetersizliği</td>
+                        <td contenteditable="true">Bakım departmanı personel, bütçe ve ekipman açısından yetersiz kaynaklara sahiptir. Tüm ekipmanların periyodik bakımını gerçekleştirmek için yeterli zaman ve kaynak bulunmamaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Teknoloji Eksikliği</td>
+                        <td contenteditable="true">Dijital bakım yönetim sistemi (CMMS) bulunmamaktadır. Manuel kayıt ve takip sistemi verimsiz ve hata yapmaya açıktır. Ekipman durumu gerçek zamanlı izlenememektedir.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kültürel Faktörler</td>
+                        <td contenteditable="true">Organizasyonda reaktif güvenlik kültürü hakimdir. Sorunlar ortaya çıktıktan sonra müdahale edilmekte, proaktif önlem alınmamaktadır. Çalışanlar risk almayı normal karşılamaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim Eksikliği</td>
+                        <td contenteditable="true">Hat yöneticileri ve süpervizörler saha gözetimini yeterince yapmamaktadır. Operatörlerin güvenli çalışma prosedürlerine uyumu kontrol edilmemekte ve güvensiz davranışlar düzeltilmemektedir.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür Yetersizliği</td>
+                        <td contenteditable="true">Sarmal kapı altında çalışma için spesifik güvenli çalışma prosedürü bulunmamaktadır. Operatörlere hangi önlemleri almaları gerektiği net olarak tanımlanmamıştır.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Tüm test hücrelerindeki sarmal kapıların acil güvenlik kontrolü yapılması ve gevşemiş bağlantıların sıkılaştırılması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm kapılar kontrol edildi ve güvenli hale getirildi (%100)</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Sarmal kapı altı çalışma alanlarına uyarı işaretleri ve güvenlik bariyerleri yerleştirilmesi</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Sorumlusu</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm kapı altı alanlara işaret ve bariyer yerleştirildi (%100)</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Operatörlere sarmal kapı güvenliği ve düşen parça riski konusunda acil farkındalık eğitimi verilmesi</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Hat Yöneticisi</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Tüm operatörler eğitim aldı ve test geçti (%100)</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Sarmal kapılar için detaylı periyodik bakım planı oluşturulması (aylık kontrol, 3 aylık bakım, yıllık kapsamlı bakım)</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Bakım planı oluşturuldu ve uygulamaya alındı</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Dijital bakım yönetim sistemi (CMMS) tedarik edilmesi ve devreye alınması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">CMMS sistemi kuruldu ve tüm ekipmanlar sisteme tanımlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Tüm test hücresi ekipmanları için kapsamlı risk değerlendirmesi yapılması ve operatörlere iletilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Sorumlusu</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Risk değerlendirmesi tamamlandı ve operatörler bilgilendirildi</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Operatör eğitim programının güncellenmesi ve ekipman bazlı spesifik risk eğitimlerinin eklenmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Eğitim programı güncellendi ve uygulamaya alındı</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Bakım ekibi kapasitesinin artırılması (ek personel veya dış kaynak kullanımı)</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Genel Müdür</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Bakım ekibi kapasitesi %30 artırıldı</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Operatör-bakım ekibi iletişim ve raporlama sisteminin kurulması (anormallik raporlama formu, dijital platform)</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Operasyon Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Raporlama sistemi kuruldu ve aylık en az 10 rapor alınıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Saha gözetim ve güvenlik denetim programının oluşturulması ve uygulanması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Hat Yöneticisi</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Haftalık güvenlik denetimleri yapılıyor ve kayıt tutuluyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Güvenlik performans göstergelerinin (KPI) tanımlanması ve yönetim gözden geçirmelerine dahil edilmesi</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">KPI'lar tanımlandı ve aylık raporlanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">ISO 45001 İş Sağlığı ve Güvenliği Yönetim Sistemi sertifikasyonu için hazırlık başlatılması</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Genel Müdür</td>
+                        <td contenteditable="true">12 ay</td>
+                        <td contenteditable="true">ISO 45001 sertifikasyonu alındı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Rutin kullanılan ekipmanlar 'güvenli' kabul edilmemeli, tüm ekipmanlar için detaylı risk değerlendirmesi yapılmalıdır. Sarmal kapı gibi mekanik ekipmanların düşen parça, sıkışma ve çarpma riskleri mutlaka değerlendirilmelidir.
+• Periyodik bakım planları sadece kağıt üzerinde kalmamalı, sistematik olarak uygulanmalı ve kayıt altına alınmalıdır. Dijital bakım yönetim sistemleri kullanılarak bakım takibi otomatize edilmelidir.
+• Operatörlere genel güvenlik eğitimlerinin yanı sıra, çalıştıkları alandaki spesifik ekipman riskleri ve güvenli çalışma prosedürleri detaylı olarak öğretilmelidir. Eğitim etkinliği test edilmeli ve periyodik olarak yenilenmelidir.
+• Operatörler ve bakım ekibi arasında etkin iletişim kanalları kurulmalıdır. Operatörler ekipmanlardaki anormallikleri kolayca raporlayabilmeli ve bakım ekibi bu raporları hızla değerlendirmelidir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Organizasyon genelinde proaktif güvenlik kültürü oluşturulmalıdır. Reaktif yaklaşımdan proaktif risk yönetimine geçiş yapılmalı, sorunlar ortaya çıkmadan önlenmelidir.
+• ISO 45001 veya benzeri uluslararası standartlara uygun entegre güvenlik yönetim sistemi kurulmalıdır. Tüm süreçlere güvenlik entegre edilmeli ve sürekli iyileştirme kültürü yerleştirilmelidir.
+• Bakım fonksiyonu stratejik bir yönetim aracı olarak görülmeli ve yeterli kaynak tahsis edilmelidir. Bakım 'maliyet merkezi' değil 'risk yönetimi ve değer yaratma aracı' olarak değerlendirilmelidir.
+• Üst yönetim güvenliğe görünür liderlik göstermeli ve güvenlik kültürünü güçlendirmelidir. Güvenlik performansı yönetim gözden geçirmelerinde düzenli olarak ele alınmalı ve iyileştirme hedefleri belirlenmelidir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Bu olay ve öğrenilen dersler tüm organizasyonda paylaşılmalıdır. Benzer risklerin bulunduğu diğer alanlarda da önleyici tedbirler alınmalıdır.
+• Ramak kala olayların raporlanması teşvik edilmeli ve raporlayan çalışanlar ödüllendirilmelidir. Ramak kala olaylar öğrenme fırsatı olarak görülmeli ve cezalandırıcı yaklaşımdan kaçınılmalıdır.
+• Güvenlik toplantıları düzenli olarak yapılmalı ve çalışanların güvenlik konusundaki görüş ve önerileri alınmalıdır. Çalışanlar güvenlik kararlarına dahil edilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm operatörler için 'Ekipman Güvenliği ve Risk Farkındalığı' eğitim programı geliştirilmeli ve uygulanmalıdır. Eğitim içeriği pratik senaryolar ve vaka çalışmaları içermelidir.
+• Bakım personeli için 'Güvenlik Odaklı Bakım' eğitimi verilmelidir. Bakım çalışmaları sırasında güvenlik risklerinin nasıl tespit edileceği ve önleneceği öğretilmelidir.
+• Hat yöneticileri ve süpervizörler için 'Güvenlik Liderliği ve Saha Gözetimi' eğitimi düzenlenmelidir. Güvensiz davranışların nasıl tespit edileceği ve düzeltileceği konusunda yetkinlik kazandırılmalıdır.
+• Yeni işe başlayan tüm çalışanlar için kapsamlı güvenlik oryantasyon programı oluşturulmalıdır. İşe başlamadan önce çalışma alanındaki tüm riskler detaylı olarak anlatılmalıdır.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">MPT Test Sahası Test Hücresi 3'te meydana gelen bu ramak kala olay, organizasyonun güvenlik yönetim sistemindeki ciddi zayıflıkları ortaya çıkarmıştır. 150 gramlık metal bağlantı klipsinin sarmal kapıdan düşerek operatörün 30 cm yakınına isabet etmesi, potansiyel olarak ölümcül bir kazaya dönüşebilecek bir durumdu. Operatörün son anda refleks göstererek geri çekilmesi ciddi yaralanmayı önlemiştir. Bu olay bir 'şanslı kaçış' olarak değerlendirilmeli ve benzer olayların tekrarını önlemek için kapsamlı sistemik iyileştirmeler yapılmalıdır.
+
+Kök neden analizi, olayın iki ana nedeni olduğunu ortaya koymuştur: Birincisi, yetersiz bakım ve inceleme sistemleri nedeniyle sarmal kapının 3 ay boyunca periyodik bakım görmemesi ve kritik bağlantı noktalarındaki gevşeme ve yıpranmanın tespit edilememesidir. İkincisi, yetersiz eğitim ve risk farkındalığı nedeniyle operatörlerin sarmal kapı altında çalışmanın potansiyel tehlikelerini bilmemeleri ve risk almalarıdır. Bu iki kök neden, daha üst seviyede bir meta kök nedene işaret etmektedir: Zayıf güvenlik yönetim sistemi ve proaktif risk yönetimi eksikliği.
+
+Organizasyon reaktif bir güvenlik kültürüne sahiptir ve sorunlar ortaya çıktıktan sonra müdahale edilmektedir. Bakım sistemi, eğitim programları, risk değerlendirme süreçleri ve güvenlik gözetimi yetersizdir. Farklı departmanlar arasında koordinasyon eksikliği bulunmakta ve güvenlik tüm süreçlere entegre edilmemektedir. Üst yönetim güvenliğe yeterli liderlik ve kaynak sağlamamaktadır. Bu sistemik zayıflıklar sadece sarmal kapıyı değil, organizasyondaki tüm ekipmanları ve çalışma alanlarını risk altına sokmaktadır.
+
+Bu raporda önerilen düzeltici eylemler acil, kısa vadeli ve uzun vadeli olmak üzere üç kategoride ele alınmıştır. Acil eylemler (1-2 hafta) mevcut riski ortadan kaldırmayı, kısa vadeli eylemler (1-3 ay) sistemik zayıflıkları gidermeyi, uzun vadeli eylemler (3-12 ay) ise proaktif güvenlik kültürü ve entegre yönetim sistemi oluşturmayı hedeflemektedir. Tüm eylemlerin uygulanması ve etkinliğinin izlenmesi kritik önem taşımaktadır.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm test hücrelerindeki sarmal kapıların acil güvenlik kontrolü tamamlanmalı, gevşemiş bağlantılar sıkılaştırılmalı ve yıpranmış parçalar değiştirilmelidir. Kapı altı çalışma alanlarına uyarı işaretleri ve güvenlik bariyerleri yerleştirilmelidir. (1 hafta)</li>
+<li contenteditable="true">Tüm operatörlere sarmal kapı güvenliği ve düşen parça riski konusunda acil farkındalık eğitimi verilmelidir. Eğitim sonrası operatörlerin bilgi düzeyi test edilmeli ve yeterlilik sağlanmalıdır. (2 hafta)</li>
+<li contenteditable="true">Sarmal kapılar için detaylı periyodik bakım planı oluşturulmalı ve uygulamaya alınmalıdır. Aylık kontrol, 3 aylık bakım ve yıllık kapsamlı bakım programı tanımlanmalıdır. Bakım kayıtları sistematik olarak tutulmalıdır. (1 ay)</li>
+<li contenteditable="true">Tüm test hücresi ekipmanları için kapsamlı risk değerlendirmesi yapılmalı ve tespit edilen riskler operatörlere iletilmelidir. Özellikle mekanik ekipmanların düşen parça, sıkışma ve çarpma riskleri detaylı analiz edilmelidir. (2 ay)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Dijital bakım yönetim sistemi (CMMS) tedarik edilmeli ve devreye alınmalıdır. Tüm ekipmanlar sisteme tanımlanmalı, bakım planları otomatize edilmeli ve bakım geçmişi dijital olarak izlenmelidir. Öngörücü bakım yaklaşımına geçiş yapılmalıdır. (3 ay)</li>
+<li contenteditable="true">Operatör eğitim programı kapsamlı olarak güncellenmeli ve ekipman bazlı spesifik risk eğitimleri eklenmelidir. Eğitim içeriği teorik bilginin yanı sıra pratik senaryolar, vaka çalışmaları ve simülasyonlar içermelidir. Eğitim etkinliği ölçülmeli ve periyodik yenileme eğitimleri yapılmalıdır. (2-3 ay)</li>
+<li contenteditable="true">Bakım ekibi kapasitesi artırılmalı ve yeterli kaynak tahsis edilmelidir. Ek personel alımı veya dış kaynak kullanımı değerlendirilmelidir. Bakım fonksiyonu stratejik bir yönetim aracı olarak görülmeli ve bütçe önceliği verilmelidir. (3 ay)</li>
+<li contenteditable="true">ISO 45001 İş Sağlığı ve Güvenliği Yönetim Sistemi sertifikasyonu için hazırlık başlatılmalıdır. Entegre güvenlik yönetim sistemi kurulmalı, tüm süreçlere güvenlik entegre edilmeli ve sürekli iyileştirme kültürü yerleştirilmelidir. Üst yönetim güvenliğe görünür liderlik göstermeli ve güvenlik performansı düzenli olarak gözden geçirilmelidir. (12 ay)</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Bakım Sistemi</td>
+                        <td class="current" contenteditable="true">Manuel, düzensiz, kayıt yok</td>
+                        <td class="target" contenteditable="true">Dijital CMMS, planlı, tam kayıt</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Değerlendirmesi</td>
+                        <td class="current" contenteditable="true">Genel, yüzeysel, güncel değil</td>
+                        <td class="target" contenteditable="true">Detaylı, ekipman bazlı, güncel</td>
+                    </tr>
+
+                    <tr>
+                        <td>Operatör Eğitimi</td>
+                        <td class="current" contenteditable="true">Genel, teorik, etkinlik ölçülmüyor</td>
+                        <td class="target" contenteditable="true">Spesifik, pratik, test ediliyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Kültürü</td>
+                        <td class="current" contenteditable="true">Reaktif, düşük farkındalık</td>
+                        <td class="target" contenteditable="true">Proaktif, yüksek farkındalık</td>
+                    </tr>
+
+                    <tr>
+                        <td>Yönetim Liderliği</td>
+                        <td class="current" contenteditable="true">Düşük öncelik, sınırlı kaynak</td>
+                        <td class="target" contenteditable="true">Yüksek öncelik, yeterli kaynak</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            
+            <div id="decision-tree-diagram" style="background: white; padding: 10px; border: 1px solid #ddd; width: 100%; height: 800px; overflow: hidden;">
+                <div class="mermaid" style="width: 100%; height: 100%;">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    ROOT1["<b>KÖK NEDEN (D1.3):</b><br/>Kök Neden"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    OLAY --> ROOT1
+
+    ROOT2["<b>KÖK NEDEN (C2.1):</b><br/>Kök Neden"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    OLAY --> ROOT2
+
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                // Mermaid initialization için bekle
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: true,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 15,
+                            nodeSpacing: 50,
+                            rankSpacing: 80,
+                            diagramPadding: 10
+                        },
+                        themeVariables: {
+                            fontSize: '11px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#333',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    // Mermaid yüklenene kadar bekle
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: true,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 15,
+                                    nodeSpacing: 50,
+                                    rankSpacing: 80,
+                                    diagramPadding: 10
+                                },
+                                themeVariables: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>
