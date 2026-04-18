@@ -79,7 +79,8 @@ except ImportError:
 try:
     from rag_pipeline.retrieval import RAGAnalyzer
     RAG_AVAILABLE = True
-except ImportError:
+except Exception:
+    # Catch ALL errors (ImportError, NameError, AttributeError, etc.)
     RAG_AVAILABLE = False
     try:
         # Try adding project root to path
@@ -87,7 +88,7 @@ except ImportError:
         sys.path.insert(0, str(project_root))
         from rag_pipeline.retrieval import RAGAnalyzer
         RAG_AVAILABLE = True
-    except ImportError:
+    except Exception:
         RAGAnalyzer = None
         print("⚠️  RAG pipeline not available. Proceeding with static knowledge base.")
 

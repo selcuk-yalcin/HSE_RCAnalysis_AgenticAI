@@ -12,7 +12,15 @@ DEĞİŞİKLİKLER (orijinal orchestrator.py'a göre):
 from typing import Dict, Optional
 from .overview_agent import OverviewAgent
 from .assessment_agent import AssessmentAgent
-from .rootcause_agent_v2 import RootCauseAgentV2 as RootCauseAgent
+# V3.1 ACTIVATED - DSPy-powered root cause analysis
+try:
+    from .rootcause_agent_v3_1 import RootCauseAgentV3_1 as RootCauseAgent
+    _using_v31 = True
+except Exception as e:
+    # Fallback to V2 if ANY dependency issue occurs
+    from .rootcause_agent_v2 import RootCauseAgentV2 as RootCauseAgent
+    _using_v31 = False
+    print(f"⚠️  V3.1 import failed ({type(e).__name__}), using V2 fallback")
 
 # ── YENİ IMPORT ────────────────────────────────────────────────────────────────
 from .skillbased_docx_agent import SkillBasedDocxAgent
@@ -33,11 +41,23 @@ class RootCauseOrchestrator:
     def __init__(self):
         print("\n" + "=" * 80)
         print("🚀 ROOT CAUSE INVESTIGATION SYSTEM BAŞLATILIYOR")
+        if _using_v31:
+            print("   ✨ V3.1 ACTIVE (DSPy-powered)")
+        else:
+            print("   ⚠️  V2 FALLBACK (DSPy unavailable)")
         print("=" * 80)
 
         self.overview_agent = OverviewAgent()
         self.assessment_agent = AssessmentAgent()
-        self.rootcause_agent = RootCauseAgent()
+        
+        # Initialize RootCauseAgent with appropriate settings
+        if _using_v31:
+            self.rootcause_agent = RootCauseAgent(
+                use_rag=False,
+                enable_diversity_check=True
+            )
+        else:
+            self.rootcause_agent = RootCauseAgent()
 
         # ── YENİ: DOCX Rapor Ajanı ────────────────────────────────────────────
         # ANTHROPIC_API_KEY env var'dan otomatik okunur
