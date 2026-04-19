@@ -18,8 +18,20 @@ except Exception as e:
     _v31_available = False
 
 from .rootcause_agent_v2 import RootCauseAgentV2
-from .orchestrator import RootCauseOrchestrator
-from .skillbased_docx_agent import SkillBasedDocxAgent
+
+# Orchestrator + DOCX ajanı ağır bağımlılık (requests vb.) çeker; paket importunda
+# yükleme yapılmaz — sadece doğrudan veya aşağıdaki lazy getter ile yüklenir.
+def __getattr__(name: str):
+    if name == "RootCauseOrchestrator":
+        from .orchestrator import RootCauseOrchestrator
+
+        return RootCauseOrchestrator
+    if name == "SkillBasedDocxAgent":
+        from .skillbased_docx_agent import SkillBasedDocxAgent
+
+        return SkillBasedDocxAgent
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 # TODO: Add remaining agents
 # from .investigation_agent import InvestigationAgent
