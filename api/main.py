@@ -50,6 +50,15 @@ rootcause_agent = None
 actionplan_agent = None
 pdf_agent = None
 
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    """Parse YES/NO style env vars. Unset → default."""
+    raw = os.getenv(name)
+    if raw is None or raw.strip() == "":
+        return default
+    return raw.strip().lower() in ("1", "true", "yes", "on")
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize agents on startup"""
@@ -73,8 +82,14 @@ async def startup_event():
         assessment_agent = AssessmentAgent()
         print("✅ Assessment Agent initialized")
         
-        rootcause_agent = RootCauseAgent()
-        print("✅ Root Cause Agent initialized (DeepSeek V3 + Claude 3.5 Sonnet)")
+        # RAG (SentenceTransformer + Mongo) startup'ı çok uzatır; Railway healthcheck zaman aşımına düşer.
+        # Üretimde varsayılan kapalı — ROOTCAUSE_USE_RAG=1 ile açın (MONGODB_URI gerekli).
+        use_rag = _env_bool("ROOTCAUSE_USE_RAG", False)
+        rootcause_agent = RootCauseAgent(use_rag=use_rag)
+        print(
+            "✅ Root Cause Agent initialized "
+            f"({'RAG on' if use_rag else 'static KB, RAG off — set ROOTCAUSE_USE_RAG=1 to enable'})"
+        )
         
         actionplan_agent = ActionPlanAgent()
         print("✅ Action Plan Agent initialized")
