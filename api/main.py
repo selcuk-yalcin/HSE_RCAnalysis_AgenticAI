@@ -8,8 +8,11 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import sys
 import os
+import traceback
 from datetime import datetime
 from pathlib import Path
+from typing import Optional, Tuple, Type
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -20,9 +23,17 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agents.overview_agent import OverviewAgent
 from agents.assessment_agent import AssessmentAgent
-from agents.rootcause_agent_v2 import RootCauseAgentV2 as RootCauseAgent
+from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.actionplan_agent import ActionPlanAgent
 from agents.claude_skill_pdf_agent import ClaudeSkillPDFAgent as PDFReportAgent
+
+# V3.1 (DSPy) öncelikli; dspy veya init hatasında V2'ye düşülür
+_RootCauseV3_1: Optional[Type] = None
+_v3_1_import_error: Optional[BaseException] = None
+try:
+    from agents.rootcause_agent_v3_1 import RootCauseAgentV3_1 as _RootCauseV3_1
+except BaseException as exc:  # noqa: BLE001 — ImportError ve bağımlılık zinciri
+    _v3_1_import_error = exc
 
 app = FastAPI(
     title="HSE Investigation API",
@@ -49,6 +60,8 @@ assessment_agent = None
 rootcause_agent = None
 actionplan_agent = None
 pdf_agent = None
+# Hangi kök neden motorunun yüklendiği (health / log)
+rootcause_engine_info = "not_initialized"
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -59,10 +72,41 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return raw.strip().lower() in ("1", "true", "yes", "on")
 
 
+def _init_root_cause_agent(use_rag: bool) -> Tuple[object, str]:
+    """
+    Önce RootCauseAgentV3_1 (DSPy); import veya __init__ başarısızsa RootCauseAgentV2.
+    ROOTCAUSE_ENGINE=v2|legacy ile doğrudan V2 zorlanabilir.
+    """
+    force_v2 = os.getenv("ROOTCAUSE_ENGINE", "").strip().lower() in (
+        "v2",
+        "2",
+        "legacy",
+    )
+    if force_v2:
+        agent = RootCauseAgentV2(use_rag=use_rag)
+        return agent, "v2 (ROOTCAUSE_ENGINE forced)"
+
+    if _RootCauseV3_1 is None:
+        err = repr(_v3_1_import_error) if _v3_1_import_error else "unknown"
+        print(f"⚠️  V3.1 import edilemedi, V2 kullanılıyor: {err}")
+        agent = RootCauseAgentV2(use_rag=use_rag)
+        return agent, f"v2 (v3.1 import failed: {err})"
+
+    try:
+        agent = _RootCauseV3_1(use_rag=use_rag)
+        return agent, "v3.1"
+    except Exception as e:
+        print(f"⚠️  V3.1 başlatılamadı, V2 kullanılıyor: {e}")
+        traceback.print_exc()
+        agent = RootCauseAgentV2(use_rag=use_rag)
+        return agent, f"v2 (fallback after v3.1 init error: {e})"
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize agents on startup"""
     global overview_agent, assessment_agent, rootcause_agent, actionplan_agent, pdf_agent
+    global rootcause_engine_info
     
     print("🚀 Starting HSE Investigation API...")
     print(f"📊 OpenRouter API Key configured: {bool(os.getenv('OPENROUTER_API_KEY'))}")
@@ -85,9 +129,10 @@ async def startup_event():
         # RAG (SentenceTransformer + Mongo) startup'ı çok uzatır; Railway healthcheck zaman aşımına düşer.
         # Üretimde varsayılan kapalı — ROOTCAUSE_USE_RAG=1 ile açın (MONGODB_URI gerekli).
         use_rag = _env_bool("ROOTCAUSE_USE_RAG", False)
-        rootcause_agent = RootCauseAgent(use_rag=use_rag)
+        rootcause_agent, rootcause_engine_info = _init_root_cause_agent(use_rag)
         print(
             "✅ Root Cause Agent initialized "
+            f"[{rootcause_engine_info}] "
             f"({'RAG on' if use_rag else 'static KB, RAG off — set ROOTCAUSE_USE_RAG=1 to enable'})"
         )
         
@@ -355,7 +400,7 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
         part2_data = part2_raw
     
     try:
-        # Process with Root Cause Agent (V2 format)
+        # V3.1 veya V2; çıktı aynı şema (transform_v2_to_frontend)
         part3_raw = rootcause_agent.analyze_root_causes(
             part1_data,
             part2_data,
@@ -469,6 +514,7 @@ async def health_check():
     return {
         "status": "healthy" if all_agents_ready else "degraded",
         "agents": agents_status,
+        "rootcause_engine": rootcause_engine_info,
         "api_key_configured": bool(api_key),
         "api_key_source": "OPENROUTER_API_KEY" if os.getenv("OPENROUTER_API_KEY") else "OPENAI_API_KEY" if os.getenv("OPENAI_API_KEY") else "none",
         "incidents_count": len(incidents_db),
