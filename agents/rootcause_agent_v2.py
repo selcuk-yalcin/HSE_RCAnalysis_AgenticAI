@@ -357,7 +357,7 @@ BEKLENEN ÇIKTI (JSON ŞEMASI):
                 print(f"⚠️  RAG augmentation failed: {e}. Using static context.")
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-sonnet-4.5",
+            model="anthropic/claude-opus-4.7",
             temperature=0.4,
             max_tokens=4000,
             messages=[
@@ -570,7 +570,7 @@ KRİTİK:
                 print(f"⚠️  RAG augmentation failed for 5-Why: {e}")
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-opus-4.6",
+            model="anthropic/claude-opus-4.7",
             temperature=0.6,
             max_tokens=4000,
             messages=[
@@ -1026,7 +1026,7 @@ Sadece JSON döndür, Türkçe içerik."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5",
+                model="anthropic/claude-opus-4.7",
                 temperature=0.5,
                 max_tokens=2000,
                 messages=[

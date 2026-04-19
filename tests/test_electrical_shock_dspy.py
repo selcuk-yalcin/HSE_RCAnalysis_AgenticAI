@@ -300,7 +300,9 @@ def main():
         # Branch detayları
         for i, branch in enumerate(branches, 1):
             branch_name = branch.get("branch_name", f"Branch {i}")
-            why_count = len(branch.get("five_why_analysis", []))
+            why_count = len(
+                branch.get("why_chain", branch.get("five_why_analysis", []))
+            )
             print_info(f"[Dal {i}] {branch_name} - {why_count} Why")
         
         # Kök neden özetleri

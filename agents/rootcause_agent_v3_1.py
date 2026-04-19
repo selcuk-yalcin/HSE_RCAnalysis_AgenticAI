@@ -47,12 +47,79 @@ except ImportError:
         from .knowledge_base import HSG245_TAXONOMY, get_category_text
 
 try:
-    from .json_parser import extract_json_from_response, safe_json_parse
+    from .json_parser import (
+        extract_json_from_response,
+        extract_json_array_from_response,
+        safe_json_parse,
+    )
 except ImportError:
     try:
-        from json_parser import extract_json_from_response, safe_json_parse
+        from json_parser import (
+            extract_json_from_response,
+            extract_json_array_from_response,
+            safe_json_parse,
+        )
     except ImportError:
-        from agents.json_parser import extract_json_from_response, safe_json_parse
+        from agents.json_parser import (
+            extract_json_from_response,
+            extract_json_array_from_response,
+            safe_json_parse,
+        )
+
+
+def _strip_code_fence(text: str) -> str:
+    """LLM çıktısındaki ```json ... ``` çitini soyar; yoksa metni döner."""
+    if not isinstance(text, str):
+        return text
+    s = text.strip()
+    if s.startswith("```"):
+        # ilk satır (```json veya ```) ve son ``` blokunu temizle
+        first_nl = s.find("\n")
+        if first_nl != -1:
+            s = s[first_nl + 1:]
+        if s.rstrip().endswith("```"):
+            s = s.rstrip()[: -3].rstrip()
+    return s.strip()
+
+
+def _parse_array_field(raw: str, label: str = "field") -> List[Dict]:
+    """LLM string çıktısından array JSON çıkar; başarısızsa boş liste döner."""
+    if not raw:
+        return []
+    cleaned = _strip_code_fence(raw)
+    arr = extract_json_array_from_response(cleaned, default=[])
+    if arr:
+        return arr
+    obj = extract_json_from_response(cleaned, default={})
+    if isinstance(obj, dict):
+        for key in ("causes", "items", "data", "results"):
+            val = obj.get(key)
+            if isinstance(val, list):
+                return val
+    print(f"❌ _parse_array_field: '{label}' parse edilemedi (önizleme): "
+          f"{cleaned[:200]}")
+    return []
+
+
+def _parse_object_field(raw: str, label: str = "field") -> Dict:
+    """LLM string çıktısından object JSON çıkar; başarısızsa {} döner."""
+    if not raw:
+        return {}
+    cleaned = _strip_code_fence(raw)
+    obj = extract_json_from_response(cleaned, default={})
+    if obj:
+        return obj
+    print(f"❌ _parse_object_field: '{label}' parse edilemedi (önizleme): "
+          f"{cleaned[:200]}")
+    return {}
+
+try:
+    from .branch_critic import BranchCriticAgent
+except ImportError:
+    try:
+        from branch_critic import BranchCriticAgent
+    except ImportError:
+        from agents.branch_critic import BranchCriticAgent
 
 # Optional RAG
 try:
@@ -71,6 +138,42 @@ except Exception:
         print("⚠️  RAG pipeline not available (V3.1 static mode)")
 
 
+def _normalize_openrouter_api_base() -> str:
+    """OPENROUTER_BASE_URL; çift /v1 segmentlerini sadeleştirir."""
+    base = (os.getenv("OPENROUTER_BASE_URL") or "https://openrouter.ai/api/v1").strip().rstrip("/")
+    while "/v1/v1" in base:
+        base = base.replace("/v1/v1", "/v1", 1)
+    return base
+
+
+def _openrouter_litellm_model() -> str:
+    """LiteLLM, 'anthropic/...' modelini Anthropic /messages API'sine yönlendirir.
+    OpenRouter kullanırken mutlaka 'openrouter/anthropic/...' biçimi gerekir;
+    aksi halde yanlış yol (ör. .../v1/v1/messages) ve 404 HTML yanıtı oluşur."""
+    raw = (os.getenv("OPENROUTER_DSPY_MODEL") or "anthropic/claude-sonnet-4.5").strip()
+    if raw.startswith("openrouter/"):
+        return raw
+    return f"openrouter/{raw.lstrip('/')}"
+
+
+def _why1_question_seed(incident_summary: str, immediate_cause: Dict) -> str:
+    """Why-1 için LLM girdisi: zincir birincil zararlı mekanizmadan başlasın (A/B etiketi bağlamdır)."""
+    code = immediate_cause.get("code", "")
+    cause_tr = (immediate_cause.get("cause_tr") or "").strip()
+    title = (immediate_cause.get("standard_title_tr") or "").strip()
+    return (
+        "GÖREV — Why-1 (ilk 'Neden?'):\n"
+        "Olay özetindeki BİRİNCİL zararlı olay/tesir mekanizmasına odaklan. "
+        "Elektrik, ark, temas vb. söz konusuysa ilk soru, kişinin neden elektrik akımına kapıldığı / "
+        "enerjili iletken veya canlı devreye temas ettiği yönünde olmalıdır.\n"
+        "LOTO, izin, eğitim, eldiven eksikliği vb. bu ilk sorunun tek başına konusu olmamalı; "
+        "bunlar genelde bu mekanizmaya yanıt olarak sonraki 'Neden?' seviyelerinde ortaya çıkar.\n\n"
+        f"OLAY ÖZETİ:\n{incident_summary}\n\n"
+        f"Bu dal için A/B doğrudan neden (çeşitlendirme bağlamı; Why-1 sorusunu yalnızca buna göre "
+        f"daraltma): [{code}] {title} — {cause_tr}"
+    )
+
+
 # ============================================================================
 # DSPy SIGNATURES - 5-WHY CHAIN
 # ============================================================================
@@ -78,12 +181,17 @@ except Exception:
 class WhyQuestion(dspy.Signature):
     """5-Why zincirinde sonraki soruyu oluştur - önceki cevaptan türet"""
     incident_summary = dspy.InputField(desc="Olay özeti ve bağlamı")
-    previous_answer = dspy.InputField(desc="Önceki Why'ın cevabı")
+    previous_answer = dspy.InputField(
+        desc="Why-1: Birincil zararlı mekanizmaya odak talimatı + olay özeti + A/B bağlamı. "
+             "Why-2+: Bir önceki Why sorusunun cevabı."
+    )
     chain_level = dspy.InputField(desc="Zincir seviyesi (Why-1 ... Why-5)")
-    
+
     question = dspy.OutputField(
-        desc="Sonraki Why sorusu - önceki cevaptan DOĞRUDAN türetilmeli, "
-             "zincir kopmamalı"
+        desc="Why-1: Soru, olay özetindeki BİRİNCİL zararlı tesir üzerine olmalı (ör. elektrik olayında "
+             "'Neden elektrik akımına kapıldı / canlı devreye temas edildi?'). "
+             "İlk soru LOTO/izin gibi ikincil faktörle başlamamalı; onlar sonraki seviyelerde bağlanır. "
+             "Why-2+: Önceki cevaptan doğrudan türet, zincir kopmasın."
     )
 
 
@@ -111,7 +219,9 @@ class ImmediateCauseIdentifier(dspy.Signature):
     category_b_codes = dspy.InputField(desc="B Kategorisi (koşullar) kodlar")
     
     causes = dspy.OutputField(
-        desc="JSON listesi - max 5 neden: {code, standard_title_tr, category_type, cause_tr, evidence_tr}"
+        desc="JSON listesi - max 5 neden: {code, standard_title_tr, category_type, cause_tr, evidence_tr}. "
+             "İlk neden (causes[0]) mümkünse olayın BİRİNCİL zararlı tesir cümlesi olmalıdır "
+             "(ör. elektrik: akıma kapılma/canlı devreye temas); prosedür ihlalleri sonraki öğelerde."
     )
 
 
@@ -182,22 +292,13 @@ class ImmediateCauseFinder(dspy.Module):
             category_a_codes=category_a,
             category_b_codes=category_b
         )
-        
-        try:
-            causes = json.loads(result.causes)
-            if not isinstance(causes, list):
-                causes = causes.get("causes", [])
-        except Exception as e:
-            print(f"❌ ImmediateCauseFinder JSON parse error: {e}")
-            print(f"   Raw result: {str(result)[:300]}")
-            if hasattr(result, 'causes'):
-                print(f"   result.causes type: {type(result.causes)}")
-                print(f"   result.causes: {str(result.causes)[:500]}")
-            causes = []
-        
+
+        raw = getattr(result, "causes", "") or ""
+        causes = _parse_array_field(raw, label="ImmediateCauseFinder.causes")
+
         # Max 5 cause
         causes = causes[:5]
-        
+
         return {
             "causes": causes,
             "count": len(causes)
@@ -300,21 +401,36 @@ class WhyChain(dspy.Module):
         
         # Why 1-5 zinciri
         for level in range(1, 6):
-            # 1. SORU OLUŞTUR (önceki cevaptan türet)
+            # Why-1: A/B cümlesini "önceki cevap" sanma — birincil mekanizmaya (akıma kapılma vb.) sabitle
+            if level == 1:
+                previous_for_question = _why1_question_seed(incident_summary, immediate_cause)
+                level_label = "Why-1 — BİRİNCİL zararlı mekanizma (ör. elektrik: akıma kapılma/temas)"
+            else:
+                previous_for_question = current_answer
+                level_label = f"Why-{level}"
+
+            # 1. SORU OLUŞTUR (Why-1: mekanizma odaklı tohum; Why-2+: önceki cevaptan türet)
             question_result = self.why_question(
                 incident_summary=incident_summary,
-                previous_answer=current_answer,
-                chain_level=f"Why-{level}"
+                previous_answer=previous_for_question,
+                chain_level=level_label
             )
             question = question_result.question
             
             # 2. CEVAP OLUŞTUR
             taxonomy = taxonomy_c if level >= 4 else ""
             taxonomy = (taxonomy + "\n" + taxonomy_d) if level >= 5 else taxonomy
-            
+
+            incident_ctx = incident_summary
+            if level == 1:
+                incident_ctx = (
+                    "Why-1 cevabı, sorulan birincil zararlı mekanizmaya (ör. akıma kapılma, canlı devreye "
+                    "temas) doğrudan yanıt vermelidir; genel prosedür özeti değil.\n\n" + incident_summary
+                )
+
             answer_result = self.why_answer(
                 question=question,
-                incident_context=incident_summary,
+                incident_context=incident_ctx,
                 taxonomy_codes=taxonomy
             )
             answer = answer_result.answer
@@ -429,24 +545,35 @@ class RootCauseAgentV3_1:
     - Backward compatible V2.5 output format
     """
     
-    def __init__(self, use_rag: bool = False, enable_diversity_check: bool = True):
+    def __init__(
+        self,
+        use_rag: bool = False,
+        enable_diversity_check: bool = True,
+        enable_branch_critic: bool = True,
+        critic_jaccard_threshold: float = 0.55,
+        critic_max_regenerations: int = 3,
+    ):
         """
         Args:
             use_rag: RAG analyzer kullan (experimental)
-            enable_diversity_check: Semantic tekrar engelleme (recommended: True)
+            enable_diversity_check: Zincir içi semantic tekrar engelleme
+            enable_branch_critic: Dallar arası critic + regenerate katmanı
+            critic_jaccard_threshold: Dallar arası benzerlik eşiği (0..1)
+            critic_max_regenerations: Tek koşuda en fazla yeniden üretim sayısı
         """
         
-        # OpenAI/OpenRouter setup
+        # OpenAI/OpenRouter setup (OpenRouter OpenAI-compatible /chat/completions)
         api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        _api_base = _normalize_openrouter_api_base()
         self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
+            base_url=_api_base,
             api_key=api_key
         )
-        
-        # DSPy LM configuration (v3+ API)
+
+        # DSPy LM — model adı 'openrouter/...' olmalı (LiteLLM + OpenRouter)
         dspy_lm = dspy.LM(
-            model="openrouter/anthropic/claude-sonnet-4.5",
-            api_base="https://openrouter.ai/api/v1",
+            model=_openrouter_litellm_model(),
+            api_base=_api_base,
             api_key=api_key,
             max_tokens=4000
         )
@@ -456,7 +583,24 @@ class RootCauseAgentV3_1:
         self.immediate_cause_finder = ImmediateCauseFinder()
         self.why_chain = WhyChain(enable_diversity_check=enable_diversity_check)
         self.meta_synthesizer = MetaRootCauseSynthesizer()
-        
+
+        # Branch critic (dallar arası tekrar engelleme)
+        self.enable_branch_critic = enable_branch_critic
+        self.branch_critic: Optional[BranchCriticAgent] = None
+        if enable_branch_critic:
+            try:
+                self.branch_critic = BranchCriticAgent(
+                    taxonomy_cd_text=(
+                        get_category_text("C") + "\n" + get_category_text("D")
+                    ),
+                    jaccard_threshold=critic_jaccard_threshold,
+                    use_llm_critic=True,
+                    max_regenerations=critic_max_regenerations,
+                )
+            except Exception as e:  # noqa: BLE001
+                print(f"⚠️  BranchCritic init başarısız: {e}")
+                self.branch_critic = None
+
         # RAG (optional)
         self.use_rag = use_rag
         self.rag_analyzer = None
@@ -468,7 +612,11 @@ class RootCauseAgentV3_1:
                 print(f"⚠️  RAG init başarısız: {e}")
                 print("   V3.1 static mode devam ediyor")
         else:
-            print("✅ Root Cause Agent V3.1 başlatıldı (DSPy powered, RAG disabled)")
+            critic_state = "ON" if self.branch_critic else "OFF"
+            print(
+                "✅ Root Cause Agent V3.1 başlatıldı "
+                f"(DSPy powered, RAG disabled, BranchCritic: {critic_state})"
+            )
     
     # ─────────────────────────────────────────────────────────────────────────
     # MAIN ENTRY POINT
@@ -580,7 +728,45 @@ class RootCauseAgentV3_1:
         print("✅ TÜM DALLAR TAMAMLANDI!")
         print(f"Ortalama Zincir Kalitesi: {sum(rca_data['chain_quality_scores']) / len(rca_data['chain_quality_scores']):.2%}")
         print("=" * 80)
-        
+
+        # ADIM 2.5: Branch Critic (dallar arası tekrar engelleme + regenerate)
+        if self.branch_critic and len(rca_data["analysis_branches"]) > 1:
+            print("\n" + "=" * 80)
+            print("🧪 ADIM 2.5: DAL TEKRAR KONTROLÜ (BranchCritic)")
+            print("=" * 80)
+            try:
+                critic_report = self.branch_critic.review(
+                    branches=rca_data["analysis_branches"],
+                    incident_summary=incident_summary,
+                )
+                rca_data["branch_critic_report"] = critic_report
+                # Final root cause listesini düzeltilmiş dallardan yeniden oluştur
+                rca_data["final_root_causes"] = [
+                    b.get("root_cause", {})
+                    for b in rca_data["analysis_branches"]
+                    if b.get("root_cause")
+                ]
+                # used_root_codes'u da güncel tut (meta synthesis için)
+                used_root_codes = [
+                    rc.get("code")
+                    for rc in rca_data["final_root_causes"]
+                    if rc.get("code")
+                ]
+                regen = critic_report.get("regenerated_count", 0)
+                div = critic_report.get("diversity_score", 1.0)
+                print(
+                    f"  ✅ BranchCritic tamamlandı | "
+                    f"yeniden üretilen dal: {regen} | "
+                    f"çeşitlilik skoru: {div:.2f}"
+                )
+                if critic_report.get("regenerated_branches"):
+                    print(
+                        "  🔁 Yeniden üretilen dallar: "
+                        f"{critic_report['regenerated_branches']}"
+                    )
+            except Exception as e:  # noqa: BLE001
+                print(f"⚠️  BranchCritic çalıştırılamadı: {type(e).__name__}: {e}")
+
         # ADIM 3: Meta synthesis (optional)
         if synthesize_meta_root and len(rca_data["final_root_causes"]) > 1:
             print("\n" + "=" * 80)
