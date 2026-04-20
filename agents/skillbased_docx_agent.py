@@ -24,10 +24,13 @@ import os
 import sys
 import re
 import time
+import copy
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
+
+from .model_constants import OPENROUTER_DOCX_DEFAULT_MODEL
 
 load_dotenv()
 
@@ -1000,7 +1003,7 @@ class SkillBasedDocxAgent:
         if not key:
             raise ValueError("OPENROUTER_API_KEY bulunamadı! .env dosyasına ekleyin.")
         self.api_key = key
-        self.model = (os.getenv("OPENROUTER_DOCX_MODEL") or "anthropic/claude-sonnet-4.5").strip()
+        self.model = (os.getenv("OPENROUTER_DOCX_MODEL") or OPENROUTER_DOCX_DEFAULT_MODEL).strip()
         self.api_url = _resolve_openrouter_chat_completions_url()
         print(f" SkillBasedDocxAgent V2 hazır (OpenRouter {self.model})")
         print(f"   API: {self.api_url}")
@@ -1152,77 +1155,104 @@ class SkillBasedDocxAgent:
         print("-" * 50)
 
         minimal = {"cover": {"title": "KÖK NEDEN ANALİZİ RAPORU"}}
-        try:
-            response = requests.post(
-                self.api_url,
-                headers=headers,
-                json=base_payload,
-                timeout=600
-            )
-
-            # Bazı modeller response_format ile 400 döndürebilir — bir kez düz istekle yeniden dene
-            if response.status_code == 400 and use_json_object:
-                detail = (response.text or "")[:500]
-                print(
-                    f"\n  ⚠️  response_format(json_object) reddedildi (400), "
-                    f"format olmadan tekrar deneniyor...\n  Sunucu: {detail}"
-                )
-                retry_payload = {k: v for k, v in base_payload.items() if k != "response_format"}
+        def _request_and_parse(payload: Dict, label: str) -> Optional[Dict]:
+            try:
                 response = requests.post(
                     self.api_url,
                     headers=headers,
-                    json=retry_payload,
+                    json=payload,
                     timeout=600
                 )
 
-            if not response.ok:
-                snippet = (response.text or "")[:1200].replace("\n", " ")
-                print(f"\n OpenRouter HTTP {response.status_code} — URL: {self.api_url}")
-                print(f" Yanıt özeti: {snippet}")
-                print("-" * 50)
-                return minimal
+                # Bazı modeller response_format ile 400 döndürebilir — bir kez düz istekle yeniden dene
+                if response.status_code == 400 and use_json_object and "response_format" in payload:
+                    detail = (response.text or "")[:500]
+                    print(
+                        f"\n  ⚠️  [{label}] response_format(json_object) reddedildi (400), "
+                        f"format olmadan tekrar deneniyor...\n  Sunucu: {detail}"
+                    )
+                    retry_payload = {k: v for k, v in payload.items() if k != "response_format"}
+                    response = requests.post(
+                        self.api_url,
+                        headers=headers,
+                        json=retry_payload,
+                        timeout=600
+                    )
 
-            try:
-                result = response.json()
-            except ValueError:
-                snippet = (response.text or "")[:1200].replace("\n", " ")
-                print("\n OpenRouter yanıtı JSON değil (HTML veya hata sayfası olabilir).")
-                print(f" URL: {self.api_url}")
-                print(f" Önizleme: {snippet}")
-                print("-" * 50)
-                return minimal
-
-            err_obj = result.get("error")
-            if err_obj:
-                print(f"\n OpenRouter API error: {err_obj}")
-                print("-" * 50)
-                return minimal
-
-            if "choices" in result and len(result["choices"]) > 0:
-                full_text = result["choices"][0].get("message", {}).get("content", "") or ""
-
-                if not full_text.strip():
-                    print("\n OpenRouter: choices[0].message.content boş.")
+                if not response.ok:
+                    snippet = (response.text or "")[:1200].replace("\n", " ")
+                    print(f"\n OpenRouter HTTP {response.status_code} — URL: {self.api_url} [{label}]")
+                    print(f" Yanıt özeti: {snippet}")
                     print("-" * 50)
-                    return minimal
+                    return None
 
-                # İçeriği ekrana yazdır (debug için)
-                print(full_text[:500] + "..." if len(full_text) > 500 else full_text)
-                print(f"\n Toplam karakter: {len(full_text)}")
+                try:
+                    result = response.json()
+                except ValueError:
+                    snippet = (response.text or "")[:1200].replace("\n", " ")
+                    print("\n OpenRouter yanıtı JSON değil (HTML veya hata sayfası olabilir).")
+                    print(f" URL: {self.api_url}")
+                    print(f" [{label}] Önizleme: {snippet}")
+                    print("-" * 50)
+                    return None
+
+                err_obj = result.get("error")
+                if err_obj:
+                    print(f"\n OpenRouter API error [{label}]: {err_obj}")
+                    print("-" * 50)
+                    return None
+
+                if "choices" in result and len(result["choices"]) > 0:
+                    full_text = result["choices"][0].get("message", {}).get("content", "") or ""
+
+                    if not full_text.strip():
+                        print(f"\n OpenRouter: choices[0].message.content boş [{label}].")
+                        print("-" * 50)
+                        return None
+
+                    # İçeriği ekrana yazdır (debug için)
+                    print(full_text[:500] + "..." if len(full_text) > 500 else full_text)
+                    print(f"\n Toplam karakter: {len(full_text)}")
+                    print("-" * 50)
+
+                    return self._parse_json_response(full_text)
+
+                print(f"\n Geçersiz API yanıtı (choices yok) [{label}]: {str(result)[:800]}")
                 print("-" * 50)
+                return None
 
-                return self._parse_json_response(full_text)
+            except requests.exceptions.RequestException as e:
+                print(f"\n OpenRouter API hatası [{label}]: {e}")
+                print("-" * 50)
+                return None
 
-            print(f"\n Geçersiz API yanıtı (choices yok): {str(result)[:800]}")
-            print("-" * 50)
-            return minimal
+        # 1) İlk deneme
+        parsed = _request_and_parse(base_payload, "attempt-1")
+        if parsed:
+            return parsed
 
-        except requests.exceptions.RequestException as e:
-            print(f"\n OpenRouter API hatası: {e}")
-            print("-" * 50)
-            return minimal
+        # 2) Parse/format bozuksa, daha katı prompt ve düşük temperature ile bir kez yeniden dene
+        retry_payload = copy.deepcopy(base_payload)
+        retry_payload["temperature"] = 0.0
+        retry_payload["messages"] = list(base_payload.get("messages", []))
+        retry_user_msg = (
+            user_msg
+            + "\n\nÖNEMLİ: Önceki yanıt geçersiz JSON idi. "
+              "Bu kez SADECE tek bir geçerli JSON nesnesi döndür. "
+              "Eksik virgül, kapanmayan tırnak, trailing comma, markdown/code fence ekleme."
+        )
+        if len(retry_payload["messages"]) >= 2:
+            retry_payload["messages"][1] = {"role": "user", "content": retry_user_msg}
 
-    def _parse_json_response(self, text: str) -> Dict:
+        print("  🔁 İlk deneme parse edilemedi, katı JSON modunda ikinci deneme yapılıyor...")
+        parsed_retry = _request_and_parse(retry_payload, "attempt-2")
+        if parsed_retry:
+            return parsed_retry
+
+        print("  ⚠️  Tüm denemeler başarısız, minimal içeriğe düşülüyor.")
+        return minimal
+
+    def _parse_json_response(self, text: str) -> Optional[Dict]:
         last_error: Optional[Exception] = None
         stripped = (text or "").strip()
 
@@ -1283,8 +1313,7 @@ class SkillBasedDocxAgent:
         print(f"     baş: {head}")
         if tail:
             print(f"     son: {tail}")
-        print("  ⚠️  Minimal içeriğe düşülüyor (rapor boş çıkacak).")
-        return {"cover": {"title": "KOK NEDEN ANALİZİ RAPORU"}}
+        return None
 
     def _build_docx(self, content: Dict, output_path: str, lang: Optional[Dict] = None) -> None:
         lang = lang or {"code": "tr", "name": "Turkish", "rtl": False}

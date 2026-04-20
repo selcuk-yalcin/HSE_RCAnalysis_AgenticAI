@@ -113,6 +113,8 @@ def _parse_object_field(raw: str, label: str = "field") -> Dict:
           f"{cleaned[:200]}")
     return {}
 
+from .model_constants import OPENROUTER_DEFAULT_CHAT_MODEL
+
 try:
     from .branch_critic import BranchCriticAgent
 except ImportError:
@@ -150,7 +152,7 @@ def _openrouter_litellm_model() -> str:
     """LiteLLM, 'anthropic/...' modelini Anthropic /messages API'sine yönlendirir.
     OpenRouter kullanırken mutlaka 'openrouter/anthropic/...' biçimi gerekir;
     aksi halde yanlış yol (ör. .../v1/v1/messages) ve 404 HTML yanıtı oluşur."""
-    raw = (os.getenv("OPENROUTER_DSPY_MODEL") or "anthropic/claude-sonnet-4.5").strip()
+    raw = (os.getenv("OPENROUTER_DSPY_MODEL") or OPENROUTER_DEFAULT_CHAT_MODEL).strip()
     if raw.startswith("openrouter/"):
         return raw
     return f"openrouter/{raw.lstrip('/')}"
@@ -621,6 +623,56 @@ class RootCauseAgentV3_1:
     # ─────────────────────────────────────────────────────────────────────────
     # MAIN ENTRY POINT
     # ─────────────────────────────────────────────────────────────────────────
+
+    def _determine_immediate_cause_limit(self, part2_data: Dict) -> int:
+        """
+        Olay ciddiyetine göre immediate-cause (dolayısıyla root-cause dalı) limitini belirle.
+        Hedef: düşük ciddiyette daha az dal (2), yüksek ciddiyette daha fazla dal (5).
+
+        Öncelik:
+          1) type_of_event (frontend kullanıcı seçimi)
+          2) investigation.level
+          3) actual_potential_harm
+        """
+        event_type = str(part2_data.get("type_of_event", "")).strip().lower()
+        investigation_level = (
+            str((part2_data.get("investigation", {}) or {}).get("level", ""))
+            .strip()
+            .lower()
+        )
+        severity_text = str(part2_data.get("actual_potential_harm", "")).strip().lower()
+
+        # Frontend event type önceliği (kullanıcı seçimi)
+        # İstenen davranış: Ramak Kala = 2, diğer tiplerde duruma göre artan dal sayısı.
+        if any(k in event_type for k in ("ramak kala", "near-miss", "near miss")):
+            return 2
+        if any(k in event_type for k in ("güvensiz durum", "guvensiz durum", "undesired circumstance")):
+            return 3
+        if any(k in event_type for k in ("maddi hasar", "property damage", "damage")):
+            return 4
+        if any(k in event_type for k in ("kaza", "accident", "ill health")):
+            return 5
+
+        if "high" in investigation_level:
+            return 5
+        if "medium" in investigation_level:
+            return 4
+        if "low" in investigation_level:
+            return 3
+        if "basic" in investigation_level:
+            return 2
+
+        if "fatal" in severity_text or "major" in severity_text:
+            return 5
+        if "serious" in severity_text:
+            return 4
+        if "minor" in severity_text:
+            return 3
+        if "damage only" in severity_text:
+            return 2
+
+        # Bilgi yoksa varsayılan: kapsamlı analiz
+        return 5
     
     def analyze_root_causes(
         self,
@@ -664,6 +716,10 @@ class RootCauseAgentV3_1:
         )
         
         immediate_causes = immediate_causes_result["causes"]
+        cause_limit = self._determine_immediate_cause_limit(part2_data)
+        immediate_causes = immediate_causes[:cause_limit]
+        rca_data["immediate_cause_limit"] = cause_limit
+        print(f"🎚️  Ciddiyete göre dal limiti: {cause_limit}")
         
         if not immediate_causes:
             print("❌ Doğrudan neden bulunamadı!")
