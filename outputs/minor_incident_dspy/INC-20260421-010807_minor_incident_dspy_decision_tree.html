@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {size: A4 landscape; margin: 3mm; }
+        * {box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }
+        body {display: flex; flex-direction: column; padding: 3px; height: 100vh; }
+        header {text-align: center; flex-shrink: 0; padding: 3px 0; }
+        header .top-title {font-size: 11px; font-weight: bold; color: #333; margin-bottom: 1px; }
+        header h1 {font-size: 13px; font-weight: bold; color: #111; margin-bottom: 1px; }
+        header .subtitle {font-size: 10px; color: #666; margin-bottom: 1px; }
+        .legend {text-align: center; font-size: 9px; color: #555; padding: 2px 4px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; margin-bottom: 3px; }
+        #diagram-wrap {flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; width: 100%; height: calc(100vh - 60px); }
+        #diagram-wrap .mermaid {width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #diagram-wrap svg {max-width: 98% !important; max-height: 98% !important; height: auto !important; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>**Why-1: Çalışan neden işlenen parçanın keskin talaş<br/>yüzeyine doğrudan temas ederek elle hizalama işlemini<br/>gerçekleştirebildi?** (Alternatif formülasyon: Neden<br/>çalışan, dönen/işlenen parçaya doğrudan el ile<br/>erişebilmiş ve keskin talaş yüzeyine temas etmiştir?)"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Çalışan keskin talaş yüzeyine doğrudan temas ederek<br/>elle hizalama işlemini gerçekleştirebildi, çünkü: 1.<br/>**Birincil neden**: Torna tezgâhının koruyucu bariyeri<br/>tam kapalı değildi. Bu, işlenen parçaya ve keskin<br/>talaslarına fiziksel erişimi engelleyen tasarımsal<br/>kontrol mekanizmasının başarısız olması anlamına gelir.<br/>2. **Operasyonel neden**: Hizalama işleminin doğası<br/>gereği, çalışanın işlenen parçaya yakın konumda<br/>çalışması gereklidir; bu da kapalı olmayan bariyer<br/>nedeniyle doğrudan temas riskini yaratır. 3. **İkincil<br/>neden**: Kullanılan standart eldiven, keskin<br/>talaşlardan koruma sağlayacak özellikte değildir."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden torna tezgâhının koruyucu bariyeri (T-12) o anda<br/>tam kapalı durumda değildi? (Tasarımsal eksiklik mi,<br/>bakım/kontrol yetersizliği mi, yoksa hizalama işlemi<br/>sırasında operatör tarafından açık bırakılmış mı?)"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["Koruyucu bariyerin (T-12) tam kapalı durumda<br/>olmamasının nedenleri çok faktörlüdür: **Birincil Neden<br/>— Operatör Davranışı**: Çalışan parçayı 'elle<br/>hizalarken' bariyeri tam kapalı tutmadığından, iş<br/>akışını hızlandırmak veya parçaya daha iyi erişim<br/>sağlamak amacıyla bariyeri kısmen açık bırakmış<br/>olabilir. **İkincil Neden — Prosedür/Tasarım<br/>Eksikliği**: Hizalama işlemi için bariyerin açık<br/>kalmasının gerekli veya kabul edilen bir uygulama<br/>olması, prosedürel boşluğa işaret eder. Güvenli<br/>hizalama yöntemi tanımlanmamıştır. **Üçüncü Neden —<br/>Bakım/Kontrol Yetersizliği**: Bariyerin tutuşması,"]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden operatör, hizalama işlemi için bariyeri tam<br/>kapalı tutmanın gerekli olduğunu bilmiyordu veya bu<br/>talimatı uygulamıyordu — eğitim eksikliği mi, prosedür<br/>netliğinin yetersizliği mi, yoksa hizalama işleminin<br/>zaman baskısı altında bariyerin açık tutulmasının<br/>'normal pratik' haline gelmesinden mi kaynaklanıyordu?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Operatörün bariyeri tam kapalı tutmama nedenleri<br/>muhtemelen üç faktörün kombinasyonundan<br/>kaynaklanmaktadır: 1. **Prosedür Netliğinin<br/>Yetersizliği**: Hizalama işlemi sırasında bariyerin tam<br/>kapalı kalması gerekliliğinin yazılı talimatlarında ne<br/>kadar açık ve vurgulı olduğu belirsizdir. 'Hafif<br/>hizalama' işlemleri için bariyerin açık<br/>tutulabileceğine dair gayri resmi uygulamaların varlığı<br/>muhtemeldir. 2. **Eğitim Eksikliği**: Operatöre bu<br/>torna tezgâhı için yeterli güvenlik eğitimi verilmiş<br/>olup olmadığı, özellikle hizalama işleminin kritik<br/>güvenlik adımları ve bariyerin rolü konusunda eğitim"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden hizalama işlemleri sırasında bariyerin açık<br/>tutulmasının gayri resmi bir uygulama haline gelmesine<br/>ve bu uygulamanın yönetim tarafından<br/>kontrol/düzeltilmeden devam etmesine izin verilmiştir?<br/>(İş hızı baskısı, eksik denetim, prosedür güncelleme<br/>eksikliği, eğitim izlemesinin yetersizliği, risk<br/>algısının düşük seviyede olması vb. faktörlerin ne<br/>olduğu)"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Bariyerin açık tutulmasının gayri resmi uygulama<br/>haline gelmesine izin verilmesinin kök sebepleri,<br/>aşağıdaki sistemik ve yönetimsel eksikliklerin<br/>kombinasyonundan kaynaklanmaktadır: 1. **Denetim ve<br/>Uygulamayı Sağlama Mekanizmalarının Yetersizliği**:<br/>Yönetim, çalışanların prosedürden sapmasını izlemek,<br/>tespit etmek ve düzeltmek için etkin bir sistem<br/>kurmamıştır. Gayri resmi uygulamanın varlığı, rutin<br/>gözetim ve auditlerin eksikliğini gösterir. 2.<br/>**Prosedürün Formalitede Kalması**: Yazılı güvenlik<br/>prosedürü mevcut olmasına rağmen, uygulamada ('çalışma<br/>kültürü') bariyerin açık tutulması normalize"]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Bu yazılı güvenlik prosedürlerinin (bariyer<br/>kapatılması) çalışanlar tarafından sistem olarak<br/>uygulanmasını sağlamak ve uyumsuzluğu tespit/düzeltmek<br/>için, yönetim tarafından etkin bir gözetim, denetim ve<br/>cezalandırma mekanizması neden kurulmamış veya<br/>uygulanamamıştır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A8 --> Q9
+    A10["Yönetim tarafından yazılı güvenlik prosedürlerinin<br/>(bariyer kapatılması) uygulanmasını sağlamak için<br/>sistematik bir gözetim, denetim ve cezalandırma<br/>mekanizması kurulmamıştır. Olay analizi göstermektedir<br/>ki: 1. **Sistematik Denetim Mekanizmasının Eksikliği**:<br/>Bariyer kapatılması prosedürünün uygulanıp<br/>uygulanmadığını belirlemek, dokümante etmek ve<br/>uyumsuzluğu tespit etmek için hiçbir audit, kontrol<br/>listesi veya periyodik denetim programı<br/>bulunmamaktadır. 2. **Uyumsuzluğu Düzeltme Prosesinin<br/>Yokluğu**: Koruyucu bariyer tam kapalı olmadığında veya<br/>standart eldiven gibi uygun olmayan koruyucu donanım"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN (D9.5 - Monitoring/Audit Inadequate (Sistematik Prosedür Uyum Denetimi Eksikliği)
+
+İkincil: D1.3 - Lack of Accountability (Uyumsuzluğu tespit etme ve cezalandırma mekanizmasının eksikliği)):</b><br/>Kök Neden<br/>Yönetim tarafından yazılı güvenlik<br/>prosedürlerinin (bariyer kapatılması)<br/>uygulanmasını sağlamak için sistematik bir<br/>gözetim, denetim ve cezalandırma mekanizması<br/>kurulmamıştır. Olay analizi göstermektedir ki: 1.<br/>**Sistematik Denetim Mekanizmasının Eksikliği**:<br/>Bariyer kapatılması prosedürünün uygulanıp<br/>uygulanmadığını belirlemek, dokümante etmek ve<br/>uyumsuzluğu tespit etmek için hiçbir audit,<br/>kontrol listesi veya periyodik denetim programı<br/>bulunmamaktadır. 2. **Uyumsuzluğu Düzeltme<br/>Prosesinin Yokluğu**: Koruyucu bariyer tam kapalı"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden çalışan, torna parçasını elle hizalarken,<br/>koruyucu bariyer tarafından engellenmeden keskin talaş<br/>yüzeyine doğrudan temas edebildi?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q11
+    A12["Çalışan, keskin talaş yüzeyine doğrudan temas edebildi<br/>çünkü koruyucu bariyer tam kapalı değildi. Tasarımsal<br/>veya bakımsal bir eksiklik nedeniyle, üretim süreci<br/>sırasında keskin yüzeylere fiziksel erişim<br/>engellenmedi. Standart eldivenlerin kesilmeye dayanıklı<br/>olmaması ise yaralanmanın şiddeti açısından ikincil bir<br/>faktördür."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Koruyucu bariyer neden tam kapalı değildi? (Tasarımsal<br/>yetersizlik mi, bakım/onarım eksikliği mi, yanlış<br/>kurulum mu, yoksa işletme sırasında kasıtlı/kasıtsız<br/>olarak açılmış/kaldırılmış mı?)"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Koruyucu bariyer tam kapalı olmama sebebi, olay<br/>raporunda açıkça belirtilmemişse de, mevcut kanıtlar<br/>işletme sırasında kasıtsız açılma/kaldırılma<br/>olasılığını işaret etmektedir. Bunun nedenleri: -<br/>Parçayı hizalama işlemi sırasında bariyer kısmi açılmış<br/>olabilir - İş hızlandırma veya kolaylık amaçlı kasıtsız<br/>açılma - Tasarımsal yetersizlik (bariyer kolay<br/>açılabilir) veya bakım kaydı yokluğu Kesinlikle<br/>belirlenmesi için: Bariyer tasarım dökümanları,<br/>bakım/onarım kayıtları, ve operatör mülakat<br/>yapılmalıdır."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Bariyer işletme sırasında kısmi<br/>açılmasına/kaldırılmasına neden olan temel faktör nedir<br/>— tasarımsal bir hata (bariyer kolay açılabilir),<br/>eğitim/prosedür boşluğu (operatöre güvenli hizalama<br/>yöntemi öğretilmedi), işletme baskısı (hız/verimlilik<br/>hedefleri bariyer kullanımı atlattırmış), yoksa diğer<br/>sistem faktörü?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Temel faktörler **eğitim/prosedür boşluğu ve sistem<br/>düzeyinde KKD sağlama eksikliğidir**. Rapordan açık<br/>olarak: 1. **Prosedür Boşluğu**: Operatöre parçayı<br/>güvenli hizalama yöntemi (bariyer tamamen kapalıyken<br/>hizalama veya uygun uçlar/fikstürler kullanarak)<br/>öğretilmemiş veya uygulanmamıştır. 2. **KKD<br/>Eksikliği**: 'Standart eldiven (kesilmeye dayanıklı<br/>değil)' kullanılması, operatöre keskin talaş ve kenar<br/>karşısında uygun koruyucu ekipman sağlanmadığını<br/>gösterir. 3. **Güvenlik Kontrol Zayıflığı**: Bariyer<br/>tam kapalı olmadığı halde çalışmaya devam edilmesi,<br/>işletme prosedürlerinin uygulanmadığını veya eksik"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Neden torna tezgâhında keskin talaş ve kenar işlemleri<br/>için uygun koruyucu ekipman (kesilmeye dayanıklı<br/>eldiven, kenar koruyucusu vb.) ve güvenli hizalama<br/>prosedürü tanımlanmamış, uygulanmamış veya<br/>denetlenemiş?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A16 --> Q17
+    A18["Torna tezgâhında keskin talaş işlemleri için uygun<br/>koruyucu ekipman ve güvenli hizalama prosedürü<br/>tanımlanmamış, uygulanmamış ve denetlenememesinin kök<br/>nedeni: **İş Sağlığı Yetkinliği Değerlendirmesinin<br/>Yetersizliği (C3.1)** Çalışan, 'elle parça hizalama'<br/>görevinde kesik riski ile ilgili yeterli beceri, bilgi<br/>ve davranış standartlarının değerlendirilmemiştir.<br/>Sonuç olarak: 1. **PPE Seçimi Eksikliği**: Keskin talaş<br/>işlemleri için kesilmeye dayanıklı eldiven<br/>(Cut-resistant gloves EN 388 Grade 3+) seçimi<br/>yapılmamış; standart eldiven kullanılmıştır. 2.<br/>**Prosedür Tanımlanmamışlığı**: 'Keskin talaş hizalama"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Çalışanların 'keskin talaş işlemleri sırasında uygun<br/>PPE seçimi ve güvenli hizalama prosedürü' konusunda<br/>yetkinliğinin değerlendirilmemesinin kök sebebi nedir?<br/>(Örneğin: Yetkinlik değerlendirme standardı/prosedürü<br/>tanımlanmamış mı? İş Sağlığı ekibi veya eğitim<br/>sorumlusu atanmamış mı? Risk değerlendirmesi yapılmamış<br/>mı? Denetim/takip sistemi eksik mi?)"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Çalışanların keskin talaş işlemleri sırasında uygun<br/>PPE seçimi ve güvenli hizalama prosedürü konusundaki<br/>yetkinliğinin değerlendirilmemesinin kök sebepleri: 1.<br/>**Yetkinlik Değerlendirme Standardı/Prosedürü<br/>Tanımlanmamış (D3.1 + C3.1)**: Rapordan, torna işlemi<br/>yapan çalışanın bu kritik görev için yetkinliği<br/>değerlendirilmiş olup olmadığı anlaşılmamaktadır.<br/>Keskin talaş ve PPE seçimi gibi teknik konularda formal<br/>değerlendirme sistemi yoktur. 2. **Risk Değerlendirmesi<br/>Eksik/Yetersiz (D4.1)**: Torna tezgâhında keskin talaş<br/>yüzeylerle çalışmanın risk analizi yapılmamış veya<br/>yetersiz yapılmıştır. PPE gereksinimleri (kesilmeye"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN (Birden fazla kod uygulanabilir:
+- **C3.1**: Yetkinlik Değerlendirmesi Yetersiz (çalışanın keskin talaş PPE/prosedürü konusunda yetkinliği değerlendirilmemiş)
+- **D3.1**: Eğitim Verilmemiş (keskin talaş işlemlerine özgü eğitim prosedürü/standart bulunmuyor)
+- **D4.1**: Risk Değerlendirmesi Yetersiz (keskin talaş hazardları ve PPE gereksinimleri analiz edilmemiş)
+- **D9.1**: SPP Eksik (keskin talaş işlemi prosedürü tanımlanmamış)
+- **D9.5**: Uyum Denetim Sistemi Eksik (bariyerler açıkken çalışma devam etti, gözlem yoktu)
+- **D1.2**: Çalışan Düzeyinde Denetim Yetersiz (koruyucu bariyer tam kapalı değilken müdahale edilmedi)
+
+**Birincil Kök Sebep: D9.1 + D4.1 + C3.1** (Prosedür yoktur, risk değerlendirmesi eksiktir, yetkinlik değerlendirilmemiştir)):</b><br/>Kök Neden<br/>Çalışanların keskin talaş işlemleri sırasında<br/>uygun PPE seçimi ve güvenli hizalama prosedürü<br/>konusundaki yetkinliğinin değerlendirilmemesinin<br/>kök sebepleri: 1. **Yetkinlik Değerlendirme<br/>Standardı/Prosedürü Tanımlanmamış (D3.1 + C3.1)**:<br/>Rapordan, torna işlemi yapan çalışanın bu kritik<br/>görev için yetkinliği değerlendirilmiş olup<br/>olmadığı anlaşılmamaktadır. Keskin talaş ve PPE<br/>seçimi gibi teknik konularda formal değerlendirme<br/>sistemi yoktur. 2. **Risk Değerlendirmesi<br/>Eksik/Yetersiz (D4.1)**: Torna tezgâhında keskin<br/>talaş yüzeylerle çalışmanın risk analizi"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden çalışan, torna tezgâhındaki işlenen parçanın<br/>keskin talaş yüzeyine doğrudan el ile temas etmiştir?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q21
+    A22["Çalışan torna tezgâhındaki işlenmiş parçanın keskin<br/>talaş yüzeyine doğrudan el ile temas etmiştir çünkü<br/>koruyucu bariyer tam kapalı değildi. Parça hizalama<br/>işlemi sırasında fiziksel engelleme mekanizması aktif<br/>değildi ve çalışan engelsiz şekilde keskin yüzeye<br/>ulaşabilmiştir. Ek olarak, kullanılan standart eldiven<br/>kesilmeye dayanıklı olmadığından, kişisel koruyucu<br/>ekipman bu tehlikeyi önleyememiştir."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden koruyucu bariyer tam kapalı haldeyken veya<br/>açılıp kapatılması kontrollü şekilde yapılırken,<br/>çalışan parça hizalama işlemini<br/>gerçekleştirememektedir? Başka bir deyişle, hizalama<br/>işleminin yapılması için bariyer devre dışı bırakılması<br/>mı gerekmektedir, yoksa bariyer tasarımı veya prosedürü<br/>bu işlemi engel mi oluşturmaktadır?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Koruyucu bariyer tasarımı veya mevcut prosedürü, parça<br/>hizalama işlemini tam kapalı durumda yapmayı<br/>engellemektedir. Bariyer tam kapalıyken hizalama<br/>yapılamadığı için, çalışan bariyer koruyuculuğunu eksik<br/>halde (tam kapalı olmayan durumda) işlem<br/>gerçekleştirmek zorunda kalmıştır. Bu, tasarım kusuru<br/>veya prosedürel yetersizlik nedeniyle güvenlik<br/>kontrolleri ile üretim ihtiyaçlarının çatışması<br/>sonucudur. Sorunu çözmek için: (1) bariyer tasarımı<br/>değiştirilerek hizalama işlemi kapalı durumda<br/>yapılabilir hale getirilmeli, (2) alternatif hizalama<br/>yöntemi geliştirilmeli, veya (3) ekipman değiştirilmeli"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden torna tezgâhı (T-12) koruyucu bariyer tasarımı<br/>veya mevcut işlem prosedürü, parça hizalama işleminin<br/>tamamı kapalı güvenlik bariyer altında<br/>gerçekleştirilmesine izin vermemektedir? (Tasarım<br/>kararı sırasında hangi kısıtlamalar/gereksinimler göz<br/>önüne alınmış veya hangi faktörler göz ardı<br/>edilmiştir?)"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A24 --> Q25
+    A26["Torna tezgâhı T-12'nin koruyucu bariyer tasarımı,<br/>parça hizalama işleminin tam kapalı güvenlik bariyer<br/>altında gerçekleştirilmesine aşağıdaki nedenlerden<br/>dolayı izin vermemektedir: 1. **Operatör görüş<br/>gereksinimiği**: Hassas parça hizalaması için doğrudan<br/>görsel kontrol ihtiyacı 2. **İşlem ergonomisi**:<br/>Operatörün erişim ve hareket özgürlüğü gereksinimi 3.<br/>**Tasarım yaşı ve standart güncelliği**: T-12 tezgâhı<br/>muhtemelen modern risk değerlendirmesi öncesi<br/>tasarlanmış olup, ISO 13850/EN ISO 12100<br/>standartlarındaki güncel makine güvenliği<br/>gereksinimlerini karşılamamaktadır 4. **Prosedürel"]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Kesme/puncture dirençli eldiven kullanımı ve parça<br/>hizalama sırasında ek kişisel koruma ekipmanları<br/>(kesintisiz göğüs/kol koruyucu) uygulanmasının neden<br/>zorunlu kılınmadığı ve/veya mevcut prosedürlerde bu<br/>koruyucu önlemlerin neden eksik bırakıldığının nedeni<br/>nedir?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A26 --> Q27
+    A28["Kesme/puncture dirençli eldiven ve ek koruma<br/>ekipmanlarının (kesintisiz göğüs/kol koruyucu)<br/>kullanımının zorunlu kılınmadığının nedeni, iş riski<br/>değerlendirmesinin eksik yapılması, çalışanın torna<br/>parçası hizalama işi sırasında maruz kalacağı<br/>kesme/delinme riskleri hakkında yeterli<br/>bilgilendirilmemesi ve mevcut prosedürlerde bu koruyucu<br/>önlemlerin açıkça tanımlanmamış olmasıdır. Standart<br/>eldiven kullanılması, keskin talaş yüzeyine karşı<br/>yetersiz korumanın göstergesidir. Bu, beceri<br/>değerlendirmesi sırasında çalışanın görevini güvenli<br/>bir şekilde yerine getirebilmesi için gerekli KKE"]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Neden torna tezgâhı görevleri için periyodik risk<br/>değerlendirmesi ve KKE prosedür güncellemeleri yönetim<br/>tarafından sistemli olarak yapılmamakta ve çalışanlar<br/>için tehlikeli görevlerdeki güvenlik standartları<br/>düzenli olarak denetlenmemektedir?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A28 --> Q29
+    A30["Torna tezgâhı görevleri için periyodik risk<br/>değerlendirmesi ve KKE prosedür güncellemelerinin<br/>yönetim tarafından sistemli olarak yapılmaması temel<br/>nedeni: **Sistemli Uyum Denetim Programının Olmaması<br/>(D9.5):** Kuruluşun tehlikeli görevlerdeki güvenlik<br/>standartlarını düzenli olarak denetlemek için kapsamlı<br/>bir audit/compliance tracking sistemi tasarlanmamıştır.<br/>Risk değerlendirme prosedürleri ve KKE uygunluğu<br/>kontrol edilmemekte, prosedürler rutin olarak<br/>güncellenmemektedir. **Risk Değerlendirmesinin Yetersiz<br/>Olması (D4.1):** Torna tezgâhı görevlerinin<br/>tehlikelerinin (keskin talaş, koruyucu bariyer"]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN (**D9.5** (Monitoring/Audit Inadequate - Systemically missing) - PRIMARY
+**D4.1** (Risk Assessment Inadequate - General Planning) - SECONDARY):</b><br/>Kök Neden<br/>Torna tezgâhı görevleri için periyodik risk<br/>değerlendirmesi ve KKE prosedür güncellemelerinin<br/>yönetim tarafından sistemli olarak yapılmaması<br/>temel nedeni: **Sistemli Uyum Denetim Programının<br/>Olmaması (D9.5):** Kuruluşun tehlikeli<br/>görevlerdeki güvenlik standartlarını düzenli<br/>olarak denetlemek için kapsamlı bir<br/>audit/compliance tracking sistemi<br/>tasarlanmamıştır. Risk değerlendirme prosedürleri<br/>ve KKE uygunluğu kontrol edilmemekte, prosedürler<br/>rutin olarak güncellenmemektedir. **Risk<br/>Değerlendirmesinin Yetersiz Olması (D4.1):** Torna"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A30 --> ROOT3
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            flowchart: { 
+                curve: 'basis', 
+                padding: 15, 
+                nodeSpacing: 50, 
+                rankSpacing: 80, 
+                useMaxWidth: true,
+                htmlLabels: true,
+                diagramPadding: 10
+            }, 
+            themeVariables: { 
+                fontSize: '11px', 
+                fontFamily: 'Segoe UI',
+                primaryColor: '#fff',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            } 
+        });
+    </script>
+</body>
+</html>

@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import json
 import os
 from .json_parser import extract_json_from_response, safe_json_parse
+from .model_constants import OPENROUTER_DEFAULT_CHAT_MODEL
 
 
 class ActionPlanAgent:
@@ -186,7 +187,7 @@ Return ONLY valid JSON.
         
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5",#actual model 
+                model=OPENROUTER_DEFAULT_CHAT_MODEL,#actual model 
                 #model = "deepseek/deepseek-r1-0528:free" # test model rofesyonel Plan Yaz
                 messages=[
                     {

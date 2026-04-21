@@ -127,7 +127,7 @@ class HybridSessionAgent:
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key
         )
-        self.model = "anthropic/claude-sonnet-4.5"
+        self.model = "anthropic/claude-3.5-haiku"
 
         # Oturum verisi
         self.raw_text: str = ""

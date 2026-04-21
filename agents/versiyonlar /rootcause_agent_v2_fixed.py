@@ -246,7 +246,7 @@ BEKLENEN ÇIKTI (JSON):
 Sadece JSON döndür, Türkçe içerik kullan."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-sonnet-4.5",
+            model="anthropic/claude-3.5-haiku",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "Sen HSG245 İsviçre Peyniri Modeli uzmanısın. 3 FARKLI perspektiften neden seç. Sadece JSON döndür."},
@@ -367,7 +367,7 @@ DÖNDÜR (JSON):
 KRİTİK: Türkçe, geçerli JSON, YASAKLI kodları kullanma."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-sonnet-4.5",
+            model="anthropic/claude-3.5-haiku",
             temperature=0.3,
             messages=[
                 {"role": "system", "content": "Sen 5-Why uzmanısın. Her dal farklı kök nedene ulaşmalı. Sadece JSON, Türkçe içerik."},

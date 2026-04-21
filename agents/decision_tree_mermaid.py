@@ -1,8 +1,13 @@
-"""5-Why Decision Tree Generator - Dikey Layout"""
+"""5-Why Decision Tree Generator — dikey (TD) tam sayfa okunabilir çıktı."""
 
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 import re
+
+try:
+    from .report_text_sanitize import strip_hse_codes
+except ImportError:
+    from agents.report_text_sanitize import strip_hse_codes
 
 
 class DecisionTreeGenerator:
@@ -33,10 +38,11 @@ class DecisionTreeGenerator:
         return html
 
     def _generate_mermaid_graph(self, branches: List[Dict], incident_event: str) -> str:
-        lines = ['graph LR']
-        event_fmt = self._fmt(incident_event, 50)
+        lines = ['graph TD']
+        incident_event = strip_hse_codes(str(incident_event or ""))
+        event_fmt = self._fmt(incident_event, 72)
         lines.append(f'    OLAY["<b>OLAY</b><br/>{event_fmt}"]')
-        lines.append('    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold')
+        lines.append('    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold')
         lines.append('')
 
         self.node_counter = 0
@@ -49,8 +55,12 @@ class DecisionTreeGenerator:
             prev_node = "OLAY"
 
             for why_idx, why_item in enumerate(why_chain, 1):
-                question = why_item.get("question_tr", why_item.get("question", ""))
-                answer = why_item.get("answer_tr", why_item.get("answer", ""))
+                question = strip_hse_codes(
+                    str(why_item.get("question_tr", why_item.get("question", "")) or "")
+                )
+                answer = strip_hse_codes(
+                    str(why_item.get("answer_tr", why_item.get("answer", "")) or "")
+                )
 
                 norm_q = self._norm(question)
                 norm_qa = self._norm(f"{question}|||{answer}")
@@ -59,10 +69,10 @@ class DecisionTreeGenerator:
                     self.node_counter += 1
                     q_node = f"Q{self.node_counter}"
                     self.question_nodes[norm_q] = q_node
-                    q_fmt = self._fmt(question, 55)
+                    q_fmt = self._fmt(question, 72)
                     label = f"<b>Neden {why_idx}:</b><br/>{q_fmt}"
                     lines.append(f'    {q_node}["{label}"]')
-                    lines.append(f'    style {q_node} fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px')
+                    lines.append(f'    style {q_node} fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px')
                 else:
                     q_node = self.question_nodes[norm_q]
 
@@ -72,9 +82,9 @@ class DecisionTreeGenerator:
                     self.node_counter += 1
                     a_node = f"A{self.node_counter}"
                     self.answer_nodes[norm_qa] = a_node
-                    a_fmt = self._fmt(answer, 55)
+                    a_fmt = self._fmt(answer, 72)
                     lines.append(f'    {a_node}["{a_fmt}"]')
-                    lines.append(f'    style {a_node} fill:#fff,stroke:#666,stroke-width:1px,font-size:12px')
+                    lines.append(f'    style {a_node} fill:#fff,stroke:#666,stroke-width:1px,font-size:14px')
                 else:
                     a_node = self.answer_nodes[norm_qa]
 
@@ -83,19 +93,20 @@ class DecisionTreeGenerator:
 
             root_cause = branch.get("root_cause", {})
             root_node = f"ROOT{branch_idx}"
-            root_title = root_cause.get("title", "Kök Neden")
-            root_cause_text = root_cause.get("cause_tr", root_cause.get("cause", ""))
-            root_code = root_cause.get("code", "")
+            root_title = strip_hse_codes(str(root_cause.get("title", "Kök Neden") or ""))
+            root_cause_text = strip_hse_codes(
+                str(root_cause.get("cause_tr", root_cause.get("cause", "")) or "")
+            )
 
-            header = f"<b>KÖK NEDEN ({root_code}):</b>" if root_code else "<b>KÖK NEDEN:</b>"
-            title_fmt = self._fmt(root_title, 50)
+            header = "<b>KÖK NEDEN</b>"
+            title_fmt = self._fmt(root_title, 72)
             content = f"{header}<br/>{title_fmt}"
             if root_cause_text:
-                cause_fmt = self._fmt(root_cause_text, 50)
+                cause_fmt = self._fmt(root_cause_text, 72)
                 content += f"<br/>{cause_fmt}"
 
             lines.append(f'    {root_node}["{content}"]')
-            lines.append(f'    style {root_node} fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold')
+            lines.append(f'    style {root_node} fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold')
             self._add_conn(lines, prev_node, root_node)
             lines.append('')
 
@@ -115,7 +126,7 @@ class DecisionTreeGenerator:
         text = re.sub(r'\s+', ' ', text)
         return text
 
-    def _fmt(self, text: str, max_line_length: int = 45) -> str:
+    def _fmt(self, text: str, max_line_length: int = 72) -> str:
         if not text:
             return ""
         text = text.strip()
@@ -134,9 +145,16 @@ class DecisionTreeGenerator:
         if current:
             lines_out.append(' '.join(current))
 
-        return '<br/>'.join(lines_out[:12])
+        # Çok uzun düğümlerde tam cümle kaybını azalt (önceki: 12 satır kesiyordu)
+        return '<br/>'.join(lines_out[:40])
 
     def _generate_html_template(self, mermaid_code: str, incident_title: str) -> str:
+        safe_title = (
+            str(incident_title or "")
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+        )
         return f"""<!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -144,27 +162,65 @@ class DecisionTreeGenerator:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>5-WHY Decision Tree</title>
     <style>
-        @page {{size: A4 landscape; margin: 3mm; }}
-        * {{box-sizing: border-box; margin: 0; padding: 0; }}
-        html, body {{width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }}
-        body {{display: flex; flex-direction: column; padding: 3px; height: 100vh; }}
-        header {{text-align: center; flex-shrink: 0; padding: 3px 0; }}
-        header .top-title {{font-size: 11px; font-weight: bold; color: #333; margin-bottom: 1px; }}
-        header h1 {{font-size: 13px; font-weight: bold; color: #111; margin-bottom: 1px; }}
-        header .subtitle {{font-size: 10px; color: #666; margin-bottom: 1px; }}
-        .legend {{text-align: center; font-size: 9px; color: #555; padding: 2px 4px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; margin-bottom: 3px; }}
-        #diagram-wrap {{flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; width: 100%; height: calc(100vh - 60px); }}
-        #diagram-wrap .mermaid {{width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }}
-        #diagram-wrap svg {{max-width: 98% !important; max-height: 98% !important; height: auto !important; display: block; margin: 0 auto; }}
+        @page {{ size: A4 portrait; margin: 8mm; }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        html, body {{
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }}
+        body {{
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }}
+        header {{
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }}
+        header .top-title {{ font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }}
+        header h1 {{ font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }}
+        header .subtitle {{ font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }}
+        .legend {{
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }}
+        #diagram-wrap {{
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }}
+        #diagram-wrap .mermaid {{
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }}
+        #diagram-wrap svg {{
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }}
     </style>
 </head>
 <body>
     <header>
         <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
         <h1>5-WHY ANALİZ AĞACI</h1>
-        <div class="subtitle">{incident_title}</div>
+        <div class="subtitle">{safe_title}</div>
     </header>
-    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
     <div id="diagram-wrap">
         <div class="mermaid">
 {mermaid_code}
@@ -172,28 +228,28 @@ class DecisionTreeGenerator:
     </div>
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({{ 
-            startOnLoad: true, 
-            theme: 'default', 
-            flowchart: {{ 
-                curve: 'basis', 
-                padding: 15, 
-                nodeSpacing: 50, 
-                rankSpacing: 80, 
-                useMaxWidth: true,
+        mermaid.initialize({{
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {{
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
                 htmlLabels: true,
-                diagramPadding: 10
-            }}, 
-            themeVariables: {{ 
-                fontSize: '11px', 
-                fontFamily: 'Segoe UI',
+                diagramPadding: 16
+            }},
+            themeVariables: {{
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
                 primaryColor: '#fff',
-                primaryTextColor: '#333',
+                primaryTextColor: '#222',
                 primaryBorderColor: '#333',
                 lineColor: '#333',
                 secondaryColor: '#f5f5f5',
                 tertiaryColor: '#fff'
-            }} 
+            }}
         }});
     </script>
 </body>

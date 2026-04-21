@@ -26,6 +26,16 @@ from openai import OpenAI
 from typing import Dict, List, Optional
 import os
 import sys
+import importlib.util
+from pathlib import Path
+
+_agents_dir = Path(__file__).resolve().parent.parent
+_mc_path = _agents_dir / "model_constants.py"
+_spec = importlib.util.spec_from_file_location("agents_model_constants", _mc_path)
+_mc = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mc)
+OPENROUTER_DEFAULT_CHAT_MODEL = _mc.OPENROUTER_DEFAULT_CHAT_MODEL
 
 # V3: Hibrit knowledge base import
 try:
@@ -253,7 +263,7 @@ BEKLENEN ÇIKTI (JSON ŞEMASI):
 """
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-sonnet-4.5",
+            model=OPENROUTER_DEFAULT_CHAT_MODEL,
             temperature=0.4,
             max_tokens=4000,
             messages=[
@@ -410,7 +420,7 @@ DÖNDÜR (JSON ŞEMASI):
 KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür. Markdown etiketi kullanma."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-opus-4.6",
+            model=OPENROUTER_DEFAULT_CHAT_MODEL,
             temperature=0.6,
             max_tokens=4000,
             messages=[

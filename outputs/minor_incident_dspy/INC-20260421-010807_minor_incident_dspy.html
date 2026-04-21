@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260421-010807";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260421-010807</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">26 Nisan 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Montaj Hattı - Torna Tezgâhı (T-12)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Küçük Yaralanma</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Bir çalışan, torna parçasını elle hizalarken keskin talaş yüzeyine sürtünme sonucu elinden hafif şekilde yaralanmıştır. İlk yardım yapılmış ve çalışan işine devam etmiştir.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">26 Nisan 2026 tarihinde, Montaj Hattı'nda bulunan T-12 torna tezgâhında çalışan bir personel, işlenen parçayı elle hizalama esnasında keskin talaş yüzeyine teması sonucu elinde küçük bir kesik meydana gelmiştir. Olayın ardından ilk yardım müdahalesi yapılmış ve yaralanan çalışan işine devam etmiştir.</div>
+<div class="paragraph" contenteditable="true">Montaj Hattı - Torna Tezgâhı (T-12)</div>
+<div class="paragraph" contenteditable="true">Bir çalışan (yaralı), Hat Sorumlusu (rapor eden)</div>
+<div class="paragraph" contenteditable="true">Olayın hemen ardından yaralı çalışana ilk yardım istasyonunda pansuman yapılmıştır. Çalışanın durumu hastaneye sevk gerektirmemiş ve vardiya sonunda işine devam etmiştir. Olay, Hat Sorumlusu tarafından rapor edilmiştir.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Torna tezgâhının koruyucu bariyeri tam kapalı değildi.</li>
+<li contenteditable="true">Kullanılan standart eldiven kesilmeye dayanıklı değildi.</li>
+<li contenteditable="true">Güvenli hizalama prosedürleri ve KKE seçimi konusunda yetkinlik değerlendirmesi eksikti.</li>
+<li contenteditable="true">Yönetim tarafından sistematik denetim ve uyum programları yetersizdi.</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Yaralı çalışana ilk yardım yapılması</td>
+                        <td contenteditable="true">Hat Sorumlusu</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Olayın kayıt altına alınması</td>
+                        <td contenteditable="true">Hat Sorumlusu</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Torna tezgâhı T-12'nin geçici olarak durdurulması ve incelenmesi</td>
+                        <td contenteditable="true">H&S Görevlisi</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İlgili çalışan ve amirlerle ön görüşmelerin yapılması</td>
+                        <td contenteditable="true">H&S Görevlisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260421-010807</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">26 Nisan 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">14:05</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Montaj Hattı - Torna Tezgâhı (T-12)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Montaj Hattı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Yaralı Çalışan</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Belirtilmemiş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Torna Tezgâhı (T-12)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">İşlenen parça, keskin talaş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Belirtilmemiş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Belirtilmemiş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart eldiven (kesilmeye dayanıklı değil)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Küçük Yaralanma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Hafif kesik</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Düşük</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Hat Sorumlusu</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Hayır</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Hastaneye sevk edilmedi, işine devam etti</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">13:50</div>
+                    <div class="timeline-event" contenteditable="true">Parça işleme süreci başlamıştır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:05</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan, torna parçasını elle hizalarken keskin talaş yüzeyine sürtünme sonucu elinde hafif bir kesik meydana gelmiştir. Kanama kontrol altına alınmıştır.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:10</div>
+                    <div class="timeline-event" contenteditable="true">Yaralı çalışana ilk yardım istasyonunda pansuman yapılmış ve olay kaydı oluşturulmuştur.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">Vardiya Sonu</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan işine devam etmiş ve vardiya sonunda normal şekilde ayrılmıştır.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why tekniği, olayın meydana gelmesine yol açan zincirleme reaksiyonu anlamak için her bir cevaba tekrar "Neden?" sorusu sorarak ilerler. Bu olayda, keskin talaş yüzeyine temas ve koruyucu bariyerin kapalı olmaması gibi doğrudan nedenlerden yola çıkılarak, operatör davranışları, prosedür eksiklikleri, eğitim yetersizlikleri, risk algısı ve yönetimsel denetim eksiklikleri gibi daha derin katmanlardaki kök nedenlere ulaşılmıştır. Her bir dal, olayın farklı bir yönünü ele alarak, nihayetinde organizasyonel ve sistemik zayıflıklara işaret eden kök nedenleri belirlemiştir.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü</td>
+                        <td contenteditable="true">Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk gibi bireysel faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Prosedür eksikliği, iletişim bozukluğu, yönetim kararları, politika yetersizlikleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Ekipman arızası, tasarım hatası, fiziksel yük, ergonomi sorunları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Çevresel Faktör</td>
+                        <td contenteditable="true">Hava koşulları, aydınlatma, gürültü, sıcaklık, alan düzeni</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">H&S Görevlisi</td>
+                        <td contenteditable="true">Baş Araştırmacı</td>
+                        <td contenteditable="true">26.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hat Sorumlusu</td>
+                        <td contenteditable="true">Departman Temsilcisi</td>
+                        <td contenteditable="true">26.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Yaralı Çalışan</td>
+                        <td contenteditable="true">Operasyonel Tanık</td>
+                        <td contenteditable="true">26.04.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - KESKİN TALAŞ YÜZEYİNE DOĞRUDAN TEMAS</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Çalışan, torna parçasını elle hizalarken keskin talaş yüzeyine doğrudan temas ederek elinde hafif bir kesik meydana gelmiştir. Bu durum, işlenen parçaya fiziksel erişimin engellenememesi ve kullanılan kişisel koruyucu ekipmanın yetersizliği ile doğrudan ilişkilidir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Keskin talaş yüzeyine doğrudan temas</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden çalışan işlenen parçanın keskin talaş yüzeyine doğrudan temas ederek elle hizalama işlemini gerçekleştirebildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışan keskin talaş yüzeyine doğrudan temas ederek elle hizalama işlemini gerçekleştirebildi, çünkü torna tezgâhının koruyucu bariyeri tam kapalı değildi. Bu durum, işlenen parçaya ve keskin talaşlarına fiziksel erişimi engelleyen tasarımsal kontrol mekanizmasının başarısız olduğunu göstermektedir. Ayrıca, hizalama işleminin doğası gereği çalışanın parçaya yakın konumda çalışması gerekliliği, kapalı olmayan bariyer nedeniyle doğrudan temas riskini yaratmıştır. Kullanılan standart eldiven ise keskin talaşlardan koruma sağlayacak özellikte değildi.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden torna tezgâhının koruyucu bariyeri (T-12) o anda tam kapalı durumda değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Koruyucu bariyerin tam kapalı durumda olmamasının nedenleri çok faktörlüdür. Çalışan, parçayı elle hizalarken bariyeri tam kapalı tutmadığından, iş akışını hızlandırmak veya parçaya daha iyi erişim sağlamak amacıyla bariyeri kısmen açık bırakmış olabilir. Ayrıca, hizalama işlemi için bariyerin açık kalmasının gerekli veya kabul edilen bir uygulama olması, prosedürel boşluğa işaret etmektedir ve güvenli hizalama yöntemi tanımlanmamıştır. Bariyerin tutuşması, hizalanması veya mekanizmasında sorun varsa ve düzenli bakım yapılmıyorsa, operatör bariyeri tam kapatmakta zorluk yaşamış olabilir. Temel neden, hizalama işlemi sırasında operatörün bariyeri açık bırakması, prosedürel kılavuzluğun olmaması ve bakım izlemesinin yetersizliğidir.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden operatör, hizalama işlemi için bariyeri tam kapalı tutmanın gerekli olduğunu bilmiyordu veya bu talimatı uygulamıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatörün bariyeri tam kapalı tutmama nedenleri muhtemelen üç faktörün kombinasyonundan kaynaklanmaktadır. Hizalama işlemi sırasında bariyerin tam kapalı kalması gerekliliğinin yazılı talimatlarda ne kadar açık ve vurgulu olduğu belirsizdir. 'Hafif hizalama' işlemleri için bariyerin açık tutulabileceğine dair gayri resmi uygulamaların varlığı muhtemeldir. Operatöre bu torna tezgâhı için yeterli güvenlik eğitimi verilmiş olup olmadığı, özellikle hizalama işleminin kritik güvenlik adımları ve bariyerin rolü konusunda eğitim alıp almadığı sorgulanmalıdır. Ayrıca, hizalama işlemleri sırasında bariyerin açık tutulmasının 'işin doğal parçası' olarak kabul görmüş olması ihtimali vardır, bu da küçük yaralanmaların sıklığıyla güvenlik önlemlerinin gevşetilmesine neden olabilir.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden hizalama işlemleri sırasında bariyerin açık tutulmasının gayri resmi bir uygulama haline gelmesine ve bu uygulamanın yönetim tarafından kontrol/düzeltilmeden devam etmesine izin verilmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Bariyerin açık tutulmasının gayri resmi uygulama haline gelmesine izin verilmesinin kök sebepleri, sistemik ve yönetimsel eksikliklerin kombinasyonundan kaynaklanmaktadır. Yönetim, çalışanların prosedürden sapmasını izlemek, tespit etmek ve düzeltmek için etkin bir sistem kurmamıştır. Yazılı güvenlik prosedürü mevcut olmasına rağmen, uygulamada bariyerin açık tutulması normalize edilmiştir. Bu, prosedürü güçlendiren mekanizmaların (periyodik eğitim yenilemesi, uyumsuzluk cezalandırılması, uyumluluk ödülü) eksik olduğunu gösterir. 'Hafif kesik' olayıyla sonuçlanan bu işlemin riskleri, yönetim veya çalışanlar tarafından ciddi olarak algılanmamıştır. Hizalama işlemi sırasında bariyeri açık tutmanın işi hızlandırdığı izleniminin çalışanlar tarafından algılanmış olması, bu davranışı rasyonalize etmiş olabilir. Hat sorumlusu veya yönetim, gayri resmi uygulamayı sistematik olarak izlemek ve düzeltmek için yeterli kapasite, zaman veya talimat almamış olabilir.</div>
+                    <span class="why-code">D - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Bu yazılı güvenlik prosedürlerinin (bariyer kapatılması) çalışanlar tarafından sistem olarak uygulanmasını sağlamak ve uyumsuzluğu tespit/düzeltmek için, yönetim tarafından etkin bir gözetim, denetim ve cezalandırma mekanizması neden kurulmamış veya uygulanamamıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim tarafından yazılı güvenlik prosedürlerinin (bariyer kapatılması) uygulanmasını sağlamak için sistematik bir gözetim, denetim ve cezalandırma mekanizması kurulmamıştır. Sistematik Denetim Mekanizmasının Eksikliği: Bariyer kapatılması prosedürünün uygulanıp uygulanmadığını belirlemek, dokümante etmek ve uyumsuzluğu tespit etmek için hiçbir audit, kontrol listesi veya periyodik denetim programı bulunmamaktadır. Uyumsuzluğu Düzeltme Prosesinin Yokluğu: Koruyucu bariyer tam kapalı olmadığında veya standart eldiven gibi uygun olmayan koruyucu donanım kullanıldığında, bunu düzeltmek için kuruluşsal bir işlem oluşturulmamıştır. Sorumluluk ve Hesap Verebilirlik Mekanizmasının Yokluğu: Prosedürü uygulamayan çalışanlara veya denetleyemeyen yöneticilere ilişkin oluşturulmuş bir sonuç mekanizması mevcut değildir. Sonuç olarak, kuruluşsal düzeyde 'Sistematik prosedür uyum denetimi/audit programı' tasarlanmamış ve uygulanmamıştır.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Sistematik Prosedür Uyum Denetimi ve Hesap Verebilirlik Eksikliği)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Sistematik Prosedür Uyum Denetimi ve Hesap Verebilirlik Eksikliği</div>
+                <div class="box-content" contenteditable="true">Yönetim tarafından yazılı güvenlik prosedürlerinin (bariyer kapatılması) uygulanmasını sağlamak için sistematik bir gözetim, denetim ve cezalandırma mekanizması kurulmamıştır. Bu durum, prosedürlerin sadece kağıt üzerinde kalmasına ve sahadaki uygulamaların kontrolsüz bir şekilde sapmasına yol açmıştır. Sistematik denetim mekanizmalarının eksikliği, uyumsuzlukların tespit edilmesini ve düzeltilmesini engellemiş, böylece güvenlik risklerinin devam etmesine zemin hazırlamıştır. Ayrıca, prosedürü uygulamayan çalışanlara veya denetleyemeyen yöneticilere yönelik bir sorumluluk ve hesap verebilirlik mekanizmasının bulunmaması, güvenlik kültürünün zayıflamasına neden olmuştur.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yönetim sisteminin eksik yönetişimi ve liderlik sorumluluğunun net olmayışı.</li>
+<li contenteditable="true">Yetersiz gözetim ve kontrol mekanizmaları; çalışan uyumsuzluğunun gözlenmemesi/düzeltilmemesi.</li>
+<li contenteditable="true">Prosedürün uygulamaya yansımaması; resmi prosedür olmasına karşın, güncellenmiş veya güçlendirilmemiş olması.</li>
+<li contenteditable="true">Prosedür uyumsuzluğunun izlenmemesi ve uygulamaya yansıtılmaması.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - KORUYUCU BARİYERİN YETERSİZLİĞİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Torna tezgâhının koruyucu bariyeri tam kapalı değildi, bu da çalışanın keskin talaş yüzeyine erişimini engellemedi ve yaralanmaya yol açtı. Bu durum, makine güvenliği kontrollerindeki bir eksikliği işaret etmektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Koruyucu bariyer tam kapalı olmadığından keskin yüzeye erişim engellenmemiş</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden çalışan, torna parçasını elle hizalarken, koruyucu bariyer tarafından engellenmeden keskin talaş yüzeyine doğrudan temas edebildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışan, keskin talaş yüzeyine doğrudan temas edebildi çünkü koruyucu bariyer tam kapalı değildi. Tasarımsal veya bakımsal bir eksiklik nedeniyle, üretim süreci sırasında keskin yüzeylere fiziksel erişim engellenmedi. Standart eldivenlerin kesilmeye dayanıklı olmaması ise yaralanmanın şiddeti açısından ikincil bir faktördür.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Koruyucu bariyer neden tam kapalı değildi?</div>
+                    <div class="why-answer" contenteditable="true">→ Koruyucu bariyerin tam kapalı olmama sebebi, olay raporunda açıkça belirtilmemişse de, mevcut kanıtlar işletme sırasında kasıtsız açılma/kaldırılma olasılığını işaret etmektedir. Bunun nedenleri arasında parçayı hizalama işlemi sırasında bariyerin kısmi açılmış olması, iş hızlandırma veya kolaylık amaçlı kasıtsız açılma, tasarımsal yetersizlik (bariyer kolay açılabilir) veya bakım kaydı yokluğu bulunabilir. Kesinlikle belirlenmesi için bariyer tasarım dökümanları, bakım/onarım kayıtları ve operatör mülakatı yapılmalıdır.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Bariyer işletme sırasında kısmi açılmasına/kaldırılmasına neden olan temel faktör nedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Temel faktörler eğitim/prosedür boşluğu ve sistem düzeyinde KKD sağlama eksikliğidir. Rapordan açık olarak, operatöre parçayı güvenli hizalama yöntemi (bariyer tamamen kapalıyken hizalama veya uygun uçlar/fikstürler kullanarak) öğretilmemiş veya uygulanmamıştır. 'Standart eldiven (kesilmeye dayanıklı değil)' kullanılması, operatöre keskin talaş ve kenar karşısında uygun koruyucu ekipman sağlanmadığını gösterir. Bariyer tam kapalı olmadığı halde çalışmaya devam edilmesi, işletme prosedürlerinin uygulanmadığını veya eksik olduğunu gösterir. Tasarım hatası veya açık işletme baskısı kanıtı raporda bulunmamaktadır; ancak sistem düzeyinde eğitim, prosedür standardizasyonu ve KKD uygulaması eksikliğinin bu olayın temel nedeni olduğu görülmektedir.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden torna tezgâhında keskin talaş ve kenar işlemleri için uygun koruyucu ekipman (kesilmeye dayanıklı eldiven, kenar koruyucusu vb.) ve güvenli hizalama prosedürü tanımlanmamış, uygulanmamış veya denetlenememiş?</div>
+                    <div class="why-answer" contenteditable="true">→ Torna tezgâhında keskin talaş işlemleri için uygun koruyucu ekipman ve güvenli hizalama prosedürü tanımlanmamış, uygulanmamış ve denetlenememesinin kök nedeni İş Sağlığı Yetkinliği Değerlendirmesinin Yetersizliği'dir. Çalışan, 'elle parça hizalama' görevinde kesik riski ile ilgili yeterli beceri, bilgi ve davranış standartlarının değerlendirilmemiştir. Sonuç olarak, keskin talaş işlemleri için kesilmeye dayanıklı eldiven seçimi yapılmamış; standart eldiven kullanılmıştır. 'Keskin talaş hizalama prosedürü' resmi olarak tanımlanmamıştır. Koruyucu bariyer tam kapalı olmadığı halde, kontrol/denetim sistemi aktif olmamış; sapma tespit edilememiştir. Çalışanın 'uygun PPE' seçme ve 'güvenli hizalama' becerisi yetkin olarak kabul edilmiş ancak gerçekte bu bilgi ve uygulama eksik kalmıştır.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Çalışanların 'keskin talaş işlemleri sırasında uygun PPE seçimi ve güvenli hizalama prosedürü' konusunda yetkinliğinin değerlendirilmemesinin kök sebebi nedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışanların keskin talaş işlemleri sırasında uygun PPE seçimi ve güvenli hizalama prosedürü konusundaki yetkinliğinin değerlendirilmemesinin kök sebepleri arasında Yetkinlik Değerlendirme Standardı/Prosedürü'nün tanımlanmamış olması, Risk Değerlendirmesi'nin eksik/yetersiz yapılması, Prosedür'ün eksik/belgelenmemiş olması, Uyum Denetim Sistemi'nin eksikliği ve Çalışan Eğitimi ve Denetiminin yetersizliği bulunmaktadır. Torna işlemi yapan çalışanın bu kritik görev için yetkinliği değerlendirilmemiş, keskin talaş ve PPE seçimi gibi teknik konularda formal değerlendirme sistemi yoktur. Torna tezgâhında keskin talaş yüzeylerle çalışmanın risk analizi yapılmamış veya yetersiz yapılmıştır. 'Keskin talaş işlemleri sırasında parça hizalama' için yazılı, adım-adım prosedür bulunmamaktadır. Koruyucu bariyer tam kapalı olmadan parça hizalanmaya başlanmış olması, prosedür uyumunun sistemli olarak denetlenmediğini göstermektedir. Standart eldiven seçimi ve bariyerler kapalı olmadan çalışmaya başlanması, işyeri denetiminin yetersiz olduğunu göstermektedir.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Risk Değerlendirmesi, Prosedür Tanımlaması ve Yetkinlik Değerlendirmesi Eksikliği)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Risk Değerlendirmesi, Prosedür Tanımlaması ve Yetkinlik Değerlendirmesi Eksikliği</div>
+                <div class="box-content" contenteditable="true">Torna tezgâhında keskin talaş işlemleri için uygun koruyucu ekipman ve güvenli hizalama prosedürlerinin tanımlanmamış, uygulanmamış ve denetlenememesinin temelinde, İş Sağlığı Yetkinliği Değerlendirmesinin yetersizliği yatmaktadır. Çalışanların bu kritik görev için gerekli bilgi, beceri ve davranış standartları değerlendirilmemiştir. Bu durum, keskin talaş işlemleri için uygun KKE seçiminin yapılmamasına, güvenli hizalama prosedürlerinin resmi olarak tanımlanmamasına ve koruyucu bariyerin tam kapalı olmadığı durumlarda dahi kontrol mekanizmalarının devreye girmemesine neden olmuştur. Sonuç olarak, risk değerlendirmesi eksik yapılmış, prosedürler belgelenmemiş ve çalışanların yetkinlikleri yeterince değerlendirilmemiştir.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yetkinlik değerlendirme standardı/prosedürü tanımlanmamış olması.</li>
+<li contenteditable="true">Keskin talaş işlemlerine özgü eğitim prosedürü/standardının bulunmaması.</li>
+<li contenteditable="true">Keskin talaş tehlikeleri ve KKE gereksinimlerinin analiz edilmediği yetersiz risk değerlendirmesi.</li>
+<li contenteditable="true">Keskin talaş işlemi prosedürünün tanımlanmamış olması.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - YETERSİZ KİŞİSEL KORUYUCU EKİPMAN (KKE)</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Çalışan tarafından kullanılan standart eldiven, keskin talaşın neden olduğu kesme riskine karşı yeterli koruma sağlamamıştır. Bu durum, KKE seçimindeki ve/veya kullanımındaki bir eksikliği göstermektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Standart eldiven keskin talaş kesme riskine karşı yeterli koruma sağlamıyor</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden çalışan, torna tezgâhındaki işlenen parçanın keskin talaş yüzeyine doğrudan el ile temas etmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışan torna tezgâhındaki işlenmiş parçanın keskin talaş yüzeyine doğrudan el ile temas etmiştir çünkü koruyucu bariyer tam kapalı değildi. Parça hizalama işlemi sırasında fiziksel engelleme mekanizması aktif değildi ve çalışan engelsiz şekilde keskin yüzeye ulaşabilmiştir. Ek olarak, kullanılan standart eldiven kesilmeye dayanıklı olmadığından, kişisel koruyucu ekipman bu tehlikeyi önleyememiştir.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden koruyucu bariyer tam kapalı haldeyken veya açılıp kapatılması kontrollü şekilde yapılırken, çalışan parça hizalama işlemini gerçekleştirememektedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Koruyucu bariyer tasarımı veya mevcut prosedürü, parça hizalama işlemini tam kapalı durumda yapmayı engellemektedir. Bariyer tam kapalıyken hizalama yapılamadığı için, çalışan bariyer koruyuculuğunu eksik halde (tam kapalı olmayan durumda) işlem gerçekleştirmek zorunda kalmıştır. Bu, tasarım kusuru veya prosedürel yetersizlik nedeniyle güvenlik kontrolleri ile üretim ihtiyaçlarının çatışması sonucudur. Sorunu çözmek için: (1) bariyer tasarımı değiştirilerek hizalama işlemi kapalı durumda yapılabilir hale getirilmeli, (2) alternatif hizalama yöntemi geliştirilmeli, veya (3) ekipman değiştirilmeli olmalıdır.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden torna tezgâhı (T-12) koruyucu bariyer tasarımı veya mevcut işlem prosedürü, parça hizalama işleminin tamamı kapalı güvenlik bariyer altında gerçekleştirilmesine izin vermemektedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Torna tezgâhı T-12'nin koruyucu bariyer tasarımı, parça hizalama işleminin tam kapalı güvenlik bariyer altında gerçekleştirilmesine operatör görüş gereksinimi, işlem ergonomisi, tasarım yaşı ve standart güncelliği, prosedürel kısıtlamalar ve alternatif güvenlik sistemlerinin yetersizliği gibi nedenlerden dolayı izin vermemektedir. T-12 tezgâhı muhtemelen modern risk değerlendirmesi öncesi tasarlanmış olup, güncel makine güvenliği gereksinimlerini karşılamamaktadır. Mevcut işlem yönergesinde hızlı parça değişikliğine öncelik verilmesi ve standart eldivenlerin keskin talaş koruması sağlamaması gibi faktörler göz ardı edilmiştir.</div>
+                    <span class="why-code">B - Organizasyonel</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Kesme/puncture dirençli eldiven kullanımı ve parça hizalama sırasında ek kişisel koruma ekipmanları uygulanmasının neden zorunlu kılınmadığı ve/veya mevcut prosedürlerde bu koruyucu önlemlerin neden eksik bırakıldığının nedeni nedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Kesme/puncture dirençli eldiven ve ek koruma ekipmanlarının kullanımının zorunlu kılınmadığının nedeni, iş riski değerlendirmesinin eksik yapılması, çalışanın torna parçası hizalama işi sırasında maruz kalacağı kesme/delinme riskleri hakkında yeterli bilgilendirilmemesi ve mevcut prosedürlerde bu koruyucu önlemlerin açıkça tanımlanmamış olmasıdır. Standart eldiven kullanılması, keskin talaş yüzeyine karşı yetersiz korumanın göstergesidir. Bu, beceri değerlendirmesi sırasında çalışanın görevini güvenli bir şekilde yerine getirebilmesi için gerekli KKE bilgisinin ve prosedürlerin eksik kalmasıdır.</div>
+                    <span class="why-code">C - İş/Görev</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden torna tezgâhı görevleri için periyodik risk değerlendirmesi ve KKE prosedür güncellemeleri yönetim tarafından sistemli olarak yapılmamakta ve çalışanlar için tehlikeli görevlerdeki güvenlik standartları düzenli olarak denetlenmemektedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Torna tezgâhı görevleri için periyodik risk değerlendirmesi ve KKE prosedür güncellemelerinin yönetim tarafından sistemli olarak yapılmaması temel nedeni Sistemli Uyum Denetim Programının Olmaması'dır. Kuruluşun tehlikeli görevlerdeki güvenlik standartlarını düzenli olarak denetlemek için kapsamlı bir audit/compliance tracking sistemi tasarlanmamıştır. Risk değerlendirme prosedürleri ve KKE uygunluğu kontrol edilmemekte, prosedürler rutin olarak güncellenmemektedir. Ayrıca, Risk Değerlendirmesinin Yetersiz Olması da önemli bir faktördür. Torna tezgâhı görevlerinin tehlikelerinin (keskin talaş, koruyucu bariyer arızaları) kapsamlı şekilde tanımlanmadığı ve uygun koruyucu ekipmanın periyodik olarak gözden geçirilmediği anlaşılmaktadır. Yönetim, bu kritik görevler için periyodik risk değerlendirmesi yapmayı, KKE uygunluğunu gözden geçirmeyi ve uyum denetimini rutin sistem haline getirmemiştir.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden (Sistemli Uyum Denetim Programı ve Yetersiz Risk Değerlendirmesi)</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Sistemli Uyum Denetim Programı ve Yetersiz Risk Değerlendirmesi</div>
+                <div class="box-content" contenteditable="true">Torna tezgâhı görevleri için periyodik risk değerlendirmesi ve KKE prosedür güncellemelerinin yönetim tarafından sistemli olarak yapılmaması, bu olayın temel kök nedenlerinden biridir. Kuruluşun tehlikeli görevlerdeki güvenlik standartlarını düzenli olarak denetlemek için kapsamlı bir audit/compliance tracking sistemi tasarlanmamıştır. Bu durum, risk değerlendirme prosedürlerinin ve KKE uygunluğunun kontrol edilmemesine, prosedürlerin rutin olarak güncellenmemesine yol açmıştır. Ayrıca, torna tezgâhı görevlerinin tehlikelerinin (keskin talaş, koruyucu bariyer arızaları) kapsamlı şekilde tanımlanmadığı ve uygun koruyucu ekipmanın periyodik olarak gözden geçirilmediği anlaşılmaktadır. Yönetim, bu kritik görevler için periyodik risk değerlendirmesi yapmayı, KKE uygunluğunu gözden geçirmeyi ve uyum denetimini rutin bir sistem haline getirmekte başarısız olmuştur.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sistemli uyum denetim programının olmaması.</li>
+<li contenteditable="true">Risk değerlendirmesinin yetersiz olması ve genel planlama eksikliği.</li>
+<li contenteditable="true">Tehlikeli görevler için kapsamlı güvenlik yönetim sistemi eksikliği.</li>
+<li contenteditable="true">Prosedürlerin güncelliğinin ve etkinliğinin takip edilmemesi.</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Güvenlik prosedürlerinin önemi ve zorunluluğu çalışanlara etkin şekilde iletilmemiş ve prosedürlerin neden var olduğu konusunda farkındalık yaratılmamıştır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">Torna tezgâhı kullanımı, güvenli hizalama yöntemleri ve kesilmeye dayanıklı KKE seçimi/kullanımı konularında çalışanlara yeterli ve güncel eğitim verilmemiştir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim Eksikliği</td>
+                        <td contenteditable="true">Saha gözetim ve denetim mekanizması tanımsız ve yetersizdir; güvenlik prosedürlerine uyumsuzluklar düzenli olarak tespit edilip düzeltilmemiştir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kültürel Faktörler</td>
+                        <td contenteditable="true">Üretim öncelikli bir kültürün varlığı, güvenlik sapmalarına tolerans gösterilmesine ve riskli davranışların 'normal pratik' haline gelmesine neden olmuştur.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Ekipman Tasarım/Bakım Eksikliği</td>
+                        <td contenteditable="true">Torna tezgâhının koruyucu bariyer tasarımı, güvenli hizalama işlemini tam kapalı durumda yapmaya izin vermemekte veya bariyerin bakımı/işlevselliği yetersiz kalmaktadır.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Risk Algısı Düşüklüğü</td>
+                        <td contenteditable="true">Hem çalışanlar hem de yönetim tarafından 'küçük yaralanma' potansiyeline sahip işlerin risk seviyesi düşük algılanmış, bu da önleyici tedbirlerin ertelenmesine yol açmıştır.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Torna tezgâhı (T-12) için detaylı risk değerlendirmesi yapılması ve keskin talaş/kenar tehlikeleri için özel önlemlerin belirlenmesi.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Yöneticisi, Teknik Departman</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Risk değerlendirmesi raporunun tamamlanması ve onaylanması</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Torna tezgâhı koruyucu bariyerlerinin teknik uygunluğunun ve işlevselliğinin kontrol edilmesi, gerekli durumlarda iyileştirme veya değiştirme yapılması.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü, Teknik Departman</td>
+                        <td contenteditable="true">3 hafta</td>
+                        <td contenteditable="true">Bariyerlerin %100 işlevsel ve güvenli hale getirilmesi</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Keskin talaş işlemleri için kesilmeye dayanıklı (EN 388 Grade 3+ veya üzeri) eldivenlerin zorunlu KKE olarak belirlenmesi ve tüm çalışanlara temin edilmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Yöneticisi, Satın Alma</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Uygun KKE'nin %100 temini ve dağıtımı</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Torna tezgâhında güvenli parça hizalama için yazılı, adım-adım standart işletim prosedürü (SOP) oluşturulması ve görsel talimatlarla desteklenmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Üretim Müdürü, HSE Uzmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">SOP'nin oluşturulması ve onaylanması</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Tüm torna operatörlerine ve ilgili personele, yeni KKE ve güvenli hizalama SOP'si dahil olmak üzere kapsamlı elektrik güvenliği ve makine güvenliği eğitimi verilmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İK Müdürü, HSE Uzmanı</td>
+                        <td contenteditable="true">1.5 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Saha denetim ve gözetim programının oluşturulması, özellikle torna tezgâhı gibi yüksek riskli alanlarda düzenli kontrollerin yapılması ve uyumsuzlukların raporlanması.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Vardiya Amirleri, Üretim Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Günlük denetim frekansı ve raporlama oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Güvenlik prosedürlerine uyumsuzluk durumunda uygulanacak disiplin süreçlerinin netleştirilmesi ve tüm çalışanlara duyurulması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">İK Müdürü, Üst Yönetim</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Disiplin prosedürlerinin yayınlanması ve anlaşılması</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Güvenlik kültürü geliştirme programı başlatılması, çalışanların güvenlik bilincini artırmaya yönelik farkındalık kampanyaları ve ödül/tanıma sistemleri oluşturulması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">İK Müdürü, HSE Yöneticisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Güvenlik anket skorlarında artış</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Tüm tehlikeli görevler için periyodik risk değerlendirmesi ve KKE prosedür güncellemelerinin sistemli hale getirilmesi.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Risk değerlendirme ve KKE prosedür güncellemelerinin takvimlendirilmesi</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Üst yönetimin güvenlik liderliği taahhüdünün güçlendirilmesi ve güvenlik performansının düzenli olarak gözden geçirilmesi.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Genel Müdür, Üst Yönetim</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Yönetim güvenlik toplantılarının düzenliliği ve aksiyon takibi</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Tüm makine ve ekipmanlar için kapsamlı risk değerlendirmeleri düzenli olarak yapılmalı ve potansiyel tehlikeler proaktif olarak belirlenmelidir. Özellikle torna tezgâhı gibi kesici/delici ekipmanlar için detaylı tehlike analizleri şarttır.
+• Kişisel Koruyucu Ekipman (KKE) seçimi, yapılan işin risklerine uygun olarak titizlikle yapılmalı ve çalışanlara doğru KKE kullanımı konusunda sürekli eğitim verilmelidir. Standart eldivenlerin kesilmeye karşı yetersiz kaldığı durumlarda, kesilmeye dayanıklı özel eldivenler zorunlu hale getirilmelidir.
+• Tüm kritik iş süreçleri için yazılı, açık ve anlaşılır Standart İşletim Prosedürleri (SOP) oluşturulmalı ve bu prosedürlere uyum düzenli olarak denetlenmelidir. Özellikle parça hizalama gibi elle müdahale gerektiren işlemler için güvenli yöntemler detaylandırılmalıdır.
+• Saha denetimleri ve gözetim faaliyetleri artırılmalı, güvenlik prosedürlerine uyumsuzluklar anında tespit edilip düzeltilmeli ve bu konuda hat yöneticilerine ve amirlere yetki ve sorumluluk verilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Kuruluş genelinde güçlü bir güvenlik kültürü oluşturulmalı ve sürdürülmelidir. Bu kültür, üst yönetimden başlayarak tüm çalışanlara yayılmalı, güvenliğin üretimden ödün vermeden öncelikli olduğu mesajı net bir şekilde iletilmelidir.
+• İş Sağlığı ve Güvenliği Yönetim Sistemi (İSGYS) sürekli iyileştirilmeli ve tüm süreçleri kapsayacak şekilde entegre edilmelidir. Risk değerlendirmesi, eğitim, denetim, olay araştırması ve düzeltici/önleyici faaliyetler birbiriyle uyumlu çalışmalıdır.
+• Makine ve ekipman alımlarında veya mevcut ekipmanların modernizasyonunda, en güncel güvenlik standartları ve ergonomik prensipler göz önünde bulundurulmalıdır. Güvenlik bariyerleri ve koruyucuların etkinliği periyodik olarak değerlendirilmelidir.
+• Çalışanların yetkinlikleri düzenli olarak değerlendirilmeli ve belirlenen eksiklikler doğrultusunda sürekli eğitim ve gelişim programları sunulmalıdır. Özellikle yüksek riskli görevlerde çalışanların yetkinlikleri belgelendirilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Tüm güvenlik prosedürleri ve KKE gereksinimleri, çalışanların anlayabileceği dilde ve formatta (görsel talimatlar, kısa videolar vb.) etkin bir şekilde iletilmelidir.
+• Güvenlik toplantıları ve bilgilendirme oturumları düzenli hale getirilmeli, çalışanların güvenlik konularında geri bildirimleri teşvik edilmeli ve dikkate alınmalıdır.
+• Olay raporlama ve kök neden analizi sonuçları, benzer olayların önlenmesi amacıyla tüm ilgili departmanlarla ve çalışanlarla şeffaf bir şekilde paylaşılmalıdır. Dersler çıkarılmalı ve yaygınlaştırılmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Torna tezgâhı operatörleri için makine güvenliği, LOTO (Kilitleme-Etiketleme) prosedürleri ve güvenli çalışma yöntemleri konularında zorunlu ve periyodik tazeleme eğitimleri düzenlenmelidir.
+• KKE seçimi, doğru kullanımı, bakımı ve depolanması konularında tüm ilgili çalışanlara uygulamalı eğitimler verilmelidir. Özellikle kesilmeye dayanıklı eldivenlerin önemi vurgulanmalıdır.
+• Hat yöneticileri ve amirlere, güvenlik denetimi, risk tespiti, olay yönetimi ve güvenlik prosedürlerine uyumun sağlanması konularında liderlik ve gözetim eğitimleri verilmelidir.
+• Yeni işe başlayan veya görev değişikliği yapan çalışanlar için kapsamlı işbaşı eğitimleri (OJT) ve risk odaklı oryantasyon programları uygulanmalıdır.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">Bu kök neden analizi, Montaj Hattı'ndaki torna tezgâhında meydana gelen küçük yaralanmanın, tek bir hatadan ziyade, bir dizi sistemik ve organizasyonel eksikliğin birleşimi sonucu ortaya çıktığını açıkça göstermektedir. Olayın doğrudan nedenleri olan koruyucu bariyerin tam kapalı olmaması ve uygun KKE'nin kullanılmaması, daha derinlerde yatan yönetimsel zayıflıklardan kaynaklanmaktadır. Özellikle risk değerlendirmesi süreçlerinin yetersizliği, güvenli çalışma prosedürlerinin eksikliği, çalışan yetkinliklerinin değerlendirilmemesi ve en önemlisi, güvenlik prosedürlerine uyumun sistematik olarak denetlenmemesi ve hesap verebilirlik mekanizmalarının bulunmaması, bu olayın temelini oluşturmuştur. Kuruluşun güvenlik yönetim sisteminde ciddi boşluklar olduğu ve bu boşlukların benzer olayların tekrarlanma riskini artırdığı tespit edilmiştir. Güvenlik kültürünün zayıflığı ve üretim öncelikli yaklaşım, riskli davranışların normalleşmesine katkıda bulunmuştur. Bu rapor, sadece mevcut eksiklikleri belirlemekle kalmayıp, aynı zamanda gelecekteki olayları önlemek için kapsamlı ve entegre bir eylem planı sunmaktadır. Bu eylem planının titizlikle uygulanması, kuruluşun genel güvenlik performansını önemli ölçüde artıracaktır.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Torna tezgâhı (T-12) için acil ve detaylı risk değerlendirmesi yapılarak, keskin talaş ve kenar tehlikelerine yönelik tüm potansiyel riskler belirlenmeli ve önceliklendirilmelidir.</li>
+<li contenteditable="true">Torna tezgâhı koruyucu bariyerlerinin teknik uygunluğu ve işlevselliği derhal kontrol edilmeli, herhangi bir arıza veya eksiklik durumunda hızlıca onarım veya değiştirme işlemleri yapılmalıdır.</li>
+<li contenteditable="true">Keskin talaş işlemleri için uygun kesilmeye dayanıklı eldivenler (EN 388 Grade 3+ veya üzeri) tüm torna operatörlerine temin edilmeli ve kullanımı zorunlu hale getirilmelidir.</li>
+<li contenteditable="true">Torna tezgâhında güvenli parça hizalama için yazılı, adım-adım standart işletim prosedürü (SOP) oluşturulmalı ve tüm operatörlere bu konuda kısa süreli, uygulamalı eğitimler verilmelidir.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kuruluş genelinde kapsamlı bir İş Sağlığı ve Güvenliği Yönetim Sistemi (İSGYS) kurulmalı veya mevcut sistem güçlendirilerek, risk değerlendirmesi, prosedür yönetimi, eğitim, denetim ve olay araştırması süreçleri entegre edilmelidir.</li>
+<li contenteditable="true">Tüm tehlikeli görevler için periyodik risk değerlendirmesi ve KKE prosedür güncellemeleri sistematik hale getirilmeli, bulgular düzenli olarak gözden geçirilerek aksiyon planlarına dönüştürülmelidir.</li>
+<li contenteditable="true">Çalışanların yetkinlikleri düzenli olarak değerlendirilmeli ve belirlenen eksiklikler doğrultusunda sürekli eğitim ve gelişim programları sunulmalıdır. Özellikle yüksek riskli görevlerde çalışanların yetkinlikleri belgelendirilmelidir.</li>
+<li contenteditable="true">Güçlü bir güvenlik kültürü oluşturulması amacıyla üst yönetimden başlayarak tüm organizasyona yönelik farkındalık ve katılım programları başlatılmalı, güvenlik performansının ödüllendirilmesi ve uyumsuzlukların disipline edilmesi mekanizmaları kurulmalıdır.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Seviyesi</td>
+                        <td class="current" contenteditable="true">Yüksek (Sistemik)</td>
+                        <td class="target" contenteditable="true">Düşük</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Uyum Oranı</td>
+                        <td class="current" contenteditable="true">%60 (Tahmini)</td>
+                        <td class="target" contenteditable="true">%95</td>
+                    </tr>
+
+                    <tr>
+                        <td>Eğitim Kapsamı</td>
+                        <td class="current" contenteditable="true">Temel ve Yetersiz</td>
+                        <td class="target" contenteditable="true">Kapsamlı ve Sürekli</td>
+                    </tr>
+
+                    <tr>
+                        <td>Bakım Periyodu</td>
+                        <td class="current" contenteditable="true">Reaktif/Düzensiz</td>
+                        <td class="target" contenteditable="true">Proaktif ve Planlı</td>
+                    </tr>
+
+                    <tr>
+                        <td>Denetim Sıklığı</td>
+                        <td class="current" contenteditable="true">Aylık/Düzensiz</td>
+                        <td class="target" contenteditable="true">Haftalık/Günlük</td>
+                    </tr>
+
+                    <tr>
+                        <td>KKE Seçim Süreci</td>
+                        <td class="current" contenteditable="true">Genel/Yetersiz</td>
+                        <td class="target" contenteditable="true">Risklere Özel/Optimal</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            
+            <div id="decision-tree-diagram" style="background: white; padding: 10px; border: 1px solid #ddd; width: 100%; height: 800px; overflow: hidden;">
+                <div class="mermaid" style="width: 100%; height: 100%;">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>**Why-1: Çalışan neden işlenen parçanın keskin talaş<br/>yüzeyine doğrudan temas ederek elle hizalama işlemini<br/>gerçekleştirebildi?** (Alternatif formülasyon: Neden<br/>çalışan, dönen/işlenen parçaya doğrudan el ile<br/>erişebilmiş ve keskin talaş yüzeyine temas etmiştir?)"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Çalışan keskin talaş yüzeyine doğrudan temas ederek<br/>elle hizalama işlemini gerçekleştirebildi, çünkü: 1.<br/>**Birincil neden**: Torna tezgâhının koruyucu bariyeri<br/>tam kapalı değildi. Bu, işlenen parçaya ve keskin<br/>talaslarına fiziksel erişimi engelleyen tasarımsal<br/>kontrol mekanizmasının başarısız olması anlamına gelir.<br/>2. **Operasyonel neden**: Hizalama işleminin doğası<br/>gereği, çalışanın işlenen parçaya yakın konumda<br/>çalışması gereklidir; bu da kapalı olmayan bariyer<br/>nedeniyle doğrudan temas riskini yaratır. 3. **İkincil<br/>neden**: Kullanılan standart eldiven, keskin<br/>talaşlardan koruma sağlayacak özellikte değildir."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden torna tezgâhının koruyucu bariyeri (T-12) o anda<br/>tam kapalı durumda değildi? (Tasarımsal eksiklik mi,<br/>bakım/kontrol yetersizliği mi, yoksa hizalama işlemi<br/>sırasında operatör tarafından açık bırakılmış mı?)"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["Koruyucu bariyerin (T-12) tam kapalı durumda<br/>olmamasının nedenleri çok faktörlüdür: **Birincil Neden<br/>— Operatör Davranışı**: Çalışan parçayı 'elle<br/>hizalarken' bariyeri tam kapalı tutmadığından, iş<br/>akışını hızlandırmak veya parçaya daha iyi erişim<br/>sağlamak amacıyla bariyeri kısmen açık bırakmış<br/>olabilir. **İkincil Neden — Prosedür/Tasarım<br/>Eksikliği**: Hizalama işlemi için bariyerin açık<br/>kalmasının gerekli veya kabul edilen bir uygulama<br/>olması, prosedürel boşluğa işaret eder. Güvenli<br/>hizalama yöntemi tanımlanmamıştır. **Üçüncü Neden —<br/>Bakım/Kontrol Yetersizliği**: Bariyerin tutuşması,"]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden operatör, hizalama işlemi için bariyeri tam<br/>kapalı tutmanın gerekli olduğunu bilmiyordu veya bu<br/>talimatı uygulamıyordu — eğitim eksikliği mi, prosedür<br/>netliğinin yetersizliği mi, yoksa hizalama işleminin<br/>zaman baskısı altında bariyerin açık tutulmasının<br/>'normal pratik' haline gelmesinden mi kaynaklanıyordu?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Operatörün bariyeri tam kapalı tutmama nedenleri<br/>muhtemelen üç faktörün kombinasyonundan<br/>kaynaklanmaktadır: 1. **Prosedür Netliğinin<br/>Yetersizliği**: Hizalama işlemi sırasında bariyerin tam<br/>kapalı kalması gerekliliğinin yazılı talimatlarında ne<br/>kadar açık ve vurgulı olduğu belirsizdir. 'Hafif<br/>hizalama' işlemleri için bariyerin açık<br/>tutulabileceğine dair gayri resmi uygulamaların varlığı<br/>muhtemeldir. 2. **Eğitim Eksikliği**: Operatöre bu<br/>torna tezgâhı için yeterli güvenlik eğitimi verilmiş<br/>olup olmadığı, özellikle hizalama işleminin kritik<br/>güvenlik adımları ve bariyerin rolü konusunda eğitim"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden hizalama işlemleri sırasında bariyerin açık<br/>tutulmasının gayri resmi bir uygulama haline gelmesine<br/>ve bu uygulamanın yönetim tarafından<br/>kontrol/düzeltilmeden devam etmesine izin verilmiştir?<br/>(İş hızı baskısı, eksik denetim, prosedür güncelleme<br/>eksikliği, eğitim izlemesinin yetersizliği, risk<br/>algısının düşük seviyede olması vb. faktörlerin ne<br/>olduğu)"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Bariyerin açık tutulmasının gayri resmi uygulama<br/>haline gelmesine izin verilmesinin kök sebepleri,<br/>aşağıdaki sistemik ve yönetimsel eksikliklerin<br/>kombinasyonundan kaynaklanmaktadır: 1. **Denetim ve<br/>Uygulamayı Sağlama Mekanizmalarının Yetersizliği**:<br/>Yönetim, çalışanların prosedürden sapmasını izlemek,<br/>tespit etmek ve düzeltmek için etkin bir sistem<br/>kurmamıştır. Gayri resmi uygulamanın varlığı, rutin<br/>gözetim ve auditlerin eksikliğini gösterir. 2.<br/>**Prosedürün Formalitede Kalması**: Yazılı güvenlik<br/>prosedürü mevcut olmasına rağmen, uygulamada ('çalışma<br/>kültürü') bariyerin açık tutulması normalize"]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Bu yazılı güvenlik prosedürlerinin (bariyer<br/>kapatılması) çalışanlar tarafından sistem olarak<br/>uygulanmasını sağlamak ve uyumsuzluğu tespit/düzeltmek<br/>için, yönetim tarafından etkin bir gözetim, denetim ve<br/>cezalandırma mekanizması neden kurulmamış veya<br/>uygulanamamıştır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A8 --> Q9
+    A10["Yönetim tarafından yazılı güvenlik prosedürlerinin<br/>(bariyer kapatılması) uygulanmasını sağlamak için<br/>sistematik bir gözetim, denetim ve cezalandırma<br/>mekanizması kurulmamıştır. Olay analizi göstermektedir<br/>ki: 1. **Sistematik Denetim Mekanizmasının Eksikliği**:<br/>Bariyer kapatılması prosedürünün uygulanıp<br/>uygulanmadığını belirlemek, dokümante etmek ve<br/>uyumsuzluğu tespit etmek için hiçbir audit, kontrol<br/>listesi veya periyodik denetim programı<br/>bulunmamaktadır. 2. **Uyumsuzluğu Düzeltme Prosesinin<br/>Yokluğu**: Koruyucu bariyer tam kapalı olmadığında veya<br/>standart eldiven gibi uygun olmayan koruyucu donanım"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN (D9.5 - Monitoring/Audit Inadequate (Sistematik Prosedür Uyum Denetimi Eksikliği)
+
+İkincil: D1.3 - Lack of Accountability (Uyumsuzluğu tespit etme ve cezalandırma mekanizmasının eksikliği)):</b><br/>Kök Neden<br/>Yönetim tarafından yazılı güvenlik<br/>prosedürlerinin (bariyer kapatılması)<br/>uygulanmasını sağlamak için sistematik bir<br/>gözetim, denetim ve cezalandırma mekanizması<br/>kurulmamıştır. Olay analizi göstermektedir ki: 1.<br/>**Sistematik Denetim Mekanizmasının Eksikliği**:<br/>Bariyer kapatılması prosedürünün uygulanıp<br/>uygulanmadığını belirlemek, dokümante etmek ve<br/>uyumsuzluğu tespit etmek için hiçbir audit,<br/>kontrol listesi veya periyodik denetim programı<br/>bulunmamaktadır. 2. **Uyumsuzluğu Düzeltme<br/>Prosesinin Yokluğu**: Koruyucu bariyer tam kapalı"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden çalışan, torna parçasını elle hizalarken,<br/>koruyucu bariyer tarafından engellenmeden keskin talaş<br/>yüzeyine doğrudan temas edebildi?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q11
+    A12["Çalışan, keskin talaş yüzeyine doğrudan temas edebildi<br/>çünkü koruyucu bariyer tam kapalı değildi. Tasarımsal<br/>veya bakımsal bir eksiklik nedeniyle, üretim süreci<br/>sırasında keskin yüzeylere fiziksel erişim<br/>engellenmedi. Standart eldivenlerin kesilmeye dayanıklı<br/>olmaması ise yaralanmanın şiddeti açısından ikincil bir<br/>faktördür."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Koruyucu bariyer neden tam kapalı değildi? (Tasarımsal<br/>yetersizlik mi, bakım/onarım eksikliği mi, yanlış<br/>kurulum mu, yoksa işletme sırasında kasıtlı/kasıtsız<br/>olarak açılmış/kaldırılmış mı?)"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Koruyucu bariyer tam kapalı olmama sebebi, olay<br/>raporunda açıkça belirtilmemişse de, mevcut kanıtlar<br/>işletme sırasında kasıtsız açılma/kaldırılma<br/>olasılığını işaret etmektedir. Bunun nedenleri: -<br/>Parçayı hizalama işlemi sırasında bariyer kısmi açılmış<br/>olabilir - İş hızlandırma veya kolaylık amaçlı kasıtsız<br/>açılma - Tasarımsal yetersizlik (bariyer kolay<br/>açılabilir) veya bakım kaydı yokluğu Kesinlikle<br/>belirlenmesi için: Bariyer tasarım dökümanları,<br/>bakım/onarım kayıtları, ve operatör mülakat<br/>yapılmalıdır."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Bariyer işletme sırasında kısmi<br/>açılmasına/kaldırılmasına neden olan temel faktör nedir<br/>— tasarımsal bir hata (bariyer kolay açılabilir),<br/>eğitim/prosedür boşluğu (operatöre güvenli hizalama<br/>yöntemi öğretilmedi), işletme baskısı (hız/verimlilik<br/>hedefleri bariyer kullanımı atlattırmış), yoksa diğer<br/>sistem faktörü?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Temel faktörler **eğitim/prosedür boşluğu ve sistem<br/>düzeyinde KKD sağlama eksikliğidir**. Rapordan açık<br/>olarak: 1. **Prosedür Boşluğu**: Operatöre parçayı<br/>güvenli hizalama yöntemi (bariyer tamamen kapalıyken<br/>hizalama veya uygun uçlar/fikstürler kullanarak)<br/>öğretilmemiş veya uygulanmamıştır. 2. **KKD<br/>Eksikliği**: 'Standart eldiven (kesilmeye dayanıklı<br/>değil)' kullanılması, operatöre keskin talaş ve kenar<br/>karşısında uygun koruyucu ekipman sağlanmadığını<br/>gösterir. 3. **Güvenlik Kontrol Zayıflığı**: Bariyer<br/>tam kapalı olmadığı halde çalışmaya devam edilmesi,<br/>işletme prosedürlerinin uygulanmadığını veya eksik"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Neden torna tezgâhında keskin talaş ve kenar işlemleri<br/>için uygun koruyucu ekipman (kesilmeye dayanıklı<br/>eldiven, kenar koruyucusu vb.) ve güvenli hizalama<br/>prosedürü tanımlanmamış, uygulanmamış veya<br/>denetlenemiş?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A16 --> Q17
+    A18["Torna tezgâhında keskin talaş işlemleri için uygun<br/>koruyucu ekipman ve güvenli hizalama prosedürü<br/>tanımlanmamış, uygulanmamış ve denetlenememesinin kök<br/>nedeni: **İş Sağlığı Yetkinliği Değerlendirmesinin<br/>Yetersizliği (C3.1)** Çalışan, 'elle parça hizalama'<br/>görevinde kesik riski ile ilgili yeterli beceri, bilgi<br/>ve davranış standartlarının değerlendirilmemiştir.<br/>Sonuç olarak: 1. **PPE Seçimi Eksikliği**: Keskin talaş<br/>işlemleri için kesilmeye dayanıklı eldiven<br/>(Cut-resistant gloves EN 388 Grade 3+) seçimi<br/>yapılmamış; standart eldiven kullanılmıştır. 2.<br/>**Prosedür Tanımlanmamışlığı**: 'Keskin talaş hizalama"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Çalışanların 'keskin talaş işlemleri sırasında uygun<br/>PPE seçimi ve güvenli hizalama prosedürü' konusunda<br/>yetkinliğinin değerlendirilmemesinin kök sebebi nedir?<br/>(Örneğin: Yetkinlik değerlendirme standardı/prosedürü<br/>tanımlanmamış mı? İş Sağlığı ekibi veya eğitim<br/>sorumlusu atanmamış mı? Risk değerlendirmesi yapılmamış<br/>mı? Denetim/takip sistemi eksik mi?)"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Çalışanların keskin talaş işlemleri sırasında uygun<br/>PPE seçimi ve güvenli hizalama prosedürü konusundaki<br/>yetkinliğinin değerlendirilmemesinin kök sebepleri: 1.<br/>**Yetkinlik Değerlendirme Standardı/Prosedürü<br/>Tanımlanmamış (D3.1 + C3.1)**: Rapordan, torna işlemi<br/>yapan çalışanın bu kritik görev için yetkinliği<br/>değerlendirilmiş olup olmadığı anlaşılmamaktadır.<br/>Keskin talaş ve PPE seçimi gibi teknik konularda formal<br/>değerlendirme sistemi yoktur. 2. **Risk Değerlendirmesi<br/>Eksik/Yetersiz (D4.1)**: Torna tezgâhında keskin talaş<br/>yüzeylerle çalışmanın risk analizi yapılmamış veya<br/>yetersiz yapılmıştır. PPE gereksinimleri (kesilmeye"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN (Birden fazla kod uygulanabilir:
+- **C3.1**: Yetkinlik Değerlendirmesi Yetersiz (çalışanın keskin talaş PPE/prosedürü konusunda yetkinliği değerlendirilmemiş)
+- **D3.1**: Eğitim Verilmemiş (keskin talaş işlemlerine özgü eğitim prosedürü/standart bulunmuyor)
+- **D4.1**: Risk Değerlendirmesi Yetersiz (keskin talaş hazardları ve PPE gereksinimleri analiz edilmemiş)
+- **D9.1**: SPP Eksik (keskin talaş işlemi prosedürü tanımlanmamış)
+- **D9.5**: Uyum Denetim Sistemi Eksik (bariyerler açıkken çalışma devam etti, gözlem yoktu)
+- **D1.2**: Çalışan Düzeyinde Denetim Yetersiz (koruyucu bariyer tam kapalı değilken müdahale edilmedi)
+
+**Birincil Kök Sebep: D9.1 + D4.1 + C3.1** (Prosedür yoktur, risk değerlendirmesi eksiktir, yetkinlik değerlendirilmemiştir)):</b><br/>Kök Neden<br/>Çalışanların keskin talaş işlemleri sırasında<br/>uygun PPE seçimi ve güvenli hizalama prosedürü<br/>konusundaki yetkinliğinin değerlendirilmemesinin<br/>kök sebepleri: 1. **Yetkinlik Değerlendirme<br/>Standardı/Prosedürü Tanımlanmamış (D3.1 + C3.1)**:<br/>Rapordan, torna işlemi yapan çalışanın bu kritik<br/>görev için yetkinliği değerlendirilmiş olup<br/>olmadığı anlaşılmamaktadır. Keskin talaş ve PPE<br/>seçimi gibi teknik konularda formal değerlendirme<br/>sistemi yoktur. 2. **Risk Değerlendirmesi<br/>Eksik/Yetersiz (D4.1)**: Torna tezgâhında keskin<br/>talaş yüzeylerle çalışmanın risk analizi"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden çalışan, torna tezgâhındaki işlenen parçanın<br/>keskin talaş yüzeyine doğrudan el ile temas etmiştir?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q21
+    A22["Çalışan torna tezgâhındaki işlenmiş parçanın keskin<br/>talaş yüzeyine doğrudan el ile temas etmiştir çünkü<br/>koruyucu bariyer tam kapalı değildi. Parça hizalama<br/>işlemi sırasında fiziksel engelleme mekanizması aktif<br/>değildi ve çalışan engelsiz şekilde keskin yüzeye<br/>ulaşabilmiştir. Ek olarak, kullanılan standart eldiven<br/>kesilmeye dayanıklı olmadığından, kişisel koruyucu<br/>ekipman bu tehlikeyi önleyememiştir."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden koruyucu bariyer tam kapalı haldeyken veya<br/>açılıp kapatılması kontrollü şekilde yapılırken,<br/>çalışan parça hizalama işlemini<br/>gerçekleştirememektedir? Başka bir deyişle, hizalama<br/>işleminin yapılması için bariyer devre dışı bırakılması<br/>mı gerekmektedir, yoksa bariyer tasarımı veya prosedürü<br/>bu işlemi engel mi oluşturmaktadır?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Koruyucu bariyer tasarımı veya mevcut prosedürü, parça<br/>hizalama işlemini tam kapalı durumda yapmayı<br/>engellemektedir. Bariyer tam kapalıyken hizalama<br/>yapılamadığı için, çalışan bariyer koruyuculuğunu eksik<br/>halde (tam kapalı olmayan durumda) işlem<br/>gerçekleştirmek zorunda kalmıştır. Bu, tasarım kusuru<br/>veya prosedürel yetersizlik nedeniyle güvenlik<br/>kontrolleri ile üretim ihtiyaçlarının çatışması<br/>sonucudur. Sorunu çözmek için: (1) bariyer tasarımı<br/>değiştirilerek hizalama işlemi kapalı durumda<br/>yapılabilir hale getirilmeli, (2) alternatif hizalama<br/>yöntemi geliştirilmeli, veya (3) ekipman değiştirilmeli"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden torna tezgâhı (T-12) koruyucu bariyer tasarımı<br/>veya mevcut işlem prosedürü, parça hizalama işleminin<br/>tamamı kapalı güvenlik bariyer altında<br/>gerçekleştirilmesine izin vermemektedir? (Tasarım<br/>kararı sırasında hangi kısıtlamalar/gereksinimler göz<br/>önüne alınmış veya hangi faktörler göz ardı<br/>edilmiştir?)"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A24 --> Q25
+    A26["Torna tezgâhı T-12'nin koruyucu bariyer tasarımı,<br/>parça hizalama işleminin tam kapalı güvenlik bariyer<br/>altında gerçekleştirilmesine aşağıdaki nedenlerden<br/>dolayı izin vermemektedir: 1. **Operatör görüş<br/>gereksinimiği**: Hassas parça hizalaması için doğrudan<br/>görsel kontrol ihtiyacı 2. **İşlem ergonomisi**:<br/>Operatörün erişim ve hareket özgürlüğü gereksinimi 3.<br/>**Tasarım yaşı ve standart güncelliği**: T-12 tezgâhı<br/>muhtemelen modern risk değerlendirmesi öncesi<br/>tasarlanmış olup, ISO 13850/EN ISO 12100<br/>standartlarındaki güncel makine güvenliği<br/>gereksinimlerini karşılamamaktadır 4. **Prosedürel"]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Kesme/puncture dirençli eldiven kullanımı ve parça<br/>hizalama sırasında ek kişisel koruma ekipmanları<br/>(kesintisiz göğüs/kol koruyucu) uygulanmasının neden<br/>zorunlu kılınmadığı ve/veya mevcut prosedürlerde bu<br/>koruyucu önlemlerin neden eksik bırakıldığının nedeni<br/>nedir?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A26 --> Q27
+    A28["Kesme/puncture dirençli eldiven ve ek koruma<br/>ekipmanlarının (kesintisiz göğüs/kol koruyucu)<br/>kullanımının zorunlu kılınmadığının nedeni, iş riski<br/>değerlendirmesinin eksik yapılması, çalışanın torna<br/>parçası hizalama işi sırasında maruz kalacağı<br/>kesme/delinme riskleri hakkında yeterli<br/>bilgilendirilmemesi ve mevcut prosedürlerde bu koruyucu<br/>önlemlerin açıkça tanımlanmamış olmasıdır. Standart<br/>eldiven kullanılması, keskin talaş yüzeyine karşı<br/>yetersiz korumanın göstergesidir. Bu, beceri<br/>değerlendirmesi sırasında çalışanın görevini güvenli<br/>bir şekilde yerine getirebilmesi için gerekli KKE"]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Neden torna tezgâhı görevleri için periyodik risk<br/>değerlendirmesi ve KKE prosedür güncellemeleri yönetim<br/>tarafından sistemli olarak yapılmamakta ve çalışanlar<br/>için tehlikeli görevlerdeki güvenlik standartları<br/>düzenli olarak denetlenmemektedir?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A28 --> Q29
+    A30["Torna tezgâhı görevleri için periyodik risk<br/>değerlendirmesi ve KKE prosedür güncellemelerinin<br/>yönetim tarafından sistemli olarak yapılmaması temel<br/>nedeni: **Sistemli Uyum Denetim Programının Olmaması<br/>(D9.5):** Kuruluşun tehlikeli görevlerdeki güvenlik<br/>standartlarını düzenli olarak denetlemek için kapsamlı<br/>bir audit/compliance tracking sistemi tasarlanmamıştır.<br/>Risk değerlendirme prosedürleri ve KKE uygunluğu<br/>kontrol edilmemekte, prosedürler rutin olarak<br/>güncellenmemektedir. **Risk Değerlendirmesinin Yetersiz<br/>Olması (D4.1):** Torna tezgâhı görevlerinin<br/>tehlikelerinin (keskin talaş, koruyucu bariyer"]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN (**D9.5** (Monitoring/Audit Inadequate - Systemically missing) - PRIMARY
+**D4.1** (Risk Assessment Inadequate - General Planning) - SECONDARY):</b><br/>Kök Neden<br/>Torna tezgâhı görevleri için periyodik risk<br/>değerlendirmesi ve KKE prosedür güncellemelerinin<br/>yönetim tarafından sistemli olarak yapılmaması<br/>temel nedeni: **Sistemli Uyum Denetim Programının<br/>Olmaması (D9.5):** Kuruluşun tehlikeli<br/>görevlerdeki güvenlik standartlarını düzenli<br/>olarak denetlemek için kapsamlı bir<br/>audit/compliance tracking sistemi<br/>tasarlanmamıştır. Risk değerlendirme prosedürleri<br/>ve KKE uygunluğu kontrol edilmemekte, prosedürler<br/>rutin olarak güncellenmemektedir. **Risk<br/>Değerlendirmesinin Yetersiz Olması (D4.1):** Torna"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A30 --> ROOT3
+
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                // Mermaid initialization için bekle
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: true,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 15,
+                            nodeSpacing: 50,
+                            rankSpacing: 80,
+                            diagramPadding: 10
+                        },
+                        themeVariables: {
+                            fontSize: '11px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#333',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    // Mermaid yüklenene kadar bekle
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: true,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 15,
+                                    nodeSpacing: 50,
+                                    rankSpacing: 80,
+                                    diagramPadding: 10
+                                },
+                                themeVariables: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

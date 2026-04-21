@@ -236,7 +236,7 @@ JSON ÇIKTI:
 }}"""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-sonnet-4.5",
+            model="anthropic/claude-3.5-haiku",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "Sen İSG analiz kalite denetçisisin. Sadece JSON döndür."},
@@ -339,7 +339,7 @@ JSON ÇIKTI:
 Karar kriterleri: PASS≥7.0, REVISE=5.0-6.9, REJECT<5.0"""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-sonnet-4.5",
+            model="anthropic/claude-3.5-haiku",
             temperature=0.1,
             messages=[
                 {"role": "system", "content": "Sen 5-Why kalite denetçisisin. Sadece JSON."},

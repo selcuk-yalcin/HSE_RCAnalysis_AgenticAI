@@ -9,6 +9,7 @@ from typing import Dict, Optional
 import json
 import os
 from .json_parser import extract_json_from_response, safe_json_parse
+from .model_constants import OPENROUTER_DEFAULT_CHAT_MODEL
 
 
 class AssessmentAgent:
@@ -142,7 +143,7 @@ Return ONLY the event type name."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5",#actual model 
+                model=OPENROUTER_DEFAULT_CHAT_MODEL,#actual model 
                 #model = "deepseek/deepseek-r1-0528:free" # test model 
                 temperature=0.0,
                 max_tokens=50,
@@ -187,7 +188,7 @@ Return ONLY the severity level."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5", 
+                model=OPENROUTER_DEFAULT_CHAT_MODEL,
                 #model=deepseek/deepseek-r1-0528:free"  # test model 
                 temperature=0.0,
                 max_tokens=50,
@@ -234,7 +235,7 @@ Return ONLY JSON."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5", # Yasal Durumu (RIDDOR) Değerlendir
+                model=OPENROUTER_DEFAULT_CHAT_MODEL, # Yasal Durumu (RIDDOR) Değerlendir
                 #model="openai/gpt-4o-mini",  #test model
                 temperature=0.0,
                 max_tokens=200,
@@ -301,7 +302,7 @@ Return a JSON with:
 Return ONLY valid JSON."""
 
         response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5", # 
+                model=OPENROUTER_DEFAULT_CHAT_MODEL, # 
                 #model="openai/gpt-4o-mini",  #test model 
             temperature=0.2,
             max_tokens=500,

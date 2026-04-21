@@ -11,6 +11,8 @@ from datetime import datetime
 from typing import Dict, Optional
 from openai import OpenAI
 
+from .model_constants import OPENROUTER_DEFAULT_CHAT_MODEL
+
 
 class ClaudeSkillPDFAgent:
     """
@@ -29,7 +31,7 @@ class ClaudeSkillPDFAgent:
             api_key=self.api_key
         )
         
-        self.model = "anthropic/claude-sonnet-4.6"
+        self.model = OPENROUTER_DEFAULT_CHAT_MODEL
         self.output_dir = Path("outputs/reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         

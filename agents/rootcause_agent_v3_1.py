@@ -123,6 +123,15 @@ except ImportError:
     except ImportError:
         from agents.branch_critic import BranchCriticAgent
 
+try:
+    from .report_text_sanitize import strip_hse_codes
+except ImportError:
+    try:
+        from agents.report_text_sanitize import strip_hse_codes
+    except ImportError:
+        def strip_hse_codes(t: str) -> str:
+            return t if isinstance(t, str) else t
+
 # Optional RAG
 try:
     from rag_pipeline.retrieval import RAGAnalyzer
@@ -159,20 +168,19 @@ def _openrouter_litellm_model() -> str:
 
 
 def _why1_question_seed(incident_summary: str, immediate_cause: Dict) -> str:
-    """Why-1 için LLM girdisi: zincir birincil zararlı mekanizmadan başlasın (A/B etiketi bağlamdır)."""
-    code = immediate_cause.get("code", "")
+    """Why-1 için LLM girdisi: zincir doğrudan neden cümlesinden başlasın; olay özetini tekrarlatma."""
     cause_tr = (immediate_cause.get("cause_tr") or "").strip()
     title = (immediate_cause.get("standard_title_tr") or "").strip()
+    direct_short = cause_tr or title
     return (
         "GÖREV — Why-1 (ilk 'Neden?'):\n"
-        "Olay özetindeki BİRİNCİL zararlı olay/tesir mekanizmasına odaklan. "
-        "Elektrik, ark, temas vb. söz konusuysa ilk soru, kişinin neden elektrik akımına kapıldığı / "
-        "enerjili iletken veya canlı devreye temas ettiği yönünde olmalıdır.\n"
-        "LOTO, izin, eğitim, eldiven eksikliği vb. bu ilk sorunun tek başına konusu olmamalı; "
-        "bunlar genelde bu mekanizmaya yanıt olarak sonraki 'Neden?' seviyelerinde ortaya çıkar.\n\n"
-        f"OLAY ÖZETİ:\n{incident_summary}\n\n"
-        f"Bu dal için A/B doğrudan neden (çeşitlendirme bağlamı; Why-1 sorusunu yalnızca buna göre "
-        f"daraltma): [{code}] {title} — {cause_tr}"
+        "İlk soru KISA olmalı ve doğrudan nedeni hedeflemeli. Olay özetinin tamamını veya senaryoyu "
+        "baştan anlatan uzun soru yazma.\n"
+        "Biçim: 'Neden [doğrudan neden / birincil zararlı mekanizma kısa ifade]?' gibi — ör. doğrudan neden "
+        "keskin talaşa temas ise soru 'Neden keskin talaş yüzeyine doğrudan temas oluştu?' yönünde olabilir.\n"
+        "Sonraki Why seviyelerinde her soru, bir önceki cevabın ana noktasından türetilir (zincir kopmasın).\n\n"
+        f"KISA DOĞRUDAN NEDEN (bu dal):\n{direct_short}\n\n"
+        f"BAĞLAM (gerekirse tek cümleyle):\n{incident_summary[:1200]}"
     )
 
 
@@ -190,10 +198,9 @@ class WhyQuestion(dspy.Signature):
     chain_level = dspy.InputField(desc="Zincir seviyesi (Why-1 ... Why-5)")
 
     question = dspy.OutputField(
-        desc="Why-1: Soru, olay özetindeki BİRİNCİL zararlı tesir üzerine olmalı (ör. elektrik olayında "
-             "'Neden elektrik akımına kapıldı / canlı devreye temas edildi?'). "
-             "İlk soru LOTO/izin gibi ikincil faktörle başlamamalı; onlar sonraki seviyelerde bağlanır. "
-             "Why-2+: Önceki cevaptan doğrudan türet, zincir kopmasın."
+        desc="Why-1: Tek cümlelik soru; doğrudan neden / birincil mekanizmayı sor (olay özetini tekrar etme). "
+             "Why-2+: Bir önceki cevabın özünü konu alan kısa 'Neden ...?' (önceki cevabı tekrarlayan giriş cümlesi yazma). "
+             "Metinde HSG kodu veya (D4.1) gibi parantezli kod kullanma."
     )
 
 
@@ -204,7 +211,7 @@ class WhyAnswer(dspy.Signature):
     taxonomy_codes = dspy.InputField(desc="İlgili HSG245 kategori kodları")
     
     answer = dspy.OutputField(
-        desc="Cevap açıklaması - rapordaki somut olgulara dayalı"
+        desc="Cevap açıklaması - rapordaki somut olgulara dayalı. Metinde HSG kodu veya parantez içi kod yazma."
     )
     hsg245_code = dspy.OutputField(
         desc="İlgili HSG245 kodu (ör: B2.1, C3.2)"
@@ -435,8 +442,9 @@ class WhyChain(dspy.Module):
                 incident_context=incident_ctx,
                 taxonomy_codes=taxonomy
             )
-            answer = answer_result.answer
+            answer = strip_hse_codes((answer_result.answer or "").strip())
             code = answer_result.hsg245_code
+            question = strip_hse_codes(question)
             
             # 3. SEMANTİK FARKLILIĞA KARŞI KONTROL (V3.1 FEATURE)
             if self.enable_diversity and level >= 2:
@@ -449,7 +457,7 @@ class WhyChain(dspy.Module):
                 
                 if diverse_check:
                     # Diversified version mevcutsa kullan
-                    answer = diverse_check
+                    answer = strip_hse_codes(str(diverse_check).strip())
             
             chain.append({
                 "level": level,
@@ -473,7 +481,7 @@ class WhyChain(dspy.Module):
         
         root_cause_data = {
             "code": final_code,
-            "cause_tr": final_answer,
+            "cause_tr": strip_hse_codes(final_answer),
             "category_type": validation.category,
             "explanation_tr": f"5-Why zincirinin sonucu: {final_answer}",
             "confidence": float(validation.confidence) if validation.confidence else 0.8

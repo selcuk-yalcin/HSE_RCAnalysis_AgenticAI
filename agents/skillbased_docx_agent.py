@@ -39,6 +39,11 @@ try:
 except ImportError:
     from json_parser import extract_json_from_response
 
+try:
+    from agents.report_text_sanitize import strip_hse_codes
+except ImportError:
+    from .report_text_sanitize import strip_hse_codes
+
 
 def _resolve_openrouter_chat_completions_url() -> str:
     """OPENROUTER_BASE_URL veya tam URL; çift /v1 ve yanlış path hatalarını azaltır."""
@@ -108,9 +113,9 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
     "incident_summary_short": "Olayın 2-3 cümle özeti - tekrarlardan kaçın, öz ve net yaz"
   },
   "executive_summary": {
-    "what_happened": "Ne oldu - 1 kısa paragraf, cover'daki özetten farklı olsun",
-    "where_happened": "Nerede oldu - sadece yer bilgisi",
-    "who_affected": "Kimler etkilendi - kısa",
+    "what_happened": "Ne oldu - 1-2 paragraf; yer, ekipman ve etkilenen kişi bilgisini burada doğal cümlelerle ver (ayrı satırda tekrarlama yok)",
+    "where_happened": "",
+    "who_affected": "",
     "immediate_response": "İlk müdahale - 1 paragraf",
     "key_findings": [
       "Bulgu 1 - kısa",
@@ -186,11 +191,11 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
       "initial_condition": "Bu faktörün başlangıç koşulu - 1 paragraf",
       "direct_cause": "Doğrudan nedenin kısa açıklaması",
       "why_chain": [
-        {"number": 1, "question": "Neden oldu?", "answer": "Çünkü detaylı yanıt", "code": "C", "category": "İş/Görev"},
-        {"number": 2, "question": "Neden?", "answer": "Çünkü detaylı yanıt", "code": "B", "category": "Organizasyonel"},
-        {"number": 3, "question": "Neden?", "answer": "Çünkü detaylı yanıt", "code": "B", "category": "Organizasyonel"},
-        {"number": 4, "question": "Neden?", "answer": "Çünkü detaylı yanıt", "code": "D", "category": "Organizasyonel"},
-        {"number": 5, "question": "Neden?", "answer": "Çünkü kök neden", "code": "D", "category": "Organizasyonel"}
+        {"number": 1, "question": "Neden [doğrudan neden kısa ifade]?", "answer": "Kısa olgu + gerekirse kısa açıklama", "code": "", "category": ""},
+        {"number": 2, "question": "Bir önceki yanıtın özünü soran kısa Neden?", "answer": "...", "code": "", "category": ""},
+        {"number": 3, "question": "...", "answer": "...", "code": "", "category": ""},
+        {"number": 4, "question": "...", "answer": "...", "code": "", "category": ""},
+        {"number": 5, "question": "...", "answer": "...", "code": "", "category": ""}
       ],
       "root_cause_title": "Kök Neden 1 başlığı",
       "root_cause_detail": "Kök nedenin çok detaylı açıklaması - 3-4 cümle",
@@ -300,6 +305,9 @@ KURALLAR:
 - Kısa cevaplar değil, DETAYLI açıklamalar
 - branches dizisi ham verideki tüm dalları içermeli
 - root_causes dizisi ham verideki tüm kök nedenleri içermeli
+- Sınıflandırma / HSG kodları (ör. D4.1, C3.1, H-1.5, K-01), parantez içi kodlar veya "Birincil Kod:" gibi etiketler narrative metinlerde, kök neden açıklamalarında ve why_chain soru-cevaplarında YAZILMAYACAK. JSON şemasındaki code alanlarını boş string bırak veya kullanma.
+- executive_summary: where_happened ve who_affected alanlarını her zaman boş string "" bırak; yer ve kişi bilgisini yalnızca what_happened içinde anlat.
+- why_chain: NEDEN 1, doğrudan nedeni tek cümleyle sor (ör. doğrudan neden "keskin talaşa temas" ise soru "Neden keskin talaş yüzeyine doğrudan temas oluştu?" gibi); olay özetini baştan sona tekrarlayan uzun soru yazma. NEDEN 2–5: Bir önceki yanıtın ana noktasını konu alan kısa "Neden ...?" zinciri kur.
 - SADECE JSON döndür, başka hiçbir şey yazma
 """
 
@@ -468,23 +476,23 @@ def _build_cover(doc, cover: dict):
         "Lokasyon": cover.get("location", "N/A"),
         "Olay Tipi": cover.get("incident_type", "N/A"),
     }, COLOR["dark_blue"])
-    _add_colored_box(doc, "OLAY ÖZETİ", cover.get("incident_summary_short", ""), COLOR["dark_blue"])
+    _add_colored_box(doc, "OLAY ÖZETİ", strip_hse_codes(str(cover.get("incident_summary_short", "") or "")), COLOR["dark_blue"])
     _add_page_break(doc)
 
 
 def _build_executive_summary(doc, es: dict, root_causes: list):
     _add_section_header(doc, "1", "YÖNETİCİ ÖZETİ")
     _add_subsection_header(doc, "1.1 Olay Özeti")
-    for field in ["what_happened", "where_happened", "who_affected", "immediate_response"]:
+    for field in ["what_happened", "immediate_response"]:
         if es.get(field):
-            _add_paragraph(doc, es[field], space_after=6)
+            _add_paragraph(doc, strip_hse_codes(str(es[field])), space_after=6)
     doc.add_paragraph()
     _add_subsection_header(doc, "1.2 Temel Bulgular")
     for finding in es.get("key_findings", []):
         p = doc.add_paragraph()
         p.paragraph_format.space_before = Pt(2)
         p.paragraph_format.space_after = Pt(2)
-        run = p.add_run(f"  {finding}")
+        run = p.add_run(f"  {strip_hse_codes(str(finding))}")
         run.font.size = Pt(10)
         run.font.color.rgb = COLOR["dark_grey"]
     doc.add_paragraph()
@@ -633,8 +641,8 @@ def _build_branches(doc, branches: list):
         run.font.color.rgb = COLOR["white"]
         doc.add_paragraph()
         _add_subsection_header(doc, f"{3+bn}.1 Başlangıç Durumu ve Doğrudan Neden")
-        _add_paragraph(doc, branch.get("initial_condition", ""), space_after=6)
-        _add_paragraph(doc, branch.get("direct_cause", ""), bold=True, space_after=8)
+        _add_paragraph(doc, strip_hse_codes(str(branch.get("initial_condition", "") or "")), space_after=6)
+        _add_paragraph(doc, strip_hse_codes(str(branch.get("direct_cause", "") or "")), bold=True, space_after=8)
         _add_subsection_header(doc, f"{3+bn}.2 5-Why Analiz Tablosu")
         why_chain = branch.get("why_chain", [])
         if why_chain:
@@ -651,8 +659,11 @@ def _build_branches(doc, branches: list):
             for i, why in enumerate(why_chain):
                 row = table.rows[i + 1]
                 bg = COLOR["light_grey"] if i % 2 == 0 else COLOR["white"]
-                qa = f"NEDEN: {why.get('question','')}\nYANIT: {why.get('answer','')}"
-                vals = [f"NEDEN {why.get('number', i+1)}", qa]
+                q = strip_hse_codes(str(why.get("question", "") or why.get("question_tr", "") or ""))
+                a = strip_hse_codes(str(why.get("answer", "") or why.get("answer_tr", "") or ""))
+                qa = f"NEDEN: {q}\nYANIT: {a}"
+                wn = why.get('number') or why.get('level') or (i + 1)
+                vals = [f"NEDEN {wn}", qa]
                 for j, val in enumerate(vals):
                     c = row.cells[j]
                     _set_cell_bg(c, bg)
@@ -662,13 +673,13 @@ def _build_branches(doc, branches: list):
                     run.bold = (j == 0)
         doc.add_paragraph()
         _add_subsection_header(doc, f"{3+bn}.3 Kök Neden")
-        rc_title = f"KOK NEDEN {bn}: {branch.get('root_cause_title','')}"
-        rc_content = f"{branch.get('root_cause_detail','')}"
+        rc_title = f"KOK NEDEN {bn}: {strip_hse_codes(str(branch.get('root_cause_title','') or ''))}"
+        rc_content = strip_hse_codes(str(branch.get('root_cause_detail','') or ''))
         _add_colored_box(doc, rc_title, rc_content, color)
         org_factors = branch.get("organizational_factors", [])
         if org_factors:
             _add_subsection_header(doc, f"{3+bn}.4 Organizasyonel Faktörler")
-            _add_bullet_list(doc, org_factors)
+            _add_bullet_list(doc, [strip_hse_codes(str(x)) for x in org_factors])
         _add_page_break(doc)
 
 
@@ -681,22 +692,24 @@ def _build_meta_root_cause(doc, meta: dict):
     _add_subsection_header(doc, "5.1 Stratejik Kök Neden (Tüm Dalların Ortak Paydası)")
     
     # Ana meta kök neden kutusu
-    meta_title = f"[{meta.get('code', '?')}] {meta.get('title', 'Meta Kök Neden')}"
-    meta_desc = meta.get('description', '')
+    meta_title = strip_hse_codes(str(meta.get('title', 'Meta Kök Neden') or ''))
+    meta_desc = strip_hse_codes(str(meta.get('description', '') or ''))
     _add_colored_box(doc, meta_title, meta_desc, COLOR["red"], COLOR["white"])
     
     # Sentezlenen kodlar
     synthesized = meta.get('synthesized_from', [])
     if synthesized:
         _add_subsection_header(doc, "5.2 Sentezlenen Kök Nedenler")
-        synth_text = f"Bu meta kök neden aşağıdaki {len(synthesized)} kök nedeni birleştirerek üst-seviye sistemik zayıflığı ortaya koymuştur:\n\n"
-        synth_text += "\n".join([f"  • {code}" for code in synthesized])
+        synth_text = (
+            f"Bu meta kök neden, analizdeki {len(synthesized)} dalın ortak paydasından türetilmiş "
+            "üst düzey bir sistemik zayıflığı ifade eder."
+        )
         _add_paragraph(doc, synth_text, space_after=8)
     
     # Sistemik zayıflık
     if meta.get('systemic_weakness'):
         _add_subsection_header(doc, "5.3 Sistemik Zayıflık")
-        _add_paragraph(doc, meta.get('systemic_weakness', ''), space_after=8)
+        _add_paragraph(doc, strip_hse_codes(str(meta.get('systemic_weakness', '') or '')), space_after=8)
     
     # Stratejik sonuçlar
     implications = meta.get('strategic_implications', [])
@@ -2602,16 +2615,16 @@ class SkillBasedDocxAgent:
             <div class="subsection-header">1.1 Olay Özeti</div>
 """
         
-        for field in ["what_happened", "where_happened", "who_affected", "immediate_response"]:
+        for field in ["what_happened", "immediate_response"]:
             if es.get(field):
-                html += f'<div class="paragraph" contenteditable="true">{es[field]}</div>\n'
+                html += f'<div class="paragraph" contenteditable="true">{strip_hse_codes(str(es[field]))}</div>\n'
         
         html += """
             <div class="subsection-header">1.2 Temel Bulgular</div>
             <ul class="bullet-list">
 """
         for finding in es.get("key_findings", []):
-            html += f'<li contenteditable="true">{finding}</li>\n'
+            html += f'<li contenteditable="true">{strip_hse_codes(str(finding))}</li>\n'
         
         html += """
             </ul>
@@ -2773,8 +2786,8 @@ class SkillBasedDocxAgent:
             <div class="section-header">{3+bn}. {branch.get('branch_title', f'KRİTİK FAKTÖR {bn}')}</div>
             
             <div class="subsection-header">{3+bn}.1 Başlangıç Durumu ve Doğrudan Neden</div>
-            <div class="paragraph" contenteditable="true">{branch.get('initial_condition', '')}</div>
-            <div class="paragraph" contenteditable="true" style="font-weight: bold;">{branch.get('direct_cause', '')}</div>
+            <div class="paragraph" contenteditable="true">{strip_hse_codes(str(branch.get('initial_condition', '') or ''))}</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">{strip_hse_codes(str(branch.get('direct_cause', '') or ''))}</div>
             
             <div class="subsection-header">{3+bn}.2 5-Why Analiz Zinciri</div>
             <div class="why-chain">
@@ -2782,22 +2795,21 @@ class SkillBasedDocxAgent:
             
             why_chain = branch.get("why_chain", [])
             for idx, why in enumerate(why_chain):
-                is_last = (idx == len(why_chain) - 1)
-                code_display = '' if is_last else f'<span class="why-code">{why.get("code", "")} - {why.get("category", "")}</span>'
+                qtxt = strip_hse_codes(str(why.get('question', '') or why.get('question_tr', '') or ''))
+                atxt = strip_hse_codes(str(why.get('answer', '') or why.get('answer_tr', '') or ''))
+                wn = why.get('number') or why.get('level') or (idx + 1)
                 html += f"""
                 <div class="why-item">
-                    <div class="why-number">NEDEN {why.get('number', '')}</div>
-                    <div class="why-question" contenteditable="true">{why.get('question', '')}</div>
-                    <div class="why-answer" contenteditable="true">→ {why.get('answer', '')}</div>
-                    {code_display}
+                    <div class="why-number">NEDEN {wn}</div>
+                    <div class="why-question" contenteditable="true">{qtxt}</div>
+                    <div class="why-answer" contenteditable="true">→ {atxt}</div>
                 </div>
 """
             
             colors = ['red', 'orange', 'green', 'blue']
             color = colors[(bn - 1) % len(colors)]
             
-            root_cause_title = branch.get('root_cause_title', '')
-            root_cause_code = branch.get('root_cause_code', '')
+            root_cause_title = strip_hse_codes(str(branch.get('root_cause_title', '') or ''))
             
             html += f"""
             </div>
@@ -2805,7 +2817,7 @@ class SkillBasedDocxAgent:
             <div class="subsection-header">{3+bn}.3 Kök Neden ({root_cause_title})</div>
             <div class="colored-box box-{color}">
                 <div class="box-header" contenteditable="true">KÖK NEDEN {bn}: {root_cause_title}</div>
-                <div class="box-content" contenteditable="true">{branch.get('root_cause_detail', '')}</div>
+                <div class="box-content" contenteditable="true">{strip_hse_codes(str(branch.get('root_cause_detail', '') or ''))}</div>
             </div>
 """
             
@@ -2815,7 +2827,7 @@ class SkillBasedDocxAgent:
             <ul class="bullet-list">
 """
                 for factor in branch.get("organizational_factors", []):
-                    html += f'<li contenteditable="true">{factor}</li>\n'
+                    html += f'<li contenteditable="true">{strip_hse_codes(str(factor))}</li>\n'
                 html += """
             </ul>
 """
@@ -2840,31 +2852,27 @@ class SkillBasedDocxAgent:
         for i, rc in enumerate(root_causes):
             html += f"""
             <div class="root-cause-box root-cause-{i+1}">
-                <div class="root-cause-header" contenteditable="true">KÖK NEDEN {i+1}: {rc.get('title', '')}</div>
+                <div class="root-cause-header" contenteditable="true">KÖK NEDEN {i+1}: {strip_hse_codes(str(rc.get('title', '') or ''))}</div>
                 <div class="root-cause-content">
                     <table style="margin-bottom: 20px;">
                         <tr>
-                            <td style="background: #D6E4F0; font-weight: bold; width: 30%;">Kod</td>
-                            <td contenteditable="true">{rc.get('code', '')}</td>
-                        </tr>
-                        <tr>
                             <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
-                            <td contenteditable="true">{rc.get('category', '')}</td>
+                            <td contenteditable="true">{strip_hse_codes(str(rc.get('category', '') or ''))}</td>
                         </tr>
                         <tr>
                             <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
-                            <td contenteditable="true">{rc.get('contributing_organizations', '')}</td>
+                            <td contenteditable="true">{strip_hse_codes(str(rc.get('contributing_organizations', '') or ''))}</td>
                         </tr>
                     </table>
                     
-                    <div class="paragraph" contenteditable="true">{rc.get('detailed_description', '')}</div>
+                    <div class="paragraph" contenteditable="true">{strip_hse_codes(str(rc.get('detailed_description', '') or ''))}</div>
                     
                     <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
                     <ul class="bullet-list">
 """
             
             for impact in rc.get("impacts", []):
-                html += f'<li contenteditable="true">{impact}</li>\n'
+                html += f'<li contenteditable="true">{strip_hse_codes(str(impact))}</li>\n'
             
             html += """
                     </ul>
@@ -2882,9 +2890,8 @@ class SkillBasedDocxAgent:
         if not meta or not meta.get("exists"):
             return ""
         
-        code = meta.get('code', '?')
-        title = meta.get('title', 'Meta Kök Neden')
-        description = meta.get('description', '')
+        title = strip_hse_codes(str(meta.get('title', 'Meta Kök Neden') or ''))
+        description = strip_hse_codes(str(meta.get('description', '') or ''))
         
         html = f"""
         <div class="section" id="meta-root-cause" style="page-break-before: always;">
@@ -2901,31 +2908,19 @@ class SkillBasedDocxAgent:
             </div>
 """
         
-        # Sentezlenen kodlar
         synthesized = meta.get('synthesized_from', [])
         if synthesized:
             html += f"""
             <div class="subsection">
                 <h3 style="color: #C0392B;">🔗 Sentezlenen Kök Nedenler</h3>
                 <p contenteditable="true" style="margin-bottom: 10px;">
-                    Bu meta kök neden aşağıdaki <strong>{len(synthesized)}</strong> kök nedeni birleştirerek 
-                    üst-seviye sistemik zayıflığı ortaya koymuştur:
+                    Bu meta kök neden, analizdeki <strong>{len(synthesized)}</strong> dalın ortak paydasından türetilmiş üst düzey bir sistemik zayıflığı ifade eder.
                 </p>
-                <ul style="list-style: none; padding-left: 0;">
-"""
-            for syn_code in synthesized:
-                html += f"""
-                    <li style="background: #FFE6E6; padding: 10px; margin: 5px 0; border-left: 4px solid #C0392B; border-radius: 4px;">
-                        <strong style="color: #C0392B;">{syn_code}</strong>
-                    </li>
-"""
-            html += """
-                </ul>
             </div>
 """
         
         # Sistemik zayıflık
-        systemic = meta.get('systemic_weakness', '')
+        systemic = strip_hse_codes(str(meta.get('systemic_weakness', '') or ''))
         if systemic:
             html += f"""
             <div class="subsection">
@@ -2945,9 +2940,10 @@ class SkillBasedDocxAgent:
                 <ul style="list-style: none; padding-left: 0;">
 """
             for i, imp in enumerate(implications, 1):
+                imp_t = strip_hse_codes(str(imp))
                 html += f"""
                     <li style="background: #FFE6E6; padding: 12px; margin: 8px 0; border-left: 4px solid #E74C3C; border-radius: 4px;">
-                        <strong style="color: #C0392B;">{i}.</strong> <span contenteditable="true">{imp}</span>
+                        <strong style="color: #C0392B;">{i}.</strong> <span contenteditable="true">{imp_t}</span>
                     </li>
 """
             html += """
@@ -3222,9 +3218,11 @@ class SkillBasedDocxAgent:
             html = f"""
         <div class="section" id="decision-tree" style="page-break-before: always;">
             <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
-            
-            <div id="decision-tree-diagram" style="background: white; padding: 10px; border: 1px solid #ddd; width: 100%; height: 800px; overflow: hidden;">
-                <div class="mermaid" style="width: 100%; height: 100%;">
+            <p style="font-size: 13px; color: #555; margin: 8px 0 12px;">
+                Üstten alta: OLAY → soru (kesik çerçeve) → cevap → kök neden. Yazdırırken dikey A4 için uygundur.
+            </p>
+            <div id="decision-tree-diagram" style="background: white; padding: 12px; border: 1px solid #ddd; width: 100%; min-height: min(95vh, 1400px); overflow: auto;">
+                <div class="mermaid" style="width: 100%; min-height: 90vh;">
 {mermaid_code}
                 </div>
             </div>
@@ -3232,25 +3230,24 @@ class SkillBasedDocxAgent:
             <!-- Mermaid.js library -->
             <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
             <script>
-                // Mermaid initialization için bekle
                 if (typeof mermaid !== 'undefined') {{
                     mermaid.initialize({{
                         startOnLoad: true,
                         theme: 'default',
                         flowchart: {{
-                            useMaxWidth: true,
+                            useMaxWidth: false,
                             htmlLabels: true,
                             curve: 'basis',
-                            padding: 15,
-                            nodeSpacing: 50,
-                            rankSpacing: 80,
-                            diagramPadding: 10
+                            padding: 20,
+                            nodeSpacing: 28,
+                            rankSpacing: 56,
+                            diagramPadding: 16
                         }},
                         themeVariables: {{
-                            fontSize: '11px',
+                            fontSize: '14px',
                             fontFamily: 'Segoe UI, Arial, sans-serif',
                             primaryColor: '#fff',
-                            primaryTextColor: '#333',
+                            primaryTextColor: '#222',
                             primaryBorderColor: '#333',
                             lineColor: '#333',
                             secondaryColor: '#f5f5f5',
@@ -3258,23 +3255,22 @@ class SkillBasedDocxAgent:
                         }}
                     }});
                 }} else {{
-                    // Mermaid yüklenene kadar bekle
                     setTimeout(function() {{
                         if (typeof mermaid !== 'undefined') {{
                             mermaid.initialize({{
                                 startOnLoad: true,
                                 theme: 'default',
                                 flowchart: {{
-                                    useMaxWidth: true,
+                                    useMaxWidth: false,
                                     htmlLabels: true,
                                     curve: 'basis',
-                                    padding: 15,
-                                    nodeSpacing: 50,
-                                    rankSpacing: 80,
-                                    diagramPadding: 10
+                                    padding: 20,
+                                    nodeSpacing: 28,
+                                    rankSpacing: 56,
+                                    diagramPadding: 16
                                 }},
                                 themeVariables: {{
-                                    fontSize: '11px',
+                                    fontSize: '14px',
                                     fontFamily: 'Segoe UI, Arial, sans-serif'
                                 }}
                             }});

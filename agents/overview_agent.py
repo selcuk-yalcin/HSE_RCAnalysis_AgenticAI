@@ -9,6 +9,7 @@ from typing import Dict, Optional
 import json
 import os
 from .json_parser import extract_json_from_response, safe_json_parse
+from .model_constants import OPENROUTER_DEFAULT_CHAT_MODEL
 
 
 class OverviewAgent:
@@ -106,7 +107,7 @@ Return ONLY the JSON object. No explanations, no markdown, just pure JSON."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5", # Yasal Durumu (RIDDOR) Değerlendir
+                model=OPENROUTER_DEFAULT_CHAT_MODEL, # Yasal Durumu (RIDDOR) Değerlendir
                 #model="openai/gpt-4o-mini",  #test model  # Veriyi Hızlıca Topla
                 temperature=0.0,
                 max_tokens=500,
@@ -165,7 +166,7 @@ Return ONLY the category name (e.g., "Minor injury"), nothing else."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-sonnet-4.5", # Yasal Durumu (RIDDOR) Değerlendir
+                model=OPENROUTER_DEFAULT_CHAT_MODEL, # Yasal Durumu (RIDDOR) Değerlendir
                 #model="openai/gpt-4o-mini",  #test model,   # Veriyi Hızlıca Topla
                 temperature=0.0,
                 max_tokens=50,

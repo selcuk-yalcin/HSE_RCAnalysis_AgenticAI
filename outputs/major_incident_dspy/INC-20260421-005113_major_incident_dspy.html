@@ -1,0 +1,2864 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260421-005113";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260421-005113</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">21.04.26</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Çelik Haddehane - Sıcak Metal Taşıma Hattı (Hatt-07)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Major injury</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Operatör, sıcak metal transferi sırasında eriyen eldiven nedeniyle ciddi yanık ve derin doku hasarı yaşadı. Olay, güncel olmayan risk değerlendirmesi ve yetersiz kişisel koruyucu ekipman kullanımı gibi sistemik eksikliklerden kaynaklanmıştır.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">25 Nisan 2026 tarihinde, Çelik Haddehane'deki Sıcak Metal Taşıma Hattı (Hatt-07) üzerinde görevli bir operatör, sıcak metal transferi esnasında kullandığı eldivenin erimesi sonucu ciddi yanıklar ve derin doku hasarı yaşadı. Operatör, acil müdahale sonrası hastaneye sevk edildi ve iş göremezlik raporu verildi.</div>
+<div class="paragraph" contenteditable="true">Çelik Haddehane - Sıcak Metal Taşıma Hattı (Hatt-07)</div>
+<div class="paragraph" contenteditable="true">Operatör, Vardiya Güvenlik Görevlisi (olaya tanık olan ve ilk müdahaleyi yapan)</div>
+<div class="paragraph" contenteditable="true">Olayın hemen ardından, yaralı operatöre ilk yardım uygulandı ve olay alanı tahliye edildi. Operatör hızla hastaneye sevk edilerek tedavi altına alındı. Vardiya Güvenlik Görevlisi tarafından olay raporu düzenlendi ve acil durum prosedürleri başlatıldı.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yalıtımlı eldiven yerine standart eldiven kullanımı.</li>
+<li contenteditable="true">Risk değerlendirmesi güncel değil ve termal tehlikeler için uygun KKE seçimi belirtilmiyor.</li>
+<li contenteditable="true">İş öncesi KKE kontrol prosedürlerinin eksikliği ve uygulanmaması.</li>
+<li contenteditable="true">Gözetim ve durdur-bildir kültürünün zayıf olması.</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Yaralı operatöre acil tıbbi müdahale sağlanması ve hastaneye sevk edilmesi</td>
+                        <td contenteditable="true">Vardiya Güvenlik Görevlisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Olay yerinin güvenliğinin sağlanması ve tahliye edilmesi</td>
+                        <td contenteditable="true">Vardiya Güvenlik Görevlisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Olayla ilgili ilk raporun hazırlanması ve üst yönetime bildirilmesi</td>
+                        <td contenteditable="true">H&S Officer</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Benzer risk taşıyan diğer operasyonlarda KKE kontrollerinin acilen gözden geçirilmesi</td>
+                        <td contenteditable="true">H&S Officer</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260421-005113</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">25 Nisan 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">08:40</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Çelik Haddehane - Sıcak Metal Taşıma Hattı (Hatt-07)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Sıcak Metal Taşıma Hattı (Hatt-07)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Operatör</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Bilinmiyor</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Sıcak Metal Taşıma Hattı Ekipmanları</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Sıcak Metal Parçası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Bilinmiyor</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Bilinmiyor</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standart Eldiven (Yetersiz)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Kaza</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Ciddi yanık (el ve ön kol), derin doku hasarı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Major</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Vardiya Güvenlik Görevlisi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Hastaneye sevk edildi, iş göremezlik bildirildi</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:15</div>
+                    <div class="timeline-event" contenteditable="true">Hat normal çalışıyor.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:30</div>
+                    <div class="timeline-event" contenteditable="true">Metal sıcaklığı yüksek; operatör eldiven kontrolü yapılmadan görev aldı.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:40</div>
+                    <div class="timeline-event" contenteditable="true">Sıcak metal parçası transferi sırasında eldiven erimesi ve cilt teması.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:42</div>
+                    <div class="timeline-event" contenteditable="true">İlk yardım müdahalesi ve alan tahliyesi.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:00</div>
+                    <div class="timeline-event" contenteditable="true">Yaralı operatörün hastaneye sevki.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">21.04.26</div>
+                    <div class="timeline-event" contenteditable="true">Olayın H&S Officer tarafından ilk değerlendirmesi ve raporlanması.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Neden tekniği, olayın doğrudan nedenlerini belirledikten sonra, her bir neden için 'Neden oldu?' sorusunu art arda sorarak kök nedenlere inmeyi amaçlar. Bu olayda, operatörün neden yetersiz KKE kullandığı, KKE prosedürlerinin neden güncel olmadığı, risk değerlendirmesinin neden düzenli yapılmadığı gibi sorularla ilerlenmiştir. Her bir 'Neden' sorusu, bir önceki cevabın altında yatan daha derin bir sistemik veya organizasyonel eksikliği ortaya çıkarmıştır. Bu sayede, sadece semptomları değil, olayın tekrarını önleyecek temel sorunları tespit etmek mümkün olmuştur.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü</td>
+                        <td contenteditable="true">Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk gibi bireysel faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Prosedür eksikliği, iletişim bozukluğu, yönetim kararları, politika yetersizlikleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Ekipman arızası, tasarım hatası, fiziksel yük, ergonomi sorunları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Çevresel Faktör</td>
+                        <td contenteditable="true">Hava koşulları, aydınlatma, gürültü, sıcaklık, alan düzeni</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">H&S Officer</td>
+                        <td contenteditable="true">Baş Araştırmacı</td>
+                        <td contenteditable="true">21.04.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Line Manager</td>
+                        <td contenteditable="true">Departman Temsilcisi</td>
+                        <td contenteditable="true">21.04.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Technical Expert</td>
+                        <td contenteditable="true">Teknik Uzman</td>
+                        <td contenteditable="true">21.04.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Union Representative</td>
+                        <td contenteditable="true">Çalışan Temsilcisi</td>
+                        <td contenteditable="true">21.04.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Maintenance Manager</td>
+                        <td contenteditable="true">Bakım Uzmanı</td>
+                        <td contenteditable="true">21.04.26</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - KOŞULSAL NEDEN: Yetersiz KKE Kullanımı ve Kontrol Eksikliği</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Operatör, sıcak metal transferi sırasında termal tehlikelere karşı yeterli koruma sağlamayan standart eldiven kullanmıştır. İşe başlamadan önce eldivenlerin uygunluğu kontrol edilmemiş ve bu durum operatörü ciddi yanık riskine maruz bırakmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Sıcak metal parçasına doğrudan temas sonucu termal enerji transferi ve yanık yaralanması</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Operatör, sıcak metal parçası transferi sırasında neden eldivensiz veya yetersiz koruma ile sıcak yüzeye doğrudan temas edebilecek konuma geldi?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör, sıcak metal parçası transferi sırasında yetersiz koruma ile doğrudan temas konumuna geldi çünkü: (1) İşe başlamadan önce eldivenlerin uygunluğu kontrol edilmedi; (2) Termal transfer işlemleri için gerekli olan yalıtımlı/ısıya dayanıklı eldiven yerine standart eldiven kullanıldı; (3) Risk değerlendirmesi güncel değildi ve termal tehlikeler için uygun koruyucu ekipman seçimi belirtilmiyordu; (4) Operatöre iş başlamadan önce kişisel koruyucu ekipmanın (KKE) uygunluğu ve kullanılması konusunda talimat veya gözetim yapılmadı. Sonuç olarak, 08:30'da eldiven kontrolü yapılmaksızın görev alınması operatörü 08:40'daki direkt sıcak yüzey temas riskine maruz bıraktı.</div>
+                    <span class="why-code">A4.3 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Risk değerlendirmesi Hatt-07 (Sıcak Metal Taşıma Hattı) için neden güncel tutulmadı ve sıcak metal transferi işlemleri için gerekli olan termal dayanıklı eldiven türü neden koruyucu ekipman seçim tablosunda (KKE Matrisi) tanımlanmamıştı?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk değerlendirmesi Hatt-07'nin güncel tutulmama nedeni, yönetim sisteminde periyodik gözden geçirme, denetim ve sorumluluğun net olarak tanımlanmamasıdır. Sıcak metal transferi işlemleri için termal dayanıklı eldiven tanımlanmamış olması ise, risk değerlendirmesinin iş prosesinin spesifik tehlikelerini (1200°C+ metal yüzey sıcaklığı) yeterince analiz etmemesinden ve KKE Matrisi'nin operasyonel gerçeklikle senkronize tutulmamasından kaynaklanmıştır. Temel kök neden: Risk değerlendirmesi ve KKE seçim süreci uygulamaya ne kadar iyi yansıtıldığını kontrol eden gözlem ve denetim mekanizması yetersizdir.</div>
+                    <span class="why-code">B2.1 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden Hatt-07'de Risk Değerlendirmesi ve KKE uygulamalarının gözlem/denetim mekanizması yetersiz hale gelmiş ve periyodik kontroller düzenli olarak yürütülmemiştir? (Sorumluluğun tanımlanması, denetim prosedürü, frekansı, kaynaklar ve takip sistemi açısından)</div>
+                    <div class="why-answer" contenteditable="true">→ Hatt-07'de Risk Değerlendirmesi ve KKE uygulamalarının gözlem/denetim mekanizması yetersiz hale gelmiş ve periyodik kontroller düzenli olarak yürütülmemiştir çünkü:
+
+1. **Sorumluluğun Tanımlanamaması**: Risk değerlendirmesinin güncellenmesi ve KKE uygulamalarının denetlenmesinden sorumlu olan birey/birim açıkça tanımlanmamıştır, bu da hesap verebilirliği ortadan kaldırmıştır.
+
+2. **Formal Denetim Prosedürünün Yokluğu**: Vardiyalarda KKE kontrol prosedürü (eldiven uygunluğu, sıcaklık seviyesine göre KKE türü seçimi) yazılı ve uygulanır halde değildir.
+
+3. **Belirlenmiş Kontrol Frekansının Olmayışı**: Hatt-07'de ne kadar sıklıkta KKE denetimi yapılacağı (örn: her vardiya başında, saatte bir, vs.) tanımlanmamıştır.
+
+4. **Kaynakların Tahsis Edilmemesi**: Denetim görevini yapacak kişi atanmamış, bu nedenle denetim düzenli olarak gerçekleşmemiştir.
+
+5. **Sistematik Takip Mekanizmasının Yetersizliği**: Denetim bulguları kaydedilmemekte, uygunsuzluklar sistematik olarak takip edilmemektedir.
+
+6. **Organizasyonel Kültürün Zayıflığı**: Güvenlik görevlileri ve operatörler KKE uygunsuzluklarını görmek ve bildirir halde olmadıkları için proaktif denetim sağlanamamaktadır.</div>
+                    <span class="why-code">B4.2 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden Hatt-07'de KKE denetim prosedürleri, kontrol frekansları ve sorumluluklar resmi olarak tanımlanmamış; yönetim seviyesinde bu sistemlerin kurulması ve uygulanması sağlanmamıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Hatt-07'de KKE denetim prosedürleri resmi olarak tanımlanmamıştır ve yönetim seviyesinde bu kontrol sistemleri kurulmamıştır çünkü:
+
+1. **Prosedür tasarım eksikliği (D9.1)**: KKE kontrolü için yazılı, resmi denetim prosedürü bulunmamaktadır. Operatör eldiven kontrolü yapılmadan görev almıştır - bu prosedürün olmadığını gösterir.
+
+2. **Yönetim kontrol sistemi eksikliği (D1.3)**: Yönetim seviyesinde KKE denetim sisteminin (kim, ne zaman, hangi sıklıkta) kurulması ve uygulanması sağlanmamıştır.
+
+3. **Risk yönetimi zaafiyeti**: Olay raporunda "Risk değerlendirmesi güncel değil" belirtilmiş - bu, sıcak metal işlemi için KKE risk değerlendirmesinin eksik/güncellenmemiş olduğunu gösterir.
+
+4. **Gözetim eksikliği (D2.2)**: Durdur-bildir kültürü zayıf olduğu için, yanlış ekipman kullanımı görülüp durdurulamıştır.
+
+5. **Uygulanabilirlik**: Hiçbir denetim sistemi yönetim tarafından zorunlu kılınmadığından, operatör standart eldiven kullanabilmiştir.</div>
+                    <span class="why-code">D9.1 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Yönetim seviyesinde sıcak metal transferi işlemleri için KKE denetim ve kontrol sistemlerinin (prosedür, yetki, sıklık, kaynak tahsisi) neden kurulmamış ve uygulanmamış olduğu? Bu eksikliğin nedeni:
+- Sıcak metal işleminin tehlikeleri için yeterli risk değerlendirmesinin yapılmamış olması mı?
+- Güvenlik sorumluluk ve hesap verebilirliğinin üst yönetimde açıkça tanımlanmamış olması mı?
+- İş sürekliliği/üretim baskısı nedeniyle güvenlik kontrol sistemlerine kaynak/öncelik ayrılmamış olması mı?
+- Yoksa Hatt-07 ve sıcak metal süreçleri için genel güvenlik politika ve standartların eksik olması mı?</div>
+                    <div class="why-answer" contenteditable="true">→ **Temel Neden: Sıcak Metal Süreçleri için Sistemik Kontrol Çerçevesinin Eksikliği**
+
+Denetim ve kontrol sistemlerinin (prosedür, yetki, sıklık, kaynak) kurulmamış olmasının kökü, dört faktörün kombinasyonunda yatmaktadır:
+
+1. **Risk Değerlendirmesinin Yetersizliği (Birincil)**: Olay raporunda "Risk değerlendirmesi güncel değil" belirtilmektedir. Bu, sıcak metal transferinin tehlikelerinin (yüksek sıcaklık, kontakt yanığı, KKE yeterliliği) sistematik olarak tanımlanmadığını ve güncellenmediğini gösterir. Hatt-07'de sıcak metal işleminin spesifik riskleri (eldiven erimesi, cilt teması) için hiçbir kontrol çerçevesi tasarlanmamış.
+
+2. **Üst Yönetimde Sorumluluk ve Hesap Verebilirliğin Tanımlanmamış Olması (İkincil)**: "Gözetim ve durdur-bildir kültürü zayıf" ifadesi, KKE denetimlerinin kimden sorumlu olduğunun, ne sıklıkta yapılacağının, başarısız bulguların nasıl işlenleceğinin tanımlanmadığını gösterir. Vardiya başında KKE kontrol edilmemesi (operatör "eldiven kontrolü yapılmadan görev aldı") sistemik denetim mekanizmasının olmadığını kanıtlar.
+
+3. **Üretim Baskısı ve Kaynak Kısıtı (Destekleyici)**: Standart eldiven kullanımı, sıcak metal hattında hız ve maliyet vurgusu gösterir. Yalıtımlı eldiven temin ve değişim protokolü oluşturmanın operasyonel ve finansal kaynak gerektireceği; ancak bu için bütçe tahsis edilmediği anlaşılmaktadır.
+
+4. **Genel Güvenlik Politika ve Standartların Eksikliği (Kök)**: Hatt-07 ve sıcak metal işlemleri için şirket düzeyinde yazılı, uygulanır bir politika, standart işletim prosedürü (SOP) ve denetim protokolü hiç kurulmamıştır. KKE uygunluk kontrolü, bakım, değişim sıklığı, denetim sorumluluğu ve hesap verebilirlik mekanizması tamamen eksik.
+
+**Sonuç**: Sorunun kaynağı **D9.1 (SPP eksikliği)** + **D4.1 (Risk değerlendirmesi eksik)** + **D1.3 (Sorumluluk eksikliği)** kombinasyonudur. Yönetim seviyesinde, bu işlem türü için gerekli kontrolü tasarlamak, kaynaklandırmak ve uygulamak için net bir çerçeve yoktur.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Sıcak Metal Süreçleri için Sistemik Kontrol Çerçevesinin Eksikliği)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Sıcak Metal Süreçleri için Sistemik Kontrol Çerçevesinin Eksikliği</div>
+                <div class="box-content" contenteditable="true">Denetim ve kontrol sistemlerinin (prosedür, yetki, sıklık, kaynak) kurulmamış olmasının kökü, risk değerlendirmesinin yetersizliği, üst yönetimde sorumluluk ve hesap verebilirliğin tanımlanmamış olması, üretim baskısı ve kaynak kısıtı ile genel güvenlik politika ve standartların eksikliği gibi dört faktörün kombinasyonunda yatmaktadır. Bu durum, sıcak metal transferinin tehlikelerinin sistematik olarak tanımlanmadığını ve güncellenmediğini, KKE denetimlerinin kimden sorumlu olduğunun net olmadığını ve şirket düzeyinde yazılı bir politika, standart işletim prosedürü (SOP) ve denetim protokolünün bulunmadığını göstermektedir.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk değerlendirmesinin periyodik gözden geçirme, denetim ve sorumluluk tanımlarının eksikliği.</li>
+<li contenteditable="true">Termal dayanıklı eldiven türünün KKE Matrisi'nde tanımlanmamış olması.</li>
+<li contenteditable="true">KKE denetim prosedürlerinin, kontrol frekanslarının ve sorumlulukların resmi olarak tanımlanmaması.</li>
+<li contenteditable="true">Yönetim seviyesinde KKE denetim sisteminin kurulmaması ve uygulanmaması.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - KKE Seçiminde ve Kullanımında Hata</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Operatör, sıcak metal transferi gibi yüksek sıcaklık gerektiren bir işte yalıtımlı (ısıya dayanıklı) eldiven yerine standart eldiven kullanmıştır. Bu durum, eldivenin erimesine ve operatörün ciddi şekilde yaralanmasına neden olmuştur.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Yalıtımlı eldiven yerine standart eldiven tercih edilerek uygun kişisel koruyucu ekipmanın kullanılmaması</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden operatör sıcak metal parçasına doğrudan cilt teması yaşadı ve eldiven koruyucu işlevini yerine getiremeyerek erimesi meydana geldi?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör sıcak metal parçasına doğrudan cilt teması yaşadı ve ciddi yanık meydana geldi, çünkü **yalıtımlı (ısıya dayanıklı) eldiven yerine standart eldiven kullanılmış ve bu eldiven yüksek sıcaklığa maruz kalarak erimişdir**. 
+
+Kök nedenler:
+- **Koruyucu ekipman yetersizliği**: Sıcak metal transferi işlemi için gerekli olan yalıtımlı eldiven standartlarının tanımlanmadığı veya uygulanmadığı
+- **Kontrol mekanizmasının yokluğu**: Operatör görev başlamadan önce eldivenin kontrolünün yapılmaması ve uygunluğunun doğrulanmaması
+- **Risk değerlendirmesinin güncel olmaması**: Sıcak metal hattında (Hatt-07) tehlike seviyeleri ve gerekli koruyucu donanım standartlarının belirtilmediği
+- **Gözetim zayıflığı**: Operatörün yanlış ekipmanla çalışmasının önceden fark edilmemesi ve durdurulmaması</div>
+                    <span class="why-code">A1.3 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Operatör sıcak metal transferi işi için eldiven seçiminde yalıtımlı (ısıya dayanıklı) eldiven yerine standart eldiveni neden tercih etti/kullandı — iş başlamadan önce uygun ekipmanın kontrol edilmesi ve onaylanması prosedürü neden uygulanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatörün standart eldiven seçmesi ve uygun ekipmanın kontrol edilmemesi nedenleri:
+
+**İŞLETME SEVİYESİ (Operatör Davranışı):**
+- Standart eldivenlerin daha rahat hissetmesi ve hız kazandırması nedeniyle tercih edilmiş olabilir
+- Yalıtımlı eldivenlerin bulunmadığı veya erişilebilir olmadığı
+- İş başlama kontrol listesi uygulanmadığı için kontrol atlanmış
+
+**DENETİM SEVİYESİ (Prosedür Eksikliği):**
+- Sıcak metal transferi işi için risk değerlendirmesinin güncel olmadığı (ön bulgular)
+- PPE seçim kriterleri yazılı olmadığı için operatöre seçim hakkı tanındığı
+- İş başlama protokolü standartlaştırılmadığı
+
+**GÖZETIM SEVİYESİ (Kültür Zayıflığı):**
+- Vardiya başında güvenlik görevlisinin ekipman kontrol etme sorumluluğunun tanımlanmadığı
+- "Durdur-bildir" kültürü zayıf olduğu için uygunsuz ekipmanı gören bir başkasının müdahale etmediği
+- Operatörün uygun olmayan ekipmanla iş yapmaya başlamasını önleyen fiziksel veya yönetimsel kontrol yoktur
+
+**KURUMSAL SEVİYE (Sistem Tasarımı):**
+- Sıcak metal işleri için zorunlu PPE türlerinin tanımlanmadığı ve eğitim verilmediği
+- İş başlamadan önce ekipman kontrol kontrolü prosedürü bulunmadığı veya uygulanmadığı
+- Risk değerlendirmesi rutin olarak güncellenmediği için kontrol eksiklikleri belgelenip düzeltilmediği</div>
+                    <span class="why-code">B2.1 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Sıcak metal taşıma hattında kullanılacak PPE (özellikle yalıtımlı eldiven) türlerinin ve seçim kriterlerinin neden yazılı prosedürde tanımlanmadığı ve risk değerlendirmesinin neden düzenli olarak güncellenmediği? (Yani: Risk yönetimi sistemi ve prosedür geliştirme süreci nasıl tasarlanmıştır ve neden bu kritik görev atlanmıştır?)</div>
+                    <div class="why-answer" contenteditable="true">→ Sıcak metal taşıma hattında kullanılacak PPE (yalıtımlı eldiven) türlerinin ve seçim kriterlerinin yazılı prosedürde tanımlanmaması ve risk değerlendirmesinin düzenli olarak güncellenmemesi, kurumun **risk yönetimi sistemi tasarımında temel eksiklikleri** yansıtmaktadır:
+
+**Kök Nedenler:**
+1. **Prosedür Geliştirme Sürecinin Eksikliği**: Tehlikeli görevlerin risk değerlendirmesi kapsamında PPE seçim kriterleri sistematik olarak belirleninmemiştir.
+
+2. **Periyodik Güncelleme Mekanizmasının Olmaması**: Risk değerlendirmesinin düzenli (örn: yıllık veya prosedür değişiminde) olarak gözden geçirilmesi için resmi bir sistem yoktur.
+
+3. **Sahiplik ve Hesap Verilebilirlik Eksikliği**: Risk yönetimi görevlerinin (değerlendirme, prosedür yazım, güncelleme) kim tarafından ve ne zaman yapılacağı açık değildir.
+
+4. **Teknik Bilgi Çalışmalarının Yetersizliği**: Sıcak metal işlemlerinin spesifik tehlikeleri (sıcaklık aralığı, eldiven erime noktaları vb.) analiz edilmemiştir.
+
+5. **Yönetim Desteğinin Yetersizliği**: Risk yönetimi sürecinin kurumsallaşması için gerekli kaynaklar (zaman, personel, bütçe) tahsis edilmemiştir.</div>
+                    <span class="why-code">B2.1 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden kurumun risk yönetimi sistemini tasarlamak ve kurumsallaştırmak için gerekli prosedür yazımı, periyodik inceleme mekanizması ve sorumluluk tanımı gibi temel yönetim fonksiyonları oluşturulmamış veya aktif olarak uygulanmamaktadır?</div>
+                    <div class="why-answer" contenteditable="true">→ Kurumun risk yönetimi sisteminin yapılandırılması, kurumsallaştırılması ve işletilmesi konusunda temel yönetim fonksiyonlarının oluşturulmamış veya aktif olarak uygulanmamış olmasının nedenleri:
+
+1. **Risk Değerlendirme Prosedürünün Periyodik İnceleme Mekanizmasının Yokluğu**: Sıcak metal taşıma hattında risk değerlendirmesi güncel değildir. Bu, risk yönetimi prosedürünün kurumsal düzeyde tanımlanmadığını, periyodik inceleme döngüsünün (yıllık/altı aylık) kurumsal standart olarak belirlenmediğini gösterir.
+
+2. **Koruyucu Donanım Standartlarının Tanımlanmamış/Uygulanmamış Olması**: Yalıtımlı eldiven yerine standart eldiven kullanımı, kurumun iş görev tanımlarında ve güvenlik prosedürlerinde donanım gerekliliklerinin net bir şekilde belirtilmediğini gösterir. Bu, risk yönetim sisteminin dokümentasyon alt yapısının eksik olduğunu işaret eder.
+
+3. **Gözetim Mekanizması ve Sorumluluk Tanımının Zayıflığı**: Eldiven kontrolü yapılmadan görev alınması, vardiya yönetiminin gözetim sorumluluğunun net olmadığını, durdur-bildir kültürünün kurumsal olarak desteklenmediğini gösterir.
+
+4. **Üst Yönetim Stratejik Kararı ve Kaynak Tahsisinin Yetersizliği**: Ön bulgularda "gözetim ve durdur-bildir kültürü zayıf" ifadesi, güvenlik yönetim sisteminin işletilmesi için gerekli eğitim, kaynak ve kurumsal denetim mekanizmalarının yeterli seviyede desteklenmediğini gösterir.</div>
+                    <span class="why-code">C3.1 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden kurum üst yönetimi, sıcak metal taşıma gibi yüksek riskli operasyonlarda (ve genel olarak işletmede) risk yönetim sisteminin temel bileşenlerini (risk değerlendirmesinin periyodik incelemesi, koruyucu donanım standartlarının tanımlanması, gözetim mekanizması ve durdur-bildir kültürü) bir **kurumsal strateji ve zorunlu standart** olarak tasarlamayı, kaynak tahsisi yapmayı ve denetim mekanizması oluşturmayı gerçekleştirmemiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Kurum üst yönetimi, sıcak metal taşıma gibi yüksek riskli operasyonlarda risk yönetim sisteminin temel bileşenlerini kurumsal strateji ve zorunlu standart olarak tasarlamayı ve kurumsallaştırmayı gerçekleştirmemiştir çünkü:
+
+**Birincil Neden: Liderlik Taahhüdünün Yetersizliği**
+Güvenlik, iş operasyonunun bir temel taşı değil, uyum gereksiniği olarak konumlandırılmıştır. Risk yönetim sistemine kurumsal kaynak, gözetim yetkisi ve stratejik öncelik tahsis edilmemiştir.
+
+**İkincil Nedenler:**
+
+1. **Sistematik Risk Değerlendirmesi Eksikliği**: Raporta "Risk değerlendirmesi güncel değil" kaydı, periyodik inceleme mekanizmasının işletilmediğini göstermektedir. Güncel risk değerlendirmesi olmadan, operasyon alanında gerekli koruyucu donanım standartları (yalıtımlı eldiven kalitesi, sıcaklık eşikleri vb.) tanımlanmaz.
+
+2. **Standart Tasarımı ve Uygulanması Sisteminin Başarısızlığı**: "Yalıtımlı eldiven yerine standart eldiven kullanımı" durumu, koruyucu donanım standartlarının ne tasarımlandığını ne de uygulanıp denetlendiğini göstermektedir. Üst yönetim, bu standartların belirlenmesi ve uygulanması için bir sistem oluşturmamıştır.
+
+3. **Gözetim Mekanizması Eksikliği**: "Gözetim ve durdur-bildir kültürü zayıf" ifadesi, yönetim seviyesinde sistematik denetim, uyum izleme ve anormallikleri tespit/düzeltme sürecinin tasarlanmadığını göstermektedir. Frontline yönetim operasyon alanında istenen davranışları pekiştirme ve sapmaları düzeltme yetkisine/yetkinliğine sahip değildir.
+
+4. **Yönetim Sorumluluğu Eksikliği**: Operasyonel sapmaların (standart dışı eldiven) biliniyor olması ancak düzeltici işlem uygulanmamış olması, üst yönetimin güvenlik sapmaları tolerans ettiğini veya denetim mekanizması oluşturmadığını göstermektedir.
+
+**Sonuç**: Güvenlik yönetim sistemi tasarımı, kaynaklandırılması, denetlenmesi ve sorumluluk atanması kurumsal stratejinin bir parçası yapılmamıştır. Bu nedenle, yasal ve etik sorumluluğun temel taşı haline gelememiş, operasyonel düzeyde yaralanmaya neden olan sapmaların tekrarı engellenememiştir.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Liderlik Taahhüdünün Yetersizliği ve Sistemik Risk Yönetimi Eksikliği)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Liderlik Taahhüdünün Yetersizliği ve Sistemik Risk Yönetimi Eksikliği</div>
+                <div class="box-content" contenteditable="true">Üst yönetimin güvenlik yönetim sisteminin temel bileşenlerini (risk değerlendirmesi, KKE standartları, gözetim mekanizması) kurumsal strateji ve zorunlu standart olarak tasarlamayı ve kurumsallaştırmayı gerçekleştirmemiş olması, olayın temel nedenidir. Güvenlik, iş operasyonunun temel taşı olarak değil, uyum gereksinimi olarak konumlandırılmıştır. Bu durum, sistematik risk değerlendirmesi eksikliği, standart tasarım ve uygulama başarısızlığı, gözetim mekanizması eksikliği ve yönetim sorumluluğunun yetersizliği gibi ikincil nedenlerle desteklenmektedir.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Güvenlik için bütçe/kaynak tahsisinin yetersiz olması.</li>
+<li contenteditable="true">Sıcak metal operasyonuna özgü risk değerlendirmesinin güncel/sistematik olmaması.</li>
+<li contenteditable="true">Koruyucu donanım standartlarının (yalıtımlı eldiven kullanım prosedürü) yazılı olarak tasarlanmamış olması.</li>
+<li contenteditable="true">Uyum denetim sistemi (gözetim mekanizması) tasarlanmamış olması.</li>
+<li contenteditable="true">Standart dışı eldiven kullanımı tespit edilmesine rağmen düzeltici işlem uygulanmaması.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - KKE Seçiminin Tehlike Ciddiyeti ile Uyuşmaması</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Operatörün kullandığı standart eldiven, sıcak metal işleminin termal şiddeti için yeterli koruma sağlamamış ve eriyerek operatörün yaralanmasına neden olmuştur. Bu durum, KKE seçiminin tehlike ciddiyetiyle uyumsuz olduğunu göstermektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Sıcak metal işleminin termal şiddeti için yeterli koruma sağlamayan standart eldiven seçimi</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden operatör, yüksek sıcaklıkta sıcak metal parçasına temas ederken, termal hazarda karşı yeterli koruma sağlamayan (standart) eldiven kullanıyordu?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör, yüksek sıcaklıkta sıcak metal parçasına temas ederken uygun termal koruma sağlamayan standart eldiven kullanmıştır çünkü:
+
+1. **Prosedür Uygulamasının Eksikliği**: Görev başında eldiven kontrolü yapılmamıştır. Standart eldiven ile yalıtımlı eldiven arasında ayrım yapılmayan veya enforze edilmeyen bir sistem mevcuttur.
+
+2. **Risk Değerlendirmesinin Güncel Olmaması**: Mevcut risk değerlendirmesi, metal sıcaklığının yüksek seviyelerde çalışılacağı koşulları güncel olarak kapsamıyor ve gereken PPE'yi belirtmiyor.
+
+3. **Zayıf Gözetim ve Denetim**: Vardiya öncesi veya görev sırasında, doğru koruma ekipmanının kullanıldığını doğrulayan aktif bir gözetim mekanizması bulunmamaktadır.
+
+4. **Durdur-Bildir Kültürünün Yetersizliği**: Operatörün veya çalışanların, uygunsuz koruma koşullarını tanıyıp işi durdurup rapor etme yetkisi ve teşviki yetersizdir.</div>
+                    <span class="why-code">B1.2 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden operatör, görev başında (08:30'de) uygun termal koruma eldiveni kontrolü yapmamış veya bu kontrol prosedürü uygulanmamıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör görev başında uygun termal koruma eldiveni kontrolü yapmamıştır çünkü:
+
+**Birincil Neden**: İş öncesi KKD kontrol prosedürü sistematik olarak uygulanmamaktadır. Risk değerlendirmesi güncel olmadığı için, sıcak metal transfer görevinin termal tehlikesi yeterince tanımlanmamıştır.
+
+**İkincil Nedenler**:
+- Yönetim tarafından KKD kontrolü için zorunlu bir durdur-kontrol noktası belirlenmemiştir
+- Zayıf gözetim kültürü, operatörün veya ekip liderinin riski sorgulamasını veya görev başladıktan sonra durmasını engellemiştir
+- Yanlış KKD (standart eldiven) stokta mevcutsa, uygun KKD'nin eksik olması veya eksik KKD için kontrol mekanizması yoktur
+- Operasyonel baskı (08:30'da metal sıcaklığı yükselmiş) güvenlik prosedürlerinin atlanmasına yol açmıştır</div>
+                    <span class="why-code">E1.2 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden iş öncesi KKD kontrol prosedürü yönetim tarafından sıcak metal transfer gibi yüksek tehlikeli görevler için zorunlu ve sistematik bir kontrol noktası olarak tasarlanmamış ve uygulanmamıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim tarafından iş öncesi KKD kontrol prosedürü sıcak metal transfer gibi yüksek tehlikeli görevler için zorunlu sistematik kontrol noktası olarak tasarlanmamış ve uygulanmamıştır çünkü:
+
+1. **Sistem Tasarımı Eksikliği**: KKD kontrol prosedürü (eldiven türü, durumu, donanım kontrol listesi) iş talimatlarında ve iş akış şemasında öncül/ön koşul adımı olarak tanımlanmamıştır.
+
+2. **Risk Değerlendirmesi Güncelliği**: Risk değerlendirmesi güncel olmadığı için sıcak metal transferinin "kritik görev" kategorisine alınması ve bu kategoriye özel kontrol prosedürleri yazılmamıştır.
+
+3. **Kontrol Noktası ve Zorunluluk Mekanizması Yok**: Vardiya başlangıcında veya görev değişiminde "5 dakikalık KKD kontrolü" gibi zorunlu bir durdurma ve kontrol aşaması tasarlanmamıştır. Operatöre "kontrol yapmak seçimdir" mesajı verilmiştir.
+
+4. **Gözetim ve Gözlemlenebilirlik Zayıf**: Doğrudan yönetici/gözcü KKD kontrol prosedürünü gözlemleyen ve uygunluğunu onaylayan bir sorumlu atanmamıştır.
+
+5. **Durdur-Bildir Kültürü Oluşmamış**: Çalışanların "KKD uygun değilse görevi yapma" hakkı ve yükümlülüğü bir kurumsal değer ve politika olarak iletilmemiştir.</div>
+                    <span class="why-code">B2.2 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden yönetim, sıcak metal transfer işlemi gibi yüksek tehlikeli görevler için iş öncesi KKD kontrol prosedürünü (zorunlu durdurma, gözetim, donanım kontrol listesi) **tasarım ve planlama aşamasında** sistematik bir ön koşul kontrol noktası olarak tanımlamayıp uygulamadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim, sıcak metal transfer işlemi için iş öncesi KKD kontrol prosedürünü **tasarım aşamasında sistematik ön koşul olarak tanımlamamış**, çünkü:
+
+1. **Prosedür Tasarım Eksikliği (Sistem Faktörü)**: Yönetim, yüksek tehlikeli görevler için risk değerlendirmesi yapmış olsa da, bu riskler karşısında **zorunlu durdurma ve gözetim kontrol noktaları** iş başlamadan önce aktif edilmemiştir. Raporda "Risk değerlendirmesi güncel değil" notu bunu doğrulamaktadır.
+
+2. **Operatör Yetkinlik Eksikliği (Personel Faktörü - C3.1 & C3.3)**: Operatör, uygun KKD seçimi ve kontrol prosedürünü (doğru eldiven türü, kontrol listesi) bilmemiş veya internalize etmemiştir. "Gözetim ve durdur-bildir kültürü zayıf" bulgusu, operatörlerin yetkinlik değerlendirmesinin ve alan koçluğunun yapılmadığını göstermektedir.
+
+3. **Sonuç**: Operatör aldığı görevde (sıcak metal transferi), yapılacak olan **iş öncesi KKD kontrolünün neden gerekli olduğunu anlamadan** ve **dış denetim mekanizması olmadan** standart eldiven ile işe başlamıştır, bu da ciddi yanığa neden olmuştur.
+
+Kök neden: Yönetim sistemik tasarımın (**D kategorisi**) yanı sıra, operatörlerin bu kritik prosedürlerde yetkinlik eksikliği (**C3.1, C3.3**).</div>
+                    <span class="why-code">C3.1 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Yönetim neden, yüksek tehlikeli sıcak metal transfer işlemi için iş öncesi KKD kontrol prosedürünü ve zorunlu durdurma kontrol noktalarını, **iş başlamadan önce aktif olarak tanımlanmış ve uygulanmış sistem bileşenleri olarak** işletme prosedürlerine entegre etmemiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim, sıcak metal transfer işleminin yüksek tehlike seviyesini yeterince tanımadığı ve/veya operasyonel baskılar nedeniyle güvenlik kontrol noktalarını iş rutininin zorunlu adımları olarak sistematize etmediği için iş öncesi KKD kontrol prosedürünü ve durdurma kontrol noktalarını entegre etmemiştir.
+
+Spesifik nedenler:
+
+1. **Risk Değerlendirmesi Yetersizliği (D4.1)**: Sıcak metal transferi için kapsamlı risk değerlendirmesi yapılmamış veya güncel tutulmamıştır. Iş öncesi KKD kontrolü kritik kontrol noktası olarak tanımlanmamıştır.
+
+2. **Prosedür Eksikliği (D9.1)**: İş öncesi KKD kontrol prosedürü yazılı, net, ölçülebilir adımlarla tanımlanmamıştır. Operatörlerin ne kontrol etmesi gerektiği, hangi kriterlerle karar vereceği belli değildir.
+
+3. **Sistematik Denetim Yokluğu (D9.5)**: İş öncesi kontrol adımlarının gerçekleşip gerçekleşmediğini doğrulamak için audit/compliance tracking sistemi (daily checklist review, supervisor verification) tasarlanmamıştır.
+
+4. **Gözetim Eksikliği (D1.2)**: Vardiya başında operatör hazırlığının (KKD kontrolü dahil) doğru yapılıp yapılmadığını gözlemleyen/doğrulayan frontline denetim mekanizması (supervisory walkthrough, pre-shift verification) yoktur.
+
+5. **Prosedür Sorumluluğunun Tanımlanmadığı**: İş öncesi KKD kontrolünü gerçekleştirecek kişi (operator self-check vs. supervisor verification) net olarak tanımlanmamıştır; sorumluluk muğlak kalmıştır.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden (Risk Yönetimi ve Prosedür Tasarımındaki Sistematik Eksiklikler)</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Risk Yönetimi ve Prosedür Tasarımındaki Sistematik Eksiklikler</div>
+                <div class="box-content" contenteditable="true">Yönetim, sıcak metal transfer işleminin yüksek tehlike seviyesini yeterince tanımadığı ve/veya operasyonel baskılar nedeniyle güvenlik kontrol noktalarını iş rutininin zorunlu adımları olarak sistematize etmediği için iş öncesi KKD kontrol prosedürünü ve durdurma kontrol noktalarını entegre etmemiştir. Bu durum, kapsamlı risk değerlendirmesi eksikliği, yazılı prosedürlerin yetersizliği, sistematik denetim yokluğu, gözetim eksikliği ve prosedür sorumluluğunun tanımlanmamış olması gibi faktörlerle açıklanmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk değerlendirmesinin yetersizliği ve güncel tutulmaması.</li>
+<li contenteditable="true">İş öncesi KKD kontrol prosedürünün yazılı, net ve ölçülebilir adımlarla tanımlanmaması.</li>
+<li contenteditable="true">İş öncesi kontrol adımlarının gerçekleşip gerçekleşmediğini doğrulamak için denetim sisteminin tasarlanmaması.</li>
+<li contenteditable="true">Vardiya başında operatör hazırlığının doğru yapılıp yapılmadığını gözlemleyen/doğrulayan frontline denetim mekanizmasının olmaması.</li>
+<li contenteditable="true">İş öncesi KKD kontrolünü gerçekleştirecek kişinin net olarak tanımlanmaması.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">7. KRİTİK FAKTÖR 4 - Güvenlik Prosedürlerinin İhlali ve Uygulanmaması</div>
+            
+            <div class="subsection-header">7.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Operatör, sıcak metal transferi gibi yüksek riskli bir göreve başlamadan önce eldiven kontrolü yapmamış ve güvenlik prosedürlerini ihlal etmiştir. Bu durum, yetersiz kişisel koruyucu ekipman kullanımına ve ciddi yaralanmaya yol açmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Operatör eldiven kontrolü yapılmadan göreve başlamış; güvenlik prosedürünün uygulanmaması</div>
+            
+            <div class="subsection-header">7.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Operatör sıcak metal parçasını ele alırken, eldiveni neden erimesi sonucunda cilt doğrudan sıcak yüzeyle temas etti?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatör sıcak metal parçasını ele alırken eldiveni erimesi ve cilt doğrudan sıcak yüzeyle temas etmesinin nedeni, iki kritik başarısızlıktan kaynaklanmıştır:
+
+**Birincil Neden - Uygunsuz KKE:** Yalıtımlı (termik) eldiven yerine standart eldiven kullanılmıştır. Standart eldivenler yüksek sıcaklık koşullarında tasarlanmamıştır ve 25 Nisan 2026'daki sıcak metal sıcaklığında eriyip işlevini yitirmektedir.
+
+**İkincil Neden - Kontrol Eksikliği:** Eldiven kontrolü yapılmamıştır. Rapor açıkça "operatör eldiven kontrolü yapılmadan görev aldı" ifadesini içermektedir. Kontrol yapılmış olsa dahi, standart eldiven o sıcaklıkta hiçbir zaman yeterli koruma sağlayamazdı. Gerekli olan termik koruma eldiveninin tedarik, kontrolü ve zorunlu kullanımı başarısız olmuştur.</div>
+                    <span class="why-code">PPE.2 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden operatöre standart eldiven sunulmuş / kullanması için izin verilmiş ve sıcak metal transferi gibi yüksek sıcaklık işlemleri için tasarlanan termik/yalıtımlı eldiven yerine tercih edilmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Standart eldiven yerine termik/yalıtımlı eldiven tercih edilmemesinin temel nedenleri:
+
+1. **Yazılı Prosedür Eksikliği**: Sıcak metal transferi için zorunlu olarak termik eldiven kullanılmasını belirten resmi KKD prosedürü mevcut değildir.
+
+2. **Risk Değerlendirmesinin Güncel Olmaması**: Hatt-07'deki sıcak metal çalışmalarının tehlike ve kontrol ölçüleri (özellikle KKD gereksinimleri) yeniden değerlendirilmemiş olup, sıcak işlemler için uygun KKD tanımlanmamıştır.
+
+3. **Görev Başlama Kontrol Mekanizmasının Zayıflığı**: Operatöre görevlendirilme sırasında KKD uygunluğu kontrol edilmemiş; yanlış eldiveni seçmesi önlenmemiştir.
+
+4. **Gözetim ve İç Kontrol Zayıflığı**: Operatörün standart eldiveni sıcak işlemde kullanması, herhangi bir yönetici veya gözetim tarafından fark edilmemiş ve durdurulmamıştır.
+
+5. **KKD Eğitimi Yetersizliği**: Operatör, sıcak metal işlemleri için standart eldivenlerin yetersiz ve tehlikeli olduğu konusunda eğitilmemiş ve bilinçlendirilmemiştir.</div>
+                    <span class="why-code">E1.1 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Risk değerlendirmesi, KKD prosedürleri ve gözetim kontrol mekanizmaları (görev başlama kontrol, gözlemci denetimi) neden Hatt-07 gibi yüksek riskli operasyonlarda düzenli olarak güncellenmemiş ve uygulanmamış?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk değerlendirmesi, KKD prosedürleri ve gözetim kontrol mekanizmaları Hatt-07 gibi yüksek riskli operasyonlarda düzenli olarak güncellenmemiş ve uygulanmamış çünkü:
+
+1. **Risk Yönetim Sistemi Eksikliği**: Risk değerlendirmesi güncel tutulmadığı için sıcak metal transferinde gerekli olan yalıtımlı eldivenlerin zorunlu kullanımı belgelenmemiş ve uygulanmamıştır.
+
+2. **KKD Prosedür Kontrolü Zayıf**: Görev başlama öncesi KKD kontrol mekanizması işletilmemiştir. Operatör eldiven kontrolü yapılmadan görev almıştır, bu da prosedürün uygulanmadığını gösterir.
+
+3. **Gözetim ve Denetim Eksikliği**: Vardiya denetiminde, metal sıcaklığının yüksek olması tespit edilmesine rağmen operasyon durdurulmamıştır. Gözlemci denetimi etkinleştirilmemiştir.
+
+4. **Organizasyonel İtaat Eksikliği**: Durdur-bildir kültürünün zayıf olması, tehlike fark edilse bile operasyonun devam ettirilmesine yol açmıştır.
+
+5. **Periyodik Güncelleme Mekanizması Yokluğu**: Sistemlerin düzenli olarak gözden geçirilmesi ve güncellenmesi için planlı bir yönetim süreci olmamıştır.</div>
+                    <span class="why-code">E1.1 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Risk Yönetim Sistemi, KKD prosedürleri ve gözetim kontrol mekanizmalarının Hatt-07'de düzenli olarak güncellenmemesi ve uygulanmamasının yapısal/yönetimsel sebepler nedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk Yönetim Sistemi, KKD prosedürleri ve gözetim kontrol mekanizmalarının Hatt-07'de düzenli olarak güncellenmemesi ve uygulanmamasının yapısal/yönetimsel sebepleri:
+
+**1. Sorumluluk Tanımı Eksikliği:**
+- KKD uygunluğu kontrolü, risk değerlendirmesi güncellemesi ve periyodik gözetim denetimi için açık sorumluluk ve hesap verilebilirlik tanımlanmamıştır.
+- Hat operatörü vs. Shift Amiri vs. Güvenlik Müdürü arasında sorumluluk sınırları belirsizdir.
+
+**2. Bütçe ve Kaynak Ayrılması Yetersizliği:**
+- KKD muayene ve test için (eldiven ısıl dayanıklılık testi, malzeme uygunluğu kontrolü) cihaz, personel saati ve harç ayrılmamıştır.
+- Gözetim denetimi için adanmış kontrol personeli atanmamıştır.
+
+**3. Yönetim Talimatı ve Sistem Tasarımı Eksikliği:**
+- "Sıcak metal hatları için KKD prosedürü" yazılı olarak tanımlanmamıştır.
+- Durdur-bildir mekanizması (stop-work authority) operatörlere verilmemiş veya kurumsal olarak desteklenmemektedir.
+- Risk değerlendirmesi güncelleme tetikleyicileri (olay, ekipman değişikliği, personel rotasyonu) belirsizdir.
+
+**4. Sıklık Standartları Eksikliği:**
+- KKD uygunluk kontrolü: Sıklık tanımlanmamıştır (günlük? haftalık? aylık?).
+- Risk değerlendirmesi gözden geçirme: Periyod belirtilmemiştir.
+- Gözetim denetimi: Rutin plan ve beklenti düzeyi yoktur.
+
+**5. Gözetim Kontrol Mekanizması ve Kültür Zayıflığı:**
+- Periyodik gözetim denetimi süreci (observation checklist, denetim sıklığı, bulgu takibi) dokümante edilmemiştir.
+- Durdur-bildir kültürü resmi olarak desteklenmiyor; güvenlik sorunu fark eden operatörlerin uyarısı ciddiye alınmamaktadır.</div>
+                    <span class="why-code">D1.1 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Operasyonel güvenlik sistemleri ve kontrol mekanizmalarının kurumsal olarak neden güncellenmiş ve uygulanabilir bir standarda yükseltilmemesi, üst yönetim kararlarında ve bütçe tahsisinde güvenli çalışma ortamına verilen önemi etkileyen faktörler nelerdir?</div>
+                    <div class="why-answer" contenteditable="true">→ Hatt-07'de operasyonel güvenlik sistemlerinin kurumsal olarak güncellenip uygulanabilir standarda yükseltilmemiş olmasının temel nedenleri, üst yönetimin güvenlik yatırımına ilişkin karar mekanizmalarında ve bütçe tahsisinde güvenlik sistemlerinin modernizasyonunun **düşük önceliğe** konmuş olmasından kaynaklanmaktadır.
+
+**Olası etken faktörler:**
+
+1. **Rekabetçi maliyet basıncı (DOĞRU)** — Operasyonel güvenlik sistemlerinin yükseltilmesi, KKD prosedürlerinin güncellenmesi ve denetim kontrol mekanizmalarının inşası kayda değer investasyon gerektirirken, kısa vadeli üretim hedefleri ve maliyet düşürme baskısı bu yatırımları ertelenmiş hale getirmiştir.
+
+2. **Güvenlik denetim süreci ve teşebbüs boşluğu (DOĞRU)** — Kurumsal düzeyde sistematik compliance denetim sistemi (D9.5) yoktur; yani güvenlik prosedürlerinin uygulanıp uygulanmadığını denetlemek için mekanizma tasarlanmamıştır. Bu, standardizasyon çabalarını başlatan, kontrol eden ve düzeltileyen bir "teşebbüs" boşluğu yaratmıştır.
+
+3. **İnsan kaynağı planlaması eksikliği (DOĞRU)** — HSG245 C3 kategorisinde görülen yetkinlik boşlukları (risk değerlendirmesi, KKD tasarımı, prosedür yazımı), ilgili rollerin tanımlanmamış, eğitilmemiş ve atanmamış olduğunu gösterir. Safety Engineer, Risk Assessment Specialist pozisyonları belirsizdir.
+
+4. **Endüstri en iyi uygulamalarından habersizyete (KISMİ)** — Sıcak metal işleme ortamında Endüstri 4.0 uygulamalarına rağmen, risklerin yönetimi ve kontrol mekanizmaları 2000'li yıllar standardında kalmıştır. Gerçek zamanlı izleme, otomatik uyarı, ve gelişmiş KKD seçenekleri (çalışma modlu eldivenler vb.) değerlendirilmemiştir.
+
+**Sonuç:** Temel neden **D1.1 (Zayıf liderlik taahhüdü)** olup, bunu **D9.5 (Sistematik denetim eksikliği)**, **D1.4 (Üretim basıncı)** ve **D1.2 (Yetersiz gözetim)** desteklemektedir.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">7.3 Kök Neden (Zayıf Liderlik Taahhüdü ve Sistematik Denetim Eksikliği)</div>
+            <div class="colored-box box-blue">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 4: Zayıf Liderlik Taahhüdü ve Sistematik Denetim Eksikliği</div>
+                <div class="box-content" contenteditable="true">Hatt-07'de operasyonel güvenlik sistemlerinin kurumsal olarak güncellenip uygulanabilir standarda yükseltilmemiş olmasının temel nedeni, üst yönetimin güvenlik yatırımına ilişkin karar mekanizmalarında ve bütçe tahsisinde güvenlik sistemlerinin modernizasyonunun düşük önceliğe konmuş olmasıdır. Rekabetçi maliyet baskısı, güvenlik denetim süreci ve teşebbüs boşluğu, insan kaynağı planlaması eksikliği ve endüstri en iyi uygulamalarından habersizlik gibi faktörler bu durumu desteklemektedir.</div>
+            </div>
+
+            <div class="subsection-header">7.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Güvenlik için bütçe/kaynak tahsisinin yetersiz olması.</li>
+<li contenteditable="true">Sistematik denetim/uyum izleme sistemi eksikliği.</li>
+<li contenteditable="true">Üretim baskısı, güvenliği ikincil hale getiren.</li>
+<li contenteditable="true">Frontline gözetim yetersizliği.</li>
+<li contenteditable="true">Risk değerlendirmesinin güncel olmaması.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">8. KRİTİK FAKTÖR 5 - Hatalı/Uygunsuz KKE Temini ve Kullanımı</div>
+            
+            <div class="subsection-header">8.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Operatörün sıcak metal transferi sırasında kullandığı eldiven, termal koruma özellikleri açısından yetersiz kalmış ve eriyerek operatörün yaralanmasına neden olmuştur. Bu durum, hatalı veya uygunsuz KKE temini ve kullanımına işaret etmektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Standart eldiven sıcak metal işlemleri için termal koruma özellikleri olmadığından yeterli koruma sağlayamamıştır</div>
+            
+            <div class="subsection-header">8.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden operatörün eldiveni sıcak metal transferi sırasında erimişve cilt doğrudan sıcak yüzeye temas etmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatörün eldiveni erimesi ve cilt doğrudan sıcak yüzeye temas etmesi, yalıtımlı eldiven yerine termal dayanıklılığı yetersiz olan standart eldiven kullanmasından kaynaklanmıştır. Sıcak metal transferi sırasında metal yüzey sıcaklığı (+1000°C civarı), standart eldiven malzemesinin erime noktasını aşmıştır. Ek olarak, görevden önce eldiven kontrolünün yapılmamış olması bu riski artırmıştır.</div>
+                    <span class="why-code">A1.2 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Operatörün sıcak metal transfer işleminde standart eldiven kullanmasının nedeni nedir? Yalıtımlı eldivenlerin çalışma alanında mevcut olmadığı mı, operatörün hangi eldiveni kullanması gerektiği konusunda eğitim/bilgi eksikliği mi, yoksa mevcut olan yalıtımlı eldivenlerin uygun olmadığı veya erişilmesi zor olduğu için tercih edilmiş mi?</div>
+                    <div class="why-answer" contenteditable="true">→ Operatörün standart eldiven kullanmasının temel nedeni, bu tehlikeli görev için gerekli olan yalıtımlı eldivenlerin çalışma alanında mevcudiyeti, operatörün kullanması gereken doğru kişisel koruyucu ekipmanı hakkında eğitim eksikliği ve risk kontrolü prosedürlerinin yeterince uygulanmamasıdır. Spesifik olarak:
+
+1. **Eğitim/Bilgi Eksikliği**: Operatör "eldiven kontrolü yapılmadan görev aldı" — bu, görev başlamadan önce uygun eldiveni seçip kontrol etmeye yönelik prosedürün ya yokluğunu ya da uygulanmadığını gösterir.
+
+2. **Sistemik Kontrol Zayıflığı**: "Risk değerlendirmesi güncel değil" ve "Gözetim ve durdur-bildir kültürü zayıf" ibareleri, yalıtımlı eldivenlerin kullanılması gereken koşulların ve bunların kontrol mekanizmalarının eksik olduğunu gösterir.
+
+3. **Kaynak Mevcudiyeti Belirsizliği**: Rapor yalıtımlı eldivenlerin mevcut olmadığını açıkça belirtmese de, kolay erişim veya standart kullanım prosedürü yokluğu tercih edilmiş olabilir.
+
+En olası senaryo: Operatör, sıcak metal transfer işleminin tehlikesini veya hangi eldiveni kullanması gerektiğini tam olarak bilmediği için standart eldiven kullanmıştr.</div>
+                    <span class="why-code">A1.2 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Risk değerlendirmesinin neden güncel tutulmadığı ve sıcak metal taşıma hattında (Hatt-07) yalıtımlı eldiven kullanım prosedürünün neden eksik veya uygulanmayan bir durum haline geldiği?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk değerlendirmesinin güncel tutulmaması ve sıcak metal taşıma hattında yalıtımlı eldiven prosedürünün eksik/uygulanmaması temelde üç katmanlı sistem başarısızlığının sonucudur:
+
+**1. Risk Yönetim Sistemi Başarısızlığı:**
+- Sıcak metal işletmelerinde tehlike analizi yetersiz yapılmıştır
+- Hatt-07'nin spesifik sıcaklık ve malzeme temasından kaynaklanan riskler yeniden değerlendirilmemiştir
+- Risk değerlendirmesinin periyodik güncelleme döngüsü tanımlanmamış veya uygulanmamıştır
+
+**2. Kontrol Önlemlerinin Uygulanmaması:**
+- Yalıtımlı eldiven kullanım prosedürü yazılı olsa dahi, uygulama denetim mekanizması olmadığından etkisiz kalmıştır
+- Operatör eldiven kontrolü adımı atlanmıştır (prosedür eksikliği veya gözetim eksikliği)
+- Uygunluğu sağlanamayan kişisel koruyucu ekipman kullanımında disiplin mekanizması işletilmemiştir
+
+**3. Örgütsel Kültür ve Gözetim Eksikliği:**
+- "Durdur-Bildir" kültürünün zayıflığı, işçilerin prosedür ihlalini bildirmede cesaret gösteremediğini gösterir
+- Vardiya liderliğinin görevi başında iken eldiven kontrolü yapılmadığı için gözetim eksik olmuştur
+- İş basıncı veya zaman baskısı prosedür ihlalinin tolere edilmesine yol açmış olabilir</div>
+                    <span class="why-code">A1.1 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Hatt-07'de sıcak metal işletmesinin risk değerlendirmesinin periyodik güncelleme döngüsü neden tanımlanmamış veya tanımlanmış olmasına rağmen uygulanmamıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Risk değerlendirmesinin periyodik güncelleme döngüsü tanımlanmamış veya tanımlanmış olmasına rağmen uygulanmamıştır çünkü:
+
+1. **Yönetim Karar Mekanizması Eksikliği**: Risk değerlendirmesinin ne sıklıkla güncelleneceği (aylık/yıllık/olay sonrası) kararlaştırılmamıştır. Sonuç olarak, sıcak metal hattındaki değişen operasyonel şartlar (yüksek sıcaklık, donanım degradasyonu) değerlendirmelere yansımamıştır.
+
+2. **Sorumluluk Tanımı Muğlak**: Risk değerlendirmesi güncellemesinden kimin sorumlu olduğu (İSG müdürü, operasyon şefi, mühendis?) açık değildir. Bu nedenle hiç kimse bunu yapmamıştır.
+
+3. **Kaynak Tahsisi Yetersiz**: Periyodik güncelleme için zaman ve personel ayrılmamıştır. Risk değerlendirmesi "yapılması gereken" ancak "acil olmayan" görev olarak kalmıştır.
+
+4. **Prosedür Denetim Mekanizması Çalışmıyor**: Güncellenmiş değerlendirmeler operasyona (örn. eldiven spesifikasyonu, sıcaklık limitleri) yansıtılmamakta; bu yansıtılmış olsa bile uygulanıp uygulanmadığı denetlenememektedir.
+
+5. **Sonuç**: Operatör standart eldiveni güvenle kullandığı gün 25 Nisan 2026'da, risk değerlendirmesi gerçekliği 6+ ay önceki durumu yansıtıyordu → ciddi yanık.</div>
+                    <span class="why-code">D1.1 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden tesis yönetimi, risk değerlendirmesinin periyodik güncellenmesi için bir prosedür, sorumluluk matrisi ve denetim mekanizması tanımlayıp uygulamadı? Bu eksikliğin arkasında, işletmenin güvenlik yönetim sisteminin olgunluk seviyesi, kaynaklandırma öncelikleri ve İSG kültürünün yetersizliği midir, yoksa başka kurumsal/yapısal engeller mi vardır?</div>
+                    <div class="why-answer" contenteditable="true">→ Tesis yönetimi, risk değerlendirmesinin periyodik güncellenmesi için prosedür, sorumluluk matrisi ve denetim mekanizması tanımlayıp uygulamadığının temel nedenleri:
+
+**1. Sistemik Denetim Mekanizmasının Eksikliği (D9.5)**
+- Risk değerlendirmesinin güncelliğini kontrol eden bir AUDIT/İZLEME SİSTEMİ tasarlanmamıştır
+- Yazılı prosedür olsa bile, uygulanıp uygulanmadığını doğrulayan sistemik kontrol eksiktir
+- Raporda "Risk değerlendirmesi güncel değil" bulgusu, bunun periyodik olarak kontrol edilmediğini gösterir
+
+**2. Operasyonel Gözetim Eksikliği (D1.2)**
+- Günlük düzeyinde frontline denetçilerin (vardiya amiri) alandaki gözlemleri yeterli değildir
+- Eldiven kullanımı kontrol edilmediği için, risk değerlendirmesine dayalı kontroller de gözlemlenmemektedir
+- "Gözetim kültürü zayıf" ifadesi, proaktif denetim mekanizmasının olmadığını gösterir
+
+**3. Zayıf Rapor ve Öğrenme Kültürü (D1.7)**
+- "Durdur-bildir kültürü zayıf" → Riskler ve sapmaların raporlanmadığı
+- Raporlanmayan riskler → Değerlendirme güncellenmemesi
+
+**4. Kurumsal Olgunluk ve Kaynak Sorunu**
+- İSG yönetim sistemi olgunluk seviyesi: Risk yönetim döngüsü (Tanımla → Uygula → İzle → Güncelle) tam kurulmamış
+- Kaynaklandırma: Risk değerlendirmesini güncelleme görevine atanmış kişi/ekip olmayabilir
+- İSG kültürü: Üretim hedefleri İSG'ye öncelik tanınmadığında, güncelleme çalışmaları ertelenmektedir
+
+**5. Sonuç**
+Eksikliğin arkasında **hepsi birlikte** yatmaktadır: Düşük olgunluk seviyesi → Sistemik denetim mekanizması tasarlanmamış → Kaynak kısıtı → İSG kültürü zayıf → Prosedür uygulanmıyor → Riskler güncellenmediği için yangın sonrasında eski eldiven standartları kullanılıyor.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">8.3 Kök Neden (Sistemik Denetim Mekanizmasının Eksikliği ve Zayıf Güvenlik Kültürü)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 5: Sistemik Denetim Mekanizmasının Eksikliği ve Zayıf Güvenlik Kültürü</div>
+                <div class="box-content" contenteditable="true">Tesis yönetimi, risk değerlendirmesinin periyodik güncellenmesi için prosedür, sorumluluk matrisi ve denetim mekanizması tanımlayıp uygulamadığının temel nedenleri, sistemik denetim mekanizmasının eksikliği, operasyonel gözetim eksikliği, zayıf rapor ve öğrenme kültürü ile kurumsal olgunluk ve kaynak sorunlarıdır. Bu durum, risk değerlendirmesinin güncelliğini kontrol eden bir denetim sisteminin tasarlanmadığını ve uygulanmadığını, günlük düzeyde denetimlerin yetersiz olduğunu ve risklerin raporlanmadığını göstermektedir.</div>
+            </div>
+
+            <div class="subsection-header">8.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk değerlendirmesi güncelliğini kontrol eden sistemik denetim programının eksikliği.</li>
+<li contenteditable="true">Operatörlerin eldiven ve risk kontrolleri uyguladığını doğrulayan günlük gözetimin eksikliği.</li>
+<li contenteditable="true">Riskler ve sapmaların raporlanmadığı için, güncelleme gereken noktaların tespit edilmemesi.</li>
+<li contenteditable="true">İSG yönetim sistemi olgunluk seviyesinin düşük olması.</li>
+<li contenteditable="true">Üretim hedeflerinin İSG'ye öncelik tanınmadığında, güncelleme çalışmalarının ertelenmesi.</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Sıcak metal transferi gibi yüksek riskli işler için gerekli KKE standartları ve prosedürleri çalışanlara etkin bir şekilde iletilmemiştir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">Operatörlere, sıcak metal işlemleri için doğru KKE seçimi, kullanımı ve riskleri konusunda yeterli eğitim verilmemiştir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim Eksikliği</td>
+                        <td contenteditable="true">Vardiya amirleri ve güvenlik görevlileri tarafından iş öncesi KKE kontrolleri ve operasyonel gözetim yetersizdir.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kültürel Faktörler</td>
+                        <td contenteditable="true">Şirket içinde "durdur-bildir" kültürü zayıf olup, çalışanlar güvenlik ihlallerini bildirme konusunda çekingen davranmaktadır.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kaynak Kısıtı</td>
+                        <td contenteditable="true">Güvenlik sistemlerinin modernizasyonu, KKE temini ve eğitimler için yeterli bütçe ve insan kaynağı tahsis edilmemiştir.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Üretim Baskısı</td>
+                        <td contenteditable="true">Üretim hedeflerine ulaşma baskısı, güvenlik prosedürlerinin atlanmasına veya göz ardı edilmesine yol açmıştır.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Sıcak metal transferi operasyonları için kapsamlı ve güncel bir risk değerlendirmesi yapılması.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Departmanı</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Risk değerlendirmesi tamamlanma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Sıcak metal transferi için yalıtımlı eldiven kullanımını zorunlu kılan yazılı bir KKE prosedürü oluşturulması ve tüm ilgili personele duyurulması.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">HSE Departmanı</td>
+                        <td contenteditable="true">3 hafta</td>
+                        <td contenteditable="true">KKE prosedürü yayınlanma oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Tüm operatörlere ve vardiya amirlerine sıcak metal işlemleri için KKE seçimi, kullanımı ve riskleri konusunda zorunlu eğitim verilmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İnsan Kaynakları Departmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">İş öncesi KKE kontrol listeleri oluşturulması ve her vardiya başlangıcında zorunlu hale getirilmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Üretim Departmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Kontrol listesi uygulama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Sıcak metal taşıma hattında düzenli ve proaktif gözetim denetimleri için bir mekanizma kurulması.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Üretim Departmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Denetim sıklığı (günlük/haftalık)</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Şirket genelinde "durdur-bildir" kültürünü teşvik eden ve destekleyen bir politika oluşturulması ve iletişiminin sağlanması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Üst Yönetim</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Durdur-bildir olay raporlama oranı artışı</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Risk değerlendirmelerinin periyodik olarak gözden geçirilmesi ve güncellenmesi için bir sistem ve sorumluluk matrisi oluşturulması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Departmanı</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Risk değerlendirmesi güncelleme oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Yalıtımlı eldivenlerin yeterli sayıda ve kolay erişilebilir şekilde stoklanması ve düzenli kontrolü.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Satın Alma Departmanı</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Yalıtımlı eldiven stok yeterliliği %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Güvenlik yönetim sisteminin genel olgunluk seviyesini artırmak için kapsamlı bir denetim ve iyileştirme programı başlatılması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Üst Yönetim</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Denetim bulgularının kapanma oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Üretim hedefleri ile güvenlik hedefleri arasında dengeyi sağlayacak bir performans yönetim sistemi oluşturulması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Üst Yönetim</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Güvenlik KPI'larının üretim KPI'ları ile entegrasyonu</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">İSG ile ilgili insan kaynakları planlamasının gözden geçirilmesi ve gerekli yetkinliklere sahip personel istihdam edilmesi.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">İnsan Kaynakları Departmanı</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">İSG personel yeterliliği oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Endüstri 4.0 ve sıcak metal işleme alanındaki en iyi güvenlik uygulamalarının araştırılması ve uygulanabilir olanların entegrasyonu.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Teknik Departman</td>
+                        <td contenteditable="true">12 ay</td>
+                        <td contenteditable="true">Yeni teknoloji/uygulama adaptasyon oranı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Yüksek riskli operasyonlar için KKE seçiminde ve kullanımında sıfır tolerans politikası benimsenmeli ve bu konuda sürekli eğitim ve denetim sağlanmalıdır.
+• Risk değerlendirmeleri dinamik bir süreç olarak ele alınmalı, operasyonel değişiklikler ve olaylar sonrası derhal güncellenmelidir.
+• İş öncesi güvenlik kontrolleri, kritik görevler için zorunlu ve denetlenebilir bir adım haline getirilmelidir.
+• Çalışanların güvenlik ihlallerini ve potansiyel tehlikeleri çekinmeden raporlayabileceği güçlü bir "durdur-bildir" kültürü oluşturulmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Kurumsal güvenlik yönetim sisteminin (İSGYS) olgunluk seviyesi artırılmalı, tüm süreçler (risk yönetimi, prosedür geliştirme, denetim, eğitim) entegre ve sistematik hale getirilmelidir.
+• Üst yönetim, güvenliği stratejik bir öncelik olarak benimsemeli ve gerekli kaynakları (bütçe, personel, zaman) tahsis etme taahhüdünde bulunmalıdır.
+• Güvenlik performansını sürekli iyileştirmek için veri odaklı bir yaklaşım benimsenmeli, olay analizlerinden elde edilen dersler tüm organizasyona yayılmalıdır.
+• Teknolojik gelişmeler (Endüstri 4.0 uygulamaları) güvenlik süreçlerine entegre edilerek proaktif risk yönetimi sağlanmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Tüm çalışanlara, özellikle yüksek riskli alanlarda görev yapanlara, güvenlik prosedürleri ve KKE kullanımı hakkında düzenli ve etkili iletişim kanalları aracılığıyla bilgi verilmelidir.
+• Olay raporları ve kök neden analizleri, öğrenilen dersler şeklinde tüm ilgili birimlerle paylaşılmalı ve geri bildirim mekanizmaları oluşturulmalıdır.
+• Güvenlik toplantıları ve bilgilendirme oturumları düzenlenerek çalışanların güvenlik konularına aktif katılımı teşvik edilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Sıcak metal transferi gibi özel tehlikeler içeren işler için detaylı ve uygulamalı KKE kullanım eğitimleri zorunlu hale getirilmelidir.
+• Vardiya amirleri ve denetçilere, iş öncesi güvenlik kontrolleri, risk tanıma ve "durdur-bildir" yetkisini kullanma konularında özel eğitimler verilmelidir.
+• Tüm çalışanlara periyodik olarak genel iş sağlığı ve güvenliği farkındalık eğitimleri tekrarlanmalı ve güncel bilgiler aktarılmalıdır.
+• Yeni işe başlayan veya görev değişikliği yapan personele, ilgili işin riskleri ve güvenlik prosedürleri hakkında kapsamlı oryantasyon ve işbaşı eğitimleri sağlanmalıdır.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">Bu olay, şirket bünyesindeki sıcak metal operasyonlarında güvenlik yönetim sisteminin temel bileşenlerinde ciddi ve sistemik eksiklikler olduğunu açıkça ortaya koymuştur. Risk değerlendirmelerinin güncel olmaması, kişisel koruyucu ekipman (KKE) seçim ve kullanım prosedürlerinin yetersizliği, iş öncesi kontrollerin uygulanmaması ve genel gözetim mekanizmalarının zayıflığı, operatörün ciddi şekilde yaralanmasına yol açan doğrudan nedenlerdir. Ancak bu doğrudan nedenlerin altında yatan asıl sorun, üst yönetimin güvenlik konusundaki taahhüdünün yetersizliği, güvenlik sistemlerinin kurumsal düzeyde yapılandırılmamış olması ve üretim baskısının güvenlik önceliklerinin önüne geçmesidir. Bu durum, sadece operasyonel bir hata değil, aynı zamanda kurumsal bir yönetim zafiyetidir. Olayın tekrarını önlemek ve benzer riskleri ortadan kaldırmak için kapsamlı ve bütüncül bir yaklaşımla güvenlik yönetim sisteminin yeniden yapılandırılması ve güçlü bir güvenlik kültürünün tesis edilmesi gerekmektedir.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sıcak metal transferi operasyonları için acil risk değerlendirmesi ve KKE prosedürlerinin güncellenmesi (1-2 ay): Tüm termal tehlikeler belirlenmeli, uygun yalıtımlı eldivenler ve diğer KKE'ler tanımlanmalı ve zorunlu hale getirilmelidir.</li>
+<li contenteditable="true">İş öncesi KKE kontrol listelerinin oluşturulması ve her vardiya başlangıcında uygulanmasının sağlanması (1-2 ay): Operatörler ve amirler tarafından KKE uygunluğu kontrol edilmeden işe başlanmamalıdır.</li>
+<li contenteditable="true">Sıcak metal hattında görevli tüm personele KKE kullanımı ve termal riskler konusunda acil ve uygulamalı eğitim verilmesi (1-2 ay): Eğitimin etkinliği saha denetimleriyle doğrulanmalıdır.</li>
+<li contenteditable="true">Saha denetimlerinin sıklığının artırılması ve "durdur-bildir" yetkisinin etkin kullanımının teşvik edilmesi (1-2 ay): Güvenlik ihlallerine anında müdahale edilmeli ve düzeltici önlemler alınmalıdır.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kapsamlı bir İSG Yönetim Sistemi (İSGYS) kurulması ve sertifikasyonu (3-12 ay): Risk yönetimi, prosedür geliştirme, eğitim, denetim ve olay yönetimi süreçleri entegre edilmelidir.</li>
+<li contenteditable="true">Üst yönetim tarafından güvenlik liderliğinin güçlendirilmesi ve güvenlik için yeterli kaynak tahsisinin sağlanması (3-12 ay): Güvenlik, şirketin stratejik hedeflerinin ayrılmaz bir parçası haline getirilmelidir.</li>
+<li contenteditable="true">Güvenlik performansını izlemek ve sürekli iyileştirmek için veri tabanlı bir sistemin kurulması (3-12 ay): Olay verileri, denetim bulguları ve ramak kala olaylar analiz edilerek proaktif önlemler alınmalıdır.</li>
+<li contenteditable="true">Şirket genelinde güçlü ve katılımcı bir güvenlik kültürünün geliştirilmesi (3-12 ay): Çalışanların güvenliğe aktif katılımı teşvik edilmeli, güvenlik bilinci artırılmalı ve ödüllendirme mekanizmaları oluşturulmalıdır.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Seviyesi</td>
+                        <td class="current" contenteditable="true">Yüksek</td>
+                        <td class="target" contenteditable="true">Düşük</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Uyum Oranı</td>
+                        <td class="current" contenteditable="true">%40</td>
+                        <td class="target" contenteditable="true">%95</td>
+                    </tr>
+
+                    <tr>
+                        <td>Eğitim Kapsamı</td>
+                        <td class="current" contenteditable="true">Yetersiz</td>
+                        <td class="target" contenteditable="true">Kapsamlı ve Uygulamalı</td>
+                    </tr>
+
+                    <tr>
+                        <td>Bakım Periyodu</td>
+                        <td class="current" contenteditable="true">Reaktif</td>
+                        <td class="target" contenteditable="true">Proaktif ve Önleyici</td>
+                    </tr>
+
+                    <tr>
+                        <td>Denetim Sıklığı</td>
+                        <td class="current" contenteditable="true">Düzensiz</td>
+                        <td class="target" contenteditable="true">Günlük/Haftalık</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Kültürü</td>
+                        <td class="current" contenteditable="true">Zayıf</td>
+                        <td class="target" contenteditable="true">Güçlü ve Katılımcı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            
+            <div id="decision-tree-diagram" style="background: white; padding: 10px; border: 1px solid #ddd; width: 100%; height: 800px; overflow: hidden;">
+                <div class="mermaid" style="width: 100%; height: 100%;">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Operatör, sıcak metal parçası transferi sırasında<br/>neden eldivensiz veya yetersiz koruma ile sıcak yüzeye<br/>doğrudan temas edebilecek konuma geldi?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Operatör, sıcak metal parçası transferi sırasında<br/>yetersiz koruma ile doğrudan temas konumuna geldi<br/>çünkü: (1) İşe başlamadan önce eldivenlerin uygunluğu<br/>kontrol edilmedi; (2) Termal transfer işlemleri için<br/>gerekli olan yalıtımlı/ısıya dayanıklı eldiven yerine<br/>standart eldiven kullanıldı; (3) Risk değerlendirmesi<br/>güncel değildi ve termal tehlikeler için uygun koruyucu<br/>ekipman seçimi belirtilmiyordu; (4) Operatöre iş<br/>başlamadan önce kişisel koruyucu ekipmanın (KKE)<br/>uygunluğu ve kullanılması konusunda talimat veya<br/>gözetim yapılmadı. Sonuç olarak, 08:30'da eldiven<br/>kontrolü yapılmaksızın görev alınması operatörü"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Risk değerlendirmesi Hatt-07 (Sıcak Metal Taşıma<br/>Hattı) için neden güncel tutulmadı ve sıcak metal<br/>transferi işlemleri için gerekli olan termal dayanıklı<br/>eldiven türü neden koruyucu ekipman seçim tablosunda<br/>(KKE Matrisi) tanımlanmamıştı?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["Risk değerlendirmesi Hatt-07'nin güncel tutulmama<br/>nedeni, yönetim sisteminde periyodik gözden geçirme,<br/>denetim ve sorumluluğun net olarak tanımlanmamasıdır.<br/>Sıcak metal transferi işlemleri için termal dayanıklı<br/>eldiven tanımlanmamış olması ise, risk<br/>değerlendirmesinin iş prosesinin spesifik tehlikelerini<br/>(1200°C+ metal yüzey sıcaklığı) yeterince analiz<br/>etmemesinden ve KKE Matrisi'nin operasyonel gerçeklikle<br/>senkronize tutulmamasından kaynaklanmıştır. Temel kök<br/>neden: Risk değerlendirmesi ve KKE seçim süreci<br/>uygulamaya ne kadar iyi yansıtıldığını kontrol eden<br/>gözlem ve denetim mekanizması yetersizdir."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden Hatt-07'de Risk Değerlendirmesi ve KKE<br/>uygulamalarının gözlem/denetim mekanizması yetersiz<br/>hale gelmiş ve periyodik kontroller düzenli olarak<br/>yürütülmemiştir? (Sorumluluğun tanımlanması, denetim<br/>prosedürü, frekansı, kaynaklar ve takip sistemi<br/>açısından)"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Hatt-07'de Risk Değerlendirmesi ve KKE uygulamalarının<br/>gözlem/denetim mekanizması yetersiz hale gelmiş ve<br/>periyodik kontroller düzenli olarak yürütülmemiştir<br/>çünkü: 1. **Sorumluluğun Tanımlanamaması**: Risk<br/>değerlendirmesinin güncellenmesi ve KKE uygulamalarının<br/>denetlenmesinden sorumlu olan birey/birim açıkça<br/>tanımlanmamıştır, bu da hesap verebilirliği ortadan<br/>kaldırmıştır. 2. **Formal Denetim Prosedürünün<br/>Yokluğu**: Vardiyalarda KKE kontrol prosedürü (eldiven<br/>uygunluğu, sıcaklık seviyesine göre KKE türü seçimi)<br/>yazılı ve uygulanır halde değildir. 3. **Belirlenmiş<br/>Kontrol Frekansının Olmayışı**: Hatt-07'de ne kadar"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden Hatt-07'de KKE denetim prosedürleri, kontrol<br/>frekansları ve sorumluluklar resmi olarak<br/>tanımlanmamış; yönetim seviyesinde bu sistemlerin<br/>kurulması ve uygulanması sağlanmamıştır?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Hatt-07'de KKE denetim prosedürleri resmi olarak<br/>tanımlanmamıştır ve yönetim seviyesinde bu kontrol<br/>sistemleri kurulmamıştır çünkü: 1. **Prosedür tasarım<br/>eksikliği (D9.1)**: KKE kontrolü için yazılı, resmi<br/>denetim prosedürü bulunmamaktadır. Operatör eldiven<br/>kontrolü yapılmadan görev almıştır - bu prosedürün<br/>olmadığını gösterir. 2. **Yönetim kontrol sistemi<br/>eksikliği (D1.3)**: Yönetim seviyesinde KKE denetim<br/>sisteminin (kim, ne zaman, hangi sıklıkta) kurulması ve<br/>uygulanması sağlanmamıştır. 3. **Risk yönetimi<br/>zaafiyeti**: Olay raporunda 'Risk değerlendirmesi<br/>güncel değil' belirtilmiş - bu, sıcak metal işlemi için"]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Yönetim seviyesinde sıcak metal transferi işlemleri<br/>için KKE denetim ve kontrol sistemlerinin (prosedür,<br/>yetki, sıklık, kaynak tahsisi) neden kurulmamış ve<br/>uygulanmamış olduğu? Bu eksikliğin nedeni: - Sıcak<br/>metal işleminin tehlikeleri için yeterli risk<br/>değerlendirmesinin yapılmamış olması mı? - Güvenlik<br/>sorumluluk ve hesap verebilirliğinin üst yönetimde<br/>açıkça tanımlanmamış olması mı? - İş sürekliliği/üretim<br/>baskısı nedeniyle güvenlik kontrol sistemlerine<br/>kaynak/öncelik ayrılmamış olması mı? - Yoksa Hatt-07 ve<br/>sıcak metal süreçleri için genel güvenlik politika ve<br/>standartların eksik olması mı?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A8 --> Q9
+    A10["**Temel Neden: Sıcak Metal Süreçleri için Sistemik<br/>Kontrol Çerçevesinin Eksikliği** Denetim ve kontrol<br/>sistemlerinin (prosedür, yetki, sıklık, kaynak)<br/>kurulmamış olmasının kökü, dört faktörün<br/>kombinasyonunda yatmaktadır: 1. **Risk<br/>Değerlendirmesinin Yetersizliği (Birincil)**: Olay<br/>raporunda 'Risk değerlendirmesi güncel değil'<br/>belirtilmektedir. Bu, sıcak metal transferinin<br/>tehlikelerinin (yüksek sıcaklık, kontakt yanığı, KKE<br/>yeterliliği) sistematik olarak tanımlanmadığını ve<br/>güncellenmediğini gösterir. Hatt-07'de sıcak metal<br/>işleminin spesifik riskleri (eldiven erimesi, cilt"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN (**Birincil Kod**: D9.1 (Görev için SPP Yoktur / No SPP for Task)
+**İkincil Kod**: D4.1 (Risk Değerlendirmesi Yetersiz / Risk Assessment Inadequate)
+**Üçüncül Kod**: D1.3 (Hesap Verebilirlik Eksikliği / Lack of Accountability)
+**Dördüncül Kod**: D1.1 (Zayıf Liderlik Taahhütü / Weak Leadership Commitment)):</b><br/>Kök Neden<br/>**Temel Neden: Sıcak Metal Süreçleri için<br/>Sistemik Kontrol Çerçevesinin Eksikliği** Denetim<br/>ve kontrol sistemlerinin (prosedür, yetki, sıklık,<br/>kaynak) kurulmamış olmasının kökü, dört faktörün<br/>kombinasyonunda yatmaktadır: 1. **Risk<br/>Değerlendirmesinin Yetersizliği (Birincil)**: Olay<br/>raporunda 'Risk değerlendirmesi güncel değil'<br/>belirtilmektedir. Bu, sıcak metal transferinin<br/>tehlikelerinin (yüksek sıcaklık, kontakt yanığı,<br/>KKE yeterliliği) sistematik olarak<br/>tanımlanmadığını ve güncellenmediğini gösterir.<br/>Hatt-07'de sıcak metal işleminin spesifik riskleri"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>**Why-1: Neden operatör sıcak metal parçasına doğrudan<br/>cilt teması yaşadı ve eldiven koruyucu işlevini yerine<br/>getiremeyerek erimesi meydana geldi?** Alternatif<br/>formülasyon: **Why-1: Neden operatör, sıcak metal<br/>transferi sırasında koruyucu eldiveni etkin bir şekilde<br/>kullanamadı / eldiven yeterfliğini kaybetti?**"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q11
+    A12["Operatör sıcak metal parçasına doğrudan cilt teması<br/>yaşadı ve ciddi yanık meydana geldi, çünkü **yalıtımlı<br/>(ısıya dayanıklı) eldiven yerine standart eldiven<br/>kullanılmış ve bu eldiven yüksek sıcaklığa maruz<br/>kalarak erimişdir**. Kök nedenler: - **Koruyucu ekipman<br/>yetersizliği**: Sıcak metal transferi işlemi için<br/>gerekli olan yalıtımlı eldiven standartlarının<br/>tanımlanmadığı veya uygulanmadığı - **Kontrol<br/>mekanizmasının yokluğu**: Operatör görev başlamadan<br/>önce eldivenin kontrolünün yapılmaması ve uygunluğunun<br/>doğrulanmaması - **Risk değerlendirmesinin güncel<br/>olmaması**: Sıcak metal hattında (Hatt-07) tehlike"]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Operatör sıcak metal transferi işi için eldiven<br/>seçiminde yalıtımlı (ısıya dayanıklı) eldiven yerine<br/>standart eldiveni neden tercih etti/kullandı — iş<br/>başlamadan önce uygun ekipmanın kontrol edilmesi ve<br/>onaylanması prosedürü neden uygulanmadı?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Operatörün standart eldiven seçmesi ve uygun ekipmanın<br/>kontrol edilmemesi nedenleri: **İŞLETME SEVİYESİ<br/>(Operatör Davranışı):** - Standart eldivenlerin daha<br/>rahat hissetmesi ve hız kazandırması nedeniyle tercih<br/>edilmiş olabilir - Yalıtımlı eldivenlerin bulunmadığı<br/>veya erişilebilir olmadığı - İş başlama kontrol listesi<br/>uygulanmadığı için kontrol atlanmış **DENETİM SEVİYESİ<br/>(Prosedür Eksikliği):** - Sıcak metal transferi işi<br/>için risk değerlendirmesinin güncel olmadığı (ön<br/>bulgular) - PPE seçim kriterleri yazılı olmadığı için<br/>operatöre seçim hakkı tanındığı - İş başlama protokolü<br/>standartlaştırılmadığı **GÖZETIM SEVİYESİ (Kültür"]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Sıcak metal taşıma hattında kullanılacak PPE<br/>(özellikle yalıtımlı eldiven) türlerinin ve seçim<br/>kriterlerinin neden yazılı prosedürde tanımlanmadığı ve<br/>risk değerlendirmesinin neden düzenli olarak<br/>güncellenmediği? (Yani: Risk yönetimi sistemi ve<br/>prosedür geliştirme süreci nasıl tasarlanmıştır ve<br/>neden bu kritik görev atlanmıştır?)"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Sıcak metal taşıma hattında kullanılacak PPE<br/>(yalıtımlı eldiven) türlerinin ve seçim kriterlerinin<br/>yazılı prosedürde tanımlanmaması ve risk<br/>değerlendirmesinin düzenli olarak güncellenmemesi,<br/>kurumun **risk yönetimi sistemi tasarımında temel<br/>eksiklikleri** yansıtmaktadır: **Kök Nedenler:** 1.<br/>**Prosedür Geliştirme Sürecinin Eksikliği**: Tehlikeli<br/>görevlerin risk değerlendirmesi kapsamında PPE seçim<br/>kriterleri sistematik olarak belirleninmemiştir. 2.<br/>**Periyodik Güncelleme Mekanizmasının Olmaması**: Risk<br/>değerlendirmesinin düzenli (örn: yıllık veya prosedür<br/>değişiminde) olarak gözden geçirilmesi için resmi bir"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>**Why-4: Neden kurumun risk yönetimi sistemini<br/>tasarlamak ve kurumsallaştırmak için gerekli prosedür<br/>yazımı, periyodik inceleme mekanizması ve sorumluluk<br/>tanımı gibi temel yönetim fonksiyonları oluşturulmamış<br/>veya aktif olarak uygulanmamaktadır?** (Alternatif<br/>ifade: Kurumun güvenlik yönetim sisteminin<br/>yapılandırılması ve işletilmesi konusunda üst yönetimin<br/>stratejik kararları, kaynak tahsisi ve denetim<br/>mekanizmaları neden yeterli olmamıştır?)"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A16 --> Q17
+    A18["Kurumun risk yönetimi sisteminin yapılandırılması,<br/>kurumsallaştırılması ve işletilmesi konusunda temel<br/>yönetim fonksiyonlarının oluşturulmamış veya aktif<br/>olarak uygulanmamış olmasının nedenleri: 1. **Risk<br/>Değerlendirme Prosedürünün Periyodik İnceleme<br/>Mekanizmasının Yokluğu**: Sıcak metal taşıma hattında<br/>risk değerlendirmesi güncel değildir. Bu, risk yönetimi<br/>prosedürünün kurumsal düzeyde tanımlanmadığını,<br/>periyodik inceleme döngüsünün (yıllık/altı aylık)<br/>kurumsal standart olarak belirlenmediğini gösterir. 2.<br/>**Koruyucu Donanım Standartlarının<br/>Tanımlanmamış/Uygulanmamış Olması**: Yalıtımlı eldiven"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Neden kurum üst yönetimi, sıcak metal taşıma gibi<br/>yüksek riskli operasyonlarda (ve genel olarak<br/>işletmede) risk yönetim sisteminin temel bileşenlerini<br/>(risk değerlendirmesinin periyodik incelemesi, koruyucu<br/>donanım standartlarının tanımlanması, gözetim<br/>mekanizması ve durdur-bildir kültürü) bir **kurumsal<br/>strateji ve zorunlu standart** olarak tasarlamayı,<br/>kaynak tahsisi yapmayı ve denetim mekanizması<br/>oluşturmayı gerçekleştirmemiştir? (Başka bir deyişle:<br/>Neden güvenlik yönetim sisteminin kurumsallaştırılması,<br/>üst yönetim tarafından bir iş sürekliliği ve yasal/etik<br/>sorumluluğun temeli olarak benimsenmemiştir?)"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Kurum üst yönetimi, sıcak metal taşıma gibi yüksek<br/>riskli operasyonlarda risk yönetim sisteminin temel<br/>bileşenlerini kurumsal strateji ve zorunlu standart<br/>olarak tasarlamayı ve kurumsallaştırmayı<br/>gerçekleştirmemiştir çünkü: **Birincil Neden: Liderlik<br/>Taahhüdünün Yetersizliği** Güvenlik, iş operasyonunun<br/>bir temel taşı değil, uyum gereksiniği olarak<br/>konumlandırılmıştır. Risk yönetim sistemine kurumsal<br/>kaynak, gözetim yetkisi ve stratejik öncelik tahsis<br/>edilmemiştir. **İkincil Nedenler:** 1. **Sistematik<br/>Risk Değerlendirmesi Eksikliği**: Raporta 'Risk<br/>değerlendirmesi güncel değil' kaydı, periyodik inceleme"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN (**Birincil Kod: D1.1 - Weak Leadership Commitment**
+→ Güvenlik için bütçe/kaynak tahsisi yetersiz, projeler ertelenemektedir
+
+**İkincil Kodlar:**
+- **D4.1** - Risk Assessment Inadequate: Sıcak metal operasyonuna özgü risk değerlendirmesi güncel/sistematik değildir
+- **D9.1** - No SPP for Task: Koruyucu donanım standartları (yalıtımlı eldiven kullanım prosedürü) yazılı olarak tasarlanmamıştır
+- **D9.5** - Monitoring/Audit Inadequate: Uyum denetim sistemi (gözetim mekanizması) tasarlanmamıştır
+- **D1.3** - Lack of Accountability: Standart dışı eldiven kullanımı tespit edilmesine rağmen düzeltici işlem uygulanmamıştır
+- **D1.2** - Inadequate Supervision: Frontline yönetim operasyon alanında durdur-bildir kültürünü pekiştirmekte yetersiz kalmıştır):</b><br/>Kök Neden<br/>Kurum üst yönetimi, sıcak metal taşıma gibi<br/>yüksek riskli operasyonlarda risk yönetim<br/>sisteminin temel bileşenlerini kurumsal strateji<br/>ve zorunlu standart olarak tasarlamayı ve<br/>kurumsallaştırmayı gerçekleştirmemiştir çünkü:<br/>**Birincil Neden: Liderlik Taahhüdünün<br/>Yetersizliği** Güvenlik, iş operasyonunun bir<br/>temel taşı değil, uyum gereksiniği olarak<br/>konumlandırılmıştır. Risk yönetim sistemine<br/>kurumsal kaynak, gözetim yetkisi ve stratejik<br/>öncelik tahsis edilmemiştir. **İkincil Nedenler:**<br/>1. **Sistematik Risk Değerlendirmesi Eksikliği**:"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden operatör, yüksek sıcaklıkta sıcak metal<br/>parçasına temas ederken, termal hazarda karşı yeterli<br/>koruma sağlamayan (standart) eldiven kullanıyordu?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q21
+    A22["Operatör, yüksek sıcaklıkta sıcak metal parçasına<br/>temas ederken uygun termal koruma sağlamayan standart<br/>eldiven kullanmıştır çünkü: 1. **Prosedür Uygulamasının<br/>Eksikliği**: Görev başında eldiven kontrolü<br/>yapılmamıştır. Standart eldiven ile yalıtımlı eldiven<br/>arasında ayrım yapılmayan veya enforze edilmeyen bir<br/>sistem mevcuttur. 2. **Risk Değerlendirmesinin Güncel<br/>Olmaması**: Mevcut risk değerlendirmesi, metal<br/>sıcaklığının yüksek seviyelerde çalışılacağı koşulları<br/>güncel olarak kapsamıyor ve gereken PPE'yi belirtmiyor.<br/>3. **Zayıf Gözetim ve Denetim**: Vardiya öncesi veya<br/>görev sırasında, doğru koruma ekipmanının"]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden operatör, görev başında (08:30'de) uygun termal<br/>koruma eldiveni kontrolü yapmamış veya bu kontrol<br/>prosedürü uygulanmamıştır?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Operatör görev başında uygun termal koruma eldiveni<br/>kontrolü yapmamıştır çünkü: **Birincil Neden**: İş<br/>öncesi KKD kontrol prosedürü sistematik olarak<br/>uygulanmamaktadır. Risk değerlendirmesi güncel olmadığı<br/>için, sıcak metal transfer görevinin termal tehlikesi<br/>yeterince tanımlanmamıştır. **İkincil Nedenler**: -<br/>Yönetim tarafından KKD kontrolü için zorunlu bir<br/>durdur-kontrol noktası belirlenmemiştir - Zayıf gözetim<br/>kültürü, operatörün veya ekip liderinin riski<br/>sorgulamasını veya görev başladıktan sonra durmasını<br/>engellemiştir - Yanlış KKD (standart eldiven) stokta<br/>mevcutsa, uygun KKD'nin eksik olması veya eksik KKD"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden iş öncesi KKD kontrol prosedürü yönetim<br/>tarafından sıcak metal transfer gibi yüksek tehlikeli<br/>görevler için zorunlu ve sistematik bir kontrol noktası<br/>olarak tasarlanmamış ve uygulanmamıştır?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A24 --> Q25
+    A26["Yönetim tarafından iş öncesi KKD kontrol prosedürü<br/>sıcak metal transfer gibi yüksek tehlikeli görevler<br/>için zorunlu sistematik kontrol noktası olarak<br/>tasarlanmamış ve uygulanmamıştır çünkü: 1. **Sistem<br/>Tasarımı Eksikliği**: KKD kontrol prosedürü (eldiven<br/>türü, durumu, donanım kontrol listesi) iş<br/>talimatlarında ve iş akış şemasında öncül/ön koşul<br/>adımı olarak tanımlanmamıştır. 2. **Risk<br/>Değerlendirmesi Güncelliği**: Risk değerlendirmesi<br/>güncel olmadığı için sıcak metal transferinin 'kritik<br/>görev' kategorisine alınması ve bu kategoriye özel<br/>kontrol prosedürleri yazılmamıştır. 3. **Kontrol"]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Neden yönetim, sıcak metal transfer işlemi gibi yüksek<br/>tehlikeli görevler için iş öncesi KKD kontrol<br/>prosedürünü (zorunlu durdurma, gözetim, donanım kontrol<br/>listesi) **tasarım ve planlama aşamasında** sistematik<br/>bir ön koşul kontrol noktası olarak tanımlamayıp<br/>uygulamadı?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A26 --> Q27
+    A28["Yönetim, sıcak metal transfer işlemi için iş öncesi<br/>KKD kontrol prosedürünü **tasarım aşamasında sistematik<br/>ön koşul olarak tanımlamamış**, çünkü: 1. **Prosedür<br/>Tasarım Eksikliği (Sistem Faktörü)**: Yönetim, yüksek<br/>tehlikeli görevler için risk değerlendirmesi yapmış<br/>olsa da, bu riskler karşısında **zorunlu durdurma ve<br/>gözetim kontrol noktaları** iş başlamadan önce aktif<br/>edilmemiştir. Raporda 'Risk değerlendirmesi güncel<br/>değil' notu bunu doğrulamaktadır. 2. **Operatör<br/>Yetkinlik Eksikliği (Personel Faktörü - C3.1 & C3.3)**:<br/>Operatör, uygun KKD seçimi ve kontrol prosedürünü<br/>(doğru eldiven türü, kontrol listesi) bilmemiş veya"]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Yönetim neden, yüksek tehlikeli sıcak metal transfer<br/>işlemi için iş öncesi KKD kontrol prosedürünü ve<br/>zorunlu durdurma kontrol noktalarını, **iş başlamadan<br/>önce aktif olarak tanımlanmış ve uygulanmış sistem<br/>bileşenleri olarak** işletme prosedürlerine entegre<br/>etmemiştir? (Örn. Riskin yönetim tarafından<br/>algılanamaması, prosedür sorumluluğunun net<br/>tanımlanmamış olması, güvenlik ve üretim arasında<br/>önceliklendirme çatışması)"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A28 --> Q29
+    A30["Yönetim, sıcak metal transfer işleminin yüksek tehlike<br/>seviyesini yeterince tanımadığı ve/veya operasyonel<br/>baskılar nedeniyle güvenlik kontrol noktalarını iş<br/>rutininin zorunlu adımları olarak sistematize etmediği<br/>için iş öncesi KKD kontrol prosedürünü ve durdurma<br/>kontrol noktalarını entegre etmemiştir. Spesifik<br/>nedenler: 1. **Risk Değerlendirmesi Yetersizliği<br/>(D4.1)**: Sıcak metal transferi için kapsamlı risk<br/>değerlendirmesi yapılmamış veya güncel tutulmamıştır.<br/>Iş öncesi KKD kontrolü kritik kontrol noktası olarak<br/>tanımlanmamıştır. 2. **Prosedür Eksikliği (D9.1)**: İş<br/>öncesi KKD kontrol prosedürü yazılı, net, ölçülebilir"]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN (**Birincil:** D4.1 (Risk Assessment Inadequate - Genel Planlama)
+**İkincil:** D9.1 (No SPP for Task - Prosedür Eksikliği)
+**Üçüncül:** D9.5 (Monitoring/Audit Inadequate - Sistematik Denetim Yokluğu)
+**Dördüncül:** D1.2 (Inadequate Supervision - Person Level)):</b><br/>Kök Neden<br/>Yönetim, sıcak metal transfer işleminin yüksek<br/>tehlike seviyesini yeterince tanımadığı ve/veya<br/>operasyonel baskılar nedeniyle güvenlik kontrol<br/>noktalarını iş rutininin zorunlu adımları olarak<br/>sistematize etmediği için iş öncesi KKD kontrol<br/>prosedürünü ve durdurma kontrol noktalarını<br/>entegre etmemiştir. Spesifik nedenler: 1. **Risk<br/>Değerlendirmesi Yetersizliği (D4.1)**: Sıcak metal<br/>transferi için kapsamlı risk değerlendirmesi<br/>yapılmamış veya güncel tutulmamıştır. Iş öncesi<br/>KKD kontrolü kritik kontrol noktası olarak<br/>tanımlanmamıştır. 2. **Prosedür Eksikliği"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Operatör sıcak metal parçasını ele alırken, eldiveni<br/>neden erimesi sonucunda cilt doğrudan sıcak yüzeyle<br/>temas etti? (Başka bir deyişle: Eldiven kontrolü<br/>yapılmış olsa bile, eldivenin o sıcaklıkta yeterli<br/>koruma sağlaması bekleniyordu mu, ve neden sağlamadı —<br/>yoksa eldive kontrolü hiç yapılmamış mı?)"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q31
+    A32["Operatör sıcak metal parçasını ele alırken eldiveni<br/>erimesi ve cilt doğrudan sıcak yüzeyle temas etmesinin<br/>nedeni, iki kritik başarısızlıktan kaynaklanmıştır:<br/>**Birincil Neden - Uygunsuz KKE:** Yalıtımlı (termik)<br/>eldiven yerine standart eldiven kullanılmıştır.<br/>Standart eldivenler yüksek sıcaklık koşullarında<br/>tasarlanmamıştır ve 25 Nisan 2026'daki sıcak metal<br/>sıcaklığında eriyip işlevini yitirmektedir. **İkincil<br/>Neden - Kontrol Eksikliği:** Eldiven kontrolü<br/>yapılmamıştır. Rapor açıkça 'operatör eldiven kontrolü<br/>yapılmadan görev aldı' ifadesini içermektedir. Kontrol<br/>yapılmış olsa dahi, standart eldiven o sıcaklıkta"]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden operatöre standart eldiven sunulmuş / kullanması<br/>için izin verilmiş ve sıcak metal transferi gibi yüksek<br/>sıcaklık işlemleri için tasarlanan termik/yalıtımlı<br/>eldiven yerine tercih edilmiştir?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A32 --> Q33
+    A34["Standart eldiven yerine termik/yalıtımlı eldiven<br/>tercih edilmemesinin temel nedenleri: 1. **Yazılı<br/>Prosedür Eksikliği**: Sıcak metal transferi için<br/>zorunlu olarak termik eldiven kullanılmasını belirten<br/>resmi KKD prosedürü mevcut değildir. 2. **Risk<br/>Değerlendirmesinin Güncel Olmaması**: Hatt-07'deki<br/>sıcak metal çalışmalarının tehlike ve kontrol ölçüleri<br/>(özellikle KKD gereksinimleri) yeniden<br/>değerlendirilmemiş olup, sıcak işlemler için uygun KKD<br/>tanımlanmamıştır. 3. **Görev Başlama Kontrol<br/>Mekanizmasının Zayıflığı**: Operatöre görevlendirilme<br/>sırasında KKD uygunluğu kontrol edilmemiş; yanlış"]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Why-3: Risk değerlendirmesi, KKD prosedürleri ve<br/>gözetim kontrol mekanizmaları (görev başlama kontrol,<br/>gözlemci denetimi) neden Hatt-07 gibi yüksek riskli<br/>operasyonlarda düzenli olarak güncellenmemiş ve<br/>uygulanmamış?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A34 --> Q35
+    A36["Risk değerlendirmesi, KKD prosedürleri ve gözetim<br/>kontrol mekanizmaları Hatt-07 gibi yüksek riskli<br/>operasyonlarda düzenli olarak güncellenmemiş ve<br/>uygulanmamış çünkü: 1. **Risk Yönetim Sistemi<br/>Eksikliği**: Risk değerlendirmesi güncel tutulmadığı<br/>için sıcak metal transferinde gerekli olan yalıtımlı<br/>eldivenlerin zorunlu kullanımı belgelenmemiş ve<br/>uygulanmamıştır. 2. **KKD Prosedür Kontrolü Zayıf**:<br/>Görev başlama öncesi KKD kontrol mekanizması<br/>işletilmemiştir. Operatör eldiven kontrolü yapılmadan<br/>görev almıştır, bu da prosedürün uygulanmadığını<br/>gösterir. 3. **Gözetim ve Denetim Eksikliği**: Vardiya"]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Risk Yönetim Sistemi, KKD prosedürleri ve gözetim<br/>kontrol mekanizmalarının Hatt-07 gibi yüksek riskli<br/>operasyonlarda düzenli olarak güncellenmemesi ve<br/>uygulanmamasına neden olan yapısal/yönetimsel sebepler<br/>nedir? (Örn: Sorumluluk tanımı, bütçe/kaynak ayrılması,<br/>yönetim talimatı, sistem tasarımı veya sıklık<br/>standartları eksikliği mi?)"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A36 --> Q37
+    A38["Risk Yönetim Sistemi, KKD prosedürleri ve gözetim<br/>kontrol mekanizmalarının Hatt-07'de düzenli olarak<br/>güncellenmemesi ve uygulanmamasının yapısal/yönetimsel<br/>sebepleri: **1. Sorumluluk Tanımı Eksikliği:** - KKD<br/>uygunluğu kontrolü, risk değerlendirmesi güncellemesi<br/>ve periyodik gözetim denetimi için açık sorumluluk ve<br/>hesap verilebilirlik tanımlanmamıştır. - Hat operatörü<br/>vs. Shift Amiri vs. Güvenlik Müdürü arasında sorumluluk<br/>sınırları belirsizdir. **2. Bütçe ve Kaynak Ayrılması<br/>Yetersizliği:** - KKD muayene ve test için (eldiven<br/>ısıl dayanıklılık testi, malzeme uygunluğu kontrolü)<br/>cihaz, personel saati ve harç ayrılmamıştır. - Gözetim"]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>**Why-5:** Risk Yönetim Sistemi, KKD prosedürleri ve<br/>gözetim kontrol mekanizmalarının Hatt-07'de bu denli<br/>eksik tanımlanmış, kaynak ayrılmamış ve uygulanmamış<br/>olması, üst yönetimin Endüstri 4.0 döneminde sıcak<br/>metal işleme ortamlarında güvenlik riskleriyle ilgili<br/>farkındalık ve önceliklendirmesinin zayıf olduğunu ve<br/>kurumsal güvenlik yönetim olgunluğunun yetersiz<br/>seviyede kaldığını göstermektedir. **Operasyonel<br/>güvenlik sistemleri ve kontrol mekanizmalarının<br/>kurumsal olarak neden güncellenmiş ve uygulanabilir bir<br/>standarda yükseltilmemesi, üst yönetim kararlarında ve<br/>bütçe tahsisinde güvenli çalışma ortamına verilen önemi"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A38 --> Q39
+    A40["Hatt-07'de operasyonel güvenlik sistemlerinin kurumsal<br/>olarak güncellenip uygulanabilir standarda<br/>yükseltilmemiş olmasının temel nedenleri, üst yönetimin<br/>güvenlik yatırımına ilişkin karar mekanizmalarında ve<br/>bütçe tahsisinde güvenlik sistemlerinin<br/>modernizasyonunun **düşük önceliğe** konmuş olmasından<br/>kaynaklanmaktadır. **Olası etken faktörler:** 1.<br/>**Rekabetçi maliyet basıncı (DOĞRU)** — Operasyonel<br/>güvenlik sistemlerinin yükseltilmesi, KKD<br/>prosedürlerinin güncellenmesi ve denetim kontrol<br/>mekanizmalarının inşası kayda değer investasyon<br/>gerektirirken, kısa vadeli üretim hedefleri ve maliyet"]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN (**Birincil:** D1.1 — Weak Leadership Commitment (Zayıf Liderlik Taahhüdü)
+
+**Destekleyici kodlar:**
+- D9.5 — Monitoring/Audit Inadequate (Sistematik denetim/uyum izleme sistemi eksikliği)
+- D1.4 — Production Pressure (Üretim basıncı, güvenliği ikincil hale getiren)
+- D1.2 — Inadequate Supervision - PERSON LEVEL (Frontline gözetim yetersizliği)
+- D4.1 — Risk Assessment Inadequate (Risk değerlendirmesi güncel değil)
+- D9.1 — No SPP for Task (Güncel KKD/güvenlik prosedürleri eksikliği)):</b><br/>Kök Neden<br/>Hatt-07'de operasyonel güvenlik sistemlerinin<br/>kurumsal olarak güncellenip uygulanabilir<br/>standarda yükseltilmemiş olmasının temel<br/>nedenleri, üst yönetimin güvenlik yatırımına<br/>ilişkin karar mekanizmalarında ve bütçe tahsisinde<br/>güvenlik sistemlerinin modernizasyonunun **düşük<br/>önceliğe** konmuş olmasından kaynaklanmaktadır.<br/>**Olası etken faktörler:** 1. **Rekabetçi maliyet<br/>basıncı (DOĞRU)** — Operasyonel güvenlik<br/>sistemlerinin yükseltilmesi, KKD prosedürlerinin<br/>güncellenmesi ve denetim kontrol mekanizmalarının<br/>inşası kayda değer investasyon gerektirirken, kısa"]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden operatörün eldiveni sıcak metal transferi<br/>sırasında erimişve cilt doğrudan sıcak yüzeye temas<br/>etmiştir?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q41
+    A42["Operatörün eldiveni erimesi ve cilt doğrudan sıcak<br/>yüzeye temas etmesi, yalıtımlı eldiven yerine termal<br/>dayanıklılığı yetersiz olan standart eldiven<br/>kullanmasından kaynaklanmıştır. Sıcak metal transferi<br/>sırasında metal yüzey sıcaklığı (+1000°C civarı),<br/>standart eldiven malzemesinin erime noktasını aşmıştır.<br/>Ek olarak, görevden önce eldiven kontrolünün yapılmamış<br/>olması bu riski artırmıştır."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Operatörün sıcak metal transfer işleminde standart<br/>eldiven kullanmasının nedeni nedir? Yalıtımlı<br/>eldivenlerin çalışma alanında mevcut olmadığı mı,<br/>operatörün hangi eldiveni kullanması gerektiği<br/>konusunda eğitim/bilgi eksikliği mi, yoksa mevcut olan<br/>yalıtımlı eldivenlerin uygun olmadığı veya erişilmesi<br/>zor olduğu için tercih edilmiş mi?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A42 --> Q43
+    A44["Operatörün standart eldiven kullanmasının temel<br/>nedeni, bu tehlikeli görev için gerekli olan yalıtımlı<br/>eldivenlerin çalışma alanında mevcudiyeti, operatörün<br/>kullanması gereken doğru kişisel koruyucu ekipmanı<br/>hakkında eğitim eksikliği ve risk kontrolü<br/>prosedürlerinin yeterince uygulanmamasıdır. Spesifik<br/>olarak: 1. **Eğitim/Bilgi Eksikliği**: Operatör<br/>'eldiven kontrolü yapılmadan görev aldı' — bu, görev<br/>başlamadan önce uygun eldiveni seçip kontrol etmeye<br/>yönelik prosedürün ya yokluğunu ya da uygulanmadığını<br/>gösterir. 2. **Sistemik Kontrol Zayıflığı**: 'Risk<br/>değerlendirmesi güncel değil' ve 'Gözetim ve"]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Risk değerlendirmesinin neden güncel tutulmadığı ve<br/>sıcak metal taşıma hattında (Hatt-07) yalıtımlı eldiven<br/>kullanım prosedürünün neden eksik veya uygulanmayan bir<br/>durum haline geldiği?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A44 --> Q45
+    A46["Risk değerlendirmesinin güncel tutulmaması ve sıcak<br/>metal taşıma hattında yalıtımlı eldiven prosedürünün<br/>eksik/uygulanmaması temelde üç katmanlı sistem<br/>başarısızlığının sonucudur: **1. Risk Yönetim Sistemi<br/>Başarısızlığı:** - Sıcak metal işletmelerinde tehlike<br/>analizi yetersiz yapılmıştır - Hatt-07'nin spesifik<br/>sıcaklık ve malzeme temasından kaynaklanan riskler<br/>yeniden değerlendirilmemiştir - Risk değerlendirmesinin<br/>periyodik güncelleme döngüsü tanımlanmamış veya<br/>uygulanmamıştır **2. Kontrol Önlemlerinin<br/>Uygulanmaması:** - Yalıtımlı eldiven kullanım prosedürü<br/>yazılı olsa dahi, uygulama denetim mekanizması"]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Hatt-07'de sıcak metal işletmesinin risk<br/>değerlendirmesinin periyodik güncelleme döngüsü neden<br/>tanımlanmamış veya tanımlanmış olmasına rağmen<br/>uygulanmamıştır? (Yönetim karar mekanizması, kaynak<br/>tahsisi, sorumluluk tanımı, prosedür denetim<br/>eksikliği?)"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A46 --> Q47
+    A48["Risk değerlendirmesinin periyodik güncelleme döngüsü<br/>tanımlanmamış veya tanımlanmış olmasına rağmen<br/>uygulanmamıştır çünkü: 1. **Yönetim Karar Mekanizması<br/>Eksikliği**: Risk değerlendirmesinin ne sıklıkla<br/>güncelleneceği (aylık/yıllık/olay sonrası)<br/>kararlaştırılmamıştır. Sonuç olarak, sıcak metal<br/>hattındaki değişen operasyonel şartlar (yüksek<br/>sıcaklık, donanım degradasyonu) değerlendirmelere<br/>yansımamıştır. 2. **Sorumluluk Tanımı Muğlak**: Risk<br/>değerlendirmesi güncellemesinden kimin sorumlu olduğu<br/>(İSG müdürü, operasyon şefi, mühendis?) açık değildir.<br/>Bu nedenle hiç kimse bunu yapmamıştır. 3. **Kaynak"]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Neden tesis yönetimi, risk değerlendirmesinin<br/>periyodik güncellenmesi için bir prosedür, sorumluluk<br/>matrisi ve denetim mekanizması tanımlayıp uygulamadı?<br/>Bu eksikliğin arkasında, işletmenin güvenlik yönetim<br/>sisteminin olgunluk seviyesi, kaynaklandırma<br/>öncelikleri ve İSG kültürünün yetersizliği midir, yoksa<br/>başka kurumsal/yapısal engeller mi vardır?"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A48 --> Q49
+    A50["Tesis yönetimi, risk değerlendirmesinin periyodik<br/>güncellenmesi için prosedür, sorumluluk matrisi ve<br/>denetim mekanizması tanımlayıp uygulamadığının temel<br/>nedenleri: **1. Sistemik Denetim Mekanizmasının<br/>Eksikliği (D9.5)** - Risk değerlendirmesinin<br/>güncelliğini kontrol eden bir AUDIT/İZLEME SİSTEMİ<br/>tasarlanmamıştır - Yazılı prosedür olsa bile, uygulanıp<br/>uygulanmadığını doğrulayan sistemik kontrol eksiktir -<br/>Raporda 'Risk değerlendirmesi güncel değil' bulgusu,<br/>bunun periyodik olarak kontrol edilmediğini gösterir<br/>**2. Operasyonel Gözetim Eksikliği (D1.2)** - Günlük<br/>düzeyinde frontline denetçilerin (vardiya amiri)"]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN (**D9.5** (Monitoring/Audit Inadequate - Primary Root Cause)
+- Risk değerlendirmesi güncelliğini kontrol eden sistemik denetim programı eksiktir
+- Yazılı prosedür olsa bile, uygulanıp uygulanmadığını doğrulayan mekanizma olmadığı için etkinliği sıfırdır
+
+**D1.2** (Inadequate Supervision - Secondary)
+- Operatörlerin eldiven ve risk kontrolleri uyguladığını doğrulayan günlük gözetim eksiktir
+
+**D1.7** (Weak Reporting/Learning Culture - Contributing)
+- Riskler ve sapmaların raporlanmadığı için, güncelleme gereken noktalar tespit edilmiyor):</b><br/>Kök Neden<br/>Tesis yönetimi, risk değerlendirmesinin periyodik<br/>güncellenmesi için prosedür, sorumluluk matrisi ve<br/>denetim mekanizması tanımlayıp uygulamadığının<br/>temel nedenleri: **1. Sistemik Denetim<br/>Mekanizmasının Eksikliği (D9.5)** - Risk<br/>değerlendirmesinin güncelliğini kontrol eden bir<br/>AUDIT/İZLEME SİSTEMİ tasarlanmamıştır - Yazılı<br/>prosedür olsa bile, uygulanıp uygulanmadığını<br/>doğrulayan sistemik kontrol eksiktir - Raporda<br/>'Risk değerlendirmesi güncel değil' bulgusu, bunun<br/>periyodik olarak kontrol edilmediğini gösterir<br/>**2. Operasyonel Gözetim Eksikliği (D1.2)** -"]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A50 --> ROOT5
+
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                // Mermaid initialization için bekle
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: true,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 15,
+                            nodeSpacing: 50,
+                            rankSpacing: 80,
+                            diagramPadding: 10
+                        },
+                        themeVariables: {
+                            fontSize: '11px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#333',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    // Mermaid yüklenene kadar bekle
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: true,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 15,
+                                    nodeSpacing: 50,
+                                    rankSpacing: 80,
+                                    diagramPadding: 10
+                                },
+                                themeVariables: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

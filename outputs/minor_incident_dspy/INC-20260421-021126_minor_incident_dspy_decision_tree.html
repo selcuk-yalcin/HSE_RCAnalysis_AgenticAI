@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }
+        header .top-title { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        header h1 { font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }
+        header .subtitle { font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+        #diagram-wrap {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }
+        #diagram-wrap .mermaid {
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }
+        #diagram-wrap svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden çalışan torna tezgâhında parçayı elle hizalarken keskin talaş<br/>yüzeyine doğrudan temas etti?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Çalışan, torna tezgâhında parçayı elle hizalarken keskin talaş yüzeyine<br/>doğrudan temas etti çünkü koruyucu bariyer tam kapalı değildi. Bu durum,<br/>devam eden makine işlemi sırasında çalışanın keskin yüzeylere korunmasız<br/>şekilde fiziksel erişim sağladı. Ayrıca, kullanılan standart eldiven<br/>kesme/kesilme riskine karşı dayanıklı olmadığından, ek koruma katmanı<br/>yoktu."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Koruyucu bariyer neden tam kapalı durumda değildi — tasarım kusuru,<br/>bakım eksikliği, prosedür ihlali veya çalışan tarafından kaldırılması<br/>nedeniyle mi ?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Olay raporunda koruyucu bariyerin tam kapalı durumda olmadığı<br/>belirtilmişse de, bunun temel sebebi (tasarım kusuru, bakım eksikliği,<br/>prosedür ihlali veya çalışan tarafından kaldırılması) net olarak<br/>tanımlanmamıştır. Raporda sadece 'Koruyucu bariyer tam kapalı değildi'<br/>kaydı mevcuttur. Kök neden analizi için bariyerin açık kalma sebebinin<br/>araştırılması ve belirlenmesi gerekmektedir."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden koruyucu bariyer (D4.1 - Makine güvenliği) çalışma sırasında açık<br/>durumda kaldı — tasarım sorunu, bakım eksikliği, prosedür ihlali, yoksa<br/>çalışan müdahalesi mi?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Koruyucu bariyer (D4.1 - Makine güvenliği) açık durumda kaldığı için<br/>çalışan kesik yaralanması maruz kalmıştır. Olay raporunda bariyer 'tam<br/>kapalı değildi' bilgisi yer almakta, ancak açık kalış nedeni (tasarım<br/>eksikliği, bakım sorunları veya çalışan müdahalesi) tam olarak<br/>belirtilmemiştir. Bununla birlikte, raporda 'parçayı elle hizalarken' ve<br/>'standart eldiven (kesilmeye dayanıklı değil)' kullanıldığı<br/>kaydedilmiştir. Bu durum, çalışanın korumasız şekilde makine tarafına<br/>erişim sağladığını, yani **prosedür ihlali ve/veya çalışan<br/>müdahalesi**nin (bariyer atlayarak doğrudan parçaya erişim) temel neden<br/>olduğunu göstermektedir. Tasarım sorunu olmaktan ziyade, uygulama ve<br/>uyum eksikliği olayın sebebidir."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Çalışan neden koruyucu bariyer sistemini atlayarak parçayı doğrudan<br/>elle hizalamaya çalışmıştır — zaman baskısı, eğitim eksikliği, bariyer<br/>tasarımının işi zorlaştırması mı, yoksa başka bir operasyonel kısıtlama<br/>mı?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Çalışan koruyucu bariyer sistemini atlayarak doğrudan elle parça<br/>hizalamaya çalışmasının kök nedenleri çok yönlüdür: 1. **Bariyer<br/>Tasarımı Sorunu (Birincil):** Raporda 'koruyucu bariyer tam kapalı<br/>değildi' not düşülmüştür. Bu, bariyer sisteminin hizalama görevini<br/>pratik ve erişilebilir kılmadığını, çalışanı doğru prosedürü atlamaya<br/>zorladığını gösterir. 2. **Eğitim ve Uygulamada Eksiklik:** Çalışanın<br/>koruyucu bariyer protokolü hakkında yeterli eğitim alıp almadığı, ve bu<br/>prosedürün montaj hattında sistemli olarak uygulanıp uygulanmadığı<br/>belirsizdir. Eksik veya ineffektif eğitim, çalışanın güvenlik sırasını<br/>atlamasını kolaylaştırır. 3. **Operasyonel Baskı / Zaman Kısıtı:**<br/>Montaj hattı ortamında (üretim hızı beklentisi yüksek), çalışan 'hızlı<br/>hizalama' için güvenli prosedürü (bariyer kullanımını) atlamış olabilir.<br/>4. **Yetersiz Koruyucu Donanım:** Kullanılan standart eldiven kesilmeye<br/>dayanıklı değildir; bu, tasarım ve koruyucu donanım seçiminde<br/>eksiklikleri gösterir. **Sonuç:** Kök neden, tasarım eksikliği ,<br/>eğitim/uygulamada boşluk ve muhtemel operasyonel baskı kombinasyonudur."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Why-5 (Son Seviye) — Sorgulamaya İşaret: Tasarım eksikliği, eğitim<br/>uygulamadaki boşluk, operasyonel baskı ve yetersiz koruyucu donanım (HSE<br/>politika ve kontrol zafiyeti) neden İş Güvenliği Yönetim Sistemi (ISMS)<br/>ve Bakım/Donanım Yönetimi tarafından önceden tespit ve düzeltilmemiştir?<br/>*Not: Bu seviyede sorgulamadan ziyade, bulguların sürdürülebilir<br/>iyileştirme eylemlerine (korektif faaliyet) ve sistematik risk kontrol<br/>mekanizmalarına dönüştürülmesi önerilir.*"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["İş Güvenliği Yönetim Sistemi (ISMS) ve Bakım/Donanım Yönetimi bu<br/>hazardları önceden tespit etmemiş çünkü: **1. Hazard Tanımlama Eksikliği<br/>:** Torna tezgâhındaki elle hizalama işleminin keskin talaş ve dönen<br/>parça tehlikesi içinde olduğu kapsamlı risk değerlendirmesinde<br/>belirtilmemiş veya eksik değerlendirilmiştir. İş Haz Analizi (JHA) bu<br/>spesifik tehlikeleri koruyucu donanım gereksinimi ile<br/>ilişkilendirmemiştir. **2. Kontrol Uygulanmadı :** Risk<br/>değerlendirmesinde tanımlanmış olsa bile, kesişmeye dayanıklı eldiven ve<br/>tam kapalı koruyucu bariyer gibi gerekli kontroller operasyonel seviyede<br/>uygulanmamıştır. **3. Tasarım Eksikliği :** Torna tezgâhının ergonomik<br/>tasarımında, koruyucu bariyer tam kapalı olmayan bir konfigürasyon<br/>kullanılması, elle müdahale gerektiğinde çalışanı tehlikeye maruz<br/>bırakmaktadır. **4. Eğitim Boşluğu :** Çalışan, standart eldivenlerin<br/>keskin talaş ve dönen parçalara karşı yetersiz olduğu konusunda eğitim<br/>almamıştır. Uygun kişisel koruyucu donanım (KKD) seçimi prosedürü ve<br/>tehlike farkındalığı eksiktir. **5. Sistematik İzleme ve Denetim<br/>Eksikliği :** ISMS içinde rutin uyum denetimi (audit) veya koruyucu<br/>donanım kullanımının gözlemsel kontrolü sistemleştirilmemiştir. Torna<br/>tezgâhlarında bariyer durumu ve KKD uygunluğu düzenli olarak kontrol<br/>edilmemektedir. **6. Yönetim Denetimi Yetersizliği :** Hat sorumlusu ve<br/>güvenlik denetim personeli, torna tezgâhındaki günlük operasyonlarda<br/>koruyucu donanım kullanımını ve bariyer durumunu aktif olarak<br/>izlememektedir. **Sürdürülebilir İyileştirme Eylemleri:** - Torna<br/>tezgâhları için güncellenmiş JHA ve risk kontrol matrisi - Kesişmeye<br/>dayanıklı KKD seçimi ve zorunlu kullanım prosedürü - Koruyucu bariyer<br/>tasarımının revize edilmesi (tam kapalı konfigürasyon) - Aylık uyum<br/>denetimi programı (bariyer, KKD kontrolü) - Torna operatörleri için<br/>spesifik tehlike farkındalığı eğitimi"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>İş Güvenliği Yönetim Sistemi (ISMS) ve Bakım/Donanım Yönetimi bu<br/>hazardları önceden tespit etmemiş çünkü: **1. Hazard Tanımlama Eksikliği<br/>:** Torna tezgâhındaki elle hizalama işleminin keskin talaş ve dönen<br/>parça tehlikesi içinde olduğu kapsamlı risk değerlendirmesinde<br/>belirtilmemiş veya eksik değerlendirilmiştir. İş Haz Analizi (JHA) bu<br/>spesifik tehlikeleri koruyucu donanım gereksinimi ile<br/>ilişkilendirmemiştir. **2. Kontrol Uygulanmadı :** Risk<br/>değerlendirmesinde tanımlanmış olsa bile, kesişmeye dayanıklı eldiven ve<br/>tam kapalı koruyucu bariyer gibi gerekli kontroller operasyonel seviyede<br/>uygulanmamıştır. **3. Tasarım Eksikliği :** Torna tezgâhının ergonomik<br/>tasarımında, koruyucu bariyer tam kapalı olmayan bir konfigürasyon<br/>kullanılması, elle müdahale gerektiğinde çalışanı tehlikeye maruz<br/>bırakmaktadır. **4. Eğitim Boşluğu :** Çalışan, standart eldivenlerin<br/>keskin talaş ve dönen parçalara karşı yetersiz olduğu konusunda eğitim<br/>almamıştır. Uygun kişisel koruyucu donanım (KKD) seçimi prosedürü ve<br/>tehlike farkındalığı eksiktir. **5. Sistematik İzleme ve Denetim<br/>Eksikliği :** ISMS içinde rutin uyum denetimi (audit) veya koruyucu<br/>donanım kullanımının gözlemsel kontrolü sistemleştirilmemiştir. Torna<br/>tezgâhlarında bariyer durumu ve KKD uygunluğu düzenli olarak kontrol<br/>edilmemektedir. **6. Yönetim Denetimi Yetersizliği :** Hat sorumlusu ve<br/>güvenlik denetim personeli, torna tezgâhındaki günlük operasyonlarda<br/>koruyucu donanım kullanımını ve bariyer durumunu aktif olarak<br/>izlememektedir. **Sürdürülebilir İyileştirme Eylemleri:** - Torna<br/>tezgâhları için güncellenmiş JHA ve risk kontrol matrisi - Kesişmeye<br/>dayanıklı KKD seçimi ve zorunlu kullanım prosedürü - Koruyucu bariyer<br/>tasarımının revize edilmesi (tam kapalı konfigürasyon) - Aylık uyum<br/>denetimi programı (bariyer, KKD kontrolü) - Torna operatörleri için<br/>spesifik tehlike farkındalığı eğitimi"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden koruyucu bariyer tam kapalı değildi?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Koruyucu bariyer tam kapalı değildi çünkü raporda açık belirtilmese de,<br/>torna tezgâhında parça işleme ve hizalama prosedürleri sırasında bariyer<br/>ergonomik engel olarak algılanmış, tamamen kapatılmamış veya operatör<br/>tarafından kısmen açık bırakılmış olabilir. Temel sebep: Tasarım,<br/>eğitim, prosedür uygulaması veya bakım denetimindeki kontrol<br/>eksikliğidir."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Bariyer ergonomik engel olarak algılanıp kısmen açık bırakılmasının<br/>temel nedeni nedir - bariyer tasarımında sorun mu, operatör eğitiminde<br/>boşluk mu, yoksa zaman baskısı altında güvenlik prosedürü ihmal mi?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Bariyer kısmen açık bırakılmasının temel nedeni çok faktörlüdür ancak<br/>raporda kanıtlanabilir temel faktörler: 1. **Bariyer Tasarımında Sorun<br/>** — Koruyucu bariyer 'tam kapalı' şekilde tasarlanmamış veya operatörün<br/>parçaya hizalanmış erişiminde ergonomik zorluk yaratıyor. Bu, tasarımsal<br/>yetersizliğin bariyer açılı bırakılmasına sebep olduğunu gösterir. 2.<br/>**Operatör Eğitiminde Boşluk** — Standart eldive (kesilmeye dayanıklı<br/>değil) kullanılması, çalışanın kişisel koruyucu donanım seçiminde eğitim<br/>eksikliğini gösterir. Ayrıca bariyer kullanım gerekliliği hakkında<br/>yeterli farkındalık yoktur. 3. **Zaman Baskısı Altında Güvenlik İhmalı**<br/>— 'Parça işleniyor' sırasında hızlı hizalama ihtiyacı bariyer açılı<br/>bırakılmasını teşvik etmiş olabilir; vardiya içindeki verimlilik baskısı<br/>güvenlik prosedürünü ikincil konuma düşürmüştür. **En baskın neden: D4.1<br/>(Bariyer tasarımı) + Operatör eğitimindeki boşluk + Zaman baskısının<br/>kombinasyonu.**"]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Bariyer tasarımının operatör için ergonomik zorluk yaratması ve 'tam<br/>kapalı' konumda tutulamaması, neden torna tezgâhında tasarım revizyon<br/>veya iyileştirme öncesi bu şekilde devam etmiştir (D4.1 - Tasarım<br/>kontrolü)?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Bariyer tasarımının ergonomik yetersizliği (tam kapalı konumda<br/>tutulamaması) ve kesintisiz işletim sırasında operatöre zorluk<br/>yaratması, tasarım doğrulama aşamasında göz önüne alınmadığı veya test<br/>edilmediği için devam etmiştir. T-12 tezgâhı üretim hattına alınmadan<br/>önce tasarım kontrolü prosesinde , koruyucu bariyer sisteminin operatör<br/>ergonomisi, tutma mekanizmasının güvenilirliği ve gerçek çalışma<br/>koşullarında işlevselliği test edilmemiştir. Sonuç olarak, tasarımda bu<br/>eksiklik tanıması yapılmamış ve revizyon tetiklenmemiştir."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>T-12 tezgâhının tasarım doğrulama aşamasında ergonomik test ve operatör<br/>koşul simülasyonunun gerçekleştirilmemesinin temel sebebi nedir —<br/>protokol eksikliği mi, kaynak/bütçe kısıtlaması mı, yoksa doğrulama<br/>standartlarının tanımlanmamış olması mı?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["T-12 tezgâhının tasarım doğrulama aşamasında ergonomik test ve operatör<br/>koşul simülasyonunun yapılmamasının temel sebebi: **Tasarım doğrulama<br/>standartlarının tanımlanmamış/uygulanmamış olmasıdır**. Rapordan görünen<br/>somut kanıtlar: - Koruyucu bariyer tasarımı operatör güvenliğini<br/>sağlayacak şekilde test edilmemiş (tam kapalı değil) - Standart eldiven<br/>ile kullanım senaryosu simüle edilmemiş (kesilmeye dayanıklı değil) -<br/>Operatör el konumlandırması ve talaş yönetimi tasarım aşamasında<br/>doğrulanmamış Bu, tasarım safhasında operatör risk senaryolarının<br/>sistematik olarak test edilmediğini gösterir. Protokol eksikliği<br/>(ve/veya bütçe kısıtlaması bunu tetiklediyse) root cause olup, kaynak<br/>kısıtlaması ikincil faktör olabilir."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Tasarım doğrulama standartlarının T-12 tezgâhı projesi kapsamında<br/>tanımlanmamış/uygulanmamış olmasının temel nedeni, **kurum seviyesinde<br/>hangi yönetim politikası, kaynak tahsisi veya proses kontrol mekanizması<br/>eksikliğidir (D4.1 - Tasarım Kontrol)?**"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["T-12 tezgâhı projesi kapsamında tasarım doğrulama standartlarının<br/>tanımlanmamış/uygulanmamış olmasının temel nedeni, **kurum seviyesinde<br/>tasarım kontrol sistemi için formal bir politika, yeterli kaynak tahsisi<br/>ve süreç kontrol mekanizmasının eksik olmasıdır**. Spesifik olarak: 1.<br/>**Tasarım Kontrol Politikası Eksikliği**: Kurum, ürün/proses tasarımı<br/>aşamasında tehlikelerin tanımlanmasını, risk değerlendirmesini ve<br/>kontrollerin doğrulanmasını gerektiren bir formal tasarım kontrol<br/>standardı yayınlamamıştır. 2. **Kaynak Tahsisi Yetersizliği**: Tasarım<br/>kontrol prosesinin uygulanması için (mühendislik saati, doğrulama test<br/>kapasitesi, güvenlik uzmanı desteği) yeterli bütçe ve insan kaynağı<br/>tahsis edilmemiştir. 3. **Proses Kontrol Mekanizması Eksikliği**:<br/>Tasarım aşamalarında (konsept, preliminary, detail tasarım, doğrulama)<br/>kontrol noktaları ve devreye alma kriterleri tanımlanmamıştır. Proje,<br/>tasarımı doğrulama gerektiren kontrol mekanizması olmaksızın<br/>ilerleyebilmiştir. Raporda gözlenen koruyucu bariyer tam kapalı olmama<br/>ve uygunsuz koruyucu ekipman kullanımı, tasarım kontrol prosesinin<br/>yokluğunun doğrudan sonucudur. Tasarım aşamasında insanoğlu-makine<br/>etkileşimi (human-machine interface) senaryoları analiz edilseydi,<br/>bariyer tasarımı ve koruyucu donanım gereksinimleri belirlenebilirdi."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>T-12 tezgâhı projesi kapsamında tasarım doğrulama standartlarının<br/>tanımlanmamış/uygulanmamış olmasının temel nedeni, **kurum seviyesinde<br/>tasarım kontrol sistemi için formal bir politika, yeterli kaynak tahsisi<br/>ve süreç kontrol mekanizmasının eksik olmasıdır**. Spesifik olarak: 1.<br/>**Tasarım Kontrol Politikası Eksikliği**: Kurum, ürün/proses tasarımı<br/>aşamasında tehlikelerin tanımlanmasını, risk değerlendirmesini ve<br/>kontrollerin doğrulanmasını gerektiren bir formal tasarım kontrol<br/>standardı yayınlamamıştır. 2. **Kaynak Tahsisi Yetersizliği**: Tasarım<br/>kontrol prosesinin uygulanması için (mühendislik saati, doğrulama test<br/>kapasitesi, güvenlik uzmanı desteği) yeterli bütçe ve insan kaynağı<br/>tahsis edilmemiştir. 3. **Proses Kontrol Mekanizması Eksikliği**:<br/>Tasarım aşamalarında (konsept, preliminary, detail tasarım, doğrulama)<br/>kontrol noktaları ve devreye alma kriterleri tanımlanmamıştır. Proje,<br/>tasarımı doğrulama gerektiren kontrol mekanizması olmaksızın<br/>ilerleyebilmiştir. Raporda gözlenen koruyucu bariyer tam kapalı olmama<br/>ve uygunsuz koruyucu ekipman kullanımı, tasarım kontrol prosesinin<br/>yokluğunun doğrudan sonucudur. Tasarım aşamasında insanoğlu-makine<br/>etkileşimi (human-machine interface) senaryoları analiz edilseydi,<br/>bariyer tasarımı ve koruyucu donanım gereksinimleri belirlenebilirdi."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden çalışan elle hizalama sırasında keskin talaş yüzeyine doğrudan<br/>temas oluşturdu?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Çalışan, koruyucu bariyer tam kapalı olmadığı için keskin talaş<br/>yüzeyine doğrudan erişim sağlayabildi. Standart eldiven kesilmeye<br/>dayanıklı değildi ve makine çalışırken elle hizalama yapılması tehlikeli<br/>bir çalışma yöntemidir. Yeterli koruyucu ekipman ve kapalı bariyer<br/>sistemi bulunmaması, çalışanın keskin metal yüzeyine doğrudan temas<br/>etmesine neden olmuştur."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden koruyucu bariyer (D4.1 - Makine Koruma Sistemi) tam kapalı<br/>değildi ve çalışan elle hizalama işlemi sırasında bariyer açık durumda<br/>çalışmaya başladı?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Koruyucu bariyer tam kapalı olmadığı için çalışan elle hizalama işlemi<br/>sırasında keskin talaş yüzeyine doğrudan maruz kalmıştır. Bariyer,<br/>makine tasarımında mevcuttur fakat: - Bakım ve fonksiyonel kontrolü<br/>yapılmamıştır - Bariyer açılış mekanizması veya kilit sistemi arızalı<br/>olabilir veya tasarım eksikliği var - Operasyonel prosedürde elle<br/>hizalama işleminin bariyer açık olduğu durumlarda yapılmasına izin veren<br/>uygunsuz bir süreç vardır - Makine koruma sisteminin periyodik<br/>incelemesi gerçekleştirilmemiştir Sonuç olarak, koruyucu bariyer sistem<br/>başarısızlığının kontrol edilememesi ve alternatif koruma önlemlerinin<br/>(uygun eldiven, çalışma prosedürü) eksikliği yaralanmaya neden olmuştur."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden koruyucu bariyer mekanizmasının periyodik bakım, fonksiyonel<br/>kontrol ve kilit sisteminin işlevselliği için planlı bir denetim sistemi<br/>işletilmemektedir?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Koruyucu bariyer mekanizmasının periyodik bakım, fonksiyonel kontrol ve<br/>kilit sisteminin işlevselliği için planlı bir denetim sistemi<br/>işletilmemektedir çünkü işletme bu güvenlik kontrol noktası için resmi<br/>bir denetim prosedürü ve bakım programı oluşturmamıştır. Olay raporunda<br/>'bariyer tam kapalı değildi' ifadesi, bariyerin mekanizal arıza veya<br/>aşınmaya maruz kaldığını ancak periyodik kontrol sistemi olmadığı için<br/>bu arızanın zamanında tespit edilmediğini göstermektedir. Bariyer kilit<br/>mekanizmasının işlevselliği kontrol edilmeyen bir durumda kalmış olup,<br/>bu durum çalışanları keskin yüzeylere maruz bırakmıştır."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Neden işletme, torna makinesi koruyucu bariyerinin periyodik bakım ve<br/>fonksiyonel kontrol sistemi (D1.4 — Yapılandırılmış Denetim Sistemi)<br/>için resmi bir prosedür ve planlı denetim programı oluşturmamıştır?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["İşletme, torna makinesi T-12'nin koruyucu bariyeri için periyodik bakım<br/>ve fonksiyonel kontrol sistemini kurmamıştır çünkü makine güvenliği<br/>yönetim sisteminde, kritik koruma cihazlarının düzenli denetlenmesine<br/>ilişkin yapılandırılmış ve planlı bir denetim prosedürü<br/>geliştirilmemiştir. Olay raporunda bariyerin 'tam kapalı değildi'<br/>olması, bu tür bir sistematik kontrol mekanizmasının ve bakım planlaması<br/>protokolünün eksikliğini doğrudan göstermektedir. Böyle bir sistem<br/>olmadan, makinelerin koruyucu bileşenleri zaman içinde arızalanabilir,<br/>fonksiyonunu kaybedebilir ve düzensiz denetimler nedeniyle sorunlar<br/>gözlemlenememektedir."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Neden işletme, torna makineleri gibi kritik üretim ekipmanları için<br/>düzenli bakım ve fonksiyonel güvenlik denetimleri yapılmasını gerektiren<br/>prosedürleri ve sorumlulukları kurumsal düzeyde tanımlamamış ve<br/>uygulamaya almamıştır?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["İşletme, torna makineleri gibi kritik üretim ekipmanları için düzenli<br/>bakım ve fonksiyonel güvenlik denetimlerini gerektiren prosedürleri<br/>kurumsal düzeyde tanımlamayıp uygulamadığından, bu ekipmanların güvenlik<br/>kontrolü sistemli bir şekilde yerine getirilmemektedir. Bu olay<br/>raporunda T-12 torna tezgâhında koruyucu bariyer tam kapalı olmayarak<br/>yaralanma riskine neden olmuştur. Kurumsal düzeyde eksik olan: - Torna<br/>makineleri için yazılı preventif bakım stratejisi ve prosedürü -<br/>Fonksiyonel güvenlik denetimlerinin (örn: koruyucu bariyerin, acil<br/>durdurma düğmesinin, talaş kontrolünün) periyodik ve sistemli denetim<br/>protokolü - Bu denetimlerin uyumluluğunu izlemek ve doğrulamak için<br/>kurumsal denetim/audit programı Bu sistematik boşluk, makine güvenliğine<br/>ilişkin önemli kontrol noktalarının gözden kaçmasına ve tekrarlayan<br/>risklere yol açmaktadır."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>İşletme, torna makineleri gibi kritik üretim ekipmanları için düzenli<br/>bakım ve fonksiyonel güvenlik denetimlerini gerektiren prosedürleri<br/>kurumsal düzeyde tanımlamayıp uygulamadığından, bu ekipmanların güvenlik<br/>kontrolü sistemli bir şekilde yerine getirilmemektedir. Bu olay<br/>raporunda T-12 torna tezgâhında koruyucu bariyer tam kapalı olmayarak<br/>yaralanma riskine neden olmuştur. Kurumsal düzeyde eksik olan: - Torna<br/>makineleri için yazılı preventif bakım stratejisi ve prosedürü -<br/>Fonksiyonel güvenlik denetimlerinin (örn: koruyucu bariyerin, acil<br/>durdurma düğmesinin, talaş kontrolünün) periyodik ve sistemli denetim<br/>protokolü - Bu denetimlerin uyumluluğunu izlemek ve doğrulamak için<br/>kurumsal denetim/audit programı Bu sistematik boşluk, makine güvenliğine<br/>ilişkin önemli kontrol noktalarının gözden kaçmasına ve tekrarlayan<br/>risklere yol açmaktadır."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
+                htmlLabels: true,
+                diagramPadding: 16
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
+                primaryColor: '#fff',
+                primaryTextColor: '#222',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>

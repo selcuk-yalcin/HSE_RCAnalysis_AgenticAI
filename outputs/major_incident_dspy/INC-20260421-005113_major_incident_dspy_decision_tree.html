@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {size: A4 landscape; margin: 3mm; }
+        * {box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }
+        body {display: flex; flex-direction: column; padding: 3px; height: 100vh; }
+        header {text-align: center; flex-shrink: 0; padding: 3px 0; }
+        header .top-title {font-size: 11px; font-weight: bold; color: #333; margin-bottom: 1px; }
+        header h1 {font-size: 13px; font-weight: bold; color: #111; margin-bottom: 1px; }
+        header .subtitle {font-size: 10px; color: #666; margin-bottom: 1px; }
+        .legend {text-align: center; font-size: 9px; color: #555; padding: 2px 4px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; margin-bottom: 3px; }
+        #diagram-wrap {flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; width: 100%; height: calc(100vh - 60px); }
+        #diagram-wrap .mermaid {width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #diagram-wrap svg {max-width: 98% !important; max-height: 98% !important; height: auto !important; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Operatör, sıcak metal parçası transferi sırasında<br/>neden eldivensiz veya yetersiz koruma ile sıcak yüzeye<br/>doğrudan temas edebilecek konuma geldi?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Operatör, sıcak metal parçası transferi sırasında<br/>yetersiz koruma ile doğrudan temas konumuna geldi<br/>çünkü: (1) İşe başlamadan önce eldivenlerin uygunluğu<br/>kontrol edilmedi; (2) Termal transfer işlemleri için<br/>gerekli olan yalıtımlı/ısıya dayanıklı eldiven yerine<br/>standart eldiven kullanıldı; (3) Risk değerlendirmesi<br/>güncel değildi ve termal tehlikeler için uygun koruyucu<br/>ekipman seçimi belirtilmiyordu; (4) Operatöre iş<br/>başlamadan önce kişisel koruyucu ekipmanın (KKE)<br/>uygunluğu ve kullanılması konusunda talimat veya<br/>gözetim yapılmadı. Sonuç olarak, 08:30'da eldiven<br/>kontrolü yapılmaksızın görev alınması operatörü"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Risk değerlendirmesi Hatt-07 (Sıcak Metal Taşıma<br/>Hattı) için neden güncel tutulmadı ve sıcak metal<br/>transferi işlemleri için gerekli olan termal dayanıklı<br/>eldiven türü neden koruyucu ekipman seçim tablosunda<br/>(KKE Matrisi) tanımlanmamıştı?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["Risk değerlendirmesi Hatt-07'nin güncel tutulmama<br/>nedeni, yönetim sisteminde periyodik gözden geçirme,<br/>denetim ve sorumluluğun net olarak tanımlanmamasıdır.<br/>Sıcak metal transferi işlemleri için termal dayanıklı<br/>eldiven tanımlanmamış olması ise, risk<br/>değerlendirmesinin iş prosesinin spesifik tehlikelerini<br/>(1200°C+ metal yüzey sıcaklığı) yeterince analiz<br/>etmemesinden ve KKE Matrisi'nin operasyonel gerçeklikle<br/>senkronize tutulmamasından kaynaklanmıştır. Temel kök<br/>neden: Risk değerlendirmesi ve KKE seçim süreci<br/>uygulamaya ne kadar iyi yansıtıldığını kontrol eden<br/>gözlem ve denetim mekanizması yetersizdir."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden Hatt-07'de Risk Değerlendirmesi ve KKE<br/>uygulamalarının gözlem/denetim mekanizması yetersiz<br/>hale gelmiş ve periyodik kontroller düzenli olarak<br/>yürütülmemiştir? (Sorumluluğun tanımlanması, denetim<br/>prosedürü, frekansı, kaynaklar ve takip sistemi<br/>açısından)"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Hatt-07'de Risk Değerlendirmesi ve KKE uygulamalarının<br/>gözlem/denetim mekanizması yetersiz hale gelmiş ve<br/>periyodik kontroller düzenli olarak yürütülmemiştir<br/>çünkü: 1. **Sorumluluğun Tanımlanamaması**: Risk<br/>değerlendirmesinin güncellenmesi ve KKE uygulamalarının<br/>denetlenmesinden sorumlu olan birey/birim açıkça<br/>tanımlanmamıştır, bu da hesap verebilirliği ortadan<br/>kaldırmıştır. 2. **Formal Denetim Prosedürünün<br/>Yokluğu**: Vardiyalarda KKE kontrol prosedürü (eldiven<br/>uygunluğu, sıcaklık seviyesine göre KKE türü seçimi)<br/>yazılı ve uygulanır halde değildir. 3. **Belirlenmiş<br/>Kontrol Frekansının Olmayışı**: Hatt-07'de ne kadar"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden Hatt-07'de KKE denetim prosedürleri, kontrol<br/>frekansları ve sorumluluklar resmi olarak<br/>tanımlanmamış; yönetim seviyesinde bu sistemlerin<br/>kurulması ve uygulanması sağlanmamıştır?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Hatt-07'de KKE denetim prosedürleri resmi olarak<br/>tanımlanmamıştır ve yönetim seviyesinde bu kontrol<br/>sistemleri kurulmamıştır çünkü: 1. **Prosedür tasarım<br/>eksikliği (D9.1)**: KKE kontrolü için yazılı, resmi<br/>denetim prosedürü bulunmamaktadır. Operatör eldiven<br/>kontrolü yapılmadan görev almıştır - bu prosedürün<br/>olmadığını gösterir. 2. **Yönetim kontrol sistemi<br/>eksikliği (D1.3)**: Yönetim seviyesinde KKE denetim<br/>sisteminin (kim, ne zaman, hangi sıklıkta) kurulması ve<br/>uygulanması sağlanmamıştır. 3. **Risk yönetimi<br/>zaafiyeti**: Olay raporunda 'Risk değerlendirmesi<br/>güncel değil' belirtilmiş - bu, sıcak metal işlemi için"]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Yönetim seviyesinde sıcak metal transferi işlemleri<br/>için KKE denetim ve kontrol sistemlerinin (prosedür,<br/>yetki, sıklık, kaynak tahsisi) neden kurulmamış ve<br/>uygulanmamış olduğu? Bu eksikliğin nedeni: - Sıcak<br/>metal işleminin tehlikeleri için yeterli risk<br/>değerlendirmesinin yapılmamış olması mı? - Güvenlik<br/>sorumluluk ve hesap verebilirliğinin üst yönetimde<br/>açıkça tanımlanmamış olması mı? - İş sürekliliği/üretim<br/>baskısı nedeniyle güvenlik kontrol sistemlerine<br/>kaynak/öncelik ayrılmamış olması mı? - Yoksa Hatt-07 ve<br/>sıcak metal süreçleri için genel güvenlik politika ve<br/>standartların eksik olması mı?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A8 --> Q9
+    A10["**Temel Neden: Sıcak Metal Süreçleri için Sistemik<br/>Kontrol Çerçevesinin Eksikliği** Denetim ve kontrol<br/>sistemlerinin (prosedür, yetki, sıklık, kaynak)<br/>kurulmamış olmasının kökü, dört faktörün<br/>kombinasyonunda yatmaktadır: 1. **Risk<br/>Değerlendirmesinin Yetersizliği (Birincil)**: Olay<br/>raporunda 'Risk değerlendirmesi güncel değil'<br/>belirtilmektedir. Bu, sıcak metal transferinin<br/>tehlikelerinin (yüksek sıcaklık, kontakt yanığı, KKE<br/>yeterliliği) sistematik olarak tanımlanmadığını ve<br/>güncellenmediğini gösterir. Hatt-07'de sıcak metal<br/>işleminin spesifik riskleri (eldiven erimesi, cilt"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN (**Birincil Kod**: D9.1 (Görev için SPP Yoktur / No SPP for Task)
+**İkincil Kod**: D4.1 (Risk Değerlendirmesi Yetersiz / Risk Assessment Inadequate)
+**Üçüncül Kod**: D1.3 (Hesap Verebilirlik Eksikliği / Lack of Accountability)
+**Dördüncül Kod**: D1.1 (Zayıf Liderlik Taahhütü / Weak Leadership Commitment)):</b><br/>Kök Neden<br/>**Temel Neden: Sıcak Metal Süreçleri için<br/>Sistemik Kontrol Çerçevesinin Eksikliği** Denetim<br/>ve kontrol sistemlerinin (prosedür, yetki, sıklık,<br/>kaynak) kurulmamış olmasının kökü, dört faktörün<br/>kombinasyonunda yatmaktadır: 1. **Risk<br/>Değerlendirmesinin Yetersizliği (Birincil)**: Olay<br/>raporunda 'Risk değerlendirmesi güncel değil'<br/>belirtilmektedir. Bu, sıcak metal transferinin<br/>tehlikelerinin (yüksek sıcaklık, kontakt yanığı,<br/>KKE yeterliliği) sistematik olarak<br/>tanımlanmadığını ve güncellenmediğini gösterir.<br/>Hatt-07'de sıcak metal işleminin spesifik riskleri"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>**Why-1: Neden operatör sıcak metal parçasına doğrudan<br/>cilt teması yaşadı ve eldiven koruyucu işlevini yerine<br/>getiremeyerek erimesi meydana geldi?** Alternatif<br/>formülasyon: **Why-1: Neden operatör, sıcak metal<br/>transferi sırasında koruyucu eldiveni etkin bir şekilde<br/>kullanamadı / eldiven yeterfliğini kaybetti?**"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q11
+    A12["Operatör sıcak metal parçasına doğrudan cilt teması<br/>yaşadı ve ciddi yanık meydana geldi, çünkü **yalıtımlı<br/>(ısıya dayanıklı) eldiven yerine standart eldiven<br/>kullanılmış ve bu eldiven yüksek sıcaklığa maruz<br/>kalarak erimişdir**. Kök nedenler: - **Koruyucu ekipman<br/>yetersizliği**: Sıcak metal transferi işlemi için<br/>gerekli olan yalıtımlı eldiven standartlarının<br/>tanımlanmadığı veya uygulanmadığı - **Kontrol<br/>mekanizmasının yokluğu**: Operatör görev başlamadan<br/>önce eldivenin kontrolünün yapılmaması ve uygunluğunun<br/>doğrulanmaması - **Risk değerlendirmesinin güncel<br/>olmaması**: Sıcak metal hattında (Hatt-07) tehlike"]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Operatör sıcak metal transferi işi için eldiven<br/>seçiminde yalıtımlı (ısıya dayanıklı) eldiven yerine<br/>standart eldiveni neden tercih etti/kullandı — iş<br/>başlamadan önce uygun ekipmanın kontrol edilmesi ve<br/>onaylanması prosedürü neden uygulanmadı?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Operatörün standart eldiven seçmesi ve uygun ekipmanın<br/>kontrol edilmemesi nedenleri: **İŞLETME SEVİYESİ<br/>(Operatör Davranışı):** - Standart eldivenlerin daha<br/>rahat hissetmesi ve hız kazandırması nedeniyle tercih<br/>edilmiş olabilir - Yalıtımlı eldivenlerin bulunmadığı<br/>veya erişilebilir olmadığı - İş başlama kontrol listesi<br/>uygulanmadığı için kontrol atlanmış **DENETİM SEVİYESİ<br/>(Prosedür Eksikliği):** - Sıcak metal transferi işi<br/>için risk değerlendirmesinin güncel olmadığı (ön<br/>bulgular) - PPE seçim kriterleri yazılı olmadığı için<br/>operatöre seçim hakkı tanındığı - İş başlama protokolü<br/>standartlaştırılmadığı **GÖZETIM SEVİYESİ (Kültür"]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Sıcak metal taşıma hattında kullanılacak PPE<br/>(özellikle yalıtımlı eldiven) türlerinin ve seçim<br/>kriterlerinin neden yazılı prosedürde tanımlanmadığı ve<br/>risk değerlendirmesinin neden düzenli olarak<br/>güncellenmediği? (Yani: Risk yönetimi sistemi ve<br/>prosedür geliştirme süreci nasıl tasarlanmıştır ve<br/>neden bu kritik görev atlanmıştır?)"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Sıcak metal taşıma hattında kullanılacak PPE<br/>(yalıtımlı eldiven) türlerinin ve seçim kriterlerinin<br/>yazılı prosedürde tanımlanmaması ve risk<br/>değerlendirmesinin düzenli olarak güncellenmemesi,<br/>kurumun **risk yönetimi sistemi tasarımında temel<br/>eksiklikleri** yansıtmaktadır: **Kök Nedenler:** 1.<br/>**Prosedür Geliştirme Sürecinin Eksikliği**: Tehlikeli<br/>görevlerin risk değerlendirmesi kapsamında PPE seçim<br/>kriterleri sistematik olarak belirleninmemiştir. 2.<br/>**Periyodik Güncelleme Mekanizmasının Olmaması**: Risk<br/>değerlendirmesinin düzenli (örn: yıllık veya prosedür<br/>değişiminde) olarak gözden geçirilmesi için resmi bir"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>**Why-4: Neden kurumun risk yönetimi sistemini<br/>tasarlamak ve kurumsallaştırmak için gerekli prosedür<br/>yazımı, periyodik inceleme mekanizması ve sorumluluk<br/>tanımı gibi temel yönetim fonksiyonları oluşturulmamış<br/>veya aktif olarak uygulanmamaktadır?** (Alternatif<br/>ifade: Kurumun güvenlik yönetim sisteminin<br/>yapılandırılması ve işletilmesi konusunda üst yönetimin<br/>stratejik kararları, kaynak tahsisi ve denetim<br/>mekanizmaları neden yeterli olmamıştır?)"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A16 --> Q17
+    A18["Kurumun risk yönetimi sisteminin yapılandırılması,<br/>kurumsallaştırılması ve işletilmesi konusunda temel<br/>yönetim fonksiyonlarının oluşturulmamış veya aktif<br/>olarak uygulanmamış olmasının nedenleri: 1. **Risk<br/>Değerlendirme Prosedürünün Periyodik İnceleme<br/>Mekanizmasının Yokluğu**: Sıcak metal taşıma hattında<br/>risk değerlendirmesi güncel değildir. Bu, risk yönetimi<br/>prosedürünün kurumsal düzeyde tanımlanmadığını,<br/>periyodik inceleme döngüsünün (yıllık/altı aylık)<br/>kurumsal standart olarak belirlenmediğini gösterir. 2.<br/>**Koruyucu Donanım Standartlarının<br/>Tanımlanmamış/Uygulanmamış Olması**: Yalıtımlı eldiven"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Neden kurum üst yönetimi, sıcak metal taşıma gibi<br/>yüksek riskli operasyonlarda (ve genel olarak<br/>işletmede) risk yönetim sisteminin temel bileşenlerini<br/>(risk değerlendirmesinin periyodik incelemesi, koruyucu<br/>donanım standartlarının tanımlanması, gözetim<br/>mekanizması ve durdur-bildir kültürü) bir **kurumsal<br/>strateji ve zorunlu standart** olarak tasarlamayı,<br/>kaynak tahsisi yapmayı ve denetim mekanizması<br/>oluşturmayı gerçekleştirmemiştir? (Başka bir deyişle:<br/>Neden güvenlik yönetim sisteminin kurumsallaştırılması,<br/>üst yönetim tarafından bir iş sürekliliği ve yasal/etik<br/>sorumluluğun temeli olarak benimsenmemiştir?)"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Kurum üst yönetimi, sıcak metal taşıma gibi yüksek<br/>riskli operasyonlarda risk yönetim sisteminin temel<br/>bileşenlerini kurumsal strateji ve zorunlu standart<br/>olarak tasarlamayı ve kurumsallaştırmayı<br/>gerçekleştirmemiştir çünkü: **Birincil Neden: Liderlik<br/>Taahhüdünün Yetersizliği** Güvenlik, iş operasyonunun<br/>bir temel taşı değil, uyum gereksiniği olarak<br/>konumlandırılmıştır. Risk yönetim sistemine kurumsal<br/>kaynak, gözetim yetkisi ve stratejik öncelik tahsis<br/>edilmemiştir. **İkincil Nedenler:** 1. **Sistematik<br/>Risk Değerlendirmesi Eksikliği**: Raporta 'Risk<br/>değerlendirmesi güncel değil' kaydı, periyodik inceleme"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN (**Birincil Kod: D1.1 - Weak Leadership Commitment**
+→ Güvenlik için bütçe/kaynak tahsisi yetersiz, projeler ertelenemektedir
+
+**İkincil Kodlar:**
+- **D4.1** - Risk Assessment Inadequate: Sıcak metal operasyonuna özgü risk değerlendirmesi güncel/sistematik değildir
+- **D9.1** - No SPP for Task: Koruyucu donanım standartları (yalıtımlı eldiven kullanım prosedürü) yazılı olarak tasarlanmamıştır
+- **D9.5** - Monitoring/Audit Inadequate: Uyum denetim sistemi (gözetim mekanizması) tasarlanmamıştır
+- **D1.3** - Lack of Accountability: Standart dışı eldiven kullanımı tespit edilmesine rağmen düzeltici işlem uygulanmamıştır
+- **D1.2** - Inadequate Supervision: Frontline yönetim operasyon alanında durdur-bildir kültürünü pekiştirmekte yetersiz kalmıştır):</b><br/>Kök Neden<br/>Kurum üst yönetimi, sıcak metal taşıma gibi<br/>yüksek riskli operasyonlarda risk yönetim<br/>sisteminin temel bileşenlerini kurumsal strateji<br/>ve zorunlu standart olarak tasarlamayı ve<br/>kurumsallaştırmayı gerçekleştirmemiştir çünkü:<br/>**Birincil Neden: Liderlik Taahhüdünün<br/>Yetersizliği** Güvenlik, iş operasyonunun bir<br/>temel taşı değil, uyum gereksiniği olarak<br/>konumlandırılmıştır. Risk yönetim sistemine<br/>kurumsal kaynak, gözetim yetkisi ve stratejik<br/>öncelik tahsis edilmemiştir. **İkincil Nedenler:**<br/>1. **Sistematik Risk Değerlendirmesi Eksikliği**:"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden operatör, yüksek sıcaklıkta sıcak metal<br/>parçasına temas ederken, termal hazarda karşı yeterli<br/>koruma sağlamayan (standart) eldiven kullanıyordu?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q21
+    A22["Operatör, yüksek sıcaklıkta sıcak metal parçasına<br/>temas ederken uygun termal koruma sağlamayan standart<br/>eldiven kullanmıştır çünkü: 1. **Prosedür Uygulamasının<br/>Eksikliği**: Görev başında eldiven kontrolü<br/>yapılmamıştır. Standart eldiven ile yalıtımlı eldiven<br/>arasında ayrım yapılmayan veya enforze edilmeyen bir<br/>sistem mevcuttur. 2. **Risk Değerlendirmesinin Güncel<br/>Olmaması**: Mevcut risk değerlendirmesi, metal<br/>sıcaklığının yüksek seviyelerde çalışılacağı koşulları<br/>güncel olarak kapsamıyor ve gereken PPE'yi belirtmiyor.<br/>3. **Zayıf Gözetim ve Denetim**: Vardiya öncesi veya<br/>görev sırasında, doğru koruma ekipmanının"]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden operatör, görev başında (08:30'de) uygun termal<br/>koruma eldiveni kontrolü yapmamış veya bu kontrol<br/>prosedürü uygulanmamıştır?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Operatör görev başında uygun termal koruma eldiveni<br/>kontrolü yapmamıştır çünkü: **Birincil Neden**: İş<br/>öncesi KKD kontrol prosedürü sistematik olarak<br/>uygulanmamaktadır. Risk değerlendirmesi güncel olmadığı<br/>için, sıcak metal transfer görevinin termal tehlikesi<br/>yeterince tanımlanmamıştır. **İkincil Nedenler**: -<br/>Yönetim tarafından KKD kontrolü için zorunlu bir<br/>durdur-kontrol noktası belirlenmemiştir - Zayıf gözetim<br/>kültürü, operatörün veya ekip liderinin riski<br/>sorgulamasını veya görev başladıktan sonra durmasını<br/>engellemiştir - Yanlış KKD (standart eldiven) stokta<br/>mevcutsa, uygun KKD'nin eksik olması veya eksik KKD"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden iş öncesi KKD kontrol prosedürü yönetim<br/>tarafından sıcak metal transfer gibi yüksek tehlikeli<br/>görevler için zorunlu ve sistematik bir kontrol noktası<br/>olarak tasarlanmamış ve uygulanmamıştır?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A24 --> Q25
+    A26["Yönetim tarafından iş öncesi KKD kontrol prosedürü<br/>sıcak metal transfer gibi yüksek tehlikeli görevler<br/>için zorunlu sistematik kontrol noktası olarak<br/>tasarlanmamış ve uygulanmamıştır çünkü: 1. **Sistem<br/>Tasarımı Eksikliği**: KKD kontrol prosedürü (eldiven<br/>türü, durumu, donanım kontrol listesi) iş<br/>talimatlarında ve iş akış şemasında öncül/ön koşul<br/>adımı olarak tanımlanmamıştır. 2. **Risk<br/>Değerlendirmesi Güncelliği**: Risk değerlendirmesi<br/>güncel olmadığı için sıcak metal transferinin 'kritik<br/>görev' kategorisine alınması ve bu kategoriye özel<br/>kontrol prosedürleri yazılmamıştır. 3. **Kontrol"]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Neden yönetim, sıcak metal transfer işlemi gibi yüksek<br/>tehlikeli görevler için iş öncesi KKD kontrol<br/>prosedürünü (zorunlu durdurma, gözetim, donanım kontrol<br/>listesi) **tasarım ve planlama aşamasında** sistematik<br/>bir ön koşul kontrol noktası olarak tanımlamayıp<br/>uygulamadı?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A26 --> Q27
+    A28["Yönetim, sıcak metal transfer işlemi için iş öncesi<br/>KKD kontrol prosedürünü **tasarım aşamasında sistematik<br/>ön koşul olarak tanımlamamış**, çünkü: 1. **Prosedür<br/>Tasarım Eksikliği (Sistem Faktörü)**: Yönetim, yüksek<br/>tehlikeli görevler için risk değerlendirmesi yapmış<br/>olsa da, bu riskler karşısında **zorunlu durdurma ve<br/>gözetim kontrol noktaları** iş başlamadan önce aktif<br/>edilmemiştir. Raporda 'Risk değerlendirmesi güncel<br/>değil' notu bunu doğrulamaktadır. 2. **Operatör<br/>Yetkinlik Eksikliği (Personel Faktörü - C3.1 & C3.3)**:<br/>Operatör, uygun KKD seçimi ve kontrol prosedürünü<br/>(doğru eldiven türü, kontrol listesi) bilmemiş veya"]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Yönetim neden, yüksek tehlikeli sıcak metal transfer<br/>işlemi için iş öncesi KKD kontrol prosedürünü ve<br/>zorunlu durdurma kontrol noktalarını, **iş başlamadan<br/>önce aktif olarak tanımlanmış ve uygulanmış sistem<br/>bileşenleri olarak** işletme prosedürlerine entegre<br/>etmemiştir? (Örn. Riskin yönetim tarafından<br/>algılanamaması, prosedür sorumluluğunun net<br/>tanımlanmamış olması, güvenlik ve üretim arasında<br/>önceliklendirme çatışması)"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A28 --> Q29
+    A30["Yönetim, sıcak metal transfer işleminin yüksek tehlike<br/>seviyesini yeterince tanımadığı ve/veya operasyonel<br/>baskılar nedeniyle güvenlik kontrol noktalarını iş<br/>rutininin zorunlu adımları olarak sistematize etmediği<br/>için iş öncesi KKD kontrol prosedürünü ve durdurma<br/>kontrol noktalarını entegre etmemiştir. Spesifik<br/>nedenler: 1. **Risk Değerlendirmesi Yetersizliği<br/>(D4.1)**: Sıcak metal transferi için kapsamlı risk<br/>değerlendirmesi yapılmamış veya güncel tutulmamıştır.<br/>Iş öncesi KKD kontrolü kritik kontrol noktası olarak<br/>tanımlanmamıştır. 2. **Prosedür Eksikliği (D9.1)**: İş<br/>öncesi KKD kontrol prosedürü yazılı, net, ölçülebilir"]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN (**Birincil:** D4.1 (Risk Assessment Inadequate - Genel Planlama)
+**İkincil:** D9.1 (No SPP for Task - Prosedür Eksikliği)
+**Üçüncül:** D9.5 (Monitoring/Audit Inadequate - Sistematik Denetim Yokluğu)
+**Dördüncül:** D1.2 (Inadequate Supervision - Person Level)):</b><br/>Kök Neden<br/>Yönetim, sıcak metal transfer işleminin yüksek<br/>tehlike seviyesini yeterince tanımadığı ve/veya<br/>operasyonel baskılar nedeniyle güvenlik kontrol<br/>noktalarını iş rutininin zorunlu adımları olarak<br/>sistematize etmediği için iş öncesi KKD kontrol<br/>prosedürünü ve durdurma kontrol noktalarını<br/>entegre etmemiştir. Spesifik nedenler: 1. **Risk<br/>Değerlendirmesi Yetersizliği (D4.1)**: Sıcak metal<br/>transferi için kapsamlı risk değerlendirmesi<br/>yapılmamış veya güncel tutulmamıştır. Iş öncesi<br/>KKD kontrolü kritik kontrol noktası olarak<br/>tanımlanmamıştır. 2. **Prosedür Eksikliği"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Operatör sıcak metal parçasını ele alırken, eldiveni<br/>neden erimesi sonucunda cilt doğrudan sıcak yüzeyle<br/>temas etti? (Başka bir deyişle: Eldiven kontrolü<br/>yapılmış olsa bile, eldivenin o sıcaklıkta yeterli<br/>koruma sağlaması bekleniyordu mu, ve neden sağlamadı —<br/>yoksa eldive kontrolü hiç yapılmamış mı?)"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q31
+    A32["Operatör sıcak metal parçasını ele alırken eldiveni<br/>erimesi ve cilt doğrudan sıcak yüzeyle temas etmesinin<br/>nedeni, iki kritik başarısızlıktan kaynaklanmıştır:<br/>**Birincil Neden - Uygunsuz KKE:** Yalıtımlı (termik)<br/>eldiven yerine standart eldiven kullanılmıştır.<br/>Standart eldivenler yüksek sıcaklık koşullarında<br/>tasarlanmamıştır ve 25 Nisan 2026'daki sıcak metal<br/>sıcaklığında eriyip işlevini yitirmektedir. **İkincil<br/>Neden - Kontrol Eksikliği:** Eldiven kontrolü<br/>yapılmamıştır. Rapor açıkça 'operatör eldiven kontrolü<br/>yapılmadan görev aldı' ifadesini içermektedir. Kontrol<br/>yapılmış olsa dahi, standart eldiven o sıcaklıkta"]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden operatöre standart eldiven sunulmuş / kullanması<br/>için izin verilmiş ve sıcak metal transferi gibi yüksek<br/>sıcaklık işlemleri için tasarlanan termik/yalıtımlı<br/>eldiven yerine tercih edilmiştir?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A32 --> Q33
+    A34["Standart eldiven yerine termik/yalıtımlı eldiven<br/>tercih edilmemesinin temel nedenleri: 1. **Yazılı<br/>Prosedür Eksikliği**: Sıcak metal transferi için<br/>zorunlu olarak termik eldiven kullanılmasını belirten<br/>resmi KKD prosedürü mevcut değildir. 2. **Risk<br/>Değerlendirmesinin Güncel Olmaması**: Hatt-07'deki<br/>sıcak metal çalışmalarının tehlike ve kontrol ölçüleri<br/>(özellikle KKD gereksinimleri) yeniden<br/>değerlendirilmemiş olup, sıcak işlemler için uygun KKD<br/>tanımlanmamıştır. 3. **Görev Başlama Kontrol<br/>Mekanizmasının Zayıflığı**: Operatöre görevlendirilme<br/>sırasında KKD uygunluğu kontrol edilmemiş; yanlış"]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Why-3: Risk değerlendirmesi, KKD prosedürleri ve<br/>gözetim kontrol mekanizmaları (görev başlama kontrol,<br/>gözlemci denetimi) neden Hatt-07 gibi yüksek riskli<br/>operasyonlarda düzenli olarak güncellenmemiş ve<br/>uygulanmamış?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A34 --> Q35
+    A36["Risk değerlendirmesi, KKD prosedürleri ve gözetim<br/>kontrol mekanizmaları Hatt-07 gibi yüksek riskli<br/>operasyonlarda düzenli olarak güncellenmemiş ve<br/>uygulanmamış çünkü: 1. **Risk Yönetim Sistemi<br/>Eksikliği**: Risk değerlendirmesi güncel tutulmadığı<br/>için sıcak metal transferinde gerekli olan yalıtımlı<br/>eldivenlerin zorunlu kullanımı belgelenmemiş ve<br/>uygulanmamıştır. 2. **KKD Prosedür Kontrolü Zayıf**:<br/>Görev başlama öncesi KKD kontrol mekanizması<br/>işletilmemiştir. Operatör eldiven kontrolü yapılmadan<br/>görev almıştır, bu da prosedürün uygulanmadığını<br/>gösterir. 3. **Gözetim ve Denetim Eksikliği**: Vardiya"]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Risk Yönetim Sistemi, KKD prosedürleri ve gözetim<br/>kontrol mekanizmalarının Hatt-07 gibi yüksek riskli<br/>operasyonlarda düzenli olarak güncellenmemesi ve<br/>uygulanmamasına neden olan yapısal/yönetimsel sebepler<br/>nedir? (Örn: Sorumluluk tanımı, bütçe/kaynak ayrılması,<br/>yönetim talimatı, sistem tasarımı veya sıklık<br/>standartları eksikliği mi?)"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A36 --> Q37
+    A38["Risk Yönetim Sistemi, KKD prosedürleri ve gözetim<br/>kontrol mekanizmalarının Hatt-07'de düzenli olarak<br/>güncellenmemesi ve uygulanmamasının yapısal/yönetimsel<br/>sebepleri: **1. Sorumluluk Tanımı Eksikliği:** - KKD<br/>uygunluğu kontrolü, risk değerlendirmesi güncellemesi<br/>ve periyodik gözetim denetimi için açık sorumluluk ve<br/>hesap verilebilirlik tanımlanmamıştır. - Hat operatörü<br/>vs. Shift Amiri vs. Güvenlik Müdürü arasında sorumluluk<br/>sınırları belirsizdir. **2. Bütçe ve Kaynak Ayrılması<br/>Yetersizliği:** - KKD muayene ve test için (eldiven<br/>ısıl dayanıklılık testi, malzeme uygunluğu kontrolü)<br/>cihaz, personel saati ve harç ayrılmamıştır. - Gözetim"]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>**Why-5:** Risk Yönetim Sistemi, KKD prosedürleri ve<br/>gözetim kontrol mekanizmalarının Hatt-07'de bu denli<br/>eksik tanımlanmış, kaynak ayrılmamış ve uygulanmamış<br/>olması, üst yönetimin Endüstri 4.0 döneminde sıcak<br/>metal işleme ortamlarında güvenlik riskleriyle ilgili<br/>farkındalık ve önceliklendirmesinin zayıf olduğunu ve<br/>kurumsal güvenlik yönetim olgunluğunun yetersiz<br/>seviyede kaldığını göstermektedir. **Operasyonel<br/>güvenlik sistemleri ve kontrol mekanizmalarının<br/>kurumsal olarak neden güncellenmiş ve uygulanabilir bir<br/>standarda yükseltilmemesi, üst yönetim kararlarında ve<br/>bütçe tahsisinde güvenli çalışma ortamına verilen önemi"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A38 --> Q39
+    A40["Hatt-07'de operasyonel güvenlik sistemlerinin kurumsal<br/>olarak güncellenip uygulanabilir standarda<br/>yükseltilmemiş olmasının temel nedenleri, üst yönetimin<br/>güvenlik yatırımına ilişkin karar mekanizmalarında ve<br/>bütçe tahsisinde güvenlik sistemlerinin<br/>modernizasyonunun **düşük önceliğe** konmuş olmasından<br/>kaynaklanmaktadır. **Olası etken faktörler:** 1.<br/>**Rekabetçi maliyet basıncı (DOĞRU)** — Operasyonel<br/>güvenlik sistemlerinin yükseltilmesi, KKD<br/>prosedürlerinin güncellenmesi ve denetim kontrol<br/>mekanizmalarının inşası kayda değer investasyon<br/>gerektirirken, kısa vadeli üretim hedefleri ve maliyet"]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN (**Birincil:** D1.1 — Weak Leadership Commitment (Zayıf Liderlik Taahhüdü)
+
+**Destekleyici kodlar:**
+- D9.5 — Monitoring/Audit Inadequate (Sistematik denetim/uyum izleme sistemi eksikliği)
+- D1.4 — Production Pressure (Üretim basıncı, güvenliği ikincil hale getiren)
+- D1.2 — Inadequate Supervision - PERSON LEVEL (Frontline gözetim yetersizliği)
+- D4.1 — Risk Assessment Inadequate (Risk değerlendirmesi güncel değil)
+- D9.1 — No SPP for Task (Güncel KKD/güvenlik prosedürleri eksikliği)):</b><br/>Kök Neden<br/>Hatt-07'de operasyonel güvenlik sistemlerinin<br/>kurumsal olarak güncellenip uygulanabilir<br/>standarda yükseltilmemiş olmasının temel<br/>nedenleri, üst yönetimin güvenlik yatırımına<br/>ilişkin karar mekanizmalarında ve bütçe tahsisinde<br/>güvenlik sistemlerinin modernizasyonunun **düşük<br/>önceliğe** konmuş olmasından kaynaklanmaktadır.<br/>**Olası etken faktörler:** 1. **Rekabetçi maliyet<br/>basıncı (DOĞRU)** — Operasyonel güvenlik<br/>sistemlerinin yükseltilmesi, KKD prosedürlerinin<br/>güncellenmesi ve denetim kontrol mekanizmalarının<br/>inşası kayda değer investasyon gerektirirken, kısa"]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden operatörün eldiveni sıcak metal transferi<br/>sırasında erimişve cilt doğrudan sıcak yüzeye temas<br/>etmiştir?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q41
+    A42["Operatörün eldiveni erimesi ve cilt doğrudan sıcak<br/>yüzeye temas etmesi, yalıtımlı eldiven yerine termal<br/>dayanıklılığı yetersiz olan standart eldiven<br/>kullanmasından kaynaklanmıştır. Sıcak metal transferi<br/>sırasında metal yüzey sıcaklığı (+1000°C civarı),<br/>standart eldiven malzemesinin erime noktasını aşmıştır.<br/>Ek olarak, görevden önce eldiven kontrolünün yapılmamış<br/>olması bu riski artırmıştır."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Operatörün sıcak metal transfer işleminde standart<br/>eldiven kullanmasının nedeni nedir? Yalıtımlı<br/>eldivenlerin çalışma alanında mevcut olmadığı mı,<br/>operatörün hangi eldiveni kullanması gerektiği<br/>konusunda eğitim/bilgi eksikliği mi, yoksa mevcut olan<br/>yalıtımlı eldivenlerin uygun olmadığı veya erişilmesi<br/>zor olduğu için tercih edilmiş mi?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A42 --> Q43
+    A44["Operatörün standart eldiven kullanmasının temel<br/>nedeni, bu tehlikeli görev için gerekli olan yalıtımlı<br/>eldivenlerin çalışma alanında mevcudiyeti, operatörün<br/>kullanması gereken doğru kişisel koruyucu ekipmanı<br/>hakkında eğitim eksikliği ve risk kontrolü<br/>prosedürlerinin yeterince uygulanmamasıdır. Spesifik<br/>olarak: 1. **Eğitim/Bilgi Eksikliği**: Operatör<br/>'eldiven kontrolü yapılmadan görev aldı' — bu, görev<br/>başlamadan önce uygun eldiveni seçip kontrol etmeye<br/>yönelik prosedürün ya yokluğunu ya da uygulanmadığını<br/>gösterir. 2. **Sistemik Kontrol Zayıflığı**: 'Risk<br/>değerlendirmesi güncel değil' ve 'Gözetim ve"]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Risk değerlendirmesinin neden güncel tutulmadığı ve<br/>sıcak metal taşıma hattında (Hatt-07) yalıtımlı eldiven<br/>kullanım prosedürünün neden eksik veya uygulanmayan bir<br/>durum haline geldiği?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A44 --> Q45
+    A46["Risk değerlendirmesinin güncel tutulmaması ve sıcak<br/>metal taşıma hattında yalıtımlı eldiven prosedürünün<br/>eksik/uygulanmaması temelde üç katmanlı sistem<br/>başarısızlığının sonucudur: **1. Risk Yönetim Sistemi<br/>Başarısızlığı:** - Sıcak metal işletmelerinde tehlike<br/>analizi yetersiz yapılmıştır - Hatt-07'nin spesifik<br/>sıcaklık ve malzeme temasından kaynaklanan riskler<br/>yeniden değerlendirilmemiştir - Risk değerlendirmesinin<br/>periyodik güncelleme döngüsü tanımlanmamış veya<br/>uygulanmamıştır **2. Kontrol Önlemlerinin<br/>Uygulanmaması:** - Yalıtımlı eldiven kullanım prosedürü<br/>yazılı olsa dahi, uygulama denetim mekanizması"]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Hatt-07'de sıcak metal işletmesinin risk<br/>değerlendirmesinin periyodik güncelleme döngüsü neden<br/>tanımlanmamış veya tanımlanmış olmasına rağmen<br/>uygulanmamıştır? (Yönetim karar mekanizması, kaynak<br/>tahsisi, sorumluluk tanımı, prosedür denetim<br/>eksikliği?)"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A46 --> Q47
+    A48["Risk değerlendirmesinin periyodik güncelleme döngüsü<br/>tanımlanmamış veya tanımlanmış olmasına rağmen<br/>uygulanmamıştır çünkü: 1. **Yönetim Karar Mekanizması<br/>Eksikliği**: Risk değerlendirmesinin ne sıklıkla<br/>güncelleneceği (aylık/yıllık/olay sonrası)<br/>kararlaştırılmamıştır. Sonuç olarak, sıcak metal<br/>hattındaki değişen operasyonel şartlar (yüksek<br/>sıcaklık, donanım degradasyonu) değerlendirmelere<br/>yansımamıştır. 2. **Sorumluluk Tanımı Muğlak**: Risk<br/>değerlendirmesi güncellemesinden kimin sorumlu olduğu<br/>(İSG müdürü, operasyon şefi, mühendis?) açık değildir.<br/>Bu nedenle hiç kimse bunu yapmamıştır. 3. **Kaynak"]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Neden tesis yönetimi, risk değerlendirmesinin<br/>periyodik güncellenmesi için bir prosedür, sorumluluk<br/>matrisi ve denetim mekanizması tanımlayıp uygulamadı?<br/>Bu eksikliğin arkasında, işletmenin güvenlik yönetim<br/>sisteminin olgunluk seviyesi, kaynaklandırma<br/>öncelikleri ve İSG kültürünün yetersizliği midir, yoksa<br/>başka kurumsal/yapısal engeller mi vardır?"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A48 --> Q49
+    A50["Tesis yönetimi, risk değerlendirmesinin periyodik<br/>güncellenmesi için prosedür, sorumluluk matrisi ve<br/>denetim mekanizması tanımlayıp uygulamadığının temel<br/>nedenleri: **1. Sistemik Denetim Mekanizmasının<br/>Eksikliği (D9.5)** - Risk değerlendirmesinin<br/>güncelliğini kontrol eden bir AUDIT/İZLEME SİSTEMİ<br/>tasarlanmamıştır - Yazılı prosedür olsa bile, uygulanıp<br/>uygulanmadığını doğrulayan sistemik kontrol eksiktir -<br/>Raporda 'Risk değerlendirmesi güncel değil' bulgusu,<br/>bunun periyodik olarak kontrol edilmediğini gösterir<br/>**2. Operasyonel Gözetim Eksikliği (D1.2)** - Günlük<br/>düzeyinde frontline denetçilerin (vardiya amiri)"]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN (**D9.5** (Monitoring/Audit Inadequate - Primary Root Cause)
+- Risk değerlendirmesi güncelliğini kontrol eden sistemik denetim programı eksiktir
+- Yazılı prosedür olsa bile, uygulanıp uygulanmadığını doğrulayan mekanizma olmadığı için etkinliği sıfırdır
+
+**D1.2** (Inadequate Supervision - Secondary)
+- Operatörlerin eldiven ve risk kontrolleri uyguladığını doğrulayan günlük gözetim eksiktir
+
+**D1.7** (Weak Reporting/Learning Culture - Contributing)
+- Riskler ve sapmaların raporlanmadığı için, güncelleme gereken noktalar tespit edilmiyor):</b><br/>Kök Neden<br/>Tesis yönetimi, risk değerlendirmesinin periyodik<br/>güncellenmesi için prosedür, sorumluluk matrisi ve<br/>denetim mekanizması tanımlayıp uygulamadığının<br/>temel nedenleri: **1. Sistemik Denetim<br/>Mekanizmasının Eksikliği (D9.5)** - Risk<br/>değerlendirmesinin güncelliğini kontrol eden bir<br/>AUDIT/İZLEME SİSTEMİ tasarlanmamıştır - Yazılı<br/>prosedür olsa bile, uygulanıp uygulanmadığını<br/>doğrulayan sistemik kontrol eksiktir - Raporda<br/>'Risk değerlendirmesi güncel değil' bulgusu, bunun<br/>periyodik olarak kontrol edilmediğini gösterir<br/>**2. Operasyonel Gözetim Eksikliği (D1.2)** -"]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A50 --> ROOT5
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            flowchart: { 
+                curve: 'basis', 
+                padding: 15, 
+                nodeSpacing: 50, 
+                rankSpacing: 80, 
+                useMaxWidth: true,
+                htmlLabels: true,
+                diagramPadding: 10
+            }, 
+            themeVariables: { 
+                fontSize: '11px', 
+                fontFamily: 'Segoe UI',
+                primaryColor: '#fff',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            } 
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }
+        header .top-title { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        header h1 { font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }
+        header .subtitle { font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+        #diagram-wrap {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }
+        #diagram-wrap .mermaid {
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }
+        #diagram-wrap svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden operatör, sıcak metal parçasını taşırken yeterli termal koruma<br/>sağlamayan standart eldiveni (yalıtımlı eldiven yerine) kullandı?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Operatör standart eldiven kullanması, sıcak metal transferi için<br/>gerekli termal risk değerlendirmesinin yapılmaması ve yalıtımlı eldiven<br/>gibi uygun kişisel koruyucu donanımın iş prosedüründe zorunlu<br/>kılınmaması nedeniyle gerçekleşmiştir. Eksik risk değerlendirmesi,<br/>yönetim tarafından görev başlama öncesi KKD kontrolünün yapılmaması ve<br/>çalışanların tehlike tanıma eğitiminin yetersiz olması temel<br/>nedenleridir."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Sıcak metal transfer işlemi için termal risk değerlendirmesi neden<br/>güncel tutulmamış ve görev başlama öncesi KKD uygunluk kontrolü<br/>prosedürü neden uygulanmamıştır?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Sıcak metal transfer işleminde termal risk değerlendirmesi güncel<br/>tutulmamış ve görev başlama öncesi KKD uygunluk kontrolü prosedürü<br/>uygulanmamıştır çünkü: 1. **Risk Değerlendirmesi Eksikliği**:<br/>Operasyonal koşullardaki değişimler (metal sıcaklığının yükselmesi)<br/>izlenmiş olmasına rağmen, termal risk değerlendirmesi buna uyarlanarak<br/>güncellenememiştir. Bu, risk yönetim döngüsünün izleme-değerlendirme<br/>aşamasında başarısız olduğunu gösterir. 2. **KKD Kontrol Prosedürünün<br/>Yokluğu/Uygulanmaması**: Görev başında KKD uygunluk kontrolü<br/>yapılmadığından, operatöre standart eldiven verilmiş ve yalıtımlı<br/>eldiven gerekli olduğu halde kullanılmamıştır. 3. **Yönetsel Denetim<br/>Zayıflığı**: 'Gözetim ve durdur-bildir kültürü zayıf' olması,<br/>prosedürlerin yazılı olsa bile uygulanmadığını ve sapmaların<br/>düzeltilmediğini gösterir."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Sıcak metal transfer işleminde yönetsel denetim ve<br/>gözetim-durdur-bildir kültürünün zayıf olması, operasyonel değişimleri<br/>izlemede ve prosedür sapmaları düzeltmede başarısız kalındığı anlamına<br/>geliyorsa, bu yönetsel kontrol mekanizmaları (rutin gözetim turları, iş<br/>sağlığı güvenliği denetim sistemleri, prosedür uygunluk kontrolleri)<br/>neden etkili bir şekilde uygulanmamıştır ?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Yönetsel kontrol mekanizmaları (rutin gözetim turları, iş sağlığı<br/>güvenliği denetim sistemleri, prosedür uygunluk kontrolleri) etkili bir<br/>şekilde uygulanmamıştır çünkü: 1. **Rutin gözetim turlarının sistematik<br/>gerçekleştirilmemesi**: Vardiya başında ve operasyon sırasında eldiven<br/>durumunun kontrol edilmesi gerekli prosedürü gözlemleyen bir gözetim<br/>sistemi bulunmamaktadır. Operatör eldiven kontrolü yapılmadan görev<br/>almıştır. 2. **Risk değerlendirmesinin güncelliğinin kaybı**: Sıcak<br/>metal taşıması için standart eldiven yeterli olmadığı bilinen bir risk<br/>olmasına rağmen, bu risk değerlendirmesi güncelleştirilmemiş ve<br/>operasyon planlarına yansıtılmamıştır. 3. **Prosedür uygunluk<br/>kontrolleri eksikliği**: Yalıtımlı eldiven yerine standart eldiven<br/>kullanımı açık bir prosedür sapmasıdır ancak bu sapma reel zamanda<br/>tespit ve düzeltme mekanizması çalışmamıştır. 4. **Durdur-bildir<br/>kültürünün zayıflığı**: Operatörlerin veya gözetim personelinin riski<br/>fark etmesi durumunda işi durdurma ve yönetimine bildirme yetkisi ve<br/>sorumluluk bilinci eksiktir. 5. **Yönetsel hesap verebilirlik<br/>eksikliği**: Gözetim ve denetim sonuçları kaydedilmiyor, sapmaların<br/>kapatılma durumu takip edilmiyor ve korektif eylemler uygulanmıyor."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Yönetsel kontrol mekanizmalarının (gözetim, risk değerlendirmesi,<br/>prosedür uygunluk kontrolleri, durdur-bildir kültürü) etkili bir şekilde<br/>uygulanamamasının temel nedeni nedir — organizasyonel kapasite, kaynak<br/>yeterliliği, rol tanımlarının netliği, eğitim eksikliği mi, yoksa<br/>yönetim taahhüdü ve öncelik verilişi (HSG D4.1) açısından bir eksiklik<br/>midir?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Yönetsel kontrol mekanizmalarının etkili uygulanamamasının temel nedeni<br/>**yönetim taahhüdü ve güvenliğe verilen öncelik eksikliğidir (HSG<br/>D4.1)**. Risk değerlendirmesi güncel olmadığı halde güncellenmemiş,<br/>gözetim sistemi kurulmamış ve durdur-bildir kültürü geliştirilmemiştir.<br/>Operatörün standart eldiven kullanmasını kimse durdurmamış, bu da<br/>yönetimin bu kontrol mekanizmalarını kurumsal olarak kurmaması ve hayata<br/>geçirmemesinin sonucudur. Kapasite, kaynak veya eğitim değil; yönetim<br/>seviyesinde güvenlik kültürü ve kontrol sistemlerine yapılan yatırım ve<br/>denetim yetersizliğidir."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Yönetim seviyesinde güvenlik kültürü ve kontrol sistemlerine yeterli<br/>yatırım ve denetim yapılamamasının temel nedeni nedir —kurumsal yapı,<br/>üretim hedefleri, liderlik desteği veya finansal kısıtlara bağlı mıdır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Yönetim seviyesinde güvenlik kültürü ve kontrol sistemlerine yeterli<br/>yatırım ve denetim yapılamamasının temel nedeni **kurumsal liderlik<br/>taahhüdünün yetersizliği** ile doğrudan ilişkilidir. Olay raporundan<br/>alınan kanıtlar: - Risk değerlendirmesinin güncel tutulmamması,<br/>periyodik güncelleme sürecine kaynak ayrılmadığını gösterir - Standart<br/>eldivenlerin sıcak metal transferi için yetersiz olmasına rağmen devam<br/>ettirilmesi, uygun kişisel koruyucu ekipman (PPE) tedarikine ve<br/>zorunluluğunun vurgulanmasına yatırım yapılmadığını işaret eder -<br/>'Gözetim ve durdur-bildir kültürü zayıf' bulgusu, denetim sistemlerinin<br/>(ör. alan denetçiliği, uyum izleme) tasarlanmadığını veya<br/>uygulanmadığını gösterir Bu sorunlar finansal kısıtlardan ziyade,<br/>yönetim seviyesinde güvenliğin üretim hedeflerine göre ikincil olarak<br/>konumlandırılmasının bir sonucudur. Liderlik, güvenlik altyapısına<br/>(denetim, risk değerlendirme, PPE, eğitim) sistematik yatırım yapmamış<br/>ve bu konulara kurumsal kaynak ayırmamıştır."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Yönetim seviyesinde güvenlik kültürü ve kontrol sistemlerine yeterli<br/>yatırım ve denetim yapılamamasının temel nedeni **kurumsal liderlik<br/>taahhüdünün yetersizliği** ile doğrudan ilişkilidir. Olay raporundan<br/>alınan kanıtlar: - Risk değerlendirmesinin güncel tutulmamması,<br/>periyodik güncelleme sürecine kaynak ayrılmadığını gösterir - Standart<br/>eldivenlerin sıcak metal transferi için yetersiz olmasına rağmen devam<br/>ettirilmesi, uygun kişisel koruyucu ekipman (PPE) tedarikine ve<br/>zorunluluğunun vurgulanmasına yatırım yapılmadığını işaret eder -<br/>'Gözetim ve durdur-bildir kültürü zayıf' bulgusu, denetim sistemlerinin<br/>(ör. alan denetçiliği, uyum izleme) tasarlanmadığını veya<br/>uygulanmadığını gösterir Bu sorunlar finansal kısıtlardan ziyade,<br/>yönetim seviyesinde güvenliğin üretim hedeflerine göre ikincil olarak<br/>konumlandırılmasının bir sonucudur. Liderlik, güvenlik altyapısına<br/>(denetim, risk değerlendirme, PPE, eğitim) sistematik yatırım yapmamış<br/>ve bu konulara kurumsal kaynak ayırmamıştır."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden yalıtımlı eldiven yerine sıcak metal işleri için uygunsuz<br/>standart eldiven kullanıldı (D4.1 — Kişisel Koruyucu Ekipman Eksikliği)?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Yalıtımlı eldiven yerine standart eldiven kullanılması, sıcak metal<br/>işleri için gereken termal koruma sınıflandırmasının risk<br/>değerlendirmesine yansıtılmamasından kaynaklanmıştır. Operatör görev<br/>başında, yüksek sıcaklıktaki metal (08:30'de sıcaklığın arttığı<br/>belirtilmiş) ile çalışırken, bu ortamın gerektirdiği özel<br/>termal/yalıtımlı KKE belirtilmemiş; standart eldiven yeterli olarak<br/>kabul edilmiştir. Bu seçim hatasının temel nedenleri: (1) Mevcut risk<br/>değerlendirmesinin sıcak metal işlemi için güncel ve hassas kategoriler<br/>içermemesi, (2) KKE seçim kriterlerinin teknik resmi prosedürlerde yer<br/>almaması veya gözetilmemesi, (3) Operatör eğitim/bilgilendirmesinde<br/>termal KKE gerekliliğinin vurgulanmaması."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Sıcak metal işlemlerine yönelik risk değerlendirmesinin neden güncel<br/>tutulmadığı ve KKE seçim prosedürlerinin operatörlerin görevlendirilmesi<br/>öncesinde kontrol edilmediği temel nedeni nedir?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Temel neden, sıcak metal işlemlerine ilişkin risk değerlendirmesinin<br/>periyodik olarak güncellenmeyen bir belge haline gelmesi ve KKE seçim<br/>prosedürünün operatörlerin görevlendirilmesi öncesinde aktif denetim<br/>mekanizması olmadan yönetilmesidir. Raporun 'Risk değerlendirmesi güncel<br/>değil' bulgusundan anlaşılacağı üzere, risklerin tanımlanması ve KKE<br/>gereksinimleri güncel tutulmamıştır. Operatöre görev verilmeden önce<br/>eldivenin uygunluğu (termal direnç, malzeme, durum) kontrol edilmemiş;<br/>bu da standart eldive kullanımı ile sonuçlanmıştır. Kurumsal açıdan KKE<br/>seçim prosedürünün yazılı bulunması yeterli değil, uygulamada her<br/>görevlendirmede doğrulanması gerekirken bu uygulama eksiktir."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Risk değerlendirmesi ve KKE seçim prosedürlerinin periyodik<br/>güncellenmesi ve operasyonel denetimi için sorumluluk, frekans ve<br/>kaynakların tanımlandığı kurumsal bir yönetim sistemi neden yoktur veya<br/>işletilmemektedir ?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Olay raporuna göre, risk değerlendirmesi güncel değildir ve KKE seçim<br/>prosedürlerinin tanımlanmadığı görülmektedir. Sıcak metal taşıma<br/>operasyonları için gerekli risk değerlendirmesinin yapılmadığı,<br/>operatörlerin uygunsuz KKE (standart eldiven) kullanması ile<br/>sonuçlanmıştır. Periyodik güncelleme sorumluluğunun, frekansının ve<br/>kaynakların tanımlandığı bir kurumsal yönetim sistemi olmadığı için,<br/>gözetim ve durdur-bildir kültürü zayıf kalmış; ciddi yanık yaralanmasına<br/>neden olmuştur."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Neden sıcak metal operasyonları için periyodik risk değerlendirmesinin<br/>sorumluluğu, güncelleme frekansı ve kaynakların tanımlandığı bir<br/>kurumsal yönetim sistemi (PSO.1-İSG Yönetim Sistemleri)<br/>oluşturulmamıştır?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Sıcak metal operasyonlarına ilişkin periyodik risk değerlendirmesinin<br/>sorumluluğu, güncelleme frekansı ve kaynakları tanımladığı bir kurumsal<br/>İSG Yönetim Sistemi oluşturulmamıştır. Raporda 'Risk değerlendirmesi<br/>güncel değil' kaydı bu eksikliği doğrulamaktadır. Sonuç olarak<br/>operasyonel tehlikelerin (yüksek sıcaklık, uygun olmayan kişisel<br/>koruyucu donanım seçimi) sistematik olarak belirlenmesi,<br/>değerlendirilmesi ve kontrol önlemleri uygulanması sağlanamamış; bu<br/>durum ciddi yanık yaralanmasına neden olmuştur. Kurumsal düzeyde risk<br/>değerlendirmesinin periyodikliği, sorumlulusu ve kaynaklarının<br/>tanımlanmadığı için, hattın gerekli kontrol önlemleri (uygun eldiven,<br/>sıcaklık monitörü, gözetim prosedürü) eksik kalmıştır."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Kurumsal İSG Yönetim Sistemi'nin periyodik risk değerlendirmesini<br/>tanımlayan, kaynaklandıran ve denetleyen yapısının neden oluşturulmadığı<br/>veya uygulanmadığı — yönetim taahhüdü, bütçe tahsisi, denetim<br/>mekanizması eksikliği midir?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Kurumsal İSG Yönetim Sistemi'nde periyodik risk değerlendirmesini<br/>tanımlayan, kaynaklandıran ve denetleyen yapısının<br/>oluşturulmadığı/uygulanmadığı temel nedenler: 1. **Risk<br/>Değerlendirmesinin Sistematikleştirilmemesi**: Olay raporunda 'Risk<br/>değerlendirmesi güncel değil' ifadesi, risk değerlendirmesinin periyodik<br/>olarak yapılmadığını veya güncellenmediğini gösterir. Sıcak metal<br/>transferi operasyonundaki tehlikelerin (yüksek sıcaklık, yanık riski)<br/>güncel değerlendirilmemesi sonucu, uygun kişisel koruyucu donanım<br/>(yalıtımlı eldiven) tanımlanmamıştır. 2. **Denetim Mekanizmasının<br/>Eksikliği**: Risk değerlendirmesinin ne zaman yapılacağı, kim tarafından<br/>yapılacağı, sonuçların nasıl uygulanacağı ve uygulamanın kim tarafından<br/>doğrulanacağı açıkça tanımlanmamıştır. 'Gözetim ve durdur-bildir kültürü<br/>zayıf' ifadesi, denetim ve kontrol mekanizmasının zayıf olduğunu<br/>doğrular. 3. **Yönetim Taahhüdü ve Bütçe Eksikliği**: Risk<br/>değerlendirmesi sonuçlarının uygulanması için gerekli kaynaklar (uygun<br/>eldiven tedariki, eğitim, denetim) tahsis edilmemiştir. Operatör<br/>standart eldiven kullanarak işe devam etmiştir; bu, risklerin<br/>tanımlanmadığını veya tanımlanmış ancak uygulanmadığını gösterir. Risk<br/>değerlendirmesinin periyodik olarak yapılması, sonuçlarının uygulanması<br/>ve uygulamanın denetlenmesi için bir sistem tasarlanmalı, bütçe tahsis<br/>edilmeli ve yönetim tarafından aktif olarak desteklenmelidir."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Kurumsal İSG Yönetim Sistemi'nde periyodik risk değerlendirmesini<br/>tanımlayan, kaynaklandıran ve denetleyen yapısının<br/>oluşturulmadığı/uygulanmadığı temel nedenler: 1. **Risk<br/>Değerlendirmesinin Sistematikleştirilmemesi**: Olay raporunda 'Risk<br/>değerlendirmesi güncel değil' ifadesi, risk değerlendirmesinin periyodik<br/>olarak yapılmadığını veya güncellenmediğini gösterir. Sıcak metal<br/>transferi operasyonundaki tehlikelerin (yüksek sıcaklık, yanık riski)<br/>güncel değerlendirilmemesi sonucu, uygun kişisel koruyucu donanım<br/>(yalıtımlı eldiven) tanımlanmamıştır. 2. **Denetim Mekanizmasının<br/>Eksikliği**: Risk değerlendirmesinin ne zaman yapılacağı, kim tarafından<br/>yapılacağı, sonuçların nasıl uygulanacağı ve uygulamanın kim tarafından<br/>doğrulanacağı açıkça tanımlanmamıştır. 'Gözetim ve durdur-bildir kültürü<br/>zayıf' ifadesi, denetim ve kontrol mekanizmasının zayıf olduğunu<br/>doğrular. 3. **Yönetim Taahhüdü ve Bütçe Eksikliği**: Risk<br/>değerlendirmesi sonuçlarının uygulanması için gerekli kaynaklar (uygun<br/>eldiven tedariki, eğitim, denetim) tahsis edilmemiştir. Operatör<br/>standart eldiven kullanarak işe devam etmiştir; bu, risklerin<br/>tanımlanmadığını veya tanımlanmış ancak uygulanmadığını gösterir. Risk<br/>değerlendirmesinin periyodik olarak yapılması, sonuçlarının uygulanması<br/>ve uygulamanın denetlenmesi için bir sistem tasarlanmalı, bütçe tahsis<br/>edilmeli ve yönetim tarafından aktif olarak desteklenmelidir."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden sıcak metal işleminde yalıtımlı koruma eldiveni yerine standart<br/>eldiven kullanıldı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Standart eldiven kullanılması, işin sıcaklık riskini yönetmek için<br/>yapılan risk değerlendirmesinin yetersiz veya güncel olmadığını, ayrıca<br/>uygun ısıya dayanıklı KKD'nin belirlenmemesi veya prosedürde<br/>tanınmadığını göstermektedir. Görev başında eldiven kontrolünün<br/>yapılmaması ve operatörün uygunsuz ekipmanla görev almasına izin<br/>verilmesi, organizasyonel kontrol eksikliğini yansıtmaktadır. Temel<br/>neden: Zararlı etmenlerin tanımlanması ve uygun koruma seçiminde<br/>idari/yönetimsel başarısızlıktır."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Risk değerlendirmesi prosedürü neden güncel olmamış ve sıcak metal<br/>transferi işinde gerekli termal koruma standartları belirlenmemiştir?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Risk değerlendirmesi prosedürü güncel olmamıştır çünkü sıcak metal<br/>transferi işi için termal koruma standartlarının belirlenmesinden<br/>sorumlu yönetim kontrolleri ve risk yönetim sistemi eksiktir. Spesifik<br/>olarak: 1. **Prosedür Güncelleme Sorumluluğu**: İş-spesifik termal<br/>tehlikeler (sıcak metal parçası teması) için yazılı standartlar ve görev<br/>tanımları oluşturulmamıştır. 2. **Kök Neden - Yönetim Sisteminin<br/>Eksikliği**: Risk değerlendirmesi periyodik olarak güncellenmediği için,<br/>D4.1 işinde yalıtımlı eldiven (termal koruma) zorunluluğu dokümante<br/>edilmemiştir. 3. **Kontrol Eksikliği**: Eldiven kontrolü prosedürü ve<br/>standartları tanımlanmadığı için operatör standart eldiven ile görev<br/>almıştır. Temel sorun: Sıcak metal işlemleri için tehlike analizi<br/>yapılmış olsa da, spesifik koruma standartları (hangi eldiven türü,<br/>sıcaklık eşiği vb.) yazılı prosedürde yer almamaktadır."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden sıcak metal taşıma işlemleri için termal koruma standartlarını<br/>tanımlayan ve yazılı prosedüre döken risk değerlendirmesi ve prosedür<br/>güncelleme sistemi işlevsel değildir?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Sıcak metal taşıma işlemleri için termal koruma standartlarını<br/>tanımlayan ve yazılı prosedüre döken risk değerlendirmesi ve prosedür<br/>güncelleme sistemi işlevsel değildir çünkü: 1. **Sistematik güncelleme<br/>mekanizması yoktur**: Risk değerlendirmesi ve prosedür revizyon<br/>tetikleyicileri (operatör geri bildirimi, ısıl parametreleri değişimi,<br/>yaralanma verileri) sürecine entegre edilmemiştir. Raporda 'Risk<br/>değerlendirmesi güncel değil' belirtilmesi, güncelleme sorumluluğunun<br/>tanımlanmadığını gösterir. 2. **Uygunluk kontrolü ve denetim eksiktir**:<br/>Standart eldiven yerine yalıtımlı eldiven kullanılması gerektiğine dair<br/>gereksinim yazılı prosedürde var olsa da, operatör kontrolü ve vardiya<br/>denetimi bu standarda uygunluğu doğrulamamıştır. 3. **Gözetim kültürü<br/>zayıftır**: Olay raporunda 'gözetim ve durdur-bildir kültürü zayıf'<br/>kaydedilmiştir. Bu, prosedürün uygulanması sorumluluğunun dağılmadığı ve<br/>denetlenmedeki anlamına gelir. 4. **Termal hazard parametrelerine karşı<br/>prosedür ilişkisi kopuktur**: Metal sıcaklığının yüksek olması bilinen<br/>bir faktör (08:30'de tespit edilmiş) olmasına rağmen, bu koşulda eldiven<br/>kontrolünün zorunlu hale getirilmesi prosedüründe yer almamıştır veya<br/>uygulanmamıştır. 5. **Kökü altyapı sorunu**: Yazılı prosedür var ancak,<br/>bu prosedürü dinamik operatif koşullara göre düzenli güncelleyen,<br/>uygunluğunu denetleyen ve uygulamayı garanti eden yönetim sistemi<br/>(sorumluluk, frekans, ölçü, düzeltici eylem) kurulmamıştır."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Sıcak metal işlemlerinde operatör uygunluğunu (eldiven tipi, termal<br/>koruma) denetleyen ve prosedür güncellemesini tetikleyen sorumluluğu<br/>(rol, frekans, ölçüt) tanımlayan yönetim sistemi (D4.1 - Yönetim<br/>Sistemleri) neden kurulmamış veya işlevsiz haldedir?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["Yönetim sistemi kurulmamış veya işlevsiz çünkü: 1. **Sorumluluğun<br/>tanımlı olmaması**: Operatör PPE uygunluğunu (eldiven tipi, termal<br/>derecesi) günlük/vardiya bazında kimseye kontrol ettirmesi gereken bir<br/>mekanizma yoktur. Rol, frekans ve ölçüt belirtilmemiştir. 2. **Periyodik<br/>denetim prosedürü eksikliği**: Sıcak metal taşıma hattında operatörlerin<br/>eldiven durumunu kontrol eden, sezon/sıcaklık değişimlerine göre<br/>güncellenen bir prosedür bulunmamaktadır. 3. **Risk değerlendirmesinin<br/>güncellenememesi**: Metal sıcaklığı yüksek olduğunda (08:30) risk<br/>değerlendirmesi tetiklenmiş, prosedür güncellenmemiş veya güncelleme<br/>sorumlusu tanımlanmamıştır. 4. **Gözetim kültürünün zayıflığı**:<br/>Standart eldiven kullanımı (yalıtımlı yerine) kontrol mekanizması<br/>tarafından yakalanmadığı için, denetim sistemi işlevsizdir. 5. **Ölçüt<br/>ve eşik değerlerin belirlenmemesi**: Hangi sıcaklık aralığında hangi<br/>eldiven tipi kullanılacağı, kimler tarafından ne sıklıkta kontrol<br/>edileceği yazılı hale getirilmemiştir."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Yönetim sistemi (PPE kontrolü, risk değerlendirmesi güncelleme, denetim<br/>prosedürü) neden kurulmamış veya işlevsiz hale gelmiştir — yönetim<br/>liderliğinin taahhüdü, kapasite planlaması, kaynak ayrılması ve güvenlik<br/>önceliklendirmesi açısından?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Yönetim sistemi (PPE kontrolü, risk değerlendirmesi güncelleme, denetim<br/>prosedürü) kurulmamış veya işlevsiz hale gelmiş olmasının temel<br/>nedenleri: 1. **Zayıf Yönetim Taahhüdü **: Güvenlik sistemlerine yeterli<br/>kaynakın ayrılmadığı ve risk değerlendirmesinin güncelliğinin<br/>sağlanmadığı, yönetim liderliğinin güvenlik konusunda taahhüdünün zayıf<br/>olduğunu gösterir. 2. **Sistemik Denetim/Monitoring Eksikliği **: PPE<br/>kontrolü, risk değerlendirmesi güncellemeleri ve denetim prosedürlerinin<br/>uygulanıp uygulanmadığını doğrulayacak sistemik bir audit ve compliance<br/>izleme mekanizması bulunmamaktadır. 3. **Kapasite ve Kaynak Planlaması<br/>Yetersizliği**: PPE kontrol prosedürü, risk değerlendirmesi güncelleme<br/>süreci ve düzenli denetim faaliyetleri için gerekli insan kaynağı, bütçe<br/>ve zamanın ayrılmamış olduğu görülmektedir. 4. **Güvenlik<br/>Önceliklendirmesi Düşük**: Operasyon baskısı nedeniyle güvenlik<br/>kontrolleri (uygun PPE seçimi, risk kontrolü) ihmal edilmiş ve<br/>'durdur-bildir' kültürü zayıflamıştır. Sonuç olarak, sistemin<br/>işlevsizliğinin kökü yönetim seviyesinde güvenlik taahhüdünün<br/>yetersizliğinde ve sistemik monitoring mekanizmalarının olmamasında<br/>yatmaktadır."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Yönetim sistemi (PPE kontrolü, risk değerlendirmesi güncelleme, denetim<br/>prosedürü) kurulmamış veya işlevsiz hale gelmiş olmasının temel<br/>nedenleri: 1. **Zayıf Yönetim Taahhüdü **: Güvenlik sistemlerine yeterli<br/>kaynakın ayrılmadığı ve risk değerlendirmesinin güncelliğinin<br/>sağlanmadığı, yönetim liderliğinin güvenlik konusunda taahhüdünün zayıf<br/>olduğunu gösterir. 2. **Sistemik Denetim/Monitoring Eksikliği **: PPE<br/>kontrolü, risk değerlendirmesi güncellemeleri ve denetim prosedürlerinin<br/>uygulanıp uygulanmadığını doğrulayacak sistemik bir audit ve compliance<br/>izleme mekanizması bulunmamaktadır. 3. **Kapasite ve Kaynak Planlaması<br/>Yetersizliği**: PPE kontrol prosedürü, risk değerlendirmesi güncelleme<br/>süreci ve düzenli denetim faaliyetleri için gerekli insan kaynağı, bütçe<br/>ve zamanın ayrılmamış olduğu görülmektedir. 4. **Güvenlik<br/>Önceliklendirmesi Düşük**: Operasyon baskısı nedeniyle güvenlik<br/>kontrolleri (uygun PPE seçimi, risk kontrolü) ihmal edilmiş ve<br/>'durdur-bildir' kültürü zayıflamıştır. Sonuç olarak, sistemin<br/>işlevsizliğinin kökü yönetim seviyesinde güvenlik taahhüdünün<br/>yetersizliğinde ve sistemik monitoring mekanizmalarının olmamasında<br/>yatmaktadır."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden operatör, sıcak metal taşıma hattında (Hatt-07) standart eldiven<br/>kullanarak yüksek sıcaklık riskin karşı koruyucu ekipman kontrolü<br/>yapmadan göreve başladı?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q31
+    A32["Operatör sıcak metal taşıma hattında standart eldiven kullanarak<br/>kontrol yapmadan göreve başladı çünkü: **Birincil Neden (Why-5)**: İş<br/>alanında (Hatt-07) görev başlamadan önce koruyucu ekipmanın uygunluğunu<br/>kontrol etmeyi zorunlu kılan ve denetleyen prosedür sistem tasarımında<br/>yer almadığından. Bunu destekleyen faktörler: 1. **Prosedür Boşluğu**:<br/>Risk değerlendirmesinin güncel olmaması, yüksek sıcaklık hattında (metal<br/>sıcaklığı yüksek) yalıtımlı eldiven zorunluluğunun yazılı ve<br/>uygulanabilir bir kontrol adımı olarak tanımlanmamış olması. 2.<br/>**Gözetim Eksikliği**: Durdur-bildir kültürünün zayıf olması, görev<br/>başlama sırasında gözetim/onay mekanizmasının (örneğin vardiya liderinin<br/>ekipman kontrolü) kurulmamış olması. 3. **Eğitim Hiçliği veya<br/>Yetersizliği**: Operatörün yalıtımlı eldiven gerekliliği konusunda<br/>eğitim almamış veya eğitim öğrenilmemiş olması. 4. **Üretim Baskısı ve<br/>Zaman Kısıtlaması**: Hattın çalışıyor olması (08:30 notu) nedeniyle<br/>hızlı başlama talebinin, güvenlik kontrol adımını atlattırması. Sonuç:<br/>**Sistem, görev başlama öncesi zorunlu koruyucu ekipman doğrulama<br/>mekanizmasını içermediğinden**, operatör kontrol yapmayan ve standart<br/>(yalıtımsız) eldiven kullanan davranış paterni oluşmuştur."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden Sıcak Metal Taşıma Hattı (Hatt-07) operasyonunda görev başlamadan<br/>önce (D4.1 - İşyeri Tehlike Değerlendirmesi) güncel risk değerlendirmesi<br/>yapılmamış ve yalıtımlı eldiven zorunluluğu yazılı prosedür olarak<br/>sistemleştirilmemiştir?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A32 --> Q33
+    A34["Sıcak Metal Taşıma Hattı (Hatt-07) operasyonunda güncel risk<br/>değerlendirmesi yapılmamış ve yalıtımlı eldiven zorunluluğu yazılı<br/>prosedür olarak sistemleştirilmemiştir, çünkü işyeri tehlike<br/>değerlendirmesi sürecinin düzenli olarak güncellenmesi ve yönetim<br/>tarafından zorunlu kılınması mekanizması olmadığından; operasyon<br/>risklerinin sistematik olarak tanımlanması, analiz edilmesi ve kontrol<br/>tedbirlerinin yazılı talimatlar haline getirilmesi sağlanamamıştır. Bu<br/>başarısızlık, HSG245'in D4.1 kategorisinde tanımlanan tehlike tanımlama,<br/>risk değerlendirme ve kontrol hiyerarşisinin işyerine uyarlanmamış<br/>olmasını yansıtmaktadır. Sonuç olarak, standart eldiven kullanımı kabul<br/>edilebilir olarak kalmış; sıcak yüzey ile direkt temas riskine karşı<br/>yeterli koruma tedbiri alınmamıştır."]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Risk değerlendirmesi prosesinin düzenli olarak güncellenmesi ve<br/>uygulanmasını sağlayan bir yönetim sistemi ve denetim mekanizması neden<br/>işyerine entegre edilmemiş veya işletilmemiştir (HSG245 D4.1 - Sistem<br/>Yönetimi)?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A34 --> Q35
+    A36["Risk değerlendirmesi prosesinin düzenli olarak güncellenmesi ve<br/>uygulanmasını sağlayan yönetim sistemi ve denetim mekanizması işyerine<br/>entegre edilmemiş veya işletilmemiştir çünkü: (1) Formalize edilmiş İSG<br/>yönetim sistemi yapısı yoktur - periyodik risk değerlendirmesi gözden<br/>geçirilme protokolü tanımlanmamıştır. Olay raporunda 'Risk<br/>değerlendirmesi güncel değil' notu, son değerlendirmeden sonra sistemde<br/>hiçbir güncelleme ve kontrol mekanizmasının çalışmadığını gösterir. (2)<br/>Denetim ve uyumluluğu izleme mekanizması işletilmemektedir - risk<br/>değerlendirmesi sonuçlarının (örn. sıcak metal hattında yalıtımlı<br/>eldiven kullanımı) uygulandığını doğrulayan kontrol sistemleri<br/>oluşturulmamıştır. (3) Gözetim ve durdur-bildir kültürü zayıftır -<br/>çalışanlar veya yöneticiler riskleri tespit ettikçe prosesi güncellemek<br/>yerine, işlem değişikliği gerçekleşmeden devam etmiştir. (4) Sorumluluğu<br/>ve hesap verilebilirliği tanımlayan rol dağılımı eksiktir - risk<br/>değerlendirmesini güncellemek, gözden geçirmek ve uygulamasını<br/>denetlemek için belirlenen kişi veya ekip olmadığı anlaşılmaktadır."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Neden İSG yönetim sistemi yapısı, periyodik denetim mekanizmaları ve<br/>risk değerlendirmesi güncelleme protokolleri kurulmamış veya kurulmasına<br/>yeterli liderlik taahhüdü ve kaynak tahsisi sağlanmamıştır?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A36 --> Q37
+    A38["İSG yönetim sistemi yapısı, periyodik denetim mekanizmaları ve risk<br/>değerlendirmesi güncelleme protokolleri kurulmamış veya kurulmasına<br/>yeterli liderlik taahhüdü ve kaynak tahsisi sağlanmamıştır çünkü: 1.<br/>**Yönetim Taahhüdü Eksikliği**: Sıcak metal taşıma hattında (Hatt-07)<br/>bilinen yüksek sıcaklık riski sistemli bir şekilde yönetilmemiştir. Risk<br/>değerlendirmesi güncel olmadığından, gerekli kontrol önlemleri<br/>(yalıtımlı eldiven, sıcaklık monitorlaması vb.) tanımlanmamış ve<br/>uygulanmamıştır. 2. **Periyodik Denetim Mekanizmasının Yokluğu**:<br/>Operatörün standart eldiven ile görev alması ve eldiven kontrolünün<br/>yapılmadan geçmesi, düzenli denetim faaliyetlerinin kurulmadığını<br/>göstermektedir. 3. **Kaynak Tahsisi Yetersizliği**: Uygun koruyucu<br/>ekipman (yalıtımlı eldiven) temin edilmemiş ve operatörlere<br/>sağlanmamıştır. Bu, ISG yönetim sistemi kurulmasına finansal ve<br/>operasyonel destek sağlanmadığını göstermektedir. 4. **Zayıf<br/>Durdur-Bildir Kültürü**: Yönetim taahhüdü olmadığında, çalışanlar riski<br/>bildirmeyi veya işi durdurmayı tercih etmemektedir."]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>Neden, Hatt-07 gibi yüksek tehlike seviyesi (D4.1 - Ciddi Yanık Riski)<br/>operasyonlarda yönetim, ISG yönetim sistemini ve kontrol önlemlerini<br/>kurumsal stratejinin temel bir parçası olarak öncelik vermemektedir?"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A38 --> Q39
+    A40["Hatt-07 gibi yüksek tehlike seviyesi operasyonlarda yönetim, ISG<br/>yönetim sistemini kurumsal stratejinin temel parçası olarak öncelik<br/>vermemektedir. Çünkü: 1. **Risk Değerlendirmesi Güncel Değil**: D4<br/>seviyesi ciddi yanık riskine karşın, risk değerlendirmesi sistematik<br/>olarak güncellenmemektedir. Eldiven spesifikasyonları ve ısıl koruma<br/>gereksinimleri periyodik olarak gözden geçirilmemektedir. 2. **Kontrol<br/>Önlemleri Uygulanmamaktadır**: Risk analizi yapılsa bile, tanımlanan<br/>kontroller (yalıtımlı eldiven zorunluluğu) operasyon katında konsisten<br/>şekilde uygulanmamıştır. 3. **Yönetim Gözetimi Eksiktir**: Vardiya<br/>yönetiminin sıcak metal taşıma hattında fiziksel varlığı ve günlük<br/>gözlem sistemi zayıftır. Operatörün standart eldiven kullanması<br/>gözlemlenip müdahale edilmemiştir. 4. **Durdur-Bildir Kültürü<br/>Zayıftır**: Operatörün riski tanıması ve iş durdurması için psikolojik<br/>güvenlik oluşturulmamıştır. Riskleri bildirme mekanizması ve yönetim<br/>cevabı güvenilir olmadığı için, operatör riskli koşullarda çalışmaya<br/>devam etmiştir. 5. **Sistematik Denetim Yoktur**: ISG uyumluluğu ve<br/>kontrol önlemleri uygulanmasını doğrulayan periyodik audit/monitoring<br/>sistemi işletilmemektedir. Bu faktörler, ISG'nin üretim hedeflerine ve<br/>stratejik önceliklere göre değerlendirildiğini, yönetim kararlarında<br/>yukarıdan aşağıya ISG taahhüdü olmadığını göstermektedir."]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Hatt-07 gibi yüksek tehlike seviyesi operasyonlarda yönetim, ISG<br/>yönetim sistemini kurumsal stratejinin temel parçası olarak öncelik<br/>vermemektedir. Çünkü: 1. **Risk Değerlendirmesi Güncel Değil**: D4<br/>seviyesi ciddi yanık riskine karşın, risk değerlendirmesi sistematik<br/>olarak güncellenmemektedir. Eldiven spesifikasyonları ve ısıl koruma<br/>gereksinimleri periyodik olarak gözden geçirilmemektedir. 2. **Kontrol<br/>Önlemleri Uygulanmamaktadır**: Risk analizi yapılsa bile, tanımlanan<br/>kontroller (yalıtımlı eldiven zorunluluğu) operasyon katında konsisten<br/>şekilde uygulanmamıştır. 3. **Yönetim Gözetimi Eksiktir**: Vardiya<br/>yönetiminin sıcak metal taşıma hattında fiziksel varlığı ve günlük<br/>gözlem sistemi zayıftır. Operatörün standart eldiven kullanması<br/>gözlemlenip müdahale edilmemiştir. 4. **Durdur-Bildir Kültürü<br/>Zayıftır**: Operatörün riski tanıması ve iş durdurması için psikolojik<br/>güvenlik oluşturulmamıştır. Riskleri bildirme mekanizması ve yönetim<br/>cevabı güvenilir olmadığı için, operatör riskli koşullarda çalışmaya<br/>devam etmiştir. 5. **Sistematik Denetim Yoktur**: ISG uyumluluğu ve<br/>kontrol önlemleri uygulanmasını doğrulayan periyodik audit/monitoring<br/>sistemi işletilmemektedir. Bu faktörler, ISG'nin üretim hedeflerine ve<br/>stratejik önceliklere göre değerlendirildiğini, yönetim kararlarında<br/>yukarıdan aşağıya ISG taahhüdü olmadığını göstermektedir."]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden operatör yalıtımlı eldiven olmadan sıcak metal taşıma görevini<br/>yerine aldı?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q41
+    A42["Operatör yalıtımlı eldiven olmadan sıcak metal taşıma görevini yerine<br/>aldığı için ciddi yanık yaşadı. Bunun nedeni: (1) Risk Değerlendirmesi<br/>güncelliğini kaybetmiş olup sıcak metal taşıyıcılığında gerekli koruyucu<br/>donanım başlangıç kontrolü protokolünün uygulanmadığı; (2) Gözetim ve<br/>durdur-bildir kültürünün zayıf olması nedeniyle operatörün uygunsuz<br/>eldiveni söz konusu edebileceği ortamda kullanmasına müsaade verildiği;<br/>(3) Yönetim tarafından bu görevde yalıtımlı eldiven gerekliliğinin<br/>vurgulanmadığı veya operatör eğitiminin eksik olduğu sonucuna<br/>varılmaktadır. Sıcak yüzeye doğrudan temas riski tanımlanmamış veya<br/>operatöre iletilmemiştir."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Risk değerlendirmesi protokolü sıcak metal taşıma işleminde neden<br/>güncel tutulmamış ve operatörün eldiven kontrolü başlangıç adımında<br/>neden eksik bırakılmıştır?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A42 --> Q43
+    A44["Risk değerlendirmesi protokolü sıcak metal taşıma işleminde güncel<br/>tutulmamıştır çünkü: (a) Operasyondaki sıcaklık koşullarına uygun PPE<br/>gereksinimlerinin periyodik gözden geçirilmesi ihmal edilmiş, (b)<br/>Eldiven kontrolü görev başlangıcında eksik bırakılmıştır çünkü operatöre<br/>dış denetim ve durdur-bildir kültürünün uygulanmadığı işletme ortamında<br/>kişisel inisiyatif alması beklenmemiştir. Temel sebep: Risk<br/>değerlendirmesi en son güncellenmesinden sonra operasyonel koşullar<br/>(metal sıcaklığı) değişmiş ancak kontrol prosedürü bu değişime<br/>uyarlanmamıştır. Ayrıca, çalışan eğitimi ve denetim sisteminde güvenlik<br/>kültürünün eksikliği, operatörün standart eldiveni sorgulamadan<br/>kullanmasına neden olmuştur."]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Neden risk değerlendirmesi prosedürünün operasyonel koşul<br/>değişikliklerine (sıcaklık artışı) uyarlanmasını sağlayan periyodik<br/>gözden geçirme mekanizması çalışmamaktadır ?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A44 --> Q45
+    A46["Risk değerlendirmesi prosedürünün periyodik gözden geçirme mekanizması,<br/>operasyonel koşul değişikliklerini (sıcaklık artışı) tespit ve uyarlama<br/>yapamamaktadır. Bunun nedenleri: (1) Risk değerlendirmesinin güncel<br/>tutulmadığı - olay raporunda 'Risk değerlendirmesi güncel değil'<br/>belirtilmiştir; (2) Operasyonel koşul değişimlerinin (sıcaklık<br/>yükselmesi) sistematik olarak izlenmediği; (3) Bu değişikliklere bağlı<br/>koruyucu ekipman uygunluğunun periyodik kontrol edilmediği; (4) Gözlem,<br/>raporlama ve müdahale kültürünün zayıf olması nedeniyle aykırılıkların<br/>sinyalinin verilmediği. Sonuç olarak, operatör 08:30'de artan sıcaklık<br/>koşulunda eldiven kontrolü yapılmadan görev almıştır."]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Neden operasyonel koşul değişiklikleri (sıcaklık artışı gibi) için<br/>sistematik izleme ve bildirim mekanizması tasarlanmamış veya<br/>uygulanmamaktadır?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A46 --> Q47
+    A48["D4.1 (Operasyonel koşul değişiklikleri için sistematik izleme ve<br/>bildirim mekanizması) tasarlanmamış veya uygulanmamaktadır çünkü: İş<br/>güvenliği yönetim sistemi, sıcak metal işlemlerinde sıcaklık, basınç ve<br/>diğer kritik operasyonel parametrelerin gerçek zamanlı izlenmesi için<br/>teknik kontrolleri tasarlamadığı ve uygulamadığı görülmektedir. Olay<br/>anında sıcaklık yükselmesi algılanmadı (veya bildirilmedi), operatöre<br/>iletilmedi ve uyarı mekanizması çalışmadı. Bu, organizasyon olarak<br/>operasyonel koşul değişikliklerinin sistem güvenliği için kritik<br/>olduğunu tanımadığı, risk değerlendirmesinin güncel tutulmadığı ve<br/>durdur-bildir kültürünün kurulmadığı anlamına gelir. Tasarımda bu seviye<br/>kontrol sistemleri (otomatik sıcaklık sensörleri, alarmlar, operatör<br/>bilgilendirme protokolleri) yer almamıştır."]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>İş güvenliği yönetim sistemi, sıcak metal işlemlerinde operasyonel<br/>koşul değişikliklerini (sıcaklık, basınç vb.) izlemek için otomatik<br/>sensör, alarm ve bildirim sistemlerini neden tasarımına ve uygulamasına<br/>dahil etmedi?"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A48 --> Q49
+    A50["İş güvenliği yönetim sistemi, sıcak metal işlemlerinde operasyonel<br/>koşul değişikliklerini izlemek için otomatik sensör, alarm ve bildirim<br/>sistemlerini tasarımına dahil etmemiştir. Temel nedenler: 1. **Risk<br/>Değerlendirmesi Eksikliği **: Planlama aşamasında, sıcaklık ve basınç<br/>gibi operasyonel parametrelerin reel-zamanlı izlenmesi gerekliliği<br/>önceden tanımlanmamıştır. Risk değerlendirmesi güncel olmadığından,<br/>operatörün manuel gözleme dayalı sistemin yetersizliği fark<br/>edilmemiştir. 2. **Sistemik İzleme Mekanizması Tasarım Hatası **:<br/>Operasyonel koşul değişikliklerinin izlenmesine ilişkin bir kontrol<br/>sistemi (otomatik alarm, sensör ağı, bildirim protokolü) yönetim<br/>sisteminin bir parçası olarak tasarlanmamıştır. Sonuç olarak, sıcaklık<br/>yükselmesine rağmen operatör manuel kontrole dayalı kalmıştır. 3.<br/>**Gözetim Kültürü Zayıflığı**: Otomatik sistemler olmadığında dahi,<br/>insan gözlemi ve durdur-bildir mekanizması devreye girememiştir. Bu,<br/>yönetim tarafından onaylanan bir kültürel eksikliktir. Olay sırasında<br/>metal sıcaklığı yüksek olmasına rağmen operatöre bilgi vermek, eldiven<br/>uygunluğunu kontrol etmek veya çalışmayı durdurmak için hiçbir otomatik<br/>veya etkili manuel sistem işletilmemiştir."]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN</b><br/>Kök Neden<br/>İş güvenliği yönetim sistemi, sıcak metal işlemlerinde operasyonel<br/>koşul değişikliklerini izlemek için otomatik sensör, alarm ve bildirim<br/>sistemlerini tasarımına dahil etmemiştir. Temel nedenler: 1. **Risk<br/>Değerlendirmesi Eksikliği **: Planlama aşamasında, sıcaklık ve basınç<br/>gibi operasyonel parametrelerin reel-zamanlı izlenmesi gerekliliği<br/>önceden tanımlanmamıştır. Risk değerlendirmesi güncel olmadığından,<br/>operatörün manuel gözleme dayalı sistemin yetersizliği fark<br/>edilmemiştir. 2. **Sistemik İzleme Mekanizması Tasarım Hatası **:<br/>Operasyonel koşul değişikliklerinin izlenmesine ilişkin bir kontrol<br/>sistemi (otomatik alarm, sensör ağı, bildirim protokolü) yönetim<br/>sisteminin bir parçası olarak tasarlanmamıştır. Sonuç olarak, sıcaklık<br/>yükselmesine rağmen operatör manuel kontrole dayalı kalmıştır. 3.<br/>**Gözetim Kültürü Zayıflığı**: Otomatik sistemler olmadığında dahi,<br/>insan gözlemi ve durdur-bildir mekanizması devreye girememiştir. Bu,<br/>yönetim tarafından onaylanan bir kültürel eksikliktir. Olay sırasında<br/>metal sıcaklığı yüksek olmasına rağmen operatöre bilgi vermek, eldiven<br/>uygunluğunu kontrol etmek veya çalışmayı durdurmak için hiçbir otomatik<br/>veya etkili manuel sistem işletilmemiştir."]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A50 --> ROOT5
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
+                htmlLabels: true,
+                diagramPadding: 16
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
+                primaryColor: '#fff',
+                primaryTextColor: '#222',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>

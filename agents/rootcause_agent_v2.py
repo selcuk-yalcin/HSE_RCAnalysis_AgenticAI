@@ -75,6 +75,8 @@ except ImportError:
     except ImportError:
         from agents.json_parser import extract_json_from_response, safe_json_parse
 
+from .model_constants import OPENROUTER_DEFAULT_CHAT_MODEL
+
 # Import RAG Analyzer for context augmentation
 try:
     from rag_pipeline.retrieval import RAGAnalyzer
@@ -357,7 +359,7 @@ BEKLENEN ÇIKTI (JSON ŞEMASI):
                 print(f"⚠️  RAG augmentation failed: {e}. Using static context.")
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-opus-4.7",
+            model=OPENROUTER_DEFAULT_CHAT_MODEL,
             temperature=0.4,
             max_tokens=4000,
             messages=[
@@ -570,7 +572,7 @@ KRİTİK:
                 print(f"⚠️  RAG augmentation failed for 5-Why: {e}")
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-opus-4.7",
+            model=OPENROUTER_DEFAULT_CHAT_MODEL,
             temperature=0.6,
             max_tokens=4000,
             messages=[
@@ -1026,7 +1028,7 @@ Sadece JSON döndür, Türkçe içerik."""
 
         try:
             response = self.client.chat.completions.create(
-                model="anthropic/claude-opus-4.7",
+                model=OPENROUTER_DEFAULT_CHAT_MODEL,
                 temperature=0.5,
                 max_tokens=2000,
                 messages=[

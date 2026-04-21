@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {size: A4 landscape; margin: 3mm; }
+        * {box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }
+        body {display: flex; flex-direction: column; padding: 3px; height: 100vh; }
+        header {text-align: center; flex-shrink: 0; padding: 3px 0; }
+        header .top-title {font-size: 11px; font-weight: bold; color: #333; margin-bottom: 1px; }
+        header h1 {font-size: 13px; font-weight: bold; color: #111; margin-bottom: 1px; }
+        header .subtitle {font-size: 10px; color: #666; margin-bottom: 1px; }
+        .legend {text-align: center; font-size: 9px; color: #555; padding: 2px 4px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; margin-bottom: 3px; }
+        #diagram-wrap {flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; width: 100%; height: calc(100vh - 60px); }
+        #diagram-wrap .mermaid {width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #diagram-wrap svg {max-width: 98% !important; max-height: 98% !important; height: auto !important; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>**Why-1: Kemal Arslan neden elektrik enerjili (380V,<br/>3-faz) panoyu açıp arıza giderme için şalter<br/>bağlantısına temas etti? Yani, ana şalter kapısını<br/>açmadan önce elektrik enerjisi neden kesilmedi / LOTO<br/>(enerji kesme-kilitleme) prosedürü neden uygulanmadı?**"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Kemal Arslan, ana şalter kapısını açmadan önce<br/>elektrik enerjisini kesmedi ve LOTO prosedürünü<br/>uygulamadı çünkü: **Birincil Neden - Kurumsal Kültür ve<br/>Yönetim Baskısı:** Tesisde 'üretim durmasın' baskısının<br/>egemen olması, elektrik kesilmesinin 2 saatlik üretim<br/>kaybına neden olacağı endişesi, ve yönetim tarafından<br/>'elektrik kesilirse ekonomik kayıp oluşur' mesajının<br/>iletilmesi, Kemal'i enerji kesme adımını atlayıp hızlı<br/>çözüme yöneltmiştir. **İkincil Neden - Prosedürün<br/>Pratikte Uygulanmaması:** Raporun açıkça belirttiği<br/>üzere 'LOTO prosedürü kâğıt üzerinde var, pratikte<br/>uygulanmıyor' ve bakım sorumlusu tarafından 'LOTO"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden yönetim ve bakım sorumluluğu altında 'üretim<br/>durmasın diye LOTO prosedürü uygulamıyoruz' anlayışı ve<br/>'elektrik kesilirse 2 saat üretim kaybı olur' endişesi<br/>kurumsal politika ve denetim sisteminde yerleşmiş<br/>durumdadır? (Diğer bir deyişle, LOTO prosedürünün<br/>optional hale gelmesine karar veren ve bunu destekleyen<br/>yönetim seviyesi mekanizmaları nelerdir?)"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["LOTO prosedürünün optional hale gelmesine karar veren<br/>yönetim seviyesi mekanizmaları: **1. ÜRETİM ODAKLI<br/>PERFORMANS SİSTEMİ:** - Denetlenilen metrik: Üretim<br/>duruş süreleri (takip ediliyor) - Denetlenmeyen metrik:<br/>Güvenlik prosedür uyumu (takip edilmiyor) - Sonuç:<br/>Prosedür atlayanlar 'hedefi tutturanlar' olarak<br/>görülüyor **2. ÜRETİM MÜDÜRÜ DÜZEYINDE YÖNETİM<br/>KÜLTÜRÜ:** - 'Elektrik kesilirse 2 saat üretim kaybı<br/>olur' → finansal riskten ölüm riskine geçiş toleransı -<br/>'Teknisyenler dikkatli çalışırlarsa sorun olmaz' →<br/>sistemik güvenlikten bireysel beceriye kayış -<br/>Riskabilir bir değerlendirme: 2 saatlik duruşun"]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden üretim hedeflerini tutturma baskısı (2 saatlik<br/>duruş = üretim kaybı), elektrik panosunda LOTO<br/>prosedürünü uygulamak yerine canlı devrede çalışmayı<br/>riskli kabul etmeye başlatmıştır - bu tercih üretim<br/>planlama, performans değerlendirme veya müşteri<br/>talepleri tarafında hangi baskılardan<br/>kaynaklanmaktadır?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Üretim hedeflerini tutturma baskısı, LOTO prosedürünün<br/>atlanmasına yol açan çok katmanlı bir sistem<br/>başarısızlığının sonucudur: **1. ÜRETIM PLANLAMA:** - 2<br/>saatlik elektrik kesme = ürün üretilememe = hedef kaybi<br/>- Acil arızalara karşı alternatif bakım pencereleri<br/>planlanmamıştır - Preventif bakım programı yetersizdir<br/>(son bakım 3 ay önce, 2 benzer arıza öncesinde) **2.<br/>PERFORMANS DEĞERLENDİRME SİSTEMİ:** - KPI'lar: 'Duruş<br/>süreleri minimize edilmeli' - Güvenlik metrikleri:<br/>Takip edilmemiştir - Yöneticiler 'Teknisyenler dikkatli<br/>çalışırlarsa sorun olmaz' diyerek riski<br/>normalleştirmişlerdir **3. MÜŞTERİ TALEP VE KÜLTÜR:** -"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>**Why-4: Performans değerlendirme ve KPI sisteminin<br/>sadece 'duruş süreleri'ne odaklanması ve güvenlik<br/>metriklerinin (LOTO uyumu, iş izin uyumu, yaralanma<br/>olayları) takip edilmemesi NEDEN kurumsal seviyede<br/>böyle tasarlanmış ve uygulanmaktadır? (Strateji, bütçe,<br/>yönetim öncelikleri, muhasebe sistemi, risk<br/>değerlendirme eksiklikleri)**"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Kurumsal seviyede performans değerlendirme ve KPI<br/>sisteminin sadece duruş sürelerine odaklanması ve<br/>güvenlik metriklerinin takip edilmemesi, aşağıdaki<br/>sistemik faktörlerin kombinasyonundan<br/>kaynaklanmaktadır: **1. Bütçeleme Mantığı ve Maliyet<br/>Yapısı:** - Üretim duruşu 'doğrudan ölçülebilir<br/>maliyet' olarak muhasebe sisteminde görülür - LOTO<br/>uyumunun, eğitimin, ikinci kişi gözetiminin ekonomik<br/>faydası 'kaçınılan kayıp' olarak muhasebeleştirilmez -<br/>Elektronik olaylardan kaynaklanan işgücü kaybı veya<br/>yaralanma maliyeti amortisman/sigorta yoluyla gizlenir<br/>**2. Yönetim Öncelikleri Hiyerarşisi:** - Raporun açık"]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Elektrik arızasının hızlı çözülmesi baskısı ve 'duruş<br/>süresi minimize etme' mantığının üretim tesisinin<br/>kurumsal strateji ve yönetim hedefleri içinde bu kadar<br/>ön plana çıkmasının temel nedeni nedir? (Örneğin:<br/>Müşteri kontratları, pazar rekabeti, karlılık<br/>hedefleri, yönetim bonus yapısı veya kurumsal risk<br/>toleransı gibi faktörlerin kurumsal kararlar üzerindeki<br/>etkisi?)"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A8 --> Q9
+    A10["Elektrik arızasının hızlı çözülmesi baskısının ve<br/>'duruş süresi minimize etme' mantığının kurumsal<br/>strateji içinde ön plana çıkmasının temel nedenleri:<br/>**1. ÜRETİM HEDEFLERI VE KAPASITE KULLANIMI BASKISI** -<br/>Rapordan: 'Elektrik kesilirse 2 saat üretim kaybı olur'<br/>(Üretim Müdürü) - Enerji kesmenin 2 saatlik direkt<br/>üretim kaybına yol açması, yönetimi hızlı çözüm (ve<br/>risk alıcı) çözüme itermiştir - Bu, kurumsal düzeyde<br/>kapasite hedeflerine ulaşmak için güvenlik kontrol<br/>sistemlerinin ertelenebilir görülmesine neden olmuştur<br/>**2. PERFORMANS ÖLÇÜMLERİNİN ASIMETRIK YAPISII** -<br/>Rapordan: 'Performans ölçümü: Duruş süreleri takip"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN (**Birincil:** D1.1 (Weak Leadership Commitment)
+- Güvenlik (LOTO) ve üretim hedefleri arasında ödünleşimi kabul eden liderlik kararı
+- LOTO prosedürünün pratikte uygulanmayacağı konusunda sessiz kabullenme
+
+**İkincil:** D1.4 (Production Pressure)
+- "Duruş süresi minimize edilmeli" direktifi ve "üretim duracak diye enerji kesme korkusu"
+- Üretim hedeflerinin güvenlik kontrol sistemlerine açık şekilde üstün kılınması
+
+**Üçüncül:** D9.5 (Monitoring/Audit Inadequate) 
+- LOTO prosedürü yazılı olsa da uyumunun hiç denetlenmemesi
+- Üretim Müdürü'nün LOTO uyumunu izlemediği, sadece duruş sürelerini takip ettiği
+
+**Dördüncül:** C3.5 (Wrong Behavior Rewarded)
+- Hızlı çözümün (LOTO atlayarak) "başarı" olarak görülmesi
+- LOTO uyumunun "gereksiz zaman kaybı" olarak tanımlanması):</b><br/>Kök Neden<br/>Elektrik arızasının hızlı çözülmesi baskısının ve<br/>'duruş süresi minimize etme' mantığının kurumsal<br/>strateji içinde ön plana çıkmasının temel<br/>nedenleri: **1. ÜRETİM HEDEFLERI VE KAPASITE<br/>KULLANIMI BASKISI** - Rapordan: 'Elektrik<br/>kesilirse 2 saat üretim kaybı olur' (Üretim<br/>Müdürü) - Enerji kesmenin 2 saatlik direkt üretim<br/>kaybına yol açması, yönetimi hızlı çözüm (ve risk<br/>alıcı) çözüme itermiştir - Bu, kurumsal düzeyde<br/>kapasite hedeflerine ulaşmak için güvenlik kontrol<br/>sistemlerinin ertelenebilir görülmesine neden<br/>olmuştur **2. PERFORMANS ÖLÇÜMLERİNİN ASIMETRIK"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>**Why-1: Neden teknisyen (Kemal Arslan) arızayı<br/>gidermek için pano içerisindeki enerjili şalter<br/>bağlantısına dokunabildi? (Yani, pano açıldığında<br/>elektrik enerjisi neden hâlâ aktif/kesili değildi?)**"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q11
+    A12["Kemal Arslan, pano içerisindeki enerjili şalter<br/>bağlantısına dokunabildi çünkü: **Birincil Neden - LOTO<br/>Prosedürü Uygulanmadı:** Elektrik enerjisi kesme adımı<br/>atlanmıştır. Prosedür kâğıt üzerinde mevcut olmasına<br/>rağmen, 'üretim durmasın' baskısı nedeniyle pano<br/>15:10'da enerjili halde açılmış ve Kemal doğrudan canlı<br/>devreye erişim imkânı bulmuştur. **İkincil Neden -<br/>Kontrol Mekanizmaları Eksik:** - Voltmetre (test<br/>cihazı) kullanılmadı - bağlantının gerçekten enerjili<br/>olup olmadığı doğrulanmadı - Yalıtımlı eldiven<br/>giyilmedi - direkt temas riski tamamen açık bırakıldı -<br/>İkinci kişi (gözetleyici) bulunmuyordu - işin güvenliği"]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden LOTO (Lockout/Tagout) prosedürü - elektrik<br/>enerjisinin kesme ve kitleme adımı - mevcut olmasına<br/>rağmen bu olay sırasında uygulanmadı ve sistemli olarak<br/>uygulanmıyor?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["LOTO prosedürü mevcut olmasına rağmen uygulanmadığı<br/>nedenleri 5-Why analizi ile açıklanmaktadır: **1. NEDEN<br/>LOTO uygulanmadı?** Elektrik enerjisi kesilmedi,<br/>prosedür izlenmedi. **2. NEDEN prosedür izlenmedi?**<br/>Üretim hattının durmasından endişe duyuldu, hızlı çözüm<br/>amaçlandı. **3. NEDEN hızlı çözüm yapılmak istendi?**<br/>Üretim kesintisinin 2 saat üretim kaybı ve hedef<br/>sapması anlamına geldiğine inanılmaktadır. **4. NEDEN<br/>üretim baskısı güvenlik prosedüründen önceliklidir?**<br/>Yönetim tarafından performans metrikleri olarak 'duruş<br/>süresi' takip edilmekte ancak 'güvenlik uyumu' takip<br/>edilmemektedir. Güvenlik denetimi sistemi yoktur. **5."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Neden üretim durması durumunda 2 saat kaybının<br/>'mutlaka önlenilmesi gereken' bir sorun olarak<br/>algılandığı ve bunu yakalamak için LOTO gibi güvenlik<br/>prosedürlerinin geçici olarak atlandığı kabul edilen<br/>bir uygulama haline gelmiştir? (Yönetim hedefleri,<br/>performans ölçütleri ve bunları başaramamanın sonuçları<br/>nelerdir?)"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Kemal'ın 2 saatlik üretim durmasını 'mutlaka<br/>önlenilmesi gereken' sorun olarak görmesinin ve LOTO'yu<br/>atlamasının nedeni, tesis yönetiminin açık bir şekilde<br/>duruş sürelerini performans ölçütü olarak belirlemesi,<br/>bunu günlük hedefle takip etmesi ve bunun Kemal'ın<br/>operasyonlarını etkilediği operatif kararları<br/>yönlendirmesidir. **YÖNETİM HEDEFLERİ:** - Üretim duruş<br/>sürelerini minimize etmek (2 saat = kayıp olarak<br/>görülüyor) - Günlük/haftalık/aylık üretim hedefleri<br/>tutturmak - Verimlilik metrikleri başarısıyla yönetim<br/>kademeleri değerlendiriliyormuş gibi görünüyor<br/>**PERFORMANS ÖLÇÜTLERI:** - Duruş süreleri etkin takip"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Neden tesis yönetimi elektrik arıza giderme<br/>işlemlerinin güvenlik prosedürlerine uyum derecesini<br/>(LOTO uygulanması, iş izin sistemi, ikinci kişi<br/>zorunluluğu) performans ölçütüne ve yöneticilerin<br/>değerlendirmesine dahil etmedi; aksine sadece üretim<br/>duruş sürelerine odaklı bir performans sistemi kurdu?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A16 --> Q17
+    A18["Tesis yönetimi, güvenlik prosedürlerine uyum<br/>derecesini performans ölçütlerine ve yöneticilerin<br/>değerlendirmesine dahil etmemiştir, çünkü kurumsal<br/>kültür ve yönetim sisteminde 'üretim hızı' tek başına<br/>optimize edilen metrik haline getirilmiştir. Kök<br/>nedenler: 1. **Çelişkili Teşvik Sistemi**: Yöneticiler<br/>duruş süresi minimizasyonu için değerlendirilirken,<br/>güvenlik prosedürlerine uyum göz ardı edilmiştir. Bu da<br/>yöneticilerin 'Teknisyenler dikkatli çalışırlarsa sorun<br/>olmaz' şeklinde prosedürü atlama kararı almalarına<br/>neden olmuştur. 2. **Güvenlik Davranışının<br/>Ödüllendirilmemesi**: Kemal Arslan'ın güvenli şekilde"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Neden şirketin üst yönetimi, 'üretim hızı ve maliyet<br/>minimizasyonu' hedeflerini belirleme ve ölçülendirme<br/>aşamasında, operasyonel güvenlik prosedürlerinin<br/>uygulanması ve uyumu KPI (Anahtar Performans<br/>Göstergesi) ve yönetici değerlendirme sistemlerine<br/>dahil etmeyi tercih etmedi veya zorunlu kılmadı?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Üst yönetim, operasyonel güvenlik prosedürlerini<br/>(LOTO, iş izin sistemi, güvenlik eğitimi) KPI ve<br/>yönetici değerlendirme sistemlerine dahil etmeyi tercih<br/>etmediği/zorunlu kılmadığı için, güvenlik uyumu kontrol<br/>edilememektedir ve 'üretim hızı' hedefleri güvenlik<br/>uyumundan daha ağır basabilmektedir. **Temel<br/>nedenler:** 1. **Liderlik Seviyesinde Karar**: Yönetim,<br/>duruş sürelerini ölçmeyi/izlemeyi seçmiş, ancak LOTO<br/>uyumu, iş izin sisteminin uygulanması veya güvenlik<br/>eğitim tamamlanmasını performans göstergeleri olarak<br/>tanımlamayı tercih etmemiştir. 2. **Sistematik Denetim<br/>Mekanizması Tasarlanmadı**: Olay raporundan 'Prosedür"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN (**D1.1** - Zayıf Liderlik Taahhüdü (Güvenlik bütçesi/kaynak kararlarında yapılan seçim - denetim sistemi kurulmadı, KPI'lere dahil edilmedi)
+
+**D9.5** - Uyumun Sistematik Denetimi Eksikliği (LOTO, iş izin, eğitim uyumunu doğrulayan sistematik audit/kontrol programı hiç tasarlanmadı)
+
+**D1.9** - Yönetim Toleransı (Bakım Sorumlusu ve Üretim Müdürü'nün LOTO'nun uygulanmadığını bilerek tolerans göstermesi)
+
+**D1.4** - Üretim Baskısı (Hedeflerde yer alan "duruş sürelerini minimize et" direktifi, güvenlik uyumu zorunluluğunun aksine davranması)):</b><br/>Kök Neden<br/>Üst yönetim, operasyonel güvenlik prosedürlerini<br/>(LOTO, iş izin sistemi, güvenlik eğitimi) KPI ve<br/>yönetici değerlendirme sistemlerine dahil etmeyi<br/>tercih etmediği/zorunlu kılmadığı için, güvenlik<br/>uyumu kontrol edilememektedir ve 'üretim hızı'<br/>hedefleri güvenlik uyumundan daha ağır<br/>basabilmektedir. **Temel nedenler:** 1. **Liderlik<br/>Seviyesinde Karar**: Yönetim, duruş sürelerini<br/>ölçmeyi/izlemeyi seçmiş, ancak LOTO uyumu, iş izin<br/>sisteminin uygulanması veya güvenlik eğitim<br/>tamamlanmasını performans göstergeleri olarak<br/>tanımlamayı tercih etmemiştir. 2. **Sistematik"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Kemal Arslan neden 15:10'da elektrik panosunun<br/>kapağını açarken ve 15:20'de şalter bağlantısına<br/>dokunurken, panoyu öncesinde enerjisiz hale getirmedi /<br/>LOTO (Lockout/Tagout) prosedürünü uygulamadı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q21
+    A22["Kemal Arslan, LOTO prosedürünü uygulamadığı için<br/>elektrik panosundaki canlı devreler (380V) ile doğrudan<br/>temas riski altında kaldı ve bu da elektrik çarpması<br/>ile sonuçlandı. LOTO prosedürünün uygulanmamasının<br/>temel nedeni, örgütsel düzeyde 'üretim duruşu maliyeti'<br/>nedeniyle enerji kesmeyi gerektiren güvenlik<br/>prosedürlerinin sistematik olarak göz ardı edilmesidir.<br/>Tanık beyanlarında ('enerjiyi kesmedi. Hep böyle<br/>yapıyoruz aslında') ve yönetim beyanlarında ('elektrik<br/>kesilirse 2 saat üretim kaybı olur... Teknisyenler<br/>dikkatli çalışırlarsa sorun olmaz') bu tutum açıkça<br/>görülmektedir. Prosedür belgesi mevcut olmasına rağmen,"]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden yönetim ve bakım ekibi, elektrik işlerinde LOTO<br/>gibi zorunlu güvenlik prosedürlerinin uygulanmasından<br/>ziyade, 'üretim duruşu maliyeti' argümanını<br/>önceliklendirmeyi kabul etmiş ve bu riski sistemik<br/>olarak toleransı vermiştir?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Yönetim ve bakım ekibi, elektrik işlerinde LOTO<br/>prosedürünün uygulanmasını 'üretim duruşu maliyeti'<br/>argümanıyla ihmal etmiştir çünkü: 1. **Finansal Değer<br/>Sistemi**: Organizasyon, kısa vadeli üretim kaybının (2<br/>saat) risk azaltma yatırımından daha maliyetli olduğuna<br/>karar vermiştir. Tanık ifadesinde 'Elektrik kesilirse 2<br/>saat üretim kaybı olur' vurgusu, bu hesaplamayı açıkça<br/>göstermektedir. 2. **Performans Metriklerinin<br/>Yanlışlığı**: Sistem, duruş sürelerini izlemekte ancak<br/>güvenlik uyumunu izlememektedir. Bu, yönetimin hangi<br/>davranışları değer verdiğini göstermektedir.<br/>'Performans ölçümü: Duruş süreleri takip ediliyor"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Why-3: Yönetim, LOTO prosedürünü uygulamamamanın '2<br/>saat üretim duruşu' maliyetini, olası bir elektrik<br/>yaralanmasının riskinden ve maliyetinden daha yüksek<br/>olarak değerlendirmiş ve bu karar sistemine neden<br/>öncelik vermiştir? Başka bir deyişle: Organizasyonun<br/>kısa vadeli üretim hedeflerini karşılama zorunluluğu,<br/>risk yönetimi ve güvenlik yatırımlarından daha yüksek<br/>değer görmesini sağlayan, yönetim stratejisindeki hangi<br/>temel ekonomik veya operasyonel baskı/mekanizma vardır?<br/>(Örn: müşteri talepleri, finansal baskı, pazar<br/>rekabeti, performans ödülleme sistemi, bütçe<br/>kısıtlamaları)"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A24 --> Q25
+    A26["Organizasyonun kısa vadeli üretim hedeflerini güvenlik<br/>riskinden öncelik veren temel mekanizmalar: 1.<br/>**Performans Ödülleme/Ölçüm Sistemi**: Müdür tarafından<br/>belirtilen 'Duruş süreleri minimize edilmeli'<br/>direktifi, teknisyenleri hızlı çalışma (risk alarak)<br/>için teşvik etmektedir. LOTO prosedürü için harcanan<br/>zaman, olumsuz performans göstergesi olarak<br/>değerlendirilmektedir. 2. **Kısa Vadeli Finansal<br/>Hesaplama**: '2 saat üretim duruşu' kaybı, olası<br/>elektrik yaralanmasının (hastane, tıbbi tedavi, yasal<br/>sorumluluğu, üretim kaybı) maliyeti ile<br/>karşılaştırılmamıştır. Hesaplama sadece doğrudan üretim"]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Neden yönetim sistemi, teknisyenlerin performansını<br/>değerlendirirken LOTO prosedürü uyumu ve güvenlik<br/>protokollerine uygun çalışma süresi yerine, sadece<br/>'duruş sürelerini minimize etme' metriğini seçmiş ve bu<br/>performans ölçümüne bağlı olarak çalışanları hızlı<br/>(riskli) çalışma için teşvik etmeye devam etmiştir?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A26 --> Q27
+    A28["Yönetim sistemi, performans ölçümünde 'duruş süreleri<br/>minimize etme'yi seçmiş çünkü kısa vadeli üretim<br/>hedefleri (ekonomik baskı) ile uzun vadeli güvenlik<br/>yatırımlarını dengeleyen sistematik bir yönetim<br/>mekanizması oluşturmamıştır. LOTO prosedürü uyumu ve<br/>güvenlik protokollerine uygun çalışma süresi, üretim<br/>ölçümüne dahil edilmediği için, yönetim tarafından<br/>'opsiyonel maliyet' olarak kategorize edilmiştir. Sonuç<br/>olarak: - Hızlı çalışan (güvenlik atlayan) teknisyenler<br/>örtülü olarak ödüllendirilmiş - LOTO prosedürünü<br/>uygulayan (yavaş çalışan) teknisyenler 'verimsiz'<br/>damgası almış - Risk normalleşmesi: 'Tecrübeli kişiler"]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Neden yönetim sistemi, 'güvenlik uyum maliyeti' yerine<br/>'duruş süresi minimizasyonunu' performans ve bütçe<br/>hedefi olarak seçip, elektrik bakım işlerinin güvenlik<br/>protokolleriyle uyumlu gerçekleştirilme süresini,<br/>ekonomik/verimlilik hesaplamalarına dahil etmemiştir?<br/>(Başka bir deyişle: Yönetim seviyesinde, güvenlik<br/>prosedürlerinin maliyeti neden kar marjını azaltacak<br/>bir unsur olarak kategorize edilerek, kısa vadeli<br/>üretim hedeflerine karşı öncelik kaybetmiştir?)"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A28 --> Q29
+    A30["Yönetim sistemi, güvenlik uyum maliyetini minimize<br/>etmek yerine duruş süresi minimizasyonunu seçmiştir<br/>çünkü: **1. KARŞILAŞTIRILABİLİR ÖLÇÜMLERİN ASIMETRISINE<br/>DAİR:** - Duruş süresi: Somut, günlük ölçülebilir (2<br/>saat kayıp = X milyon TL) - Güvenlik maliyeti: Soyut,<br/>olasılıksal (kazalar 'henüz' olmadığı sürece sıfır<br/>gözüküyor) **2. KISA VADELI PERFORMANS HEDEFLERÎNE<br/>DAİR:** - Quarterly/yıllık üretim hedefleri sabitken -<br/>Güvenlik kazaları 'sosyal olmayan kalabalık' (fat tail)<br/>riskleri - Yönetim: 'Hoşlanmadığımız olasılık' yerine<br/>'bildiğimiz kayıp' tercih eder **3. PROSEDÜR UYUMU<br/>DENETİMİNİN OLMAMASI SEBEBÎYLE:** - LOTO prosedürü"]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN (**D1.1** - Weak Leadership Commitment (Güvenlik deprioritizasyonu bütçe kararlarında)
+**D1.4** - Production Pressure (Duruş süresi minimize etme baskısı açıkça bildirildi)
+**D1.9** - Management Tolerance of Known Deviations (Yönetim, LOTO ihlalini bildikleri halde tolere etti)
+**D9.5** - Monitoring/Audit Inadequate (LOTO uyumu asla denetlenmedi - 2 yıl boyunca)):</b><br/>Kök Neden<br/>Yönetim sistemi, güvenlik uyum maliyetini<br/>minimize etmek yerine duruş süresi minimizasyonunu<br/>seçmiştir çünkü: **1. KARŞILAŞTIRILABİLİR<br/>ÖLÇÜMLERİN ASIMETRISINE DAİR:** - Duruş süresi:<br/>Somut, günlük ölçülebilir (2 saat kayıp = X milyon<br/>TL) - Güvenlik maliyeti: Soyut, olasılıksal<br/>(kazalar 'henüz' olmadığı sürece sıfır gözüküyor)<br/>**2. KISA VADELI PERFORMANS HEDEFLERÎNE DAİR:** -<br/>Quarterly/yıllık üretim hedefleri sabitken -<br/>Güvenlik kazaları 'sosyal olmayan kalabalık' (fat<br/>tail) riskleri - Yönetim: 'Hoşlanmadığımız<br/>olasılık' yerine 'bildiğimiz kayıp' tercih eder"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden Kemal Arslan, elektrik panosundaki arızayı<br/>gidermek için panoya müdahale ederken, 380V ana şalter<br/>elektrik enerjisini önceden kapatmadı ve panoyu<br/>enerjisiz hale getirmedi?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q31
+    A32["Kemal Arslan, ana şalteri kapatmadığı için üç temel<br/>nedeni vardır: 1. **Organizasyonel Baskı ve Üretim<br/>Önceliği**: Üretim müdürünün 'Elektrik kesilirse 2 saat<br/>üretim kaybı olur' açıklaması ve 'Teknisyenler dikkatli<br/>çalışırlarsa sorun olmaz' yaklaşımı, güvenli<br/>prosedürlerden daha ziyade hızlı müdahaleyi teşvik<br/>etmiştir. Teknisyen üretim stopsunun maliyetini<br/>bilmekte ve bu baskıya maruz kalmaktadır. 2.<br/>**Normalleştirilmiş Risk ve Kültürel Faktör**: Tanık<br/>beyanından 'Hep böyle yapıyoruz aslında' ifadesi, LOTO<br/>prosedürü uygulanmasa da işlerin halledildiği yönünde<br/>yanlış bir güven ortamı oluşmuştur. Bakım Sorumlusunun"]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden Bakım Sorumlusu ve Üretim Yönetimi, var olan<br/>LOTO prosedürünü pratikte uygulamadığı halde, bu<br/>eksikliği düzeltmek için önlem almamışlardır? (Yani,<br/>yönetim neden LOTO prosedürünün uygulanmadığını<br/>görmelerine rağmen bunu kabul etmiş ve<br/>değiştirmemiştir?)"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A32 --> Q33
+    A34["Yönetim (Bakım Sorumlusu ve Üretim Yönetimi) LOTO<br/>prosedürünün uygulanmadığını gördüğü halde önlem<br/>almamıştır çünkü: 1. **Üretim Önceliği Kültürü**:<br/>Üretim hedeflerinin güvenlikten daha yüksek öncelik<br/>taşıması. Müdür açıkça 'Elektrik kesilirse 2 saat<br/>üretim kaybı olur' deyerek üretim endişelerini<br/>güvenlikten üstün tutmuştur. 2. **Prosedürün Biçimsel<br/>Varlığı**: LOTO prosedürü 'kâğıt üzerinde var' ama<br/>'pratikte uygulanmıyor' – yönetim bu durumu meşru<br/>olarak kabul etmiştir. 3. **Denetim Sisteminin<br/>Yokluğu**: LOTO uyumunun denetlenip kontrol edilmemesi,<br/>yönetimin bunu 'görmezden gelmesi' anlamına gelir. 4."]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Neden üretim yönetimi, elektrik çalışmalarında LOTO<br/>prosedürünü uygulamayan yaklaşımla kalıp, bu durumu<br/>düzeltmek için aktif adım atmamıştır? Üretim duruş<br/>sürelerini güvenlik prosedürlerinden öncelikli kılan<br/>kararı (örn. '2 saat üretim kaybı' görmezden gelme)<br/>hangi kurumsal baskılar, performans hedefleri ya da iş<br/>stratejileri tarafından itilmiştir?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A34 --> Q35
+    A36["Üretim yönetimi LOTO prosedürünü uygulamayan<br/>yaklaşımla kalıp bu durumu düzeltmediği temel nedenleri<br/>şunlardır: **1. ÜRETİM DURUŞ SÜRESİ EKONOMISI:** -<br/>Elektrik kesilmesi = 2 saat üretim kaybı = doğrudan<br/>finansal kayıp - Yönetim, bu kayıptan sorumlu olması<br/>nedeniyle prosedür atlama eğilimi göstermiştir - Üretim<br/>hedefleri, güvenlik protokollerine tercih edilmiştir<br/>**2. PERFORMANS ÖLÇÜMLERİ VE TESCİL SİSTEMİ:** -<br/>'Performans ölçümü: Duruş süreleri takip ediliyor<br/>(güvenlik değil)' - Yönetim, güvenlik ihlallerini<br/>değil, sadece üretim durma sürelerini raporlamaktadır -<br/>Güvenlik protokolü uyumunun ölçülmemesi = uyulmasının"]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Neden güvenlik protokol uyumunun (LOTO, iş izin,<br/>gözetim, eğitim, denetim) ölçüldüğü ve denetlendiği<br/>KURUMSAl bir sistem yapılmamış ve Üretim Müdürü<br/>tarafından 'teknisyenler dikkatli çalışırsa sorun<br/>olmaz' anlayışı ile BİREYSEL sorumluluğa<br/>kaydırılmıştır?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A36 --> Q37
+    A38["Güvenlik protokol uyumunun kurumsal bir ölçme-denetim<br/>sisteminin olmaması ve Üretim Müdürü tarafından<br/>bireysel sorumluluğa kaydırılmasının temel nedenleri:<br/>1. **YÖNETİM KÜLTÜRÜ**: 'Üretim durmasın' baskısı<br/>altında, güvenlik prosedürleri (özellikle LOTO)<br/>'gereksiz zaman kaybı' olarak görülmüştür. Müdür<br/>açıklaması 'Elektrik kesilirse 2 saat üretim kaybı<br/>olur. Teknisyenler dikkatli çalışırlarsa sorun olmaz' -<br/>bu, güvenlik sistematiğini riskli kişisel davranışa<br/>indirgemektedir. 2. **DENETIM VE ÖLÇÜM YAPILMAMASI**: -<br/>LOTO prosedürü uyumunun denetimi: **Hiç yapılmamış** -<br/>Elektrik işleri bakım denetimi: **Düzenli yapılmıyor**"]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>Yönetim yapısında güvenlik fonksiyonunun (İSG<br/>departmanı), üretim hedeflerine karşı karar alma<br/>otoritesinin olmaması ve operasyonel kararların (LOTO<br/>uyumu, iş izin sistemi) yalnızca üretim müdürlüğü<br/>tarafından alınması, kurumsal strateji ve organizasyon<br/>tasarımında güvenliğe hangi konumun atfedildiğini<br/>göstermektedir. Bu yapıda, güvenlik neden operasyonel<br/>kararların **eşit ortağı değil, maliyeti** olarak<br/>görülmektedir?"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A38 --> Q39
+    A40["Güvenlik, bu organizasyon yapısında **üretim<br/>hedeflerine hizmet eden bir kısıtlama, yani maliyet<br/>unsuru** olarak konumlandırılmıştır. Bunun sebepleri:<br/>1. **Hiyerarşik Otorite Yapısı**: Güvenlik kararları<br/>üretim müdürlüğünün onayı olmadan uygulanamaz. İSG<br/>departmanı danışman rolündedir, karar mercii değildir.<br/>2. **Üretim Hedefi Baskısı (D1.4)**: Rapordan<br/>anlaşıldığı üzere, üretim duruş süreleri minimize<br/>edilmesi açık talimat gibi davranılmaktadır. LOTO<br/>prosedürü uygulanmadığı için 'zaman kaybı' olarak<br/>görülmektedir. 3. **Performans Ölçütlerinin Güvenlik<br/>Dışında Olması**: Denetim ve takip, duruş sürelerine"]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN (**D1.4** - Production Pressure / Üretim Hedefi Baskısı
+**D1.9** - Management Tolerance of Known Deviations / Yönetim Toleransı
+**D9.5** - Monitoring/Audit Inadequate / Denetim Sisteminin Eksikliği
+**D1.5** - Normalization of Deviance / İhlal Normalleşmesi
+
+Birincil kod: **D1.4** (Üretim hedefi açıkça güvenlik kararlarını yönlendirmektedir)
+İkincil kod: **D1.9** (Yönetim, LOTO ihlalini ve riski bilmekte, tolere etmektedir)
+Tertiyel kod: **D9.5** (Güvenlik uyumunun hiçbir sistematik denetimi yoktur)):</b><br/>Kök Neden<br/>Güvenlik, bu organizasyon yapısında **üretim<br/>hedeflerine hizmet eden bir kısıtlama, yani<br/>maliyet unsuru** olarak konumlandırılmıştır. Bunun<br/>sebepleri: 1. **Hiyerarşik Otorite Yapısı**:<br/>Güvenlik kararları üretim müdürlüğünün onayı<br/>olmadan uygulanamaz. İSG departmanı danışman<br/>rolündedir, karar mercii değildir. 2. **Üretim<br/>Hedefi Baskısı (D1.4)**: Rapordan anlaşıldığı<br/>üzere, üretim duruş süreleri minimize edilmesi<br/>açık talimat gibi davranılmaktadır. LOTO prosedürü<br/>uygulanmadığı için 'zaman kaybı' olarak<br/>görülmektedir. 3. **Performans Ölçütlerinin"]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden Kemal Arslan, elektrik panosundaki şalter<br/>bağlantısına temas ederken panonun elektrik enerjisinin<br/>KAPATILMAMIŞ / KESTİLMEMİŞ olduğu halde çalışmak<br/>durumunda kaldı?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q41
+    A42["Kemal Arslan, elektrik panosundaki şalter bağlantısına<br/>temas ederken panonun elektrik enerjisinin kesilmemiş<br/>olmasının temel nedeni, işletme yönetiminin üretim<br/>hedefi baskısı altında LOTO (Lockout/Tagout)<br/>prosedürünün uygulanmamasıdır. Rapordan anlaşılacağı<br/>üzere: 1. **Prosedür-Uygulama Farkı**: LOTO prosedürü<br/>yazılı olarak mevcut olmasına rağmen, pratik<br/>uygulanmamaktadır ('kâğıt üzerinde var, pratikte<br/>uygulanmıyor'). 2. **Üretim Hedefi Baskısı**: Üretim<br/>müdürünün açık ifadesi ile 'elektrik kesilirse 2 saat<br/>üretim kaybı olur' endişesiyle, enerji kesme kararı<br/>alınmamıştır. 3. **Normalleştirilmiş Risk**: 'Hızlıca"]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Neden işletme yönetimi, LOTO prosedürünün uygulanması<br/>nedeniyle ortaya çıkacak 2 saatlik üretim kaybını kabul<br/>etmeyerek, elektrik çarpması riski karşısında hızlı<br/>çalışma ('tecrübeli teknisyenler dikkat eder')<br/>yaklaşımını tercih etmiş; performans ölçütlerine<br/>güvenlik prosedürü uyumu yerine yalnızca 'duruş<br/>sürelerini minimize etme' hedefi koymuştur?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A42 --> Q43
+    A44["İşletme yönetimi, 2 saatlik üretim kaybını kabul<br/>etmeyerek, elektrik çarpması gibi yaşamsal risk<br/>karşısında 'hızlı çalışma' ve 'tecrübeli teknisyenler<br/>dikkat eder' yaklaşımını tercih etmiştir çünkü: 1.<br/>**Perverse Incentive Sistemi**: Performans ölçütleri<br/>yalnızca 'duruş sürelerini minimize etme'ye odaklandığı<br/>için, teknisyenlerin LOTO prosedürünü (2 saatlik kayba<br/>neden olan) atlaması örtülü olarak teşvik edilmiştir.<br/>2. **Yönetim Değer Hiyerarşisi**: Üretim hedefi,<br/>güvenlik prosedürü uyumundan daha yüksek önceliğe sahip<br/>olmuştur. Üretim Müdürü 'elektrik kesilirse 2 saat<br/>üretim kaybı olur. Teknisyenler dikkatli çalışırlarsa"]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Yönetim neden 2 saatlik üretim kaybını kabul edilemez<br/>veya tolere edilemez düzeyde görmüş ve bu kaybı önlemek<br/>için güvenlik prosedürü ihlalini sistematik olarak<br/>destekleyen bir yönetim kültürü oluşturmuştur?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A44 --> Q45
+    A46["Yönetim, 2 saatlik üretim kaybını finansal ve<br/>operasyonel olarak kabul edilemez bir düzey olarak<br/>değerlendirmiştir. Üretim Müdürü'nün '2 saat üretim<br/>kaybı olur, ama teknisyenler dikkatli çalışırlarsa<br/>sorun olmaz' beyanı, prosedür ihlalinin yönetim<br/>tarafından bilinçli olarak tolere edildiğini gösterir.<br/>Bakım Sorumlusu'nun 'LOTO prosedürü var ama üretim<br/>aksamasın diye pek uygulamıyoruz' beyanı, bu toleransın<br/>sistematik ve kurumsal düzeyde yerleşmiş olduğunu<br/>ortaya koymaktadır. Yönetim, kısa vadeli üretim<br/>hedefleri ile enerji kesme protokolünü çatıştıran bir<br/>kültür yaratmış, teknisyenleri hız ve 'dikkat' ile"]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Neden yönetim, LOTO prosedürü gibi zorunlu güvenlik<br/>protokollerini uygulamaktansa, 'dikkat ile çalışma'<br/>esasında üretim akışını optimize etmeyi ve 2 saatlik<br/>üretim kaybını kabul etmemeyi tercih eder? Bu tercihte<br/>hangi performans ölçüm sistemi, bütçe baskısı veya<br/>operasyonel KPI'lar etkili olmuştur?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A46 --> Q47
+    A48["Yönetim, açık şekilde üretim performans KPI'larına<br/>(duruş süresi, üretim kaybı, verimlilik) dayalı bir<br/>tercih yapmıştır. Bu tercihte etkin faktörler: 1.<br/>**Performans Ölçüm Sistemi**: Güvenlik göstergeleri<br/>(LOTO uyumu %, kaza sıfır) değil, üretim metrikleri<br/>(duruş süresi dakika, günlük çıktı ton) ölçülmektedir.<br/>Raporda 'Performans ölçümü: Duruş süreleri takip<br/>ediliyor (güvenlik değil)' açıkça belirtilmiştir. 2.<br/>**Bütçe/Operasyonel Baskısı**: '2 saatlik üretim kaybı'<br/>ifadesi, bu kayıpla ilişkili finansal ceza veya hedef<br/>başarısızlığı anlamına gelmektedir. Elektrik kesme =<br/>üretim durdurma = hedef kaçırma = performans"]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Güvenlik göstergelerinin (LOTO uyumu %, kaza sıfır)<br/>kurumsal KPI ve performans değerlendirme sistemine<br/>neden dahil edilmemiş veya dahil olsa bile üretim<br/>KPI'larının (duruş süresi, çıktı) altında<br/>ağırlıklandırılmıştır? (Yani: Bu KPI tasarım tercihini<br/>yapan karar mekanizması, yönetim yapısı ve kurumsal<br/>risk gözetimi nedir?)"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A48 --> Q49
+    A50["Güvenlik göstergelerinin (LOTO uyumu %, kaza sıfır)<br/>KPI sistemine dahil edilmemesi veya üretim KPI'larının<br/>altında ağırlıklandırılması, aşağıdaki kurumsal yönetim<br/>kararlarının sonucudur: **1. Liderlik Seviyesi - Zayıf<br/>Güvenlik Taahhüdü (D1.1)** - Güvenlik KPI'larına bütçe<br/>ve kaynak tahsis edilmemiştir - Üretim hedeflerine<br/>kıyasla güvenlik hedefleri ikincil düzeyde kalmıştır -<br/>Kurumsal KPI tasarımında güvenlik göstergeleri temel<br/>kriteri değildir **2. Yönetim Toleransı ve Normalleşme<br/>(D1.9 + D1.5)** - Üretim Müdürü: 'Elektrik kesilirse 2<br/>saat üretim kaybı olur. Teknisyenler dikkatli<br/>çalışırlarsa sorun olmaz' → Riskin kasten tolere"]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN (D1.1 - Zayıf Liderlik Taahhüdü
+D1.2 - Yetersiz Denetim (Ön Hat - Bakım Denetimi)
+D1.4 - Üretim Baskısı (KPI Tasarımı)
+D1.5 - Sapmayı Normalleştirme (2+ yıl, yaygın, yönetim bilgili)
+D1.9 - Yönetim Toleransı (Bilinen Sapmalar)
+D4.4 - İş İzin Sistemi (PTW) Eksikliği
+D4.5 - LOTO Uygulanmıyor
+D9.5 - İzleme/Denetim Sistemi Eksikliği (KPI Uyum Takibi Yok)):</b><br/>Kök Neden<br/>Güvenlik göstergelerinin (LOTO uyumu %, kaza<br/>sıfır) KPI sistemine dahil edilmemesi veya üretim<br/>KPI'larının altında ağırlıklandırılması, aşağıdaki<br/>kurumsal yönetim kararlarının sonucudur: **1.<br/>Liderlik Seviyesi - Zayıf Güvenlik Taahhüdü<br/>(D1.1)** - Güvenlik KPI'larına bütçe ve kaynak<br/>tahsis edilmemiştir - Üretim hedeflerine kıyasla<br/>güvenlik hedefleri ikincil düzeyde kalmıştır -<br/>Kurumsal KPI tasarımında güvenlik göstergeleri<br/>temel kriteri değildir **2. Yönetim Toleransı ve<br/>Normalleşme (D1.9 + D1.5)** - Üretim Müdürü:<br/>'Elektrik kesilirse 2 saat üretim kaybı olur."]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A50 --> ROOT5
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            flowchart: { 
+                curve: 'basis', 
+                padding: 15, 
+                nodeSpacing: 50, 
+                rankSpacing: 80, 
+                useMaxWidth: true,
+                htmlLabels: true,
+                diagramPadding: 10
+            }, 
+            themeVariables: { 
+                fontSize: '11px', 
+                fontFamily: 'Segoe UI',
+                primaryColor: '#fff',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            } 
+        });
+    </script>
+</body>
+</html>

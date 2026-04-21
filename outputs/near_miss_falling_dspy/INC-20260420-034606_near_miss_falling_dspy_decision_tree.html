@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page {size: A4 landscape; margin: 3mm; }
+        * {box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {width: 100vw; height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; background: white; overflow: hidden; }
+        body {display: flex; flex-direction: column; padding: 3px; height: 100vh; }
+        header {text-align: center; flex-shrink: 0; padding: 3px 0; }
+        header .top-title {font-size: 11px; font-weight: bold; color: #333; margin-bottom: 1px; }
+        header h1 {font-size: 13px; font-weight: bold; color: #111; margin-bottom: 1px; }
+        header .subtitle {font-size: 10px; color: #666; margin-bottom: 1px; }
+        .legend {text-align: center; font-size: 9px; color: #555; padding: 2px 4px; background: #f5f5f5; border: 1px solid #ddd; flex-shrink: 0; margin-bottom: 3px; }
+        #diagram-wrap {flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; width: 100%; height: calc(100vh - 60px); }
+        #diagram-wrap .mermaid {width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #diagram-wrap svg {max-width: 98% !important; max-height: 98% !important; height: auto !important; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">NEDEN (kesik) → CEVAP (düz) → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden sarmal kapı mekanizmasının üst bağlantı braketi<br/>metal yorulma ve gevşeme sonucu kopup yere düştü?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Sarmal kapı mekanizmasının üst bağlantı braketi,<br/>**periyodik bakım programının eksik uygulanması ve<br/>bağlantı elemanlarının tork kontrolünün yapılmaması**<br/>sonucu metal yorulma ve gevşemeye maruz kalmıştır.<br/>Rapordan anlaşıldığı üzere son detaylı mekanizma<br/>kontrolü 14 ay öncesinde yapılmış olup, bu dönemde kapı<br/>yoğun kullanıma maruz kalıp döngüsel yükleme<br/>yaşamıştır. Bağlantı noktalarının tork kontrolü<br/>yapılmadığı için vidalar ve braketler zamanla gevşemiş,<br/>yapısal integriteyi kaybetmiş ve nihayet metal parça<br/>koparak yere düşmüştür. Ek olarak, çalışanlar<br/>tarafından duyulan anormal tıkırtı sesleri (08:40"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Sarmal kapı mekanizmasının periyodik bakım programı<br/>neden **14 aylık bir dönem boyunca detaylı mekanizma<br/>kontrolü yapılmaksızın** bırakılmıştır? Bakım planlama<br/>sisteminde, kaynak tahsisinde veya üretim baskısı<br/>altında bakım görevinin ertelenmesine neden olan<br/>organizasyonel/prosedürel faktör nedir?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["14 aylık detaylı mekanizma kontrolü boşluğunun ana<br/>nedenleri, organizasyonel ve prosedürel eksikliklerde<br/>yatmaktadır: **Birincil Faktör - Bakım Planlaması<br/>Sistemi Arızası:** Kağıtta 'aylık bakım' yazıldığı<br/>halde, son detaylı kontrolün 14 ay önceki kayıt ile<br/>gösterilmesi, planlama vs. gerçekleştirme arasında<br/>ciddi uyumun olmadığını göstermektedir. Sarmal kapı<br/>gibi kritik cihazlarda, bakım takvimi takip edilmemiş<br/>veya atlanmıştır. **İkincil Faktör - Operasyonel<br/>Önceliğin Düşüklüğü:** Raporta açıkça belirtildiği gibi<br/>'bakım önceliği düşük; üretim girişi aksamasın baskısı'<br/>mevcuttur. Üretim bölgesindeki ana giriş kapısı,"]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Bakım planlaması sisteminde 'aylık bakım' prosedürü<br/>tanımlı olmasına rağmen, Sarmal Kapı SK-01'in detaylı<br/>mekanizma kontrolünün 14 ay boyunca<br/>gerçekleştirilememesinin veya kayıtlanmamasının temel<br/>nedeni nedir? — Başka bir deyişle: Bakım takviminin<br/>uygulanmasını izleyen sorumlu kişi/ekip var mıydı;<br/>eksik bakımlar ne zaman ve nasıl fark edilebilirdi;<br/>sistem entegrasyonunda (planlama + gerçekleştirme +<br/>kayıt) hangi nokta kopmuştur?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Sarmal Kapı SK-01'in 14 ay boyunca detaylı mekanizma<br/>kontrolünün gerçekleştirilmemesinin/kayıtlanmamasının<br/>temel nedeni, **bakım yönetim sistemi üç kritik noktada<br/>kopmasıdır**: **1. Sorumluluk Boşluğu<br/>(Planlama-Uygulama Kopuşu)** - Aylık bakım prosedürü<br/>'kağıtta' tanımlı olmasına rağmen, bunun kim<br/>tarafından, ne zaman ve nasıl uygulanacağı net<br/>atanmamıştır - Son kayıtlı detaylı mekanizma kontrolü<br/>14 ay öncedir; bu dönem sonrasında denetlenmeyen bir<br/>işlem var - 'Bakım müdürü,' 'vardiya koordinatörü' gibi<br/>açık sorumluluk tanımı yoktur **2. İzleme ve Erken<br/>Uyarı Sistemi Eksikliği (Uygulama-Kayıt Kopuşu)** -"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>**Why-4**: Bakım müdürü görevini, denetim<br/>mekanizmasını ve tork kontrol prosedürünü tanımlayan<br/>sorumluluk matrisinin neden oluşturulmadığı /<br/>kurulmadığı, ve üretim kesintisini önleme önceliğinin<br/>neden güvenlik protokollerinin uygulanmasından daha<br/>ağır baslandığı yönetim seviyesinde?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Yönetim seviyesinde sorumluluk matrisi oluşturulmadığı<br/>için bakım görevleri muğlak kalmıştır. Bakım müdürünün<br/>spesifik sorumlulukları (aylık kontrol sıklığı, tork<br/>ölçüm standartları, kontrol noktaları), denetim<br/>mekanizması (bakım ekibi denetimi, kayıt doğrulaması)<br/>ve eskalasyon prosedürü tanımlanmamıştır. Sonuç olarak,<br/>son detaylı kontrol 14 ay geride kalmıştır. Üretim<br/>kesintisini önleme baskısı, güvenlik protokollerinden<br/>daha ağır bastığı için çalışanlar anormal sesi duysalar<br/>da kapının durdurulmasını talep etmemiştir. Yönetim<br/>tarafından 'üretim devam etsin' sinyali, 'anormal ses<br/>duyunca uyarı ver' prosedürünü etkisiz kılmıştır."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden tesis yönetimi ve İnsan Kaynakları, kritik<br/>ekipman (sarmal kapı gibi) için bakım sorumluluk<br/>matrisini ve güvenlik-üretim öncelik sıralamasını<br/>yazılı prosedür olarak resmi olarak oluşturmamıştır? Bu<br/>belgeler oluşturulamamasının arkasında hangi faktör<br/>yatmaktadır — kaynak yetersizliği, yazılı sistem kurma<br/>bilgisinin yokluğu, güvenlik kültürünün zayıflığı, mı<br/>yoksa yönetim seviyesinde bu tür dokümantasyona<br/>verilecek önem konusunda bir uzlaşma olmaması mıdır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A8 --> Q9
+    A10["Kritik ekipman (sarmal kapı gibi) için bakım<br/>sorumluluğu matrisinin ve güvenlik-üretim öncelik<br/>sıralamasının yazılı prosedür olarak resmi olarak<br/>oluşturulamamasının arkasında **çok faktörlü bir<br/>nedenler bileşimi** yatmaktadır: **Birincil Faktör -<br/>Yönetim Seviyesinde Güvenlik Önceliklendirmesinin<br/>Eksikliği (D1.1)**: - Olay raporundaki 'kağıtta aylık'<br/>ifadesi ve 14 aylık denetim boşluğu, yönetim<br/>seviyesinde bu tür dokümantasyona verilecek önem<br/>konusunda bir uzlaşma olmamasını göstermektedir -<br/>Üretim kesintisi baskısı (45 dk duruş yönetim için<br/>önemli) ve bakım ertelenmesi (aylık plan &gt; 14 ay"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN (**D1.1** (Weak Leadership Commitment - Zayıf Liderlik Bağlılığı): Güvenlik projelerine (bakım prosedür dokümantasyonu) kaynak ayrılmamış, üretim baskısı önceliklendirilebilmiştir
+
+**D6.1** (Maintenance Strategy Inadequate - Bakım Stratejisi Yetersiz): Kritik ekipman (sarmal kapı) için sistematik PM planı ve sorumluluğu matrisi oluşturulmamıştır
+
+**D9.1** (No SPP for Task - Görev için Yazılı Prosedür Yok): Bakım sorumluluğu matrisi ve güvenlik-üretim öncelik sıralaması yazılı prosedür olarak mevcut değildir
+
+**D9.5** (Monitoring/Audit Inadequate - İzleme/Denetim Yetersiz): Bakım uyumluluğu denetlemek için sistemik audit/kontrol mekanizması tasarlanmamış; bakım kayıtları kısmi ve izlenmemektedir
+
+**D1.5** (Normalization of Deviance - Sapmaların Normalleştirilmesi): 14 aylık denetim boşluğu ve "kağıtta aylık" prosedür vs. gerçek uygulama arasındaki uçurum, bakım ertelenmesinin normalleştirildiğini göstermektedir):</b><br/>Kök Neden<br/>Kritik ekipman (sarmal kapı gibi) için bakım<br/>sorumluluğu matrisinin ve güvenlik-üretim öncelik<br/>sıralamasının yazılı prosedür olarak resmi olarak<br/>oluşturulamamasının arkasında **çok faktörlü bir<br/>nedenler bileşimi** yatmaktadır: **Birincil Faktör<br/>- Yönetim Seviyesinde Güvenlik<br/>Önceliklendirmesinin Eksikliği (D1.1)**: - Olay<br/>raporundaki 'kağıtta aylık' ifadesi ve 14 aylık<br/>denetim boşluğu, yönetim seviyesinde bu tür<br/>dokümantasyona verilecek önem konusunda bir<br/>uzlaşma olmamasını göstermektedir - Üretim<br/>kesintisi baskısı (45 dk duruş yönetim için"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden sarmal kapının üst mekanizmasındaki bağlantı<br/>braketi kopup zemine düştü?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q11
+    A12["Sarmal kapının üst mekanizmasındaki bağlantı braketi,<br/>bakım programının etkisiz uygulanması ve mekanik<br/>bağlantıların periyodik tork kontrol ve gevşemelik<br/>kontrolünün yapılmamış olması nedeniyle aşınıp<br/>gevşemiş, sonuç olarak yoğun kullanım sırasında<br/>kopmuştur. Olay öncesi işçiler tarafından duyulan<br/>anormal metalik sesler, mekanik arızanın ileri aşamada<br/>olduğunun uyarı işaretiydi ancak bu sinyal<br/>'durdur-bildir' prosedürü eksikliği nedeniyle<br/>değerlendirilmemiştir."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Bakım programı kağıtta aylık olarak tanımlanmasına<br/>rağmen, son 14 ayda sarmal kapı mekanizmasında kritik<br/>bağlantıların (tork, gevşemelik) detaylı kontrolü neden<br/>yapılmamış ve bakım kayıtları neden eksik kalmıştır?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Bakım programının kağıtta tanımlanmasına rağmen<br/>uygulanmamasının kök nedenleri şunlardır: 1. **Bakım<br/>Yönetim Sistemi Eksikliği**: Son 14 ayda kritik<br/>bağlantılar için hiç detaylı tork/gevşemelik kontrolü<br/>yapılmamıştır. Bu, bakım planının rutin kontrol listesi<br/>haline getirildiğini (kağıt üzerinde işaretleme) ama<br/>gerçek uygulanmadığını gösterir. 2. **Üretim Baskısı<br/>ile Bakım Çatışması**: Vardiya notunda 'aceleyle içeri<br/>girdik' ifadesi ve anormal seslerin ciddiye alınmaması,<br/>bakım/güvenlik aktivitelerinin üretim hızının gerisinde<br/>bırakıldığını gösterir. 3. **Kontrol ve Denetim<br/>Mekanizması Eksikliği**: Bakım kayıtlarının kısmen"]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Bakım programı ve denetim mekanizması bu denli<br/>zayıflamış olmasunun, işletme yönetiminin üretim<br/>hedefleri ile bakım/güvenlik kaynakları arasında nasıl<br/>bir tercih (optimal kaynak tahsisi veya bütçe<br/>kısıtlaması) yaptığını göstermektedir. Bu tercihin veya<br/>kısıtlamanın arka sebebi nedir?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Bakım programının ve denetim mekanizmasının<br/>zayıflaması, işletme yönetiminin **üretim sürekliliği<br/>ve operasyonel verimlilik hedeflerini, bakım/güvenlik<br/>kaynaklarına göre daha yüksek önceliğe<br/>yerleştirdiğini** göstermektedir. Bunun arka sebepleri<br/>şunlardır: **Birincil Sebepler:** 1. **Bütçe<br/>Kısıtlaması / Maliyet Optimizasyonu:** Bakım personeli,<br/>araçları veya dış bakım hizmetleri için ayrılan bütçe<br/>sınırlı olabilir; yönetim, kayan bakım (reactive<br/>maintenance) modelini tercih etmiş olabilir. 2.<br/>**Üretim Baskısı ve Kapasite Hedefleri:** Kapıyı<br/>kapatıp bakım yapmak = üretim duruşu = hedefler"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>**Why-4: Yönetim, üretim hedefleri ve operasyonel<br/>verimliliği, preventif bakım ve güvenlik<br/>yatırımlarından neden daha yüksek önceliğe<br/>yerleştirmiştir? Bu tercihte rol oynayan kurumsal<br/>baskılar, performans metrikleri, finansal sınırlamalar<br/>veya pazar koşulları nelerdir?**"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A16 --> Q17
+    A18["Yönetim, preventif bakım ve güvenlik yatırımlarını<br/>üretim hedefleri ve operasyonel verimliliğin altına<br/>almıştır. Bu karar, aşağıdaki kurumsal baskılarla<br/>açıklanmaktadır: **1. Performans Metrikleri<br/>Prioritesi:** - Üretim hedefleri ve kapı arıza<br/>(downtime) süresi gibi operasyonel KPI'lar ön plandadır<br/>- Güvenlik/bakım metrikleri (preventif bakım tamamlanma<br/>oranı, mekanizma kontrol sıklığı) sistem tarafından<br/>veri toplanmamakta veya raporlanmamaktadır **2.<br/>Finansal Sınırlamalar:** - Detaylı mekanizma kontrolü<br/>14 aydır yapılmamıştır (bütçe kısıtlaması olduğu<br/>düşünülmektedir) - Tork kontrolü gibi kritik kalite"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Yönetim kararlarında üretim hedeflerini<br/>güvenlik/bakımın üzerine alan değerlendirme sistemi ve<br/>bütçe tahsisi mekanizması niçin kurulmuş veya<br/>sürdürülmüştür? (Örneğin: Performans değerlendirmesinde<br/>güvenlik KPI'larının ağırlığı nedir? Bakım bütçesi<br/>tahsisi hangi kriterlere göre yapılmaktadır? Endüstri<br/>standartları ve dış denetim mekanizmaları bu kararları<br/>yeterince kontrol etmemektedir?)"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Yönetim, üretim hedeflerini güvenlik/bakım<br/>kayıklarının üzerine alan değerlendirme sistemi ve<br/>bütçe tahsisi mekanizmasını aşağıdaki nedenlerle kurmuş<br/>ve sürdürmüştür: **1. Performans Ölçüm Sistemi<br/>Güvenlik'i Marjinal Konuma Yerleştiriyor:** - Sarmal<br/>kapı bakımı 14 aydır 'detaylı mekanizma kontrolü'<br/>geçirmemiş; bu muhasebe sisteminde kritik olmayan bir<br/>görevi işaretliyor - Güvenlik KPI'ları (ramak kala<br/>raporları, mekanik bakım %'si) muhtemelen Üretim<br/>KPI'larının (kapı uptime, throughput) ağırlık<br/>oranlarının çok altında - Anormal ses/titreşim<br/>prosedürü 'zayıf uygulanıyor' → çalışanlar ve"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN (**D6.6** (Deferred Maintenance Normalization) — PRIMARY
+**D1.4** (Production Pressure) — CONTRIBUTING
+**D1.1** (Weak Leadership Commitment) — ROOT ORGANIZATIONAL
+**D9.5** (Monitoring/Audit Inadequate) — SYSTEMIC CONTROL GAP):</b><br/>Kök Neden<br/>Yönetim, üretim hedeflerini güvenlik/bakım<br/>kayıklarının üzerine alan değerlendirme sistemi ve<br/>bütçe tahsisi mekanizmasını aşağıdaki nedenlerle<br/>kurmuş ve sürdürmüştür: **1. Performans Ölçüm<br/>Sistemi Güvenlik'i Marjinal Konuma<br/>Yerleştiriyor:** - Sarmal kapı bakımı 14 aydır<br/>'detaylı mekanizma kontrolü' geçirmemiş; bu<br/>muhasebe sisteminde kritik olmayan bir görevi<br/>işaretliyor - Güvenlik KPI'ları (ramak kala<br/>raporları, mekanik bakım %'si) muhtemelen Üretim<br/>KPI'larının (kapı uptime, throughput) ağırlık<br/>oranlarının çok altında - Anormal ses/titreşim"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>**Why-1: Sarmal kapı mekanizmasındaki metal bağlantı<br/>braketi neden koptu / gevşeyerek yere düştü?** (Odak:<br/>Mekanik arızanın temel nedeni — aşınma, gevşeme,<br/>malzeme yorulması vb.)"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q21
+    A22["Sarmal kapı mekanizmasındaki metal bağlantı braketi,<br/>**bakım eksikliğine ve zamanında tespit edilmeyen<br/>mekanik gevşemeye bağlı olarak kopmuştur**. Spesifik<br/>nedenler: - **Son 14 aydır detaylı mekanik kontrol<br/>yapılmamıştır** — bu dönemde bağlantı cıvatalarının ve<br/>braketinin zamanla gevşemesi tespit edilememiştir. -<br/>**Tork/sıkılık kontrolü periyodik bakım prosedürüne<br/>dahil edilmemiştir** — cıvataların gevşemesi öznel<br/>gözlem veya periyodik kalibrasyonlu kontrol olmadığında<br/>ilerlemektedir. - **Anormal sinyaller (tıkırtı sesi)<br/>yeterli şekilde incelenmemiştir** — 08:40'ta çeşitli<br/>çalışanlar tıkırtı sesinden bahsetmişler ancak kapı,"]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>**Why-2: Sarmal kapı mekanizmasının son 14 aydır<br/>detaylı mekanik kontrolünden geçmemesinin ve<br/>tork/sıkılık kontrolünün periyodik bakım prosedürüne<br/>dahil edilmemesinin temel sebebi nedir?** (Başka bir<br/>deyişle: Bakım planı ve tork kontrolünü uygulamayan<br/>sistem, kaynaklar, prosedür yazımı, ya da<br/>önceliklendirme politikası nedir?)"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Sarmal kapı mekanizmasının son 14 aydır detaylı<br/>mekanik kontrolünden geçmemesinin ve tork/sıkılık<br/>kontrolünün periyodik bakım prosedürüne dahil<br/>edilmemesinin temel sebepleri: **1. Prosedür Yazımı<br/>Eksikliği:** - Periyodik bakım prosedürüne 'kritik<br/>bağlantı tork kontrolü' başlık olarak dahil<br/>edilmemiştir - Kontrol noktaları ve tork değerleri<br/>tanımlanmamıştır - Mekanik bağlantıların belirtilen<br/>aralıklarla kontrol edilmesi zorunlu kılınmamıştır **2.<br/>Kaynaklar ve İş Yükü Yönetimi:** - Bakım personelinin<br/>iş yükü, bu detaylı kontrolleri düzenli olarak yapmaya<br/>müsait değildir - Yapılan aylık planlı bakımlar"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Üretim tesisindeki 'üretim akışını kesme baskısı'nın<br/>bakım etkinliklerinin ertelenmesine neden olması, hangi<br/>yönetim hedefleri / performans metriklerinin / teşkilat<br/>kültürünün sonucudur ve bu hedeflerin oluşturulmasında<br/>risk yönetimi / koruma bakış açısı neden öncelikli<br/>değildir?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A24 --> Q25
+    A26["'Üretim akışını kesme baskısı'nın bakım<br/>etkinliklerinin ertelenmesine neden olan yönetim<br/>hedefleri ve kültür unsurları şunlardır: **Performans<br/>Metrikleri:** - Üretim sürekliliği ve kapasitesi (%<br/>uptime) - Üretim duruşu süresi minimize etme - Kısa<br/>vadeli verimlilik göstergeleri **Yönetsel Kültür:** -<br/>Güvenlik ve bakım 'prodüktif olmayan' maliyet merkezi<br/>olarak görülmesi - Üretim müdürü baskısı nedeniyle<br/>bakım zamanlaması ile üretime uyum baskısı - Reaktif<br/>yönetim (olay sonrası müdahale) yerine proaktif yönetim<br/>(önleyici bakım) tercih edilmemesi **Risk Yönetimi<br/>Neden Öncelikli Değil:** - Ramak kala olaylar"]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Yönetim kültürünün güvenliği ve proaktif bakımı<br/>'üretim için gerekli olmayan maliyet' olarak kategorize<br/>etmesine neden olan örgütsel sistem faktörleri<br/>nelerdir? (Ör: Performans değerlendirme kriterleri,<br/>bütçe tahsisi yapısı, üretim müdürünün teşvik<br/>mekanizması, kalite-güvenlik-verimlilik arasında<br/>tanımlanan öncelik sırası?)"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A26 --> Q27
+    A28["Yönetim kültürünün güvenlik ve bakımı 'üretim için<br/>gerekli olmayan maliyet' olarak kategorize etmesinin<br/>temel örgütsel sistem faktörleri: 1. **Performans<br/>Değerlendirme Kriterleri**: Üretim müdürünün başarı<br/>metriği 'üretim saatleri' ve 'kapasite kullanımı'dır.<br/>Bakım duruşları negatif performans göstergesi olarak<br/>kaydedilir. Ramak kala bildirimi cezalandırıcı<br/>değildir. 2. **Bütçe Tahsisi Yapısı**: Bakım bütçesi,<br/>'acil onarım' bütçesine göre ikincil kabul edilir.<br/>Planlı bakım için 14 aylık aralık, 'maliyet tasarrufu'<br/>yaklaşımını gösterir; bütçe güvenliğe tahsis edilmemiş,<br/>sadece arıza sonrası müdahaleye ayrılmıştır. 3."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Üretim müdürlüğü ve bütçe tahsisinin performans<br/>metriklerinde, güvenlik yerine 'üretim duruşsuzluğunu'<br/>ve 'maliyet tasarrufu' ilkesini merkeze alan bu yönetim<br/>sisteminin tasarımı ve benimsenmesine hangi kurumsal<br/>stratejik kararlar, pazar rekabet baskıları veya<br/>yönetim felsefesi katkıda bulunmuştur?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A28 --> Q29
+    A30["Olay raporu, aşağıdaki kurumsal stratejik tercihler ve<br/>yönetim felsefesinin güvenlik yerine üretim<br/>duruşsuzluğunu ve maliyet tasarrufunu merkeze aldığını<br/>göstermektedir: **1. Bakım Bütçesi & Öncelik Tahsisi<br/>(Stratejik Karar)** - Son detaylı mekanizma kontrolü 14<br/>ay gecikmişken 'aylık periyodik bakım planı' yalnızca<br/>kağıt üzerinde kalması, bakım fonksiyonuna düşük bütçe<br/>tahsisini yansıtmaktadır. - Kritik bağlantı tork<br/>kontrolü hiçbir zaman sistemik olarak yapılmamıştır —<br/>bu, bakım-güvenlik maliyetleri ile işletme tasarrufu<br/>arasında kâr lehine tercih yapıldığını gösterir. **2.<br/>Üretim Devamlılığı Prioritizasyonu (Pazar Baskısı)** -"]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN (**D1.1** — Zayıf Liderlik Taahhütü (Weak Leadership Commitment)
+→ Güvenlik projelerine bütçe tahsisinde düşük öncelik; kritik bakım kontrolleri 14 ay deferred
+
+**D1.4** — Üretim Baskısı (Production Pressure)
+→ "Üretim girişi aksamasın baskısı"; ~45 dk duruşun finansal maliyeti, güvenlik yatırımını bastırmaktadır
+
+**D6.6** — Deferred Maintenance Normalizasyonu (Deferred Maintenance Normalization)
+→ Son detaylı mekanizma kontrolü 14 ay gecikmişken kağıt üzerinde aylık PM planlı; kritik tork kontrolleri hiçbir zaman yapılmadı; backlog tolere edilmiştir
+
+**D9.5** — Monitoring/Denetim Yetersizliği (Monitoring/Audit Inadequate)
+→ Anormal ses/titreşim için "durdur-bildir prosedürü zayıf uygulanıyor" — sistemik uyum denetim mekanizması eksiktir
+
+**D1.9** — Yönetim Toleransı Bilinen Sapmalara (Management Tolerance of Known Deviations)
+→ Bakım kaydı eksiklikleri ve tork kontrolü yapılmayan durum 14 aydır yönetim tarafından bilinir ve tolere edilir):</b><br/>Kök Neden<br/>Olay raporu, aşağıdaki kurumsal stratejik<br/>tercihler ve yönetim felsefesinin güvenlik yerine<br/>üretim duruşsuzluğunu ve maliyet tasarrufunu<br/>merkeze aldığını göstermektedir: **1. Bakım<br/>Bütçesi & Öncelik Tahsisi (Stratejik Karar)** -<br/>Son detaylı mekanizma kontrolü 14 ay gecikmişken<br/>'aylık periyodik bakım planı' yalnızca kağıt<br/>üzerinde kalması, bakım fonksiyonuna düşük bütçe<br/>tahsisini yansıtmaktadır. - Kritik bağlantı tork<br/>kontrolü hiçbir zaman sistemik olarak<br/>yapılmamıştır — bu, bakım-güvenlik maliyetleri ile<br/>işletme tasarrufu arasında kâr lehine tercih"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden sarmal kapının bağlantı braketi, mekanizma<br/>içindeki aşınma, gevşeme veya metal yorgunluğu<br/>nedeniyle kopmuş duruma gelmiştir?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q31
+    A32["Sarmal kapının bağlantı braketi, mekanizma içindeki<br/>uzun süreli aşınma ve gevşemeye bağlı metal yorgunluğu<br/>nedeniyle kopmuştur. Yapısal neden: Son detaylı<br/>mekanizma kontrolü 14 ay önce yapılmış olup, aradan<br/>geçen sürede periyodik tork kontrolü ve bağlantı<br/>sıkılığı muayenesinin yapılmadığı kayıtlarda<br/>görülmektedir. Operasyonel neden: Anormal metalik<br/>'tıkırtı' sesleri (08:40'ta gözlemlenmiş) göz ardı<br/>edilmiş, 'durdur-bildir' prosedürü uygulanmamıştır.<br/>Yönetimsel neden: Bakım önceliğinin düşük tutulması ve<br/>üretim akışını kesmeyen yönündeki örtülü baskı, kritik<br/>mekanik kontrollerinin ertelenmesine yol açmıştır."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden sarmal kapı mekanizmasının periyodik bakım planı<br/>(kağıtta aylık olarak tanımlanmış olmasına rağmen) 14<br/>aylık bir aralıkla gerçekleştirilmiş ve son detaylı<br/>mekanizma kontrolü bu kadar uzun süre ertelenmişitir?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A32 --> Q33
+    A34["Sarmal kapı mekanizmasının periyodik bakım planının 14<br/>aylık aralıkla gerçekleştirilmesinin temel nedeni,<br/>**planlı bakım sisteminin yönetimsel olarak<br/>uygulanmaması ve uygulanmasının denetlenmemesidir**.<br/>**Kök Sebeplerinin Zinciri:** 1. **Yazılı plan-uygulama<br/>ayrışması**: Bakım planı kağıtta aylık olmasına rağmen,<br/>hiçbir mekanizma bu planın uygulanmasını zorunlu<br/>kılamıyordu. 2. **Operasyonel baskı**: Üretim hattının<br/>kesintisiz çalışması talebi, planlı bakımı<br/>'ertelenebilir' görülen faaliyete dönüştürmüştür. 3.<br/>**Sorumluluk boşluğu**: Kimin bakım planını uygulamakla<br/>sorumlu olduğu (bakım müdürü, vardiya sorumlusu, tesisi"]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Neden sarmal kapı mekanizmasının periyodik bakım<br/>sorumluluğu açıkça tanımlanmamış ve bakım planının<br/>uygulanmasını izlemek için KPI / denetim mekanizması<br/>kurulmamıştır? (Yani: Yönetim seviyesinde bakım<br/>görevinin sahipliği ve performans denetim sistemi<br/>oluşturulmamasının nedeni nedir?)"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A34 --> Q35
+    A36["Sarmal kapı mekanizmasının periyodik bakım sorumluluğu<br/>açıkça tanımlanmamış ve bakım planının uygulanmasını<br/>izlemek için KPI/denetim mekanizması kurulmamamasının<br/>temel nedenleri: 1. **Yönetim Seviyesinde Sorumluluk<br/>Boşluğu**: Bakım görevinin kim tarafından yönetileceği,<br/>kim tarafından denetleneceği ve hangi ölçütlerle<br/>başarısının değerlendirileceği belirtilmemiştir. Bu<br/>sebeple bakım planı 'kağıtta aylık' olarak kalırken,<br/>fiili uygulanması (son kontrol 14 ay önce) ihmal<br/>edilmiştir. 2. **Üretim Baskısının Güvenlikle<br/>Dengelenmemesi**: Raporun ön bulgularında 'üretim<br/>girişi aksamasın baskısı' açıkça belirtilmiştir."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Yönetim seviyesinde bakım görevinin (sarmal kapı<br/>mekanizması periyodik kontrolü) sahibinin açıkça<br/>tanımlanmamış ve uygulanmasını izlemek için KPI/denetim<br/>mekanizmasının kurulmamış olmasının temel nedeni, bakım<br/>ve güvenlik konularının kurumsal risk yönetim<br/>stratejisine ve öncelik sıralamasına yeterince entegre<br/>edilmemiş olmasıdır — bu entegrasyon eksikliğinin<br/>yönetim tarafından neden kabullenildiği veya göz ardı<br/>edildiği?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A36 --> Q37
+    A38["Yönetim seviyesinde bakım görevinin sahibinin açıkça<br/>tanımlanmamış olması ve KPI/denetim mekanizmasının<br/>kurulmamış olmasının temel nedeni, **kurumsal risk<br/>yönetim stratejisinde bakım ve güvenlik işlevlerinin<br/>düşük önceliklendirilmesidir**. Yönetim bu durumu<br/>kabullemiş/göz ardı etmiştir çünkü: 1. **Üretim<br/>hedefleri baskısı**: Kapı bakımı 'üretim durdurabilir'<br/>faaliyeti olarak görüldüğü için, kısıtlı kaynaklar<br/>doğrudan üretim faaliyetlerine yönlendirilmiştir. 2.<br/>**Reaktif yönetim kültürü**: 'Henüz ciddi olay olmamış'<br/>mantığıyla, proaktif bakım sistemine yatırım<br/>yapılmamıştır. Bakım, acil durumlara yanıt verme olarak"]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>**Why-5: Yönetim stratejisinin neden 'üretim hedefleri<br/>baskısı → reaktif bakım kültürü → sorumluluk<br/>bulanıklığı' yapısını kabul etmiştir ve bu stratejik<br/>seçimlerin kökünde hangi kurumsal/dış faktörler (pazar<br/>rekabeti, finansal baskı, liderlik yaklaşımı, endüstri<br/>normları) bulunmaktadır?** Başka bir deyişle:<br/>**Yönetimin bu tür bir risk toleransı ve öncelik<br/>sistemini benimseyen temel motivasyonları nelerdir?**"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A38 --> Q39
+    A40["Yönetim stratejisinin 'üretim hedefleri baskısı →<br/>reaktif bakım kültürü → sorumluluk bulanıklığı'<br/>yapısını kabullenmiş olmasının kökünde aşağıdaki<br/>kurumsal ve dış faktörler bulunmaktadır: **1. FINANSAL<br/>BASKI VE MALIYET YÖNETİMİ:** - Bakım bütçeleri 'kontrol<br/>altına alınması gereken maliyet merkezi' olarak<br/>kategorize edilmiştir - Reaktif bakım (arıza sonrası<br/>tamiri), planlı bakımdan daha düşük cari maliyeti<br/>göstermektedir - Yönetim, beklenen arıza oranını ve<br/>potansiyel ramak kala riskini finansal açıdan 'kabul<br/>edilebilir' olarak değerlendirmiş görünmektedir **2.<br/>PAZAR REKABETI VE ÜRETİM HEDEFLERİ:** - Üretim duruşu ="]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN (**D1.1 - Weak Leadership Commitment** (Zayıf Liderlik Taahhüdü)
++ **D1.4 - Production Pressure** (Üretim Baskısı)
++ **D6.6 - Deferred Maintenance Normalization** (Ertelenmiş Bakımın Normalleştirilmesi)
++ **D1.9 - Management Tolerance of Known Deviations** (Bilinen Sapmaların Yönetim Tarafından Tolere Edilmesi)
++ **D9.5 - Monitoring/Audit Inadequate** (İzleme/Denetim Yetersiz - Bakım Uyumu Sistem Olarak Kontrol Edilmemekte)):</b><br/>Kök Neden<br/>Yönetim stratejisinin 'üretim hedefleri baskısı →<br/>reaktif bakım kültürü → sorumluluk bulanıklığı'<br/>yapısını kabullenmiş olmasının kökünde aşağıdaki<br/>kurumsal ve dış faktörler bulunmaktadır: **1.<br/>FINANSAL BASKI VE MALIYET YÖNETİMİ:** - Bakım<br/>bütçeleri 'kontrol altına alınması gereken maliyet<br/>merkezi' olarak kategorize edilmiştir - Reaktif<br/>bakım (arıza sonrası tamiri), planlı bakımdan daha<br/>düşük cari maliyeti göstermektedir - Yönetim,<br/>beklenen arıza oranını ve potansiyel ramak kala<br/>riskini finansal açıdan 'kabul edilebilir' olarak<br/>değerlendirmiş görünmektedir **2. PAZAR REKABETI"]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Sarmal kapının üst mekanizmasındaki bağlantı braketi<br/>neden koptu / mekanizmada ilk kopma veya kritik<br/>aşınma/gevşeme oluştu?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q41
+    A42["Sarmal kapının üst mekanizmasındaki bağlantı<br/>braketinde ilk gevşeme/kritik aşınma, **periyodik bakım<br/>planının etkili uygulanmaması ve bağlantı noktalarında<br/>tork kontrolü yapılmaması** nedeniyle oluşmuştur.<br/>Raporda belirtildiği üzere, son detaylı mekanizma<br/>kontrolü 14 ay önce yapılmış, kritik bağlantı tork<br/>kontrol protokolü mevcut değildir. Anormal metalik ses<br/>ve tıkırtı, gevşemenin ilerlemesinin bir göstergesi<br/>olmuş; bu sinyallere çalışanlar tarafından yeterince<br/>karşılık verilmemiştir. Bakım önceliğinin düşük olması<br/>ve üretim akışının kesintiye uğramaması baskısı,<br/>periyodik kontrollerin yetersiz kalmasına yol açmıştır."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Periyodik bakım planı mevcut olmasına rağmen, son 14<br/>ayda detaylı mekanizma kontrolü ve tork kontrol<br/>protokolü **neden etkili şekilde uygulanmamış ve bakım<br/>yönetimi düşük öncelik haline gelmiştir**? (Bakım<br/>kaynağı yetersizliği mi, üretim baskısı mı, bakım<br/>planının tanımı mi eksik, yoksa sorumlu atama/gözetim<br/>mi yapılmamış?)"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A42 --> Q43
+    A44["Detaylı mekanizma kontrolü ve tork kontrol<br/>protokolünün 14 ay boyunca etkili şekilde<br/>uygulanmaması, **dört temel neden kombinasyonundan**<br/>kaynaklanmıştır: **1. Bakım Yönetim Sistemi Eksikliği<br/>(Birincil Neden):** - Periyodik bakım planı 'kağıtta<br/>aylık' olarak tanımlanmış ancak **gerçek uygulanması<br/>izlenmemiş** - Bakım kayıtları 'kısmen eksik' — yani<br/>yapılan/yapılmayan işlerin net kaydı yoktur - Tork<br/>kontrol protokolü tanımlanmış olsa da, **uygulanmaktan<br/>sorumlu kişi/ekip açıkça belirtilmemiştir** **2. Üretim<br/>Baskısı ve Önceliklendirme Hatası:** - 'Bakım önceliği<br/>düşük; üretim girişi aksamasın baskısı' doğrudan"]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Bakım yönetim sistemi (periyodik kontrol, tork ölçümü,<br/>kayıt ve denetim) tasarlanmadı veya tasarlanmış olsa da<br/>**sistematik olarak uygulanmadığı ve 14 ay boyunca hiç<br/>denetlenmediği** gerçeğinin temelinde, tesis yönetim<br/>yapısında **bakım sorumluluğunun (kim, ne zaman,<br/>nasıl?) açıkça tanımlanmadığı veya yasal/prosedürel<br/>olarak zorunlu kılınmadığı** sorusu vardır — bu<br/>sorumluluğun tanımlanmadığı / enforsu edilmediği temel<br/>nedenler nelerdir? (Örn: bakım müdürü olmayışı, yönetim<br/>gözetim kontrol listesinin eksikliği, muhasebe/bütçe<br/>sorunu, vs.)"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A44 --> Q45
+    A46["Olay raporundan tespit edilen bakım sorumluluğunun<br/>tanımlanmadığı / enforsu edilmediği temel nedenler:<br/>**1. Resmi Bakım Yöneticisi / Sorumlusu Pozisyonunun<br/>Tanımlanmadığı:** - Raporda 'bakım müdürü' yerine<br/>sadece genel 'bakım müdahalesi' tabiri kullanılmıştır -<br/>Kim tarafından, ne zaman, nasıl yapılacağı açıkça<br/>belirtilmemiştir **2. Yönetim Gözetim ve Denetim<br/>Mekanizmasının Eksik Olması:** - 14 ay boyunca detaylı<br/>mekanizma kontrolü yapılmamıştır - Bakım kayıtları<br/>'kısmen eksik' durumdadır; hiçbir denetim kaydı yoktur<br/>- Aylık plan 'kağıtta' kalarak fiili uygulanmamıştır<br/>**3. Üretim Devamılılık Baskısının Bakım Sorumluluğunun"]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Yönetim neden sarmal kapı bakım sorumluluğunun açık<br/>bir şekilde tanımlanması, bakım kayıtlarının tam<br/>tutulması ve tork kontrolü gibi teknik parametrelerin<br/>denetim prosedürü haline getirilmesini<br/>önceliklendirmemiş / resource tahsis etmemiştir?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A46 --> Q47
+    A48["Yönetim, sarmal kapı bakım sorumluluğunun açık<br/>tanımlaması, bakım kayıtlarının tam tutulması ve tork<br/>kontrolü gibi teknik parametrelerin denetim prosedürü<br/>haline getirilmesini önceliklendirmemiş/kaynak tahsis<br/>etmemiştir çünkü: 1. **Üretim Baskısı Üzerinde Güvenlik<br/>Uzlaştırması**: Olay raporu 'üretim girişi aksamasın<br/>baskısı' altında bakım önceliğinin düşük tutulduğunu<br/>açıkça belirtir. Kapının bakım için kapatılması üretim<br/>duruşuna neden olacağından, yönetim bu önlemi<br/>ertelemiştir. 2. **Ramak Kala (Near-Miss) Algısı**:<br/>Olay kopan parçanın çarpması olmadığından 'ramak kala'<br/>olarak sınıflandırılmıştır. Bu, yönetimin sorunu 'düşük"]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Üretim alanında yönetim ve operasyonel öncelikleri<br/>belirleyen performans değerlendirme, bütçe tahsisi veya<br/>hedef belirleme sistemi, neden güvenlik yatırımlarından<br/>ziyade üretim/verimlilik hedeflerini ön plana<br/>koymaktadır? (Yönetim yapısı, teşvikler, şirket<br/>stratejisi, sektörel normu.)"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A48 --> Q49
+    A50["Üretim tesisinde bakım yatırımlarından ziyade<br/>üretim/verimlilik hedeflerinin ön plana alınması,<br/>**aşağıdaki yapısal faktörlerden kaynaklanmaktadır**:<br/>**1. YÖNETİM STRATEJİSİ VE ÖNCELİKLENDİRME:** Sarmal<br/>kapı mekanizması bakım planı yazılı olarak aylık<br/>belirtilmesine rağmen, son detaylı kontrol **14 ay<br/>öncesinde** yapılmış olması, bakım kaynaklarının<br/>(personel, zaman, bütçe) üretim sürekliliğine<br/>yönlendirildiğini gösterir. Yönetim, kısa vadeli<br/>kapasiteyi maksimize etmeyi, uzun vadeli varlık<br/>bütünlüğünden önce tutmaktadır. **2. OPERASYONEL<br/>BASKILAR:** Tanık beyanı ('ses bir süredir vardı ama"]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN (**D6.6** — Deferred Maintenance Normalization
+**D1.4** — Production Pressure
+**D1.1** — Weak Leadership Commitment):</b><br/>Kök Neden<br/>Üretim tesisinde bakım yatırımlarından ziyade<br/>üretim/verimlilik hedeflerinin ön plana alınması,<br/>**aşağıdaki yapısal faktörlerden<br/>kaynaklanmaktadır**: **1. YÖNETİM STRATEJİSİ VE<br/>ÖNCELİKLENDİRME:** Sarmal kapı mekanizması bakım<br/>planı yazılı olarak aylık belirtilmesine rağmen,<br/>son detaylı kontrol **14 ay öncesinde** yapılmış<br/>olması, bakım kaynaklarının (personel, zaman,<br/>bütçe) üretim sürekliliğine yönlendirildiğini<br/>gösterir. Yönetim, kısa vadeli kapasiteyi<br/>maksimize etmeyi, uzun vadeli varlık bütünlüğünden<br/>önce tutmaktadır. **2. OPERASYONEL BASKILAR:**"]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A50 --> ROOT5
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default', 
+            flowchart: { 
+                curve: 'basis', 
+                padding: 15, 
+                nodeSpacing: 50, 
+                rankSpacing: 80, 
+                useMaxWidth: true,
+                htmlLabels: true,
+                diagramPadding: 10
+            }, 
+            themeVariables: { 
+                fontSize: '11px', 
+                fontFamily: 'Segoe UI',
+                primaryColor: '#fff',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            } 
+        });
+    </script>
+</body>
+</html>

@@ -235,7 +235,7 @@ BEKLENEN ÇIKTI (JSON ŞEMASI — içerik değil, sadece format):
 """
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-sonnet-4.5",
+            model="anthropic/claude-3.5-haiku",
             temperature=0.4,   # 0.2 → 0.4 (daha esnek kod seçimi)
             messages=[
                 {
@@ -382,7 +382,7 @@ DÖNDÜR (JSON ŞEMASI — içerik değil, sadece format):
 KRİTİK: Tüm içerik %100 TÜRKÇE. Geçerli JSON döndür. Markdown etiketi kullanma."""
 
         response = self.client.chat.completions.create(
-            model="anthropic/claude-opus-4.6",
+            model="anthropic/claude-3.5-haiku",
             temperature=0.6,   # 0.3 → 0.6 (çeşitlilik için artırıldı)
             messages=[
                 {

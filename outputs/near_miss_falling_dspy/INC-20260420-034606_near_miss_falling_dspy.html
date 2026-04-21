@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260420-034606";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260420-034606</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">20.04.26</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Üretim Tesisi - Ana Giriş, Sarmal Kapı Alanı (SK-01)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Ramak Kala</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Sarmal kapının üst mekanizmasından kopan metal bir braket, bir depo operatörünün yakınına düşerek ramak kala olayına neden olmuştur. Olayda fiziksel yaralanma yaşanmamış, ancak kapı 45 dakika süreyle durmuştur.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">18 Mart 2026 tarihinde, sabah vardiyasında, Üretim Tesisi Ana Girişi'ndeki sarmal kapının üst mekanizmasından metal bir bağlantı braketi koparak yere düşmüştür. Yaklaşık 1.5 metre mesafede duran depo operatörü Mehmet Öz'ün yanına düşen parça, herhangi bir fiziksel yaralanmaya yol açmamış ancak operatörde psikolojik şok etkisi yaratmıştır. Olay öncesinde kapıdan anormal metalik sesler duyulduğu belirtilmiştir.</div>
+<div class="paragraph" contenteditable="true">Üretim Tesisi - Ana Giriş, Sarmal Kapı Alanı (SK-01)</div>
+<div class="paragraph" contenteditable="true">Depo operatörü Mehmet Öz (psikolojik şok), vardiya güvenlik görevlisi Selin Korkmaz (rapor eden), isimsiz çalışanlar (tanıklar).</div>
+<div class="paragraph" contenteditable="true">Olayın hemen ardından alan tahliye edilmiş, şeritlerle çevrilmiş ve kapı güvenli bir şekilde kapatılmıştır. Bakım ekibi müdahale ederek kopan parçayı mühürlemiş ve olay kaydı ile ramak kala bildirimi tamamlanmıştır. Kapının güvenlik kontrolü nedeniyle yaklaşık 45 dakika üretim duruşu yaşanmıştır.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Sarmal kapının periyodik bakım planı kağıt üzerinde aylık olmasına rağmen, son detaylı mekanizma kontrolü 14 ay önce yapılmıştır.</li>
+<li contenteditable="true">Kritik bağlantı noktalarında tork kontrolü gibi önemli bakım faaliyetleri sistematik olarak gerçekleştirilmemiştir.</li>
+<li contenteditable="true">Çalışanlar tarafından duyulan anormal sesler ve titreşimler, "durdur-bildir" prosedürünün zayıf uygulanması nedeniyle ciddiye alınmamış ve raporlanmamıştır.</li>
+<li contenteditable="true">Yönetim seviyesinde üretim sürekliliği baskısı, güvenlik ve bakım önceliklerinin önüne geçmiştir.</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Olay alanı tahliye edildi ve şeritlendi.</td>
+                        <td contenteditable="true">Vardiya Güvenlik Görevlisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Sarmal kapı güvenli bir şekilde kapatıldı.</td>
+                        <td contenteditable="true">Bakım Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Kopan parça mühürlendi ve incelenmek üzere alındı.</td>
+                        <td contenteditable="true">Bakım Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Ramak kala olayı rapor edildi ve kaydı tutuldu.</td>
+                        <td contenteditable="true">H&S Görevlisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260420-034606</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">18 Mart 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">08:42</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Üretim Tesisi - Ana Giriş, Sarmal Kapı Alanı (SK-01)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Ana Giriş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Mehmet Öz (Depo Operatörü)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Sabah Vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Sarmal Kapı (SK-01)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Metal bağlantı braketi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Belirtilmemiş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Belirtilmemiş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Belirtilmemiş</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Ramak Kala</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Fiziksel yaralanma yok; psikolojik şok</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 (Mehmet Öz)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Düşük (Maddi hasar yok, üretim duruşu 45 dk)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Selin Korkmaz (Vardiya Güvenlik Görevlisi)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Hayır</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Uygulanabilir değil</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:35</div>
+                    <div class="timeline-event" contenteditable="true">Sarmal kapı normal çalışıyor, yoğun personel girişi.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:40</div>
+                    <div class="timeline-event" contenteditable="true">Birkaç kişi kapıdan gelen "tıkırtı" sesinden bahsetti.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:42</div>
+                    <div class="timeline-event" contenteditable="true">Metal bağlantı braketi koparak yere düştü; bölge tahliye edildi.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:45</div>
+                    <div class="timeline-event" contenteditable="true">Alan şeritlendi, kapı güvenli şekilde kapatıldı.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:00</div>
+                    <div class="timeline-event" contenteditable="true">Bakım müdahalesi yapıldı, kopan parça mühürlendi.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">09:30</div>
+                    <div class="timeline-event" contenteditable="true">Olay kaydı ve ramak kala bildirimi tamamlandı.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Neden tekniği, bir olayın ardındaki neden-sonuç ilişkilerini derinlemesine incelemek için kullanılan basit ama etkili bir araçtır. Bu olayda, sarmal kapıdan parça düşmesi olayı birincil neden olarak ele alınmış ve bu olayın neden gerçekleştiği sorgulanmıştır. Her bir 'neden' cevabı, bir sonraki 'neden' sorusunun temelini oluşturmuştur. Örneğin, 'braket neden koptu?' sorusuna verilen cevap, 'bakım eksikliği' ise, bir sonraki soru 'bakım neden eksikti?' şeklinde devam etmiştir. Bu iteratif süreç, organizasyonel, yönetimsel ve kültürel düzeydeki kök nedenlere ulaşana kadar sürdürülmüştür. Analiz, birden fazla neden zinciri (dal) oluşturarak, olaya etki eden farklı faktörleri kapsamlı bir şekilde değerlendirmiştir.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü</td>
+                        <td contenteditable="true">Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk gibi bireysel faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Prosedür eksikliği, iletişim bozukluğu, yönetim kararları, politika yetersizlikleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Ekipman arızası, tasarım hatası, fiziksel yük, ergonomi sorunları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Çevresel Faktör</td>
+                        <td contenteditable="true">Hava koşulları, aydınlatma, gürültü, sıcaklık, alan düzeni</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">H&S Görevlisi</td>
+                        <td contenteditable="true">Baş Araştırmacı</td>
+                        <td contenteditable="true">20.04.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">Teknik Uzman</td>
+                        <td contenteditable="true">20.04.26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Depo Amiri</td>
+                        <td contenteditable="true">Departman Temsilcisi</td>
+                        <td contenteditable="true">20.04.26</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - BAKIM YÖNETİM SİSTEMİ EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Sarmal kapının üst mekanizmasından metal bir bağlantı braketi koparak yere düşmüştür. Bu durum, mekanik aşınma, gevşeme ve yorulma sonucu meydana gelmiştir. Olay öncesinde kapıdan anormal tıkırtı sesleri duyulmasına rağmen, herhangi bir müdahalede bulunulmamıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Metal bağlantı braketinin zamanla mekanik aşınma, gevşeme ve yorulma sonucu kopması.</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden sarmal kapı mekanizmasının üst bağlantı braketi metal yorulma ve gevşeme sonucu kopup yere düştü?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı mekanizmasının üst bağlantı braketi, periyodik bakım programının eksik uygulanması ve bağlantı elemanlarının tork kontrolünün yapılmaması sonucu metal yorulma ve gevşemeye maruz kalmıştır. Rapordan anlaşıldığı üzere son detaylı mekanizma kontrolü 14 ay öncesinde yapılmış olup, bu dönemde kapı yoğun kullanıma maruz kalıp döngüsel yükleme yaşamıştır. Bağlantı noktalarının tork kontrolü yapılmadığı için vidalar ve braketler zamanla gevşemiş, yapısal integriteyi kaybetmiş ve nihayet metal parça koparak yere düşmüştür. Ek olarak, çalışanlar tarafından duyulan anormal tıkırtı sesleri (08:40 civarında) uyarı işareti olması rağmen, "durdur-bildir" prosedürünün zayıf uygulanması nedeniyle olay preventif müdahale olmaksızın hasara kadar ilerlemesine izin verilmiştir.</div>
+                    <span class="why-code">B2.3 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı mekanizmasının periyodik bakım programı neden 14 aylık bir dönem boyunca detaylı mekanizma kontrolü yapılmaksızın bırakılmıştır? Bakım planlama sisteminde, kaynak tahsisinde veya üretim baskısı altında bakım görevinin ertelenmesine neden olan organizasyonel/prosedürel faktör nedir?</div>
+                    <div class="why-answer" contenteditable="true">→ 14 aylık detaylı mekanizma kontrolü boşluğunun ana nedenleri, organizasyonel ve prosedürel eksikliklerde yatmaktadır: Birincil Faktör - Bakım Planlaması Sistemi Arızası: Kağıtta "aylık bakım" yazıldığı halde, son detaylı kontrolün 14 ay önceki kayıt ile gösterilmesi, planlama vs. gerçekleştirme arasında ciddi uyumun olmadığını göstermektedir. Sarmal kapı gibi kritik cihazlarda, bakım takvimi takip edilmemiş veya atlanmıştır. İkincil Faktör - Operasyonel Önceliğin Düşüklüğü: Raporta açıkça belirtildiği gibi "bakım önceliği düşük; üretim girişi aksamasın baskısı" mevcuttur. Üretim bölgesindeki ana giriş kapısı, personel akışını sağladığı için, bakım nedeniyle kapanması operasyonel olarak tolere edilmemiştir. Üçüncül Faktör - Kaynak Tahsisi Yetersizliği: Bakım ekibinin başka görevlerle meşgul olması veya bakım personelinin bakım iş yükü nedeniyle planlı bakım takvimi ertelenmesi yaşanmış olabilir. Dördüncü Faktör - Prosedür ve Gözetim Zayıflığı: Bakım kayıtlarının kısmen eksik olması ve tork kontrolünün sistematik olarak yapılmamış olması, bakım prosedürünün enforsel ve denetlenebilir bir sistem olmadığını göstermektedir.</div>
+                    <span class="why-code">E1.1 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Bakım planlaması sisteminde "aylık bakım" prosedürü tanımlı olmasına rağmen, Sarmal Kapı SK-01'in detaylı mekanizma kontrolünün 14 ay boyunca gerçekleştirilememesinin veya kayıtlanmamasının temel nedeni nedir? — Başka bir deyişle: Bakım takviminin uygulanmasını izleyen sorumlu kişi/ekip var mıydı; eksik bakımlar ne zaman ve nasıl fark edilebilirdi; sistem entegrasyonunda (planlama + gerçekleştirme + kayıt) hangi nokta kopmuştur?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal Kapı SK-01'in 14 ay boyunca detaylı mekanizma kontrolünün gerçekleştirilmemesinin/kayıtlanmamasının temel nedeni, bakım yönetim sistemi üç kritik noktada kopmasıdır: 1. Sorumluluk Boşluğu (Planlama-Uygulama Kopuşu): Aylık bakım prosedürü "kağıtta" tanımlı olmasına rağmen, bunun kim tarafından, ne zaman ve nasıl uygulanacağı net atanmamıştır. Son kayıtlı detaylı mekanizma kontrolü 14 ay öncedir; bu dönem sonrasında denetlenmeyen bir işlem var. "Bakım müdürü," "vardiya koordinatörü" gibi açık sorumluluk tanımı yoktur. 2. İzleme ve Erken Uyarı Sistemi Eksikliği (Uygulama-Kayıt Kopuşu): Anormal sesler ("tıkırtı," "ses bir süredir vardı") çalışanlar tarafından bildirilmesine rağmen, bunlar sistematik olarak kaydedilmemiş veya önemsenmiştir. Kritik kontroller (tork kontrolü) yapılmıyor; eksik bakımlar 14 ay boyunca belirlenmiyor. Bakım kayıtları "kısmen eksik" — bu, denetim ve uygunluk doğrulamasının olmadığını gösterir. 3. Operasyonel Baskı > Güvenlik Önceliği (Kültür Kopuşu): Raporda: "Bakım önceliği düşük; üretim girişi aksamasın baskısı". Çalışan beyanı: "Ses bir süredir vardı ama aceleyle içeri girdik" — güvenlik uyarılarının göz ardı edilmesiyle sonuçlanan kültür. Özet: Sistem kopusu, sorumluluğun net atanmaması, denetim mekanizmasının olmaması ve üretim basıncının güvenlik protokollerini geçmesinde yatmaktadır. Bakım planı var, ancak uygulanmasını garantileyen gözlemci, kayıt doğrulayıcı veya escallation prosedürü yoktur.</div>
+                    <span class="why-code">E1.3 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Bakım müdürü görevini, denetim mekanizmasını ve tork kontrol prosedürünü tanımlayan sorumluluk matrisinin neden oluşturulmadığı / kurulmadığı, ve üretim kesintisini önleme önceliğinin neden güvenlik protokollerinin uygulanmasından daha ağır baslandığı yönetim seviyesinde?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim seviyesinde sorumluluk matrisi oluşturulmadığı için bakım görevleri muğlak kalmıştır. Bakım müdürünün spesifik sorumlulukları (aylık kontrol sıklığı, tork ölçüm standartları, kontrol noktaları), denetim mekanizması (bakım ekibi denetimi, kayıt doğrulaması) ve eskalasyon prosedürü tanımlanmamıştır. Sonuç olarak, son detaylı kontrol 14 ay geride kalmıştır. Üretim kesintisini önleme baskısı, güvenlik protokollerinden daha ağır bastığı için çalışanlar anormal sesi duysalar da kapının durdurulmasını talep etmemiştir. Yönetim tarafından "üretim devam etsin" sinyali, "anormal ses duyunca uyarı ver" prosedürünü etkisiz kılmıştır. Güvenlik-üretim çatışmasını çözmek için yönetim seviyesinde yazılı karar ve öncelik sıralaması olmalıydı.</div>
+                    <span class="why-code">D9.1 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden tesis yönetimi ve İnsan Kaynakları, kritik ekipman (sarmal kapı gibi) için bakım sorumluluk matrisini ve güvenlik-üretim öncelik sıralamasını yazılı prosedür olarak resmi olarak oluşturmamıştır? Bu belgeler oluşturulamamasının arkasında hangi faktör yatmaktadır — kaynak yetersizliği, yazılı sistem kurma bilgisinin yokluğu, güvenlik kültürünün zayıflığı, mı yoksa yönetim seviyesinde bu tür dokümantasyona verilecek önem konusunda bir uzlaşma olmaması mıdır?</div>
+                    <div class="why-answer" contenteditable="true">→ Kritik ekipman (sarmal kapı gibi) için bakım sorumluluğu matrisinin ve güvenlik-üretim öncelik sıralamasının yazılı prosedür olarak resmi olarak oluşturulamamasının arkasında çok faktörlü bir nedenler bileşimi yatmaktadır: Birincil Faktör - Yönetim Seviyesinde Güvenlik Önceliklendirmesinin Eksikliği (D1.1): Olay raporundaki "kağıtta aylık" ifadesi ve 14 aylık denetim boşluğu, yönetim seviyesinde bu tür dokümantasyona verilecek önem konusunda bir uzlaşma olmamasını göstermektedir. Üretim kesintisi baskısı (45 dk duruş yönetim için önemli) ve bakım ertelenmesi (aylık plan > 14 ay gerçeklik), güvenlik prosedürlerinin kurumsal düzeyde alt priorite olduğunu göstermektedir. İkincil Faktörler: 1. Yazılı sistem kurma bilgisinin kısmi yokluğu (D6.1, D9.1): Bakım stratejisi ve prosedür tasarımı için kurumsal standart bulunmamaktadır. 2. Güvenlik kültürü zayıflığı (D1.5, D1.11): "Ses bir süredir vardı ama aceleyle içeri girdik" şeklindeki çalışan beyanı, işçilerin anormal göstergeleri ciddiye almadığını, yönetimle psikolojik güvenliğin zayıf olduğunu göstermektedir. 3. Sistemik denetim mekanizmasının eksikliği (D9.5): Bakım uyumluluğunun denetlenmesi için yazılı audit/kontrol sistemi tasarlanmamıştır. Sonuç: Sorumluluğu matrisi ve öncelik sıralaması eksikliğinin temel nedeni, yönetim seviyesinde bu tür dokümantasyona verilecek önemin kurumsal olarak belirlenmemesi ve güvenlik kültürünün zayıflığıdır. Kaynak kısıtlılığı değil, stratejik karar eksikliğidir.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Yönetim Seviyesinde Güvenlik Önceliklendirmesi ve Bakım Stratejisi Eksikliği)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Yönetim Seviyesinde Güvenlik Önceliklendirmesi ve Bakım Stratejisi Eksikliği</div>
+                <div class="box-content" contenteditable="true">Kritik ekipmanlar için bakım sorumluluğu matrisinin ve güvenlik-üretim öncelik sıralamasının yazılı prosedür olarak resmi olarak oluşturulamaması, yönetim seviyesinde güvenlik önceliklendirmesinin yetersiz olduğunu göstermektedir. Aylık bakım planının kağıt üzerinde kalması ve 14 aylık denetim boşluğu, yazılı sistem kurma bilgisinin eksikliği, güvenlik kültürünün zayıflığı ve sistemik denetim mekanizmalarının bulunmaması gibi faktörlerle birleşerek bu duruma yol açmıştır. Bu durum, kaynak kısıtlılığından ziyade stratejik karar eksikliğinden kaynaklanmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yönetim seviyesinde güvenlik önceliklendirmesinin eksikliği ve üretim baskısının güvenlik prosedürlerinin önüne geçmesi.</li>
+<li contenteditable="true">Kritik ekipmanlar için sistematik bakım stratejisinin ve sorumluluk matrisinin oluşturulmaması.</li>
+<li contenteditable="true">Bakım uyumluluğunu denetlemek için sistemik izleme ve denetim mekanizmalarının yetersizliği.</li>
+<li contenteditable="true">Bakım kayıtlarının kısmen eksik olması ve bilinen sapmaların yönetim tarafından tolere edilmesi.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - ÇALIŞANLARIN ANORMAL SESLERİ GÖRMEZDEN GELMESİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Çalışanlar, sarmal kapıdan gelen anormal tıkırtı seslerini fark etmelerine rağmen, bunu ciddiye almayıp hızlıca içeri girmeyi tercih etmişlerdir. Bu durum, "durdur-bildir" prosedürünün zayıf uygulanmasından kaynaklanmaktadır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Çalışanların anormal tıkırtı sesini tanıması ancak bunu ciddiye almayıp hızlı içeri girmeyi tercih etmesi.</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden sarmal kapının üst mekanizmasındaki bağlantı braketi kopup zemine düştü?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapının üst mekanizmasındaki bağlantı braketi, bakım programının etkisiz uygulanması ve mekanik bağlantıların periyodik tork kontrol ve gevşemelik kontrolünün yapılmamış olması nedeniyle aşınıp gevşemiş, sonuç olarak yoğun kullanım sırasında kopmuştur. Olay öncesi işçiler tarafından duyulan anormal metalik sesler, mekanik arızanın ileri aşamada olduğunun uyarı işaretiydi ancak bu sinyal "durdur-bildir" prosedürü eksikliği nedeniyle değerlendirilmemiştir.</div>
+                    <span class="why-code">A1.2 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Bakım programı kağıtta aylık olarak tanımlanmasına rağmen, son 14 ayda sarmal kapı mekanizmasında kritik bağlantıların (tork, gevşemelik) detaylı kontrolü neden yapılmamış ve bakım kayıtları neden eksik kalmıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Bakım programının kağıtta tanımlanmasına rağmen uygulanmamasının kök nedenleri şunlardır: 1. Bakım Yönetim Sistemi Eksikliği: Son 14 ayda kritik bağlantılar için hiç detaylı tork/gevşemelik kontrolü yapılmamıştır. Bu, bakım planının rutin kontrol listesi haline getirildiğini (kağıt üzerinde işaretleme) ama gerçek uygulanmadığını gösterir. 2. Üretim Baskısı ile Bakım Çatışması: Vardiya notunda "aceleyle içeri girdik" ifadesi ve anormal seslerin ciddiye alınmaması, bakım/güvenlik aktivitelerinin üretim hızının gerisinde bırakıldığını gösterir. 3. Kontrol ve Denetim Mekanizması Eksikliği: Bakım kayıtlarının kısmen eksik kalması ve bakım uyumunun denetlenmemesi, sistematik bir izleme ve uyum kontrolünün olmadığını gösterir. 4. Eğitim ve Farkındalık Eksikliği: Çalışanların anormal ses/titreşim gördüğünde "durdur-bildir" protokolünü uygulamadıkları belirtilmiştir. Bu, prosedürlerin eğitim veya pekiştirilmede yetersiz olduğunu gösterir. 5. Mekanizmanın Taşınırız Olarak Görülmesi: Sarmal kapı sistem sağlığının göz ardı edilmesi, risk değerlendirmesinin eksikliğini yansıtır.</div>
+                    <span class="why-code">B2.1 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Bakım programı ve denetim mekanizması bu denli zayıflamış olmasunun, işletme yönetiminin üretim hedefleri ile bakım/güvenlik kaynakları arasında nasıl bir tercih (optimal kaynak tahsisi veya bütçe kısıtlaması) yaptığını göstermektedir. Bu tercihin veya kısıtlamanın arka sebebi nedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Bakım programının ve denetim mekanizmasının zayıflaması, işletme yönetiminin üretim sürekliliği ve operasyonel verimlilik hedeflerini, bakım/güvenlik kaynaklarına göre daha yüksek önceliğe yerleştirdiğini göstermektedir. Bunun arka sebepleri şunlardır: Birincil Sebepler: 1. Bütçe Kısıtlaması / Maliyet Optimizasyonu: Bakım personeli, araçları veya dış bakım hizmetleri için ayrılan bütçe sınırlı olabilir; yönetim, kayan bakım (reactive maintenance) modelini tercih etmiş olabilir. 2. Üretim Baskısı ve Kapasite Hedefleri: Kapıyı kapatıp bakım yapmak = üretim duruşu = hedefler kaçırıldı. Tanık ifadesi ("aceleyle içeri girdik") yönetimsel baskıyı yansıtmaktadır. 3. Risk Algısı Zayıflığı: "Şu ana kadar sorun olmadı, kapı çalışıyor" düşüncesi ile preventif bakıma yatırım yapılmamıştır; ramak kala olayları ciddiye alınmamıştır. 4. İnsan Kaynakları Yetersizliği: Bakım ekibinin iş yükü çok fazla olabilir; 14 aylık bakım boşluğu örgütsel kapasitesizliğin göstergesidir. 5. Güvenlik Kültürü ve Yönetim Taahhüdü Eksikliği: Üretim hedefleri kadar güvenlik hedefleri belirlenememiş ve izlenmemiştir.</div>
+                    <span class="why-code">D2.1 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Yönetim, üretim hedefleri ve operasyonel verimliliği, preventif bakım ve güvenlik yatırımlarından neden daha yüksek önceliğe yerleştirmiştir? Bu tercihte rol oynayan kurumsal baskılar, performans metrikleri, finansal sınırlamalar veya pazar koşulları nelerdir?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim, preventif bakım ve güvenlik yatırımlarını üretim hedefleri ve operasyonel verimliliğin altına almıştır. Bu karar, aşağıdaki kurumsal baskılarla açıklanmaktadır: 1. Performans Metrikleri Prioritesi: Üretim hedefleri ve kapı arıza (downtime) süresi gibi operasyonel KPI'lar ön plandadır. Güvenlik/bakım metrikleri (preventif bakım tamamlanma oranı, mekanizma kontrol sıklığı) sistem tarafından veri toplanmamakta veya raporlanmamaktadır. 2. Finansal Sınırlamalar: Detaylı mekanizma kontrolü 14 aydır yapılmamıştır (bütçe kısıtlaması olduğu düşünülmektedir). Tork kontrolü gibi kritik kalite kontrol prosedürleri uygulanmamıştır. Bakım müdürü/ekibine yeterli kaynak ayrılmamış olabilir. 3. Operasyonel Verimliliği Güvenlik Lehine Harcamama: "Durdur-bildir" prosedürü zayıf uygulanmaktadır çünkü anormal sesi raporlamak = kapı durması = üretim kaybı. Tanık beyanı: "ses bir süredir vardı ama aceleyle içeri girdik" — hız baskısı güvenlik protokolünü geçersiz kılmıştır. 4. Pazar Koşulları / Rekabet Baskısı: Tesisin ana girişi yoğun personel trafiği göstermektedir (rekabet ortamında verimlilik baskısı yüksektir). 45 dakikalık üretim duruşu bile muhasebe edilerek maliyet hesaplandığından, yönetim preventif duruşları kabul etmemektedir. 5. Kurumsal Kültür: Eğitim eksikliği ("çalışanların anormal sesi ciddiye alma eğitimi yetersiz"), yönetim tarafından güvenlik bilinçlendirilmesine düşük bütçe ayrıldığını gösterir. Bakım kaydı kısmen eksiktir — bu, bakım görevlerinin operasyonel baskı altında ertelendiğini gösterir.</div>
+                    <span class="why-code">D1.4 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Yönetim kararlarında üretim hedeflerini güvenlik/bakımın üzerine alan değerlendirme sistemi ve bütçe tahsisi mekanizması niçin kurulmuş veya sürdürülmüştür? (Örneğin: Performans değerlendirmesinde güvenlik KPI'larının ağırlığı nedir? Bakım bütçesi tahsisi hangi kriterlere göre yapılmaktadır? Endüstri standartları ve dış denetim mekanizmaları bu kararları yeterince kontrol etmemektedir?)</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim, üretim hedeflerini güvenlik/bakım kayıklarının üzerine alan değerlendirme sistemi ve bütçe tahsisi mekanizmasını aşağıdaki nedenlerle kurmuş ve sürdürmüştür: 1. Performans Ölçüm Sistemi Güvenlik'i Marjinal Konuma Yerleştiriyor: Sarmal kapı bakımı 14 aydır "detaylı mekanizma kontrolü" geçirmemiş; bu muhasebe sisteminde kritik olmayan bir görevi işaretliyor. Güvenlik KPI'ları (ramak kala raporları, mekanik bakım %'si) muhtemelen Üretim KPI'larının (kapı uptime, throughput) ağırlık oranlarının çok altında. Anormal ses/titreşim prosedürü "zayıf uygulanıyor" → çalışanlar ve operatörler bu sinyalleri rapor etmek konusunda teşvik edilmiyor. 2. Bütçe Tahsisi Mekanizması Preventif Bakım'ı Erteliyor: Bakım bütçesi retrospektif ("kapalı kalırsa tamir et") temeline göre çalışıyor, prospektif değil. Kapı 45 dakika "üretim duruşu" nedeniyle kapalı; ancak bunu tetikleyen 14 aylık bakım gecikmesi bütçe tahsisinde ciddiye alınmadı. Tork kontrolü yapılmıyor → maliyet kısıtından dolayı prosedür bile eksik. 3. Endüstri Standartları ve Dış Denetim Mekanizmaları Yetersiz: HSG245 / ISO 45001 gibi standartlar bu tesiste mevcutsa, D6.6 (Deferred Maintenance Normalization) ve D1.4 (Production Pressure) uygulanması kontrol mekanizmasında başarısız olmuş. Dış denetimler muhtemelen "son detaylı kontrol tarihi"ni gözden kaçırmış veya önemsiz kategori olarak işaretlemiş. İç denetim/audit sistemi (D9.5) çalışmıyor → bakım backlogs'ı aktif olarak izlenmiyor.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Üretim Odaklı Yönetim ve Güvenlik Kültürü Eksikliği)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Üretim Odaklı Yönetim ve Güvenlik Kültürü Eksikliği</div>
+                <div class="box-content" contenteditable="true">Yönetim, üretim hedeflerini güvenlik ve bakımın önüne koyan bir değerlendirme sistemi ve bütçe tahsisi mekanizması kurmuştur. Bu durum, güvenlik KPI'larının düşük ağırlıkta olması, preventif bakım bütçelerinin kısıtlı olması ve endüstri standartlarının yetersiz denetlenmesi gibi faktörlerle açıklanmaktadır. Çalışanların anormal sesleri rapor etme motivasyonunun düşük olması, üretim baskısının güvenlik protokollerini geçersiz kıldığını göstermektedir.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Performans ölçüm sisteminin güvenliği marjinal konuma yerleştirmesi.</li>
+<li contenteditable="true">Preventif bakım bütçesinin yetersiz olması ve bakımın reaktif bir yaklaşımla ele alınması.</li>
+<li contenteditable="true">Endüstri standartlarının ve dış denetim mekanizmalarının yetersizliği.</li>
+<li contenteditable="true">İç denetim ve takip sistemlerinin etkin çalışmaması.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - DENETİM VE İZLEME YETERSİZLİĞİ</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Periyodik bakım planı kağıtta 'aylık' olarak belirtilmesine rağmen, sarmal kapının son detaylı mekanizma kontrolü 14 ay öncesine tarihlendirilmiştir. Ayrıca, kritik bağlantı tork kontrolü gibi önemli bakım faaliyetleri yapılmamıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Periyodik bakım planı kağıtta 'aylık' olarak belirtilmesine rağmen, son detaylı mekanizma kontrolü 14 ay öncesine tarihlendi; kritik bağlantı tork kontrolü yapılmamış.</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı mekanizmasındaki metal bağlantı braketi neden koptu / gevşeyerek yere düştü?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı mekanizmasındaki metal bağlantı braketi, bakım eksikliğine ve zamanında tespit edilmeyen mekanik gevşemeye bağlı olarak kopmuştur. Spesifik nedenler: Son 14 aydır detaylı mekanik kontrol yapılmamıştır — bu dönemde bağlantı cıvatalarının ve braketinin zamanla gevşemesi tespit edilememiştir. Tork/sıkılık kontrolü periyodik bakım prosedürüne dahil edilmemiştir — cıvataların gevşemesi öznel gözlem veya periyodik kalibrasyonlu kontrol olmadığında ilerlemektedir. Anormal sinyaller (tıkırtı sesi) yeterli şekilde incelenmemiştir — 08:40'ta çeşitli çalışanlar tıkırtı sesinden bahsetmişler ancak kapı, prosedür gereği bir acil kontrol geçirmemiştir. Malzeme yorulması nedeniyle bağlantı başarısız olmuştur — gevşemiş bağlantılar, devam eden yükleme ve titreşime maruz kalarak kırılmıştır.</div>
+                    <span class="why-code">E2.1 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapı mekanizmasının son 14 aydır detaylı mekanik kontrolünden geçmemesinin ve tork/sıkılık kontrolünün periyodik bakım prosedürüne dahil edilmemesinin temel sebebi nedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı mekanizmasının son 14 aydır detaylı mekanik kontrolünden geçmemesinin ve tork/sıkılık kontrolünün periyodik bakım prosedürüne dahil edilmemesinin temel sebepleri: 1. Prosedür Yazımı Eksikliği: Periyodik bakım prosedürüne "kritik bağlantı tork kontrolü" başlık olarak dahil edilmemiştir. Kontrol noktaları ve tork değerleri tanımlanmamıştır. Mekanik bağlantıların belirtilen aralıklarla kontrol edilmesi zorunlu kılınmamıştır. 2. Kaynaklar ve İş Yükü Yönetimi: Bakım personelinin iş yükü, bu detaylı kontrolleri düzenli olarak yapmaya müsait değildir. Yapılan aylık planlı bakımlar muhtemelen rutin ve temel kontrolleri kapsamaktadır. Tork kontrolü için gerekli kalibrasyon araçları (torque wrench vb.) veya bulunmamakta veya bakım ekibinin eğitimi yapılmamıştır. 3. Kurumsal Önceliklendirme Politikası: Üretim akışını kesme baskısı, bakım etkinliklerinin ertelenmesine neden olmaktadır. "Arıza çıktığında tamiri yap" (reaktif bakım) mantığı, "iyi durumda kalmasını sağla" (preventif bakım) üstün gelmektedir. Ramak kala olayları yönetim tarafından yeterli şekilde kriz sinyali olarak algılanmamaktadır. 4. Yönetim Sistemi Zayıflığı: Bakım kayıtları kısmen eksiktir; 14 aydır yapılan detaylı kontrolün eksikliği yönetim kontrol sisteminde yakalanmamıştır. Çalışanların anormal sesi (tıkırtı) ciddiye alma eğitimi yetersiz olup; "durdur-bildir" prosedürü zayıf uygulanmaktadır.</div>
+                    <span class="why-code">E2.1 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Üretim tesisindeki "üretim akışını kesme baskısı"nın bakım etkinliklerinin ertelenmesine neden olması, hangi yönetim hedefleri / performans metriklerinin / teşkilat kültürünün sonucudur ve bu hedeflerin oluşturulmasında risk yönetimi / koruma bakış açısı neden öncelikli değildir?</div>
+                    <div class="why-answer" contenteditable="true">→ "Üretim akışını kesme baskısı"nın bakım etkinliklerinin ertelenmesine neden olan yönetim hedefleri ve kültür unsurları şunlardır: Performans Metrikleri: Üretim sürekliliği ve kapasitesi (% uptime). Üretim duruşu süresi minimize etme. Kısa vadeli verimlilik göstergeleri. Yönetsel Kültür: Güvenlik ve bakım "prodüktif olmayan" maliyet merkezi olarak görülmesi. Üretim müdürü baskısı nedeniyle bakım zamanlaması ile üretime uyum baskısı. Reaktif yönetim (olay sonrası müdahale) yerine proaktif yönetim (önleyici bakım) tercih edilmemesi. Risk Yönetimi Neden Öncelikli Değil: Ramak kala olaylar (near-miss) ciddi olarak algılanmamakta. Güvenlik inverstasyonunun ROI'si direkt ve görünür olmadığı için göz ardı edilmesi. "Sorun olmadıkça bakım yapma" felsefesi (kültürel risk toleransı yüksek). Bakım ve güvenlik fonksiyonlarının üretim hedeflerine karşı yeterli ağırlığı olmaması. Çok seviyeli yönetimde güvenlik-üretim trade-off analizi yapılmaması.</div>
+                    <span class="why-code">A1.2 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Yönetim kültürünün güvenliği ve proaktif bakımı "üretim için gerekli olmayan maliyet" olarak kategorize etmesine neden olan örgütsel sistem faktörleri nelerdir? (Ör: Performans değerlendirme kriterleri, bütçe tahsisi yapısı, üretim müdürünün teşvik mekanizması, kalite-güvenlik-verimlilik arasında tanımlanan öncelik sırası?)</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim kültürünün güvenlik ve bakımı "üretim için gerekli olmayan maliyet" olarak kategorize etmesinin temel örgütsel sistem faktörleri: 1. Performans Değerlendirme Kriterleri: Üretim müdürünün başarı metriği "üretim saatleri" ve "kapasite kullanımı"dır. Bakım duruşları negatif performans göstergesi olarak kaydedilir. Ramak kala bildirimi cezalandırıcı değildir. 2. Bütçe Tahsisi Yapısı: Bakım bütçesi, "acil onarım" bütçesine göre ikincil kabul edilir. Planlı bakım için 14 aylık aralık, "maliyet tasarrufu" yaklaşımını gösterir; bütçe güvenliğe tahsis edilmemiş, sadece arıza sonrası müdahaleye ayrılmıştır. 3. Üretim Müdürünün Teşvik Mekanizması: Müdürün bonus veya değerlendirmesi, "üretim duruşsuzluğu" üzerine kurulmuştur. Kapıyı kapatıp bakım yapmak kısa vadede cezalandırılır; anormal ses bildirmek "işin aksaması" olarak algılanır. 4. Kalite-Güvenlik-Verimlilik Öncelik Sırası: Sistem tasarımında sıra "Verimlilik → Kalite → Güvenlik" olarak ayarlanmıştır. Çalışanlar ("aceleyle içeri girdik") bu hiyerarşiyi içselleştirmiştir. 5. Prosedür Uygulama Baskısı Eksikliği: "Durdur-bildir" prosedürü yazılı ama uygulanmıyor; çünkü sistem tasarımı bunu "uygunlatıyor".</div>
+                    <span class="why-code">C3.5 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Üretim müdürlüğü ve bütçe tahsisinin performans metriklerinde, güvenlik yerine "üretim duruşsuzluğunu" ve "maliyet tasarrufu" ilkesini merkeze alan bu yönetim sisteminin tasarımı ve benimsenmesine hangi kurumsal stratejik kararlar, pazar rekabet baskıları veya yönetim felsefesi katkıda bulunmuştur?</div>
+                    <div class="why-answer" contenteditable="true">→ Olay raporu, aşağıdaki kurumsal stratejik tercihler ve yönetim felsefesinin güvenlik yerine üretim duruşsuzluğunu ve maliyet tasarrufunu merkeze aldığını göstermektedir: 1. Bakım Bütçesi & Öncelik Tahsisi (Stratejik Karar): Son detaylı mekanizma kontrolü 14 ay gecikmişken "aylık periyodik bakım planı" yalnızca kağıt üzerinde kalması, bakım fonksiyonuna düşük bütçe tahsisini yansıtmaktadır. Kritik bağlantı tork kontrolü hiçbir zaman sistemik olarak yapılmamıştır — bu, bakım-güvenlik maliyetleri ile işletme tasarrufu arasında kâr lehine tercih yapıldığını gösterir. 2. Üretim Devamlılığı Prioritizasyonu (Pazar Baskısı): Rapor açıkça "Bakım önceliği düşük; üretim girişi aksamasın baskısı" olarak belirtmektedir. Kapı arızası → "~45 dk üretim duruşu" bilgisi, üretim kaybının finansal maliyetinin güvenlik yatırımından ağır bastığını göstermektedir. Bu, işletme metrikleri (Uptime, OEE) ile güvenlik metrikleri arasında açık bir hiyerarşi kurmaktadır. 3. Çalışan Uyarı Sistemine Güven Eksikliği (Yönetim Felsefesi): "Anormal ses/titreşim için durdur-bildir prosedürü zayıf uygulanıyor" → Bu, çalışanların sinyalleri bildirme motivasyonunun kurumsal olarak bastırıldığını gösterir. Tanık beyanı: "Ses bir süredir vardı ama aceleyle içeri girdik" — Çalışanlar, anormal durumu fark etmelerine rağmen, hız/verimlilik baskısı altında görmezden gelmektedir. Bu, üretim hızı vs. güvenlik tedavüsü açık çatışmasında çalışanların kararlaştırıldığını göstermektedir. 4. Liderlik Seviyesi Güvenlik Taahhütü (Stratejik Eksiklik): Bakım kaydı eksiklikleri 14 aydır tolere edilmiş, sistem tasarımında hiçbir korektif eylem alınmamıştır. Bu, C-suite/üretim müdürlüğünde güvenlik-operasyon dengesinde "operasyonal verimlilik" lehine kararlaştırıldığını göstermektedir. Sonuç: Bu organizasyonda güvenlik, maliyetlendirilmiş bir gider olarak görülmektedir; üretim hedeflerine göre sınırlandırılmaktadır. Pazar rekabet baskısı (daha düşük maliyet = daha rekabetçi fiyat) ile yönetim felsefesi ("duruşsuzluk = başarı") birleşerek, ramak kala olayın tasarlanmış bir sonucu haline getirmektedir.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden (Yönetim Tarafından Ertelenmiş Bakımın Normalleştirilmesi ve Üretim Baskısı)</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Yönetim Tarafından Ertelenmiş Bakımın Normalleştirilmesi ve Üretim Baskısı</div>
+                <div class="box-content" contenteditable="true">Yönetim stratejisi, güvenlik yerine üretim duruşsuzluğunu ve maliyet tasarrufunu merkeze almıştır. Bu durum, bakım bütçelerinin düşük öncelikli olması, üretim devamlılığına yönelik pazar baskısı, çalışan uyarı sistemine güven eksikliği ve liderlik seviyesinde güvenlik taahhüdünün yetersizliği gibi faktörlerle açıklanmaktadır. Bilinen sapmaların yönetim tarafından tolere edilmesi ve bakım uyumunun sistemik olarak kontrol edilmemesi, bu kök nedenin temelini oluşturmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Zayıf liderlik taahhüdü ve güvenlik projelerine düşük bütçe tahsisi.</li>
+<li contenteditable="true">Üretim baskısı nedeniyle güvenlik prosedürlerinin göz ardı edilmesi.</li>
+<li contenteditable="true">Ertelenmiş bakımın normalleştirilmesi ve kritik kontrollerin yapılmaması.</li>
+<li contenteditable="true">İzleme ve denetim mekanizmalarının yetersizliği ve bilinen sapmaların tolere edilmesi.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">7. KRİTİK FAKTÖR 4 - ZAMAN BASKISI VE BİLİŞSEL KISAYOLLAR</div>
+            
+            <div class="subsection-header">7.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Sabah vardiyasının yoğun giriş döneminde, çalışanlar sarmal kapıdan gelen anormal sesleri fark etmelerine rağmen, üretim akışını bozmamak adına bu sesleri görmezden gelmişlerdir. Bu durum, zaman baskısı ve bilişsel kısayolların bir sonucudur.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Sabah vardiyasının yoğun giriş döneminde işçilerin üretim akışını bozmamak için anormal sesleri görmezden gelmesi.</div>
+            
+            <div class="subsection-header">7.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden sarmal kapının bağlantı braketi, mekanizma içindeki aşınma, gevşeme veya metal yorgunluğu nedeniyle kopmuş duruma gelmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapının bağlantı braketi, mekanizma içindeki uzun süreli aşınma ve gevşemeye bağlı metal yorgunluğu nedeniyle kopmuştur. Yapısal neden: Son detaylı mekanizma kontrolü 14 ay önce yapılmış olup, aradan geçen sürede periyodik tork kontrolü ve bağlantı sıkılığı muayenesinin yapılmadığı kayıtlarda görülmektedir. Operasyonel neden: Anormal metalik "tıkırtı" sesleri (08:40'ta gözlemlenmiş) göz ardı edilmiş, "durdur-bildir" prosedürü uygulanmamıştır. Yönetimsel neden: Bakım önceliğinin düşük tutulması ve üretim akışını kesmeyen yönündeki örtülü baskı, kritik mekanik kontrollerinin ertelenmesine yol açmıştır.</div>
+                    <span class="why-code">A2.3 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden sarmal kapı mekanizmasının periyodik bakım planı (kağıtta aylık olarak tanımlanmış olmasına rağmen) 14 aylık bir aralıkla gerçekleştirilmiş ve son detaylı mekanizma kontrolü bu kadar uzun süre ertelenmişitir?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı mekanizmasının periyodik bakım planının 14 aylık aralıkla gerçekleştirilmesinin temel nedeni, planlı bakım sisteminin yönetimsel olarak uygulanmaması ve uygulanmasının denetlenmemesidir. Kök Sebeplerinin Zinciri: 1. Yazılı plan-uygulama ayrışması: Bakım planı kağıtta aylık olmasına rağmen, hiçbir mekanizma bu planın uygulanmasını zorunlu kılamıyordu. 2. Operasyonel baskı: Üretim hattının kesintisiz çalışması talebi, planlı bakımı "ertelenebilir" görülen faaliyete dönüştürmüştür. 3. Sorumluluk boşluğu: Kimin bakım planını uygulamakla sorumlu olduğu (bakım müdürü, vardiya sorumlusu, tesisi yönetimi) net tanımlanmamıştır. 4. Gözetim eksikliği: Bakım performansını izlemek için KPI (temel performans göstergeleri) veya denetim sistemi bulunmamaktadır. 5. Risk algısının zayıflığı: Mekanik sistemlerdeki düzenli bakımın can güvenliği ile doğrudan ilişkili olduğu korporatif düzeyde içselleştirilmemiştir. Sonuç olarak, bu "14 aylık aralık", sistemik olarak planlı bakım kültürünün yetersizliğini ve yönetimsel kontrol mekanizmalarının işlev görmediğini göstermektedir.</div>
+                    <span class="why-code">C4.1 - İş/Görev Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden sarmal kapı mekanizmasının periyodik bakım sorumluluğu açıkça tanımlanmamış ve bakım planının uygulanmasını izlemek için KPI / denetim mekanizması kurulmamıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapı mekanizmasının periyodik bakım sorumluluğu açıkça tanımlanmamış ve bakım planının uygulanmasını izlemek için KPI/denetim mekanizması kurulmamasının temel nedenleri: 1. Yönetim Seviyesinde Sorumluluk Boşluğu: Bakım görevinin kim tarafından yönetileceği, kim tarafından denetleneceği ve hangi ölçütlerle başarısının değerlendirileceği belirtilmemiştir. Bu sebeple bakım planı "kağıtta aylık" olarak kalırken, fiili uygulanması (son kontrol 14 ay önce) ihmal edilmiştir. 2. Üretim Baskısının Güvenlikle Dengelenmemesi: Raporun ön bulgularında "üretim girişi aksamasın baskısı" açıkça belirtilmiştir. Yönetim, bakım durduraklarında üretim kaybını önlemeye yönelik bir baskı oluşturmuş, ancak bu baskıyı dengeleyecek güvenlik-odaklı KPI veya denetim mekanizması tanımlamadığı için bakım gözardı edilmiştir. 3. Prosedür Uygulanabilirliğinin Kontrol Edilmemesi: "Durdur-bildir" prosedürü zayıf uygulanmaktadır, çünkü bu prosedürün ne kadar iyi izlendiğini ölçmek ve bunun için sorumluluk yüklemeyi sağlayacak bir mekanizma (KPI, denetim, performans değerlendirme) yoktur. Çalışanlar "ses duydu" ama bildirim ve görevli desteği olmadığı için sorunu çözememiştir. 4. Kayıt ve İzleme Eksikliği: Bakım kayıtları kısmen eksiktir ve kritik kontroller (tork kontrolü) yapılmamaktadır. Bu, bakım görevini yerine getiren kişinin hesap verebilirliği olmadığını, yapılan veya yapılmayan işlerin izlenmediğini gösterir. Sonuç: Yönetim seviyesinde bakım görevinin açık sahipliği tanımlanmamış, bakım planının uygulanmasını izlemek için KPI/denetim mekanizması kurulmamış, ve güvenlik prosedürlerinin uygulanmasından kimin sorumlu olduğu netleştirilmemiştir. Bu sistem boşluğu, üretim baskısının güvenliği ikinci plana itmiş ve mekanik aşınmanın zamanında tespit edilmesini engellemiştir.</div>
+                    <span class="why-code">B1.3 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Yönetim seviyesinde bakım görevinin (sarmal kapı mekanizması periyodik kontrolü) sahibinin açıkça tanımlanmamış ve uygulanmasını izlemek için KPI/denetim mekanizmasının kurulmamış olmasının temel nedeni, bakım ve güvenlik konularının kurumsal risk yönetim stratejisine ve öncelik sıralamasına yeterince entegre edilmemiş olmasıdır — bu entegrasyon eksikliğinin yönetim tarafından neden kabullenildiği veya göz ardı edildiği?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim seviyesinde bakım görevinin sahibinin açıkça tanımlanmamış olması ve KPI/denetim mekanizmasının kurulmamış olmasının temel nedeni, kurumsal risk yönetim stratejisinde bakım ve güvenlik işlevlerinin düşük önceliklendirilmesidir. Yönetim bu durumu kabullemiş/göz ardı etmiştir çünkü: 1. Üretim hedefleri baskısı: Kapı bakımı "üretim durdurabilir" faaliyeti olarak görüldüğü için, kısıtlı kaynaklar doğrudan üretim faaliyetlerine yönlendirilmiştir. 2. Reaktif yönetim kültürü: "Henüz ciddi olay olmamış" mantığıyla, proaktif bakım sistemine yatırım yapılmamıştır. Bakım, acil durumlara yanıt verme olarak algılanmış, planlı/preventif bakım stratejik öncelik almamıştır. 3. Sorumluluk bulanıklığı: Açık görev sahibi olmadığı için, hiç kimse "bu benim sorumluluğum" dememektedir. Yönetim bu boşluğu, sistematik sorumluluk atanması yerine zaman içinde normalleştirmiştir. 4. Eksik risk değerlendirmesi: Mekanik aşınmadan kaynaklanan düşen parça riskinin, "0,001% ihtimal" olarak kategorize edilmiş veya ihmal edilmiş olması muhtemeldir. 5. Kurumsal KPI sistemi: Yönetim performans göstergelerinde "bakım sistem etkinliği" yerine sadece "üretim verimliliği" ve "maliyet düşürme" metrikleri takip etmektedir.</div>
+                    <span class="why-code">D1.2 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Yönetim stratejisinin neden "üretim hedefleri baskısı → reaktif bakım kültürü → sorumluluk bulanıklığı" yapısını kabul etmiştir ve bu stratejik seçimlerin kökünde hangi kurumsal/dış faktörler (pazar rekabeti, finansal baskı, liderlik yaklaşımı, endüstri normları) bulunmaktadır?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim stratejisinin "üretim hedefleri baskısı → reaktif bakım kültürü → sorumluluk bulanıklığı" yapısını kabullenmiş olmasının kökünde aşağıdaki kurumsal ve dış faktörler bulunmaktadır: 1. FINANSAL BASKI VE MALIYET YÖNETİMİ: Bakım bütçeleri "kontrol altına alınması gereken maliyet merkezi" olarak kategorize edilmiştir. Reaktif bakım (arıza sonrası tamiri), planlı bakımdan daha düşük cari maliyeti göstermektedir. Yönetim, beklenen arıza oranını ve potansiyel ramak kala riskini finansal açıdan "kabul edilebilir" olarak değerlendirmiş görünmektedir. 2. PAZAR REKABETI VE ÜRETİM HEDEFLERİ: Üretim duruşu = doğrudan gelir kaybı eşitliği işletilmektedir. Planlı bakımlar = kaçınılmaz duruş olarak algılanmış, minimize edilmeye çalışılmıştır. Rakip tesislerle karşılaştırıldığında, zamanlanan bakım için duruş süresi, "verimsizlik" olarak işaretlenmiş olabilir. 3. LİDERLİK YAKLAŞIMI VE KPI HIYERARŞİSİ: Üretim KPI'ları (çıktı, hat verimliliği) açık olarak tanımlanmış ve ölçülmüştür. Güvenlik KPI'ları (ramak kala önleme, bakım mükemmelliği) ya yok sayılmış ya da geç kalan göstergeler (kaza) bazında ölçülmüştür. Liderlik mesajlaması: "Üretim akışını kesintisiz tutun" > "Riskleri keşfetmek için zaman ayırın". 4. ENDÜSTRİ NORMLARI VE "YETERİNCE İYİ" STANDARDI: Makine ve tesislerde 12-18 ay arası "bakım dönemleri" endüstri pratiğinde yaygın olabilir. "Henüz arıza olmadı" = "sistem çalışıyor" algısı yönetim seviyesinde güçlüdür. Ramak kala olayları, harekete geçici uyarı olarak değil, "istatistiksel sapmalar" olarak görülmüştür. 5. SORUMLULUK BULANIKLIŞININ STRATEJİK ROLÜ: Bakım müdürü: "Bütçe ve personel yetersiz" diyebilir. Operasyon müdürü: "Bakım idaresinin sorumluluk alanı" diyebilir. Üst yönetim: "Tesisde rakam toplaması sağlıklı devam ediyor" diyebilir. Bu bulanıklık, karardan kaçınma için şemsiye görevi görmüştür. 6. BİLİNÇLİ RİSK TOLERANSI: Yönetim, açık ya da zımni olarak şu hesabı yapmıştır: Senaryo A (Planlı Bakım): Düzenli duruş, kesin maliyet, sıfır ramak kala. Senaryo B (Reaktif Bakım): Az duruş, düşük cari maliyet, düşük-orta ramak kala riski. Yönetim Senaryo B'yi tercih etmiş, bu tercihin güvenlik sonuçlarını uzun vadeli kayıt tutmamıştır.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">7.3 Kök Neden (Yönetim Stratejisinin Üretim Odaklılığı ve Reaktif Bakım Kültürü)</div>
+            <div class="colored-box box-blue">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 4: Yönetim Stratejisinin Üretim Odaklılığı ve Reaktif Bakım Kültürü</div>
+                <div class="box-content" contenteditable="true">Yönetim stratejisinin temelinde, üretim hedefleri baskısı, reaktif bakım kültürü ve sorumluluk bulanıklığı yatmaktadır. Finansal baskılar, pazar rekabeti, liderlik yaklaşımındaki eksiklikler ve endüstri normlarının "yeterince iyi" standardı, yönetimin güvenlik yatırımlarından ziyade üretim ve verimlilik hedeflerini ön plana almasına neden olmuştur. Bu durum, bilinen risklerin tolere edilmesine ve bakım uyumunun sistemik olarak kontrol edilmemesine yol açmıştır.</div>
+            </div>
+
+            <div class="subsection-header">7.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Zayıf liderlik taahhüdü ve güvenlik projelerine düşük öncelik verilmesi.</li>
+<li contenteditable="true">Üretim baskısı ve performans metriklerinin güvenlikten daha öncelikli olması.</li>
+<li contenteditable="true">Ertelenmiş bakımın normalleştirilmesi ve bilinen sapmaların yönetim tarafından tolere edilmesi.</li>
+<li contenteditable="true">İzleme ve denetim mekanizmalarının yetersizliği ve bakım uyumunun kontrol edilmemesi.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">8. KRİTİK FAKTÖR 5 - PROSEDÜR TASARIMI VE UYGULAMA YETERSİZLİĞİ</div>
+            
+            <div class="subsection-header">8.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Sarmal kapıdan anormal ses/titreşim tespit edildiğinde, kapıyı durdurma ve raporlama prosedürünün açık, uygulanabilir ve çalışanlara eğitilmiş olmaması. Çalışanlar sesi duymuş ancak raporlamak yerine işlemlerine devam etmiştir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Anormal ses/titreşim tespit edildiğinde kapıyı durdurma ve raporlama prosedürünün açık, uygulanabilir ve eğitilmiş olmaması.</div>
+            
+            <div class="subsection-header">8.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Sarmal kapının üst mekanizmasındaki bağlantı braketi neden koptu / mekanizmada ilk kopma veya kritik aşınma/gevşeme oluştu?</div>
+                    <div class="why-answer" contenteditable="true">→ Sarmal kapının üst mekanizmasındaki bağlantı braketinde ilk gevşeme/kritik aşınma, periyodik bakım planının etkili uygulanmaması ve bağlantı noktalarında tork kontrolü yapılmaması nedeniyle oluşmuştur. Raporda belirtildiği üzere, son detaylı mekanizma kontrolü 14 ay önce yapılmış, kritik bağlantı tork kontrol protokolü mevcut değildir. Anormal metalik ses ve tıkırtı, gevşemenin ilerlemesinin bir göstergesi olmuş; bu sinyallere çalışanlar tarafından yeterince karşılık verilmemiştir. Bakım önceliğinin düşük olması ve üretim akışının kesintiye uğramaması baskısı, periyodik kontrollerin yetersiz kalmasına yol açmıştır. Sonuç olarak bağlantı braketi kopmuştur.</div>
+                    <span class="why-code">B2.1 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Periyodik bakım planı mevcut olmasına rağmen, son 14 ayda detaylı mekanizma kontrolü ve tork kontrol protokolü neden etkili şekilde uygulanmamış ve bakım yönetimi düşük öncelik haline gelmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Detaylı mekanizma kontrolü ve tork kontrol protokolünün 14 ay boyunca etkili şekilde uygulanmaması, dört temel neden kombinasyonundan kaynaklanmıştır: 1. Bakım Yönetim Sistemi Eksikliği (Birincil Neden): Periyodik bakım planı "kağıtta aylık" olarak tanımlanmış ancak gerçek uygulanması izlenmemiş. Bakım kayıtları "kısmen eksik" — yani yapılan/yapılmayan işlerin net kaydı yoktur. Tork kontrol protokolü tanımlanmış olsa da, uygulanmaktan sorumlu kişi/ekip açıkça belirtilmemiştir. 2. Üretim Baskısı ve Önceliklendirme Hatası: "Bakım önceliği düşük; üretim girişi aksamasın baskısı" doğrudan belirtilmiştir. Kapının "aksamasız çalışması" bakım müdahalelerine göre önceliklendirilmiş. Koruma amaçlı (preventif) bakım, reaktif (arızaya müdahale) moduna dönüşmüştür. 3. Sorumluluğun Tanımlanmaması ve Gözetim Eksikliği: Mekanizma kontrolünü "kimin" yapacağı, ne sıklıkta yapılacağı, kimin kontrol edeceği belirsizdir. Bakım müdürü/sorumlusu tarafından düzenli denetim ve ilerleme takibi yapılmamış. 14 aylık boşluk göz ardı edilmiştir. 4. Uyarı Sistemlerinin Etkinleştirilmemesi: "Durdur-bildir" prosedürü zayıf uygulanmıştır — çalışanlar anormal sesleri bildirmemiştir. Çalışan eğitimi eksik — sesler "normal" kabul edilmiştir. Geri bildirim mekanizması (sesler/anormallikler → bakıma iletilme) çalışmamıştır. Sonuç: Sorun bakım kaynağı yetersizliği değil, bakım planının uygulanması için sorumluluğun tanımlanmadığı ve yönetim gözetiminin eksik olduğu; buna ek olarak üretim baskısı nedeniyle bakım ihmal edilmiştir.</div>
+                    <span class="why-code">B1.2 - Organizasyonel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Bakım yönetim sistemi (periyodik kontrol, tork ölçümü, kayıt ve denetim) tasarlanmadı veya tasarlanmış olsa da sistematik olarak uygulanmadığı ve 14 ay boyunca hiç denetlenmediği gerçeğinin temelinde, tesis yönetim yapısında bakım sorumluluğunun (kim, ne zaman, nasıl?) açıkça tanımlanmadığı veya yasal/prosedürel olarak zorunlu kılınmadığı sorusu vardır — bu sorumluluğun tanımlanmadığı / enforsu edilmediği temel nedenler nelerdir?</div>
+                    <div class="why-answer" contenteditable="true">→ Olay raporundan tespit edilen bakım sorumluluğunun tanımlanmadığı / enforsu edilmediği temel nedenler: 1. Resmi Bakım Yöneticisi / Sorumlusu Pozisyonunun Tanımlanmadığı: Raporda "bakım müdürü" yerine sadece genel "bakım müdahalesi" tabiri kullanılmıştır. Kim tarafından, ne zaman, nasıl yapılacağı açıkça belirtilmemiştir. 2. Yönetim Gözetim ve Denetim Mekanizmasının Eksik Olması: 14 ay boyunca detaylı mekanizma kontrolü yapılmamıştır. Bakım kayıtları "kısmen eksik" durumdadır; hiçbir denetim kaydı yoktur. Aylık plan "kağıtta" kalarak fiili uygulanmamıştır. 3. Üretim Devamılılık Baskısının Bakım Sorumluluğunun Önceliğini Düşürmesi: "Üretim girişi aksamasın baskısı" nedeniyle bakım gözetim zayıflatılmıştır. Anormal ses ("tıkırtı") dinlenmiş ancak "aceleyle içeri girdiler" — prosedürel zorunluluk yoktur. 4. Çalışan Eğitim ve Raporlama Prosedürünün Zayıflığı: "Durdur-bildir prosedürü zayıf uygulanıyor" — sorumluluk ve ceza mekanizması tanımlanmamış. Anormal sinyallemelerin nereye, kime raporlanacağı net değildir. 5. Teknik Kontrol Parametrelerinin Kanun / Prosedür Olarak Zorunlu Kılınmadığı: "Tork kontrolü yapılmıyor" — bu kontrol ne yasal gereklilik ne de prosedürel zorunluluk haline getirilmiştir. Bakım kalitesi denetimi (audit) sistemi yok.</div>
+                    <span class="why-code">A1.1 - İnsan Faktörü</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Yönetim neden sarmal kapı bakım sorumluluğunun açık bir şekilde tanımlanması, bakım kayıtlarının tam tutulması ve tork kontrolü gibi teknik parametrelerin denetim prosedürü haline getirilmesini önceliklendirmemiş / resource tahsis etmemiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim, sarmal kapı bakım sorumluluğunun açık tanımlaması, bakım kayıtlarının tam tutulması ve tork kontrolü gibi teknik parametrelerin denetim prosedürü haline getirilmesini önceliklendirmemiş/kaynak tahsis etmemiştir çünkü: 1. Üretim Baskısı Üzerinde Güvenlik Uzlaştırması: Olay raporu "üretim girişi aksamasın baskısı" altında bakım önceliğinin düşük tutulduğunu açıkça belirtir. Kapının bakım için kapatılması üretim duruşuna neden olacağından, yönetim bu önlemi ertelemiştir. 2. Ramak Kala (Near-Miss) Algısı: Olay kopan parçanın çarpması olmadığından "ramak kala" olarak sınıflandırılmıştır. Bu, yönetimin sorunu "düşük risklendirme" olarak değerlendirmesine, dolayısıyla sistematik bakım prosedürüne yatırım yapmamasına neden olmuştur. 3. Bakım Yönetim Sisteminin Eksikliği: "Kağıtta aylık" plan ile gerçekteki 14 aylık boşluk, yapılması gereken bakımın uygulanmadığını gösterir. Sorumluluğun açık tanımlanmadığı ve denetlenmedikleri için hiç kimse bu sorunu gündeme getirmemiştir. 4. Teknik Denetim Prosedürünün Olmaması: Tork kontrolü, titreşim/ses monitorlaması gibi teknik parametrelerin rutin denetim prosedürü haline getirilmemesi, bakımın reaktif kalmastını sağlamıştır. Kök Neden: Yönetim, güvenlik ve üretim arasındaki çatışmada üretimi tercih etmiş ve bakım sistemine yeterli kaynak/prosedür tahsis etmemiştir.</div>
+                    <span class="why-code">D9.2 - Çevresel Faktör</span>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Üretim alanında yönetim ve operasyonel öncelikleri belirleyen performans değerlendirme, bütçe tahsisi veya hedef belirleme sistemi, neden güvenlik yatırımlarından ziyade üretim/verimlilik hedeflerini ön plana koymaktadır? (Yönetim yapısı, teşvikler, şirket stratejisi, sektörel normu.)</div>
+                    <div class="why-answer" contenteditable="true">→ Üretim tesisinde bakım yatırımlarından ziyade üretim/verimlilik hedeflerinin ön plana alınması, aşağıdaki yapısal faktörlerden kaynaklanmaktadır: 1. YÖNETİM STRATEJİSİ VE ÖNCELİKLENDİRME: Sarmal kapı mekanizması bakım planı yazılı olarak aylık belirtilmesine rağmen, son detaylı kontrol 14 ay öncesinde yapılmış olması, bakım kaynaklarının (personel, zaman, bütçe) üretim sürekliliğine yönlendirildiğini gösterir. Yönetim, kısa vadeli kapasiteyi maksimize etmeyi, uzun vadeli varlık bütünlüğünden önce tutmaktadır. 2. OPERASYONEL BASKILAR: Tanık beyanı ("ses bir süredir vardı ama aceleyle içeri girdik") ve ön bulgular ("üretim girişi aksamasın baskısı") gösterir ki, çalışanlar anormal sesleri bildirmek yerine, üretim akışını durdurmamayı tercih etmektedirler. Bu, zımni veya açık üretim hedefleridir. 3. BAKIMIN TERTİRDELENMESİ (DEFERRED MAINTENANCE): Planlı bakım programı var ancak uygulanmamıştır. Bu normalleştirilmiş bakım gecikmeleri yönetim tarafından "kabul edilebilir risk" olarak görülmektedir. Olay anı (45 dakikalık duruş) ile 14 ay bakım gecikme maliyeti karşılaştırıldığında, yönetim kararı "az sık meydana gelen riskleri tolere etmek tercih etmektedir" şeklinde okunmaktadır. 4. PERFORMANCE ÖLÇÜM SİSTEMİ: Vardiya ve yönetim performansı değerlendirilirken kullanılan metrikler (üretim çıktısı, vardiya süresi, duruş süresi) bakım görevlerini "overhead" maliyet olarak görmektedir. Bakım KPI'ları (örn: bakım görevlerinin zamanında tamamlanması, RCM scores) performans değerlendirmelerine dahil değildir. 5. TEŞVIK SİSTEMİ: Vardiya amirlerinin bonusu veya değerlendirilmesi "üretim hedefleri" üzerine kurulmuşsa, bakım duruşları (hatta planlı bakım duruşları) performans azaltıcı görülmektedir. Tersine, bakım görevlerini erteleyerek "duruş süresini azaltan" operatörler ödüllendirilmektedir. SONUÇ: Yönetim yapısı, teşvik mekanizmaları ve stratejik hedefler, güvenlik yatırımlarını (koruyucu bakım) "verimlilik engeli" olarak konumlandırmakta; kısa vadeli çıktı maksimizasyonu, uzun vadeli risk yönetiminden öncelikli tutulmaktadır.</div>
+                    
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">8.3 Kök Neden (Yönetim Stratejisinin Üretim Odaklılığı ve Reaktif Bakım Kültürü)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 5: Yönetim Stratejisinin Üretim Odaklılığı ve Reaktif Bakım Kültürü</div>
+                <div class="box-content" contenteditable="true">Üretim tesisinde bakım yatırımlarından ziyade üretim/verimlilik hedeflerinin ön plana alınması, yönetim stratejisi, operasyonel baskılar, ertelenmiş bakımın normalleştirilmesi, performans ölçüm sistemi ve teşvik sisteminden kaynaklanmaktadır. Yönetim, kısa vadeli kapasiteyi maksimize etmeyi, uzun vadeli varlık bütünlüğünden önce tutmaktadır. Bu durum, güvenlik yatırımlarını "verimlilik engeli" olarak konumlandırmakta ve kısa vadeli çıktı maksimizasyonunu uzun vadeli risk yönetiminden öncelikli tutmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">8.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Zayıf liderlik taahhüdü ve güvenlik projelerine düşük öncelik verilmesi.</li>
+<li contenteditable="true">Üretim baskısı ve performans metriklerinin güvenlikten daha öncelikli olması.</li>
+<li contenteditable="true">Ertelenmiş bakımın normalleştirilmesi ve bilinen sapmaların yönetim tarafından tolere edilmesi.</li>
+<li contenteditable="true">İzleme ve denetim mekanizmalarının yetersizliği ve bakım uyumunun kontrol edilmemesi.</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Anormal ses/titreşim için "durdur-bildir" prosedürünün çalışanlara etkin bir şekilde iletilmemesi ve uygulanmaması.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">Çalışanların anormal durumları tanıma ve raporlama konusunda yeterli eğitim almaması.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim Eksikliği</td>
+                        <td contenteditable="true">Bakım planlarının uygulanmasının ve kritik kontrollerin (tork kontrolü) yapılmasının denetlenmemesi.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kültürel Faktörler</td>
+                        <td contenteditable="true">Üretim öncelikli kültürün, güvenlik sapmalarının tolere edilmesine yol açması ve çalışanların riskleri göz ardı etme eğilimi.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kaynak Tahsisi Yetersizliği</td>
+                        <td contenteditable="true">Bakım bütçelerinin ve personel kaynaklarının preventif bakım faaliyetleri için yetersiz olması.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Sarmal kapı ve benzeri kritik ekipmanlar için detaylı ve güncel bir periyodik bakım planı oluşturulması ve uygulanması.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Bakım planı tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Kritik bağlantı noktalarında tork kontrolü ve gevşeklik muayenelerini içeren bakım prosedürlerinin geliştirilmesi ve zorunlu hale getirilmesi.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">3 hafta</td>
+                        <td contenteditable="true">Tork kontrolü uygulama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Tüm çalışanlara "durdur-bildir" prosedürü hakkında kapsamlı eğitim verilmesi ve anormal durumları raporlama teşvik mekanizmalarının oluşturulması.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Yöneticisi, İK Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama oranı %100, raporlama oranı artışı</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Bakım kayıtlarının eksiksiz tutulmasını sağlayacak bir sistem kurulması ve bu kayıtların düzenli olarak denetlenmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Bakım Müdürü, Kalite Kontrol</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Kayıt tutma uyum oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Yönetim seviyesinde güvenlik ve üretim hedefleri arasında dengeyi sağlayacak, güvenlik öncelikli bir performans değerlendirme ve bütçe tahsisi politikası oluşturulması.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Üst Yönetim, Finans Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Güvenlik KPI'larının performans değerlendirmesine entegrasyonu</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Kritik ekipmanlar için bakım sorumluluk matrisinin oluşturulması ve ilgili personelin görev ve yetkilerinin netleştirilmesi.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Bakım Müdürü, İK Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Sorumluluk matrisi tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Periyodik bakım planlarının uygulanmasını izlemek için KPI'lar (Temel Performans Göstergeleri) belirlenmesi ve düzenli denetim mekanizmalarının kurulması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Bakım Müdürü, HSE Yöneticisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">KPI takip ve denetim sıklığı</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Reaktif bakım yerine proaktif (önleyici) bakım kültürünün benimsenmesi ve bu yönde eğitim ve farkındalık çalışmalarının yapılması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Yöneticisi, İK Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Proaktif bakım faaliyetlerinin artışı</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Tesis genelinde risk değerlendirmelerinin güncellenmesi ve ramak kala olaylarının ciddiyetle ele alınarak kök neden analizlerinin yapılması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">4 ay</td>
+                        <td contenteditable="true">Risk değerlendirme güncelliği, ramak kala analiz oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Yönetim seviyesinde güvenlik liderliğinin güçlendirilmesi ve güvenlik taahhüdünün tüm organizasyona yayılması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Üst Yönetim</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Güvenlik denetimlerinde yönetim katılımı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Kritik ekipmanların periyodik bakım planları sadece kağıt üzerinde kalmamalı, etkin bir şekilde uygulanmalı ve denetlenmelidir. Özellikle tork kontrolü gibi detaylı mekanik kontroller atlanmamalıdır.
+• Çalışanların anormal durumları (ses, titreşim vb.) fark ettiğinde bunları derhal rapor etmelerini sağlayacak "durdur-bildir" prosedürleri netleştirilmeli ve bu konuda kapsamlı eğitimler verilmelidir.
+• Yönetim seviyesinde üretim hedefleri ile güvenlik öncelikleri arasında denge kurulmalı, güvenlik yatırımları maliyet olarak değil, operasyonel sürekliliğin ve çalışan sağlığının temel bir unsuru olarak görülmelidir.
+• Bakım kayıtları eksiksiz tutulmalı ve bu kayıtların düzenli olarak incelenmesiyle bakım süreçlerindeki sapmalar erken tespit edilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Kurumsal risk yönetim stratejisine bakım ve güvenlik işlevlerinin entegrasyonu sağlanmalı, bu alanlara yeterli kaynak ve öncelik tahsis edilmelidir.
+• Reaktif bakım kültürü yerine proaktif ve önleyici bakım yaklaşımları benimsenmeli, bu yönde teknolojik altyapı ve personel yetkinlikleri geliştirilmelidir.
+• Performans değerlendirme sistemleri, güvenlik KPI'larını (ramak kala raporlama, bakım uyumu vb.) içerecek şekilde güncellenmeli ve bu KPI'lar yönetim seviyesinde takip edilmelidir.
+• Güvenlik kültürü, tüm çalışanların aktif katılımını teşvik edecek şekilde güçlendirilmeli, güvenlik bilinci ve sorumluluk duygusu artırılmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Tüm çalışanlara, ramak kala olayının potansiyel sonuçları ve önemi hakkında bilgilendirme yapılmalı, güvenlik bilinci artırılmalıdır.
+• "Durdur-bildir" prosedürü, görsel materyaller ve düzenli hatırlatmalarla sürekli olarak iletişimde tutulmalı, raporlama kanalları netleştirilmelidir.
+• Bakım planları ve prosedürlerindeki değişiklikler, ilgili tüm departmanlara ve personele zamanında ve anlaşılır bir dille iletilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm bakım personeline, kritik ekipmanların detaylı mekanik kontrolü ve tork kontrolü konularında ileri düzey eğitimler verilmelidir.
+• Tüm çalışanlara, anormal durumları (ses, titreşim, koku vb.) tanıma, değerlendirme ve raporlama konusunda pratik eğitimler sunulmalıdır.
+• Yönetim kademesine, güvenlik liderliği, risk yönetimi ve güvenlik-üretim dengesi konularında özel eğitimler düzenlenmelidir.
+• Yeni işe başlayan personele, tesisin güvenlik prosedürleri ve acil durum eylem planları hakkında kapsamlı oryantasyon eğitimleri verilmelidir.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">Bu ramak kala olayı, sarmal kapının üst mekanizmasından metal bir braketin kopmasıyla sonuçlanmış ve ciddi yaralanma potansiyeli taşımıştır. Analizler, olayın tek bir nedene bağlı olmadığını, aksine bir dizi organizasyonel ve yönetimsel eksikliğin birleşimi olduğunu ortaya koymuştur. Temel sorunlar arasında, periyodik bakım planlarının yetersiz uygulanması, kritik kontrollerin (tork kontrolü) yapılmaması, çalışanların anormal durumları rapor etme konusundaki isteksizliği ve en önemlisi, yönetimin üretim hedeflerini güvenlik önceliklerinin önüne koyan bir strateji benimsemesi yer almaktadır. Bu durum, ertelenmiş bakımın normalleşmesine ve bilinen sapmaların tolere edilmesine yol açmıştır. Olay, tesisin güvenlik yönetim sisteminde köklü değişikliklere ihtiyaç duyduğunu açıkça göstermektedir. Mevcut sistem, ramak kala olaylarının önlenmesi ve potansiyel kazaların önüne geçilmesi konusunda yetersiz kalmaktadır. Bu nedenle, sadece anlık düzeltmeler değil, uzun vadeli ve sistemik iyileştirmeler hayati önem taşımaktadır.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm sarmal kapıların ve benzeri kritik ekipmanların acil ve detaylı mekanik kontrolü ile tork kontrollerinin yapılması.</li>
+<li contenteditable="true">"Durdur-bildir" prosedürünün acil olarak gözden geçirilmesi, netleştirilmesi ve tüm çalışanlara zorunlu eğitim verilmesi.</li>
+<li contenteditable="true">Bakım kayıt sisteminin dijitalleştirilmesi veya mevcut sistemin eksiksiz veri girişi için denetlenmesi.</li>
+<li contenteditable="true">Olayın tüm çalışanlara duyurulması ve ramak kala olaylarının önemi hakkında farkındalık kampanyası başlatılması.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kritik ekipmanlar için kapsamlı bir önleyici bakım (PM) programının oluşturulması, sorumluluk matrislerinin belirlenmesi ve düzenli denetimlerle etkinliğinin sağlanması.</li>
+<li contenteditable="true">Yönetim seviyesinde güvenlik performansını ölçen ve teşvik eden KPI'ların (ramak kala raporlama, bakım uyumu, güvenlik denetim sonuçları) entegre edilmesi.</li>
+<li contenteditable="true">Güvenlik kültürünü güçlendirmeye yönelik uzun vadeli programlar geliştirilmesi, çalışan katılımının artırılması ve güvenlik liderliğinin teşvik edilmesi.</li>
+<li contenteditable="true">Risk değerlendirme süreçlerinin güncellenmesi ve potansiyel tehlikelerin proaktif olarak belirlenmesi ve kontrol altına alınması için sürekli iyileştirme mekanizmalarının kurulması.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Seviyesi</td>
+                        <td class="current" contenteditable="true">Yüksek (Ciddi yaralanma potansiyeli)</td>
+                        <td class="target" contenteditable="true">Düşük (Kontrol altına alınmış)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Uyum Oranı (Bakım)</td>
+                        <td class="current" contenteditable="true">%20 (14 ay gecikme)</td>
+                        <td class="target" contenteditable="true">%95</td>
+                    </tr>
+
+                    <tr>
+                        <td>Eğitim Kapsamı (Durdur-Bildir)</td>
+                        <td class="current" contenteditable="true">Yetersiz</td>
+                        <td class="target" contenteditable="true">Kapsamlı ve Etkin</td>
+                    </tr>
+
+                    <tr>
+                        <td>Bakım Yaklaşımı</td>
+                        <td class="current" contenteditable="true">Reaktif</td>
+                        <td class="target" contenteditable="true">Proaktif</td>
+                    </tr>
+
+                    <tr>
+                        <td>Denetim Sıklığı (Bakım)</td>
+                        <td class="current" contenteditable="true">Düzensiz/Yok</td>
+                        <td class="target" contenteditable="true">Aylık/Haftalık</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            
+            <div id="decision-tree-diagram" style="background: white; padding: 10px; border: 1px solid #ddd; width: 100%; height: 800px; overflow: hidden;">
+                <div class="mermaid" style="width: 100%; height: 100%;">
+graph LR
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:13px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden sarmal kapı mekanizmasının üst bağlantı braketi<br/>metal yorulma ve gevşeme sonucu kopup yere düştü?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q1
+    A2["Sarmal kapı mekanizmasının üst bağlantı braketi,<br/>**periyodik bakım programının eksik uygulanması ve<br/>bağlantı elemanlarının tork kontrolünün yapılmaması**<br/>sonucu metal yorulma ve gevşemeye maruz kalmıştır.<br/>Rapordan anlaşıldığı üzere son detaylı mekanizma<br/>kontrolü 14 ay öncesinde yapılmış olup, bu dönemde kapı<br/>yoğun kullanıma maruz kalıp döngüsel yükleme<br/>yaşamıştır. Bağlantı noktalarının tork kontrolü<br/>yapılmadığı için vidalar ve braketler zamanla gevşemiş,<br/>yapısal integriteyi kaybetmiş ve nihayet metal parça<br/>koparak yere düşmüştür. Ek olarak, çalışanlar<br/>tarafından duyulan anormal tıkırtı sesleri (08:40"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Sarmal kapı mekanizmasının periyodik bakım programı<br/>neden **14 aylık bir dönem boyunca detaylı mekanizma<br/>kontrolü yapılmaksızın** bırakılmıştır? Bakım planlama<br/>sisteminde, kaynak tahsisinde veya üretim baskısı<br/>altında bakım görevinin ertelenmesine neden olan<br/>organizasyonel/prosedürel faktör nedir?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A2 --> Q3
+    A4["14 aylık detaylı mekanizma kontrolü boşluğunun ana<br/>nedenleri, organizasyonel ve prosedürel eksikliklerde<br/>yatmaktadır: **Birincil Faktör - Bakım Planlaması<br/>Sistemi Arızası:** Kağıtta 'aylık bakım' yazıldığı<br/>halde, son detaylı kontrolün 14 ay önceki kayıt ile<br/>gösterilmesi, planlama vs. gerçekleştirme arasında<br/>ciddi uyumun olmadığını göstermektedir. Sarmal kapı<br/>gibi kritik cihazlarda, bakım takvimi takip edilmemiş<br/>veya atlanmıştır. **İkincil Faktör - Operasyonel<br/>Önceliğin Düşüklüğü:** Raporta açıkça belirtildiği gibi<br/>'bakım önceliği düşük; üretim girişi aksamasın baskısı'<br/>mevcuttur. Üretim bölgesindeki ana giriş kapısı,"]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Bakım planlaması sisteminde 'aylık bakım' prosedürü<br/>tanımlı olmasına rağmen, Sarmal Kapı SK-01'in detaylı<br/>mekanizma kontrolünün 14 ay boyunca<br/>gerçekleştirilememesinin veya kayıtlanmamasının temel<br/>nedeni nedir? — Başka bir deyişle: Bakım takviminin<br/>uygulanmasını izleyen sorumlu kişi/ekip var mıydı;<br/>eksik bakımlar ne zaman ve nasıl fark edilebilirdi;<br/>sistem entegrasyonunda (planlama + gerçekleştirme +<br/>kayıt) hangi nokta kopmuştur?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A4 --> Q5
+    A6["Sarmal Kapı SK-01'in 14 ay boyunca detaylı mekanizma<br/>kontrolünün gerçekleştirilmemesinin/kayıtlanmamasının<br/>temel nedeni, **bakım yönetim sistemi üç kritik noktada<br/>kopmasıdır**: **1. Sorumluluk Boşluğu<br/>(Planlama-Uygulama Kopuşu)** - Aylık bakım prosedürü<br/>'kağıtta' tanımlı olmasına rağmen, bunun kim<br/>tarafından, ne zaman ve nasıl uygulanacağı net<br/>atanmamıştır - Son kayıtlı detaylı mekanizma kontrolü<br/>14 ay öncedir; bu dönem sonrasında denetlenmeyen bir<br/>işlem var - 'Bakım müdürü,' 'vardiya koordinatörü' gibi<br/>açık sorumluluk tanımı yoktur **2. İzleme ve Erken<br/>Uyarı Sistemi Eksikliği (Uygulama-Kayıt Kopuşu)** -"]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>**Why-4**: Bakım müdürü görevini, denetim<br/>mekanizmasını ve tork kontrol prosedürünü tanımlayan<br/>sorumluluk matrisinin neden oluşturulmadığı /<br/>kurulmadığı, ve üretim kesintisini önleme önceliğinin<br/>neden güvenlik protokollerinin uygulanmasından daha<br/>ağır baslandığı yönetim seviyesinde?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A6 --> Q7
+    A8["Yönetim seviyesinde sorumluluk matrisi oluşturulmadığı<br/>için bakım görevleri muğlak kalmıştır. Bakım müdürünün<br/>spesifik sorumlulukları (aylık kontrol sıklığı, tork<br/>ölçüm standartları, kontrol noktaları), denetim<br/>mekanizması (bakım ekibi denetimi, kayıt doğrulaması)<br/>ve eskalasyon prosedürü tanımlanmamıştır. Sonuç olarak,<br/>son detaylı kontrol 14 ay geride kalmıştır. Üretim<br/>kesintisini önleme baskısı, güvenlik protokollerinden<br/>daha ağır bastığı için çalışanlar anormal sesi duysalar<br/>da kapının durdurulmasını talep etmemiştir. Yönetim<br/>tarafından 'üretim devam etsin' sinyali, 'anormal ses<br/>duyunca uyarı ver' prosedürünü etkisiz kılmıştır."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden tesis yönetimi ve İnsan Kaynakları, kritik<br/>ekipman (sarmal kapı gibi) için bakım sorumluluk<br/>matrisini ve güvenlik-üretim öncelik sıralamasını<br/>yazılı prosedür olarak resmi olarak oluşturmamıştır? Bu<br/>belgeler oluşturulamamasının arkasında hangi faktör<br/>yatmaktadır — kaynak yetersizliği, yazılı sistem kurma<br/>bilgisinin yokluğu, güvenlik kültürünün zayıflığı, mı<br/>yoksa yönetim seviyesinde bu tür dokümantasyona<br/>verilecek önem konusunda bir uzlaşma olmaması mıdır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A8 --> Q9
+    A10["Kritik ekipman (sarmal kapı gibi) için bakım<br/>sorumluluğu matrisinin ve güvenlik-üretim öncelik<br/>sıralamasının yazılı prosedür olarak resmi olarak<br/>oluşturulamamasının arkasında **çok faktörlü bir<br/>nedenler bileşimi** yatmaktadır: **Birincil Faktör -<br/>Yönetim Seviyesinde Güvenlik Önceliklendirmesinin<br/>Eksikliği (D1.1)**: - Olay raporundaki 'kağıtta aylık'<br/>ifadesi ve 14 aylık denetim boşluğu, yönetim<br/>seviyesinde bu tür dokümantasyona verilecek önem<br/>konusunda bir uzlaşma olmamasını göstermektedir -<br/>Üretim kesintisi baskısı (45 dk duruş yönetim için<br/>önemli) ve bakım ertelenmesi (aylık plan &gt; 14 ay"]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN (**D1.1** (Weak Leadership Commitment - Zayıf Liderlik Bağlılığı): Güvenlik projelerine (bakım prosedür dokümantasyonu) kaynak ayrılmamış, üretim baskısı önceliklendirilebilmiştir
+
+**D6.1** (Maintenance Strategy Inadequate - Bakım Stratejisi Yetersiz): Kritik ekipman (sarmal kapı) için sistematik PM planı ve sorumluluğu matrisi oluşturulmamıştır
+
+**D9.1** (No SPP for Task - Görev için Yazılı Prosedür Yok): Bakım sorumluluğu matrisi ve güvenlik-üretim öncelik sıralaması yazılı prosedür olarak mevcut değildir
+
+**D9.5** (Monitoring/Audit Inadequate - İzleme/Denetim Yetersiz): Bakım uyumluluğu denetlemek için sistemik audit/kontrol mekanizması tasarlanmamış; bakım kayıtları kısmi ve izlenmemektedir
+
+**D1.5** (Normalization of Deviance - Sapmaların Normalleştirilmesi): 14 aylık denetim boşluğu ve "kağıtta aylık" prosedür vs. gerçek uygulama arasındaki uçurum, bakım ertelenmesinin normalleştirildiğini göstermektedir):</b><br/>Kök Neden<br/>Kritik ekipman (sarmal kapı gibi) için bakım<br/>sorumluluğu matrisinin ve güvenlik-üretim öncelik<br/>sıralamasının yazılı prosedür olarak resmi olarak<br/>oluşturulamamasının arkasında **çok faktörlü bir<br/>nedenler bileşimi** yatmaktadır: **Birincil Faktör<br/>- Yönetim Seviyesinde Güvenlik<br/>Önceliklendirmesinin Eksikliği (D1.1)**: - Olay<br/>raporundaki 'kağıtta aylık' ifadesi ve 14 aylık<br/>denetim boşluğu, yönetim seviyesinde bu tür<br/>dokümantasyona verilecek önem konusunda bir<br/>uzlaşma olmamasını göstermektedir - Üretim<br/>kesintisi baskısı (45 dk duruş yönetim için"]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden sarmal kapının üst mekanizmasındaki bağlantı<br/>braketi kopup zemine düştü?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q11
+    A12["Sarmal kapının üst mekanizmasındaki bağlantı braketi,<br/>bakım programının etkisiz uygulanması ve mekanik<br/>bağlantıların periyodik tork kontrol ve gevşemelik<br/>kontrolünün yapılmamış olması nedeniyle aşınıp<br/>gevşemiş, sonuç olarak yoğun kullanım sırasında<br/>kopmuştur. Olay öncesi işçiler tarafından duyulan<br/>anormal metalik sesler, mekanik arızanın ileri aşamada<br/>olduğunun uyarı işaretiydi ancak bu sinyal<br/>'durdur-bildir' prosedürü eksikliği nedeniyle<br/>değerlendirilmemiştir."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Bakım programı kağıtta aylık olarak tanımlanmasına<br/>rağmen, son 14 ayda sarmal kapı mekanizmasında kritik<br/>bağlantıların (tork, gevşemelik) detaylı kontrolü neden<br/>yapılmamış ve bakım kayıtları neden eksik kalmıştır?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A12 --> Q13
+    A14["Bakım programının kağıtta tanımlanmasına rağmen<br/>uygulanmamasının kök nedenleri şunlardır: 1. **Bakım<br/>Yönetim Sistemi Eksikliği**: Son 14 ayda kritik<br/>bağlantılar için hiç detaylı tork/gevşemelik kontrolü<br/>yapılmamıştır. Bu, bakım planının rutin kontrol listesi<br/>haline getirildiğini (kağıt üzerinde işaretleme) ama<br/>gerçek uygulanmadığını gösterir. 2. **Üretim Baskısı<br/>ile Bakım Çatışması**: Vardiya notunda 'aceleyle içeri<br/>girdik' ifadesi ve anormal seslerin ciddiye alınmaması,<br/>bakım/güvenlik aktivitelerinin üretim hızının gerisinde<br/>bırakıldığını gösterir. 3. **Kontrol ve Denetim<br/>Mekanizması Eksikliği**: Bakım kayıtlarının kısmen"]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Bakım programı ve denetim mekanizması bu denli<br/>zayıflamış olmasunun, işletme yönetiminin üretim<br/>hedefleri ile bakım/güvenlik kaynakları arasında nasıl<br/>bir tercih (optimal kaynak tahsisi veya bütçe<br/>kısıtlaması) yaptığını göstermektedir. Bu tercihin veya<br/>kısıtlamanın arka sebebi nedir?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A14 --> Q15
+    A16["Bakım programının ve denetim mekanizmasının<br/>zayıflaması, işletme yönetiminin **üretim sürekliliği<br/>ve operasyonel verimlilik hedeflerini, bakım/güvenlik<br/>kaynaklarına göre daha yüksek önceliğe<br/>yerleştirdiğini** göstermektedir. Bunun arka sebepleri<br/>şunlardır: **Birincil Sebepler:** 1. **Bütçe<br/>Kısıtlaması / Maliyet Optimizasyonu:** Bakım personeli,<br/>araçları veya dış bakım hizmetleri için ayrılan bütçe<br/>sınırlı olabilir; yönetim, kayan bakım (reactive<br/>maintenance) modelini tercih etmiş olabilir. 2.<br/>**Üretim Baskısı ve Kapasite Hedefleri:** Kapıyı<br/>kapatıp bakım yapmak = üretim duruşu = hedefler"]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>**Why-4: Yönetim, üretim hedefleri ve operasyonel<br/>verimliliği, preventif bakım ve güvenlik<br/>yatırımlarından neden daha yüksek önceliğe<br/>yerleştirmiştir? Bu tercihte rol oynayan kurumsal<br/>baskılar, performans metrikleri, finansal sınırlamalar<br/>veya pazar koşulları nelerdir?**"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A16 --> Q17
+    A18["Yönetim, preventif bakım ve güvenlik yatırımlarını<br/>üretim hedefleri ve operasyonel verimliliğin altına<br/>almıştır. Bu karar, aşağıdaki kurumsal baskılarla<br/>açıklanmaktadır: **1. Performans Metrikleri<br/>Prioritesi:** - Üretim hedefleri ve kapı arıza<br/>(downtime) süresi gibi operasyonel KPI'lar ön plandadır<br/>- Güvenlik/bakım metrikleri (preventif bakım tamamlanma<br/>oranı, mekanizma kontrol sıklığı) sistem tarafından<br/>veri toplanmamakta veya raporlanmamaktadır **2.<br/>Finansal Sınırlamalar:** - Detaylı mekanizma kontrolü<br/>14 aydır yapılmamıştır (bütçe kısıtlaması olduğu<br/>düşünülmektedir) - Tork kontrolü gibi kritik kalite"]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Yönetim kararlarında üretim hedeflerini<br/>güvenlik/bakımın üzerine alan değerlendirme sistemi ve<br/>bütçe tahsisi mekanizması niçin kurulmuş veya<br/>sürdürülmüştür? (Örneğin: Performans değerlendirmesinde<br/>güvenlik KPI'larının ağırlığı nedir? Bakım bütçesi<br/>tahsisi hangi kriterlere göre yapılmaktadır? Endüstri<br/>standartları ve dış denetim mekanizmaları bu kararları<br/>yeterince kontrol etmemektedir?)"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A18 --> Q19
+    A20["Yönetim, üretim hedeflerini güvenlik/bakım<br/>kayıklarının üzerine alan değerlendirme sistemi ve<br/>bütçe tahsisi mekanizmasını aşağıdaki nedenlerle kurmuş<br/>ve sürdürmüştür: **1. Performans Ölçüm Sistemi<br/>Güvenlik'i Marjinal Konuma Yerleştiriyor:** - Sarmal<br/>kapı bakımı 14 aydır 'detaylı mekanizma kontrolü'<br/>geçirmemiş; bu muhasebe sisteminde kritik olmayan bir<br/>görevi işaretliyor - Güvenlik KPI'ları (ramak kala<br/>raporları, mekanik bakım %'si) muhtemelen Üretim<br/>KPI'larının (kapı uptime, throughput) ağırlık<br/>oranlarının çok altında - Anormal ses/titreşim<br/>prosedürü 'zayıf uygulanıyor' → çalışanlar ve"]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN (**D6.6** (Deferred Maintenance Normalization) — PRIMARY
+**D1.4** (Production Pressure) — CONTRIBUTING
+**D1.1** (Weak Leadership Commitment) — ROOT ORGANIZATIONAL
+**D9.5** (Monitoring/Audit Inadequate) — SYSTEMIC CONTROL GAP):</b><br/>Kök Neden<br/>Yönetim, üretim hedeflerini güvenlik/bakım<br/>kayıklarının üzerine alan değerlendirme sistemi ve<br/>bütçe tahsisi mekanizmasını aşağıdaki nedenlerle<br/>kurmuş ve sürdürmüştür: **1. Performans Ölçüm<br/>Sistemi Güvenlik'i Marjinal Konuma<br/>Yerleştiriyor:** - Sarmal kapı bakımı 14 aydır<br/>'detaylı mekanizma kontrolü' geçirmemiş; bu<br/>muhasebe sisteminde kritik olmayan bir görevi<br/>işaretliyor - Güvenlik KPI'ları (ramak kala<br/>raporları, mekanik bakım %'si) muhtemelen Üretim<br/>KPI'larının (kapı uptime, throughput) ağırlık<br/>oranlarının çok altında - Anormal ses/titreşim"]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>**Why-1: Sarmal kapı mekanizmasındaki metal bağlantı<br/>braketi neden koptu / gevşeyerek yere düştü?** (Odak:<br/>Mekanik arızanın temel nedeni — aşınma, gevşeme,<br/>malzeme yorulması vb.)"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q21
+    A22["Sarmal kapı mekanizmasındaki metal bağlantı braketi,<br/>**bakım eksikliğine ve zamanında tespit edilmeyen<br/>mekanik gevşemeye bağlı olarak kopmuştur**. Spesifik<br/>nedenler: - **Son 14 aydır detaylı mekanik kontrol<br/>yapılmamıştır** — bu dönemde bağlantı cıvatalarının ve<br/>braketinin zamanla gevşemesi tespit edilememiştir. -<br/>**Tork/sıkılık kontrolü periyodik bakım prosedürüne<br/>dahil edilmemiştir** — cıvataların gevşemesi öznel<br/>gözlem veya periyodik kalibrasyonlu kontrol olmadığında<br/>ilerlemektedir. - **Anormal sinyaller (tıkırtı sesi)<br/>yeterli şekilde incelenmemiştir** — 08:40'ta çeşitli<br/>çalışanlar tıkırtı sesinden bahsetmişler ancak kapı,"]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>**Why-2: Sarmal kapı mekanizmasının son 14 aydır<br/>detaylı mekanik kontrolünden geçmemesinin ve<br/>tork/sıkılık kontrolünün periyodik bakım prosedürüne<br/>dahil edilmemesinin temel sebebi nedir?** (Başka bir<br/>deyişle: Bakım planı ve tork kontrolünü uygulamayan<br/>sistem, kaynaklar, prosedür yazımı, ya da<br/>önceliklendirme politikası nedir?)"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A22 --> Q23
+    A24["Sarmal kapı mekanizmasının son 14 aydır detaylı<br/>mekanik kontrolünden geçmemesinin ve tork/sıkılık<br/>kontrolünün periyodik bakım prosedürüne dahil<br/>edilmemesinin temel sebepleri: **1. Prosedür Yazımı<br/>Eksikliği:** - Periyodik bakım prosedürüne 'kritik<br/>bağlantı tork kontrolü' başlık olarak dahil<br/>edilmemiştir - Kontrol noktaları ve tork değerleri<br/>tanımlanmamıştır - Mekanik bağlantıların belirtilen<br/>aralıklarla kontrol edilmesi zorunlu kılınmamıştır **2.<br/>Kaynaklar ve İş Yükü Yönetimi:** - Bakım personelinin<br/>iş yükü, bu detaylı kontrolleri düzenli olarak yapmaya<br/>müsait değildir - Yapılan aylık planlı bakımlar"]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Üretim tesisindeki 'üretim akışını kesme baskısı'nın<br/>bakım etkinliklerinin ertelenmesine neden olması, hangi<br/>yönetim hedefleri / performans metriklerinin / teşkilat<br/>kültürünün sonucudur ve bu hedeflerin oluşturulmasında<br/>risk yönetimi / koruma bakış açısı neden öncelikli<br/>değildir?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A24 --> Q25
+    A26["'Üretim akışını kesme baskısı'nın bakım<br/>etkinliklerinin ertelenmesine neden olan yönetim<br/>hedefleri ve kültür unsurları şunlardır: **Performans<br/>Metrikleri:** - Üretim sürekliliği ve kapasitesi (%<br/>uptime) - Üretim duruşu süresi minimize etme - Kısa<br/>vadeli verimlilik göstergeleri **Yönetsel Kültür:** -<br/>Güvenlik ve bakım 'prodüktif olmayan' maliyet merkezi<br/>olarak görülmesi - Üretim müdürü baskısı nedeniyle<br/>bakım zamanlaması ile üretime uyum baskısı - Reaktif<br/>yönetim (olay sonrası müdahale) yerine proaktif yönetim<br/>(önleyici bakım) tercih edilmemesi **Risk Yönetimi<br/>Neden Öncelikli Değil:** - Ramak kala olaylar"]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Yönetim kültürünün güvenliği ve proaktif bakımı<br/>'üretim için gerekli olmayan maliyet' olarak kategorize<br/>etmesine neden olan örgütsel sistem faktörleri<br/>nelerdir? (Ör: Performans değerlendirme kriterleri,<br/>bütçe tahsisi yapısı, üretim müdürünün teşvik<br/>mekanizması, kalite-güvenlik-verimlilik arasında<br/>tanımlanan öncelik sırası?)"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A26 --> Q27
+    A28["Yönetim kültürünün güvenlik ve bakımı 'üretim için<br/>gerekli olmayan maliyet' olarak kategorize etmesinin<br/>temel örgütsel sistem faktörleri: 1. **Performans<br/>Değerlendirme Kriterleri**: Üretim müdürünün başarı<br/>metriği 'üretim saatleri' ve 'kapasite kullanımı'dır.<br/>Bakım duruşları negatif performans göstergesi olarak<br/>kaydedilir. Ramak kala bildirimi cezalandırıcı<br/>değildir. 2. **Bütçe Tahsisi Yapısı**: Bakım bütçesi,<br/>'acil onarım' bütçesine göre ikincil kabul edilir.<br/>Planlı bakım için 14 aylık aralık, 'maliyet tasarrufu'<br/>yaklaşımını gösterir; bütçe güvenliğe tahsis edilmemiş,<br/>sadece arıza sonrası müdahaleye ayrılmıştır. 3."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Üretim müdürlüğü ve bütçe tahsisinin performans<br/>metriklerinde, güvenlik yerine 'üretim duruşsuzluğunu'<br/>ve 'maliyet tasarrufu' ilkesini merkeze alan bu yönetim<br/>sisteminin tasarımı ve benimsenmesine hangi kurumsal<br/>stratejik kararlar, pazar rekabet baskıları veya<br/>yönetim felsefesi katkıda bulunmuştur?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A28 --> Q29
+    A30["Olay raporu, aşağıdaki kurumsal stratejik tercihler ve<br/>yönetim felsefesinin güvenlik yerine üretim<br/>duruşsuzluğunu ve maliyet tasarrufunu merkeze aldığını<br/>göstermektedir: **1. Bakım Bütçesi & Öncelik Tahsisi<br/>(Stratejik Karar)** - Son detaylı mekanizma kontrolü 14<br/>ay gecikmişken 'aylık periyodik bakım planı' yalnızca<br/>kağıt üzerinde kalması, bakım fonksiyonuna düşük bütçe<br/>tahsisini yansıtmaktadır. - Kritik bağlantı tork<br/>kontrolü hiçbir zaman sistemik olarak yapılmamıştır —<br/>bu, bakım-güvenlik maliyetleri ile işletme tasarrufu<br/>arasında kâr lehine tercih yapıldığını gösterir. **2.<br/>Üretim Devamlılığı Prioritizasyonu (Pazar Baskısı)** -"]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN (**D1.1** — Zayıf Liderlik Taahhütü (Weak Leadership Commitment)
+→ Güvenlik projelerine bütçe tahsisinde düşük öncelik; kritik bakım kontrolleri 14 ay deferred
+
+**D1.4** — Üretim Baskısı (Production Pressure)
+→ "Üretim girişi aksamasın baskısı"; ~45 dk duruşun finansal maliyeti, güvenlik yatırımını bastırmaktadır
+
+**D6.6** — Deferred Maintenance Normalizasyonu (Deferred Maintenance Normalization)
+→ Son detaylı mekanizma kontrolü 14 ay gecikmişken kağıt üzerinde aylık PM planlı; kritik tork kontrolleri hiçbir zaman yapılmadı; backlog tolere edilmiştir
+
+**D9.5** — Monitoring/Denetim Yetersizliği (Monitoring/Audit Inadequate)
+→ Anormal ses/titreşim için "durdur-bildir prosedürü zayıf uygulanıyor" — sistemik uyum denetim mekanizması eksiktir
+
+**D1.9** — Yönetim Toleransı Bilinen Sapmalara (Management Tolerance of Known Deviations)
+→ Bakım kaydı eksiklikleri ve tork kontrolü yapılmayan durum 14 aydır yönetim tarafından bilinir ve tolere edilir):</b><br/>Kök Neden<br/>Olay raporu, aşağıdaki kurumsal stratejik<br/>tercihler ve yönetim felsefesinin güvenlik yerine<br/>üretim duruşsuzluğunu ve maliyet tasarrufunu<br/>merkeze aldığını göstermektedir: **1. Bakım<br/>Bütçesi & Öncelik Tahsisi (Stratejik Karar)** -<br/>Son detaylı mekanizma kontrolü 14 ay gecikmişken<br/>'aylık periyodik bakım planı' yalnızca kağıt<br/>üzerinde kalması, bakım fonksiyonuna düşük bütçe<br/>tahsisini yansıtmaktadır. - Kritik bağlantı tork<br/>kontrolü hiçbir zaman sistemik olarak<br/>yapılmamıştır — bu, bakım-güvenlik maliyetleri ile<br/>işletme tasarrufu arasında kâr lehine tercih"]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden sarmal kapının bağlantı braketi, mekanizma<br/>içindeki aşınma, gevşeme veya metal yorgunluğu<br/>nedeniyle kopmuş duruma gelmiştir?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q31
+    A32["Sarmal kapının bağlantı braketi, mekanizma içindeki<br/>uzun süreli aşınma ve gevşemeye bağlı metal yorgunluğu<br/>nedeniyle kopmuştur. Yapısal neden: Son detaylı<br/>mekanizma kontrolü 14 ay önce yapılmış olup, aradan<br/>geçen sürede periyodik tork kontrolü ve bağlantı<br/>sıkılığı muayenesinin yapılmadığı kayıtlarda<br/>görülmektedir. Operasyonel neden: Anormal metalik<br/>'tıkırtı' sesleri (08:40'ta gözlemlenmiş) göz ardı<br/>edilmiş, 'durdur-bildir' prosedürü uygulanmamıştır.<br/>Yönetimsel neden: Bakım önceliğinin düşük tutulması ve<br/>üretim akışını kesmeyen yönündeki örtülü baskı, kritik<br/>mekanik kontrollerinin ertelenmesine yol açmıştır."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden sarmal kapı mekanizmasının periyodik bakım planı<br/>(kağıtta aylık olarak tanımlanmış olmasına rağmen) 14<br/>aylık bir aralıkla gerçekleştirilmiş ve son detaylı<br/>mekanizma kontrolü bu kadar uzun süre ertelenmişitir?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A32 --> Q33
+    A34["Sarmal kapı mekanizmasının periyodik bakım planının 14<br/>aylık aralıkla gerçekleştirilmesinin temel nedeni,<br/>**planlı bakım sisteminin yönetimsel olarak<br/>uygulanmaması ve uygulanmasının denetlenmemesidir**.<br/>**Kök Sebeplerinin Zinciri:** 1. **Yazılı plan-uygulama<br/>ayrışması**: Bakım planı kağıtta aylık olmasına rağmen,<br/>hiçbir mekanizma bu planın uygulanmasını zorunlu<br/>kılamıyordu. 2. **Operasyonel baskı**: Üretim hattının<br/>kesintisiz çalışması talebi, planlı bakımı<br/>'ertelenebilir' görülen faaliyete dönüştürmüştür. 3.<br/>**Sorumluluk boşluğu**: Kimin bakım planını uygulamakla<br/>sorumlu olduğu (bakım müdürü, vardiya sorumlusu, tesisi"]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Neden sarmal kapı mekanizmasının periyodik bakım<br/>sorumluluğu açıkça tanımlanmamış ve bakım planının<br/>uygulanmasını izlemek için KPI / denetim mekanizması<br/>kurulmamıştır? (Yani: Yönetim seviyesinde bakım<br/>görevinin sahipliği ve performans denetim sistemi<br/>oluşturulmamasının nedeni nedir?)"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A34 --> Q35
+    A36["Sarmal kapı mekanizmasının periyodik bakım sorumluluğu<br/>açıkça tanımlanmamış ve bakım planının uygulanmasını<br/>izlemek için KPI/denetim mekanizması kurulmamamasının<br/>temel nedenleri: 1. **Yönetim Seviyesinde Sorumluluk<br/>Boşluğu**: Bakım görevinin kim tarafından yönetileceği,<br/>kim tarafından denetleneceği ve hangi ölçütlerle<br/>başarısının değerlendirileceği belirtilmemiştir. Bu<br/>sebeple bakım planı 'kağıtta aylık' olarak kalırken,<br/>fiili uygulanması (son kontrol 14 ay önce) ihmal<br/>edilmiştir. 2. **Üretim Baskısının Güvenlikle<br/>Dengelenmemesi**: Raporun ön bulgularında 'üretim<br/>girişi aksamasın baskısı' açıkça belirtilmiştir."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Yönetim seviyesinde bakım görevinin (sarmal kapı<br/>mekanizması periyodik kontrolü) sahibinin açıkça<br/>tanımlanmamış ve uygulanmasını izlemek için KPI/denetim<br/>mekanizmasının kurulmamış olmasının temel nedeni, bakım<br/>ve güvenlik konularının kurumsal risk yönetim<br/>stratejisine ve öncelik sıralamasına yeterince entegre<br/>edilmemiş olmasıdır — bu entegrasyon eksikliğinin<br/>yönetim tarafından neden kabullenildiği veya göz ardı<br/>edildiği?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A36 --> Q37
+    A38["Yönetim seviyesinde bakım görevinin sahibinin açıkça<br/>tanımlanmamış olması ve KPI/denetim mekanizmasının<br/>kurulmamış olmasının temel nedeni, **kurumsal risk<br/>yönetim stratejisinde bakım ve güvenlik işlevlerinin<br/>düşük önceliklendirilmesidir**. Yönetim bu durumu<br/>kabullemiş/göz ardı etmiştir çünkü: 1. **Üretim<br/>hedefleri baskısı**: Kapı bakımı 'üretim durdurabilir'<br/>faaliyeti olarak görüldüğü için, kısıtlı kaynaklar<br/>doğrudan üretim faaliyetlerine yönlendirilmiştir. 2.<br/>**Reaktif yönetim kültürü**: 'Henüz ciddi olay olmamış'<br/>mantığıyla, proaktif bakım sistemine yatırım<br/>yapılmamıştır. Bakım, acil durumlara yanıt verme olarak"]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>**Why-5: Yönetim stratejisinin neden 'üretim hedefleri<br/>baskısı → reaktif bakım kültürü → sorumluluk<br/>bulanıklığı' yapısını kabul etmiştir ve bu stratejik<br/>seçimlerin kökünde hangi kurumsal/dış faktörler (pazar<br/>rekabeti, finansal baskı, liderlik yaklaşımı, endüstri<br/>normları) bulunmaktadır?** Başka bir deyişle:<br/>**Yönetimin bu tür bir risk toleransı ve öncelik<br/>sistemini benimseyen temel motivasyonları nelerdir?**"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A38 --> Q39
+    A40["Yönetim stratejisinin 'üretim hedefleri baskısı →<br/>reaktif bakım kültürü → sorumluluk bulanıklığı'<br/>yapısını kabullenmiş olmasının kökünde aşağıdaki<br/>kurumsal ve dış faktörler bulunmaktadır: **1. FINANSAL<br/>BASKI VE MALIYET YÖNETİMİ:** - Bakım bütçeleri 'kontrol<br/>altına alınması gereken maliyet merkezi' olarak<br/>kategorize edilmiştir - Reaktif bakım (arıza sonrası<br/>tamiri), planlı bakımdan daha düşük cari maliyeti<br/>göstermektedir - Yönetim, beklenen arıza oranını ve<br/>potansiyel ramak kala riskini finansal açıdan 'kabul<br/>edilebilir' olarak değerlendirmiş görünmektedir **2.<br/>PAZAR REKABETI VE ÜRETİM HEDEFLERİ:** - Üretim duruşu ="]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN (**D1.1 - Weak Leadership Commitment** (Zayıf Liderlik Taahhüdü)
++ **D1.4 - Production Pressure** (Üretim Baskısı)
++ **D6.6 - Deferred Maintenance Normalization** (Ertelenmiş Bakımın Normalleştirilmesi)
++ **D1.9 - Management Tolerance of Known Deviations** (Bilinen Sapmaların Yönetim Tarafından Tolere Edilmesi)
++ **D9.5 - Monitoring/Audit Inadequate** (İzleme/Denetim Yetersiz - Bakım Uyumu Sistem Olarak Kontrol Edilmemekte)):</b><br/>Kök Neden<br/>Yönetim stratejisinin 'üretim hedefleri baskısı →<br/>reaktif bakım kültürü → sorumluluk bulanıklığı'<br/>yapısını kabullenmiş olmasının kökünde aşağıdaki<br/>kurumsal ve dış faktörler bulunmaktadır: **1.<br/>FINANSAL BASKI VE MALIYET YÖNETİMİ:** - Bakım<br/>bütçeleri 'kontrol altına alınması gereken maliyet<br/>merkezi' olarak kategorize edilmiştir - Reaktif<br/>bakım (arıza sonrası tamiri), planlı bakımdan daha<br/>düşük cari maliyeti göstermektedir - Yönetim,<br/>beklenen arıza oranını ve potansiyel ramak kala<br/>riskini finansal açıdan 'kabul edilebilir' olarak<br/>değerlendirmiş görünmektedir **2. PAZAR REKABETI"]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Sarmal kapının üst mekanizmasındaki bağlantı braketi<br/>neden koptu / mekanizmada ilk kopma veya kritik<br/>aşınma/gevşeme oluştu?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    OLAY --> Q41
+    A42["Sarmal kapının üst mekanizmasındaki bağlantı<br/>braketinde ilk gevşeme/kritik aşınma, **periyodik bakım<br/>planının etkili uygulanmaması ve bağlantı noktalarında<br/>tork kontrolü yapılmaması** nedeniyle oluşmuştur.<br/>Raporda belirtildiği üzere, son detaylı mekanizma<br/>kontrolü 14 ay önce yapılmış, kritik bağlantı tork<br/>kontrol protokolü mevcut değildir. Anormal metalik ses<br/>ve tıkırtı, gevşemenin ilerlemesinin bir göstergesi<br/>olmuş; bu sinyallere çalışanlar tarafından yeterince<br/>karşılık verilmemiştir. Bakım önceliğinin düşük olması<br/>ve üretim akışının kesintiye uğramaması baskısı,<br/>periyodik kontrollerin yetersiz kalmasına yol açmıştır."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Periyodik bakım planı mevcut olmasına rağmen, son 14<br/>ayda detaylı mekanizma kontrolü ve tork kontrol<br/>protokolü **neden etkili şekilde uygulanmamış ve bakım<br/>yönetimi düşük öncelik haline gelmiştir**? (Bakım<br/>kaynağı yetersizliği mi, üretim baskısı mı, bakım<br/>planının tanımı mi eksik, yoksa sorumlu atama/gözetim<br/>mi yapılmamış?)"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A42 --> Q43
+    A44["Detaylı mekanizma kontrolü ve tork kontrol<br/>protokolünün 14 ay boyunca etkili şekilde<br/>uygulanmaması, **dört temel neden kombinasyonundan**<br/>kaynaklanmıştır: **1. Bakım Yönetim Sistemi Eksikliği<br/>(Birincil Neden):** - Periyodik bakım planı 'kağıtta<br/>aylık' olarak tanımlanmış ancak **gerçek uygulanması<br/>izlenmemiş** - Bakım kayıtları 'kısmen eksik' — yani<br/>yapılan/yapılmayan işlerin net kaydı yoktur - Tork<br/>kontrol protokolü tanımlanmış olsa da, **uygulanmaktan<br/>sorumlu kişi/ekip açıkça belirtilmemiştir** **2. Üretim<br/>Baskısı ve Önceliklendirme Hatası:** - 'Bakım önceliği<br/>düşük; üretim girişi aksamasın baskısı' doğrudan"]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Bakım yönetim sistemi (periyodik kontrol, tork ölçümü,<br/>kayıt ve denetim) tasarlanmadı veya tasarlanmış olsa da<br/>**sistematik olarak uygulanmadığı ve 14 ay boyunca hiç<br/>denetlenmediği** gerçeğinin temelinde, tesis yönetim<br/>yapısında **bakım sorumluluğunun (kim, ne zaman,<br/>nasıl?) açıkça tanımlanmadığı veya yasal/prosedürel<br/>olarak zorunlu kılınmadığı** sorusu vardır — bu<br/>sorumluluğun tanımlanmadığı / enforsu edilmediği temel<br/>nedenler nelerdir? (Örn: bakım müdürü olmayışı, yönetim<br/>gözetim kontrol listesinin eksikliği, muhasebe/bütçe<br/>sorunu, vs.)"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A44 --> Q45
+    A46["Olay raporundan tespit edilen bakım sorumluluğunun<br/>tanımlanmadığı / enforsu edilmediği temel nedenler:<br/>**1. Resmi Bakım Yöneticisi / Sorumlusu Pozisyonunun<br/>Tanımlanmadığı:** - Raporda 'bakım müdürü' yerine<br/>sadece genel 'bakım müdahalesi' tabiri kullanılmıştır -<br/>Kim tarafından, ne zaman, nasıl yapılacağı açıkça<br/>belirtilmemiştir **2. Yönetim Gözetim ve Denetim<br/>Mekanizmasının Eksik Olması:** - 14 ay boyunca detaylı<br/>mekanizma kontrolü yapılmamıştır - Bakım kayıtları<br/>'kısmen eksik' durumdadır; hiçbir denetim kaydı yoktur<br/>- Aylık plan 'kağıtta' kalarak fiili uygulanmamıştır<br/>**3. Üretim Devamılılık Baskısının Bakım Sorumluluğunun"]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Yönetim neden sarmal kapı bakım sorumluluğunun açık<br/>bir şekilde tanımlanması, bakım kayıtlarının tam<br/>tutulması ve tork kontrolü gibi teknik parametrelerin<br/>denetim prosedürü haline getirilmesini<br/>önceliklendirmemiş / resource tahsis etmemiştir?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A46 --> Q47
+    A48["Yönetim, sarmal kapı bakım sorumluluğunun açık<br/>tanımlaması, bakım kayıtlarının tam tutulması ve tork<br/>kontrolü gibi teknik parametrelerin denetim prosedürü<br/>haline getirilmesini önceliklendirmemiş/kaynak tahsis<br/>etmemiştir çünkü: 1. **Üretim Baskısı Üzerinde Güvenlik<br/>Uzlaştırması**: Olay raporu 'üretim girişi aksamasın<br/>baskısı' altında bakım önceliğinin düşük tutulduğunu<br/>açıkça belirtir. Kapının bakım için kapatılması üretim<br/>duruşuna neden olacağından, yönetim bu önlemi<br/>ertelemiştir. 2. **Ramak Kala (Near-Miss) Algısı**:<br/>Olay kopan parçanın çarpması olmadığından 'ramak kala'<br/>olarak sınıflandırılmıştır. Bu, yönetimin sorunu 'düşük"]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Üretim alanında yönetim ve operasyonel öncelikleri<br/>belirleyen performans değerlendirme, bütçe tahsisi veya<br/>hedef belirleme sistemi, neden güvenlik yatırımlarından<br/>ziyade üretim/verimlilik hedeflerini ön plana<br/>koymaktadır? (Yönetim yapısı, teşvikler, şirket<br/>stratejisi, sektörel normu.)"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:12px
+    A48 --> Q49
+    A50["Üretim tesisinde bakım yatırımlarından ziyade<br/>üretim/verimlilik hedeflerinin ön plana alınması,<br/>**aşağıdaki yapısal faktörlerden kaynaklanmaktadır**:<br/>**1. YÖNETİM STRATEJİSİ VE ÖNCELİKLENDİRME:** Sarmal<br/>kapı mekanizması bakım planı yazılı olarak aylık<br/>belirtilmesine rağmen, son detaylı kontrol **14 ay<br/>öncesinde** yapılmış olması, bakım kaynaklarının<br/>(personel, zaman, bütçe) üretim sürekliliğine<br/>yönlendirildiğini gösterir. Yönetim, kısa vadeli<br/>kapasiteyi maksimize etmeyi, uzun vadeli varlık<br/>bütünlüğünden önce tutmaktadır. **2. OPERASYONEL<br/>BASKILAR:** Tanık beyanı ('ses bir süredir vardı ama"]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:12px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN (**D6.6** — Deferred Maintenance Normalization
+**D1.4** — Production Pressure
+**D1.1** — Weak Leadership Commitment):</b><br/>Kök Neden<br/>Üretim tesisinde bakım yatırımlarından ziyade<br/>üretim/verimlilik hedeflerinin ön plana alınması,<br/>**aşağıdaki yapısal faktörlerden<br/>kaynaklanmaktadır**: **1. YÖNETİM STRATEJİSİ VE<br/>ÖNCELİKLENDİRME:** Sarmal kapı mekanizması bakım<br/>planı yazılı olarak aylık belirtilmesine rağmen,<br/>son detaylı kontrol **14 ay öncesinde** yapılmış<br/>olması, bakım kaynaklarının (personel, zaman,<br/>bütçe) üretim sürekliliğine yönlendirildiğini<br/>gösterir. Yönetim, kısa vadeli kapasiteyi<br/>maksimize etmeyi, uzun vadeli varlık bütünlüğünden<br/>önce tutmaktadır. **2. OPERASYONEL BASKILAR:**"]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:12px,font-weight:bold
+    A50 --> ROOT5
+
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                // Mermaid initialization için bekle
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: true,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 15,
+                            nodeSpacing: 50,
+                            rankSpacing: 80,
+                            diagramPadding: 10
+                        },
+                        themeVariables: {
+                            fontSize: '11px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#333',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    // Mermaid yüklenene kadar bekle
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: true,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 15,
+                                    nodeSpacing: 50,
+                                    rankSpacing: 80,
+                                    diagramPadding: 10
+                                },
+                                themeVariables: {
+                                    fontSize: '11px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>
