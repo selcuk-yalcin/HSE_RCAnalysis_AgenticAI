@@ -180,6 +180,31 @@ class BranchCriticAgent:
         return inter / union if union else 0.0
 
     @staticmethod
+    def _normalize_code(code_str: str) -> str:
+        """Kod stringini normalize et: markdown ve açıklamaları çıkar, sadece kodları al.
+        
+        Örnek:
+            "**D9.5** - MONITORING/AUDIT\n**D1.2**" -> "D1.2,D9.5"
+            "D9.5 (PRIMARY); D1.2 (SECONDARY)" -> "D1.2,D9.5"
+        """
+        if not code_str:
+            return ""
+        
+        # Markdown bold işaretlerini temizle
+        cleaned = code_str.replace("**", "").replace("*", "")
+        
+        # Her satırı işle ve kodları bul (D9.5, A3.2, D1.2 gibi)
+        codes = []
+        import re
+        # A-Z ile başlayan, ardından sayılar ve opsiyonel nokta+sayı olan kodları bul
+        matches = re.findall(r'\b([A-Z]\d+(?:\.\d+)?)\b', cleaned)
+        codes.extend(matches)
+        
+        # Unique kodları sırala ve birleştir (karşılaştırma için tutarlı format)
+        unique_codes = sorted(set(codes))
+        return ",".join(unique_codes)
+
+    @staticmethod
     def _branch_summary(branch: Dict) -> str:
         immediate = branch.get("immediate_cause", {})
         whys = branch.get("why_chain", [])
@@ -222,10 +247,14 @@ class BranchCriticAgent:
                 root_i = bi.get("root_cause", {}) or {}
                 root_j = bj.get("root_cause", {}) or {}
 
+                # Normalize edilmiş kodları karşılaştır
+                norm_code_i = self._normalize_code(root_i.get("code", ""))
+                norm_code_j = self._normalize_code(root_j.get("code", ""))
+                
                 same_code = (
-                    root_i.get("code")
-                    and root_j.get("code")
-                    and root_i.get("code") == root_j.get("code")
+                    norm_code_i
+                    and norm_code_j
+                    and norm_code_i == norm_code_j
                 )
                 fp_i = self._branch_fingerprint(bi)
                 fp_j = self._branch_fingerprint(bj)

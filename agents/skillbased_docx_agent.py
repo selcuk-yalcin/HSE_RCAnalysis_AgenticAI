@@ -1,12 +1,12 @@
 """
-SkillBasedDocxAgent V2 - OpenRouter Claude API + python-docx ile Profesyonel HSE Raporu
+SkillBasedDocxAgent V2 - OpenRouter LLM + python-docx ile Profesyonel HSE Raporu
 ========================================================================================
 
 MİMARİ:
-  RootCauseAgentV2 → JSON → OpenRouter Claude API (içerik üretir) → python-docx (DOCX oluşturur)
+  RootCauseAgentV2 → JSON → OpenRouter LLM (içerik üretir) → python-docx (DOCX oluşturur)
 
 AVANTAJLAR:
-  - OpenRouter üzerinden Claude kullanır
+  - OpenRouter üzerinden seçili modeli kullanır
   - python-docx ile kesin, güvenilir DOCX oluşturma
   - 10-20 sayfalık profesyonel rapor
   - HSE renk şeması: koyu mavi, kırmızı, turuncu, yeşil kutular/tablolar
@@ -30,7 +30,7 @@ from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
 
-from .model_constants import OPENROUTER_DOCX_DEFAULT_MODEL
+from .model_constants import resolve_openrouter_docx_model
 
 load_dotenv()
 
@@ -1000,7 +1000,7 @@ def detect_language(text: str) -> dict:
 
 class SkillBasedDocxAgent:
     """
-    V2: Claude API içerik üretir → python-docx DOCX oluşturur.
+    V2: OpenRouter uzerinden LLM icerigi uretir → python-docx DOCX olusturur.
 
     Kullanım:
         agent = SkillBasedDocxAgent()
@@ -1016,7 +1016,7 @@ class SkillBasedDocxAgent:
         if not key:
             raise ValueError("OPENROUTER_API_KEY bulunamadı! .env dosyasına ekleyin.")
         self.api_key = key
-        self.model = (os.getenv("OPENROUTER_DOCX_MODEL") or OPENROUTER_DOCX_DEFAULT_MODEL).strip()
+        self.model = resolve_openrouter_docx_model().strip()
         self.api_url = _resolve_openrouter_chat_completions_url()
         print(f" SkillBasedDocxAgent V2 hazır (OpenRouter {self.model})")
         print(f"   API: {self.api_url}")
@@ -1039,7 +1039,7 @@ class SkillBasedDocxAgent:
             Oluşturulan DOCX dosyasının tam yolu
         """
         print("\n" + "=" * 70)
-        print(" DOCX RAPOR ÜRETME V2 (Claude + python-docx)")
+        print(f" DOCX RAPOR URETME V2 (OpenRouter model: {self.model})")
         print("=" * 70)
 
         raw_data = self._build_raw_payload(investigation_data)
@@ -1057,7 +1057,7 @@ class SkillBasedDocxAgent:
         char_count = len(json.dumps(raw_data, ensure_ascii=False))
         print(f" Ham veri hazır ({char_count} karakter)")
 
-        print("\n Claude API'ye içerik isteği gönderiliyor...")
+        print(f"\n OpenRouter modeline icerik istegi gonderiliyor... ({self.model})")
         start = time.time()
         content = self._generate_content_with_claude(raw_data, lang)
         elapsed = time.time() - start

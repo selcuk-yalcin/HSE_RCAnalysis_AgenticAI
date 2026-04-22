@@ -115,7 +115,7 @@ def _parse_object_field(raw: str, label: str = "field") -> Dict:
           f"{cleaned[:200]}")
     return {}
 
-from .model_constants import OPENROUTER_DEFAULT_CHAT_MODEL
+from .model_constants import resolve_openrouter_dspy_model
 
 try:
     from .branch_critic import BranchCriticAgent
@@ -163,7 +163,7 @@ def _openrouter_litellm_model() -> str:
     """LiteLLM, 'anthropic/...' modelini Anthropic /messages API'sine yönlendirir.
     OpenRouter kullanırken mutlaka 'openrouter/anthropic/...' biçimi gerekir;
     aksi halde yanlış yol (ör. .../v1/v1/messages) ve 404 HTML yanıtı oluşur."""
-    raw = (os.getenv("OPENROUTER_DSPY_MODEL") or OPENROUTER_DEFAULT_CHAT_MODEL).strip()
+    raw = resolve_openrouter_dspy_model().strip()
     if raw.startswith("openrouter/"):
         return raw
     return f"openrouter/{raw.lstrip('/')}"
@@ -235,7 +235,9 @@ class ImmediateCauseIdentifier(dspy.Signature):
             "Format: [{code, standard_title_tr, category_type, cause_tr, evidence_tr}, ...]. "
             "En fazla 5 neden. Her cause_tr kisa ve net olmalı (maks ~180 karakter). "
             "Ilk neden (causes[0]) birincil zararlı mekanizmayı hedeflesin "
-            "(ör. elektrikte akıma kapılma/canlı devreye temas); prosedür ihlali sonraya kalsın."
+            "(ör. elektrikte akıma kapılma/canlı devreye temas); prosedür ihlali sonraya kalsın. "
+            "KRITIK: Her neden FARKLI bir açıdan olmalı (teknik/fiziksel/davranışsal/çevresel). "
+            "Aynı tema (ör. gözetim eksikliği, KKD kullanımı) farklı nedenlerde TEKRAR ETMEMELI!"
         )
     )
 
@@ -789,7 +791,7 @@ class RootCauseAgentV3_1:
         use_rag: bool = False,
         enable_diversity_check: bool = True,
         enable_branch_critic: bool = True,
-        critic_jaccard_threshold: float = 0.55,
+        critic_jaccard_threshold: float = 0.35,
         critic_max_regenerations: int = 3,
     ):
         """
@@ -797,7 +799,7 @@ class RootCauseAgentV3_1:
             use_rag: RAG analyzer kullan (experimental)
             enable_diversity_check: Zincir içi semantic tekrar engelleme
             enable_branch_critic: Dallar arası critic + regenerate katmanı
-            critic_jaccard_threshold: Dallar arası benzerlik eşiği (0..1)
+            critic_jaccard_threshold: Dallar arası benzerlik eşiği (0..1, düşük=hassas)
             critic_max_regenerations: Tek koşuda en fazla yeniden üretim sayısı
         """
         

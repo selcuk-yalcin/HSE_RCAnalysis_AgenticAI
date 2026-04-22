@@ -2,16 +2,20 @@
 FastAPI Backend for HSE Investigation System
 Connects admin panel with AI agents
 """
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import sys
 import os
 import traceback
+import asyncio
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple, Type
+import json
+from celery.result import AsyncResult
 
 from dotenv import load_dotenv
 
@@ -27,6 +31,19 @@ from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.actionplan_agent import ActionPlanAgent
 from agents.claude_skill_pdf_agent import ClaudeSkillPDFAgent as PDFReportAgent
 from agents.hitl_question_service import next_hitl_questions, next_why_probe_questions
+from agents.model_constants import (
+    resolve_openrouter_chat_model,
+    resolve_openrouter_dspy_model,
+    resolve_openrouter_docx_model,
+)
+from shared.redis_client import cache_key, get_json as cache_get_json, set_json as cache_set_json
+
+try:
+    from celery_app import celery_app
+    from tasks.pipeline_tasks import run_pipeline_task
+except Exception:  # noqa: BLE001
+    celery_app = None
+    run_pipeline_task = None
 
 # V3.1 (DSPy) öncelikli; dspy veya init hatasında V2'ye düşülür
 _RootCauseV3_1: Optional[Type] = None
@@ -71,6 +88,18 @@ def _env_bool(name: str, default: bool = False) -> bool:
     if raw is None or raw.strip() == "":
         return default
     return raw.strip().lower() in ("1", "true", "yes", "on")
+
+
+def _use_celery_pipeline() -> bool:
+    return _env_bool("USE_CELERY_PIPELINE", False)
+
+
+def _hitl_cache_ttl_seconds() -> int:
+    raw = (os.getenv("HITL_CACHE_TTL_SECONDS") or "900").strip()
+    try:
+        return max(60, int(raw))
+    except Exception:  # noqa: BLE001
+        return 900
 
 
 def _init_root_cause_agent(use_rag: bool) -> Tuple[object, str]:
@@ -154,6 +183,132 @@ async def startup_event():
 
 # In-memory storage (replace with database in production)
 incidents_db = {}
+jobs_db = {}
+
+
+def _utc_now_iso() -> str:
+    return datetime.utcnow().isoformat() + "Z"
+
+
+def _job_stage_message(stage: str) -> str:
+    mapping = {
+        "queued": "Kuyruga alindi",
+        "investigate": "Kok neden analizi calisiyor",
+        "actionplan": "Aksiyon plani olusturuluyor",
+        "completed": "Pipeline tamamlandi",
+        "failed": "Pipeline hata ile sonlandi",
+    }
+    return mapping.get(stage, stage)
+
+
+def _set_job_state(job_id: str, **kwargs):
+    job = jobs_db.get(job_id)
+    if not job:
+        return
+    job.update(kwargs)
+    job["updated_at"] = _utc_now_iso()
+
+
+def _default_part1_data(incident_id: str) -> dict:
+    return {
+        "incident_id": incident_id,
+        "description": "To be reviewed - testing mode",
+        "brief_details": {},
+        "note": "Part 1 not completed - for testing purposes only",
+    }
+
+
+def _default_part2_data() -> dict:
+    return {
+        "event_type": "Accident",
+        "investigation_level": "Medium level",
+        "note": "Part 2 not completed - for testing purposes only",
+    }
+
+
+def _sync_incident_from_pipeline_result(result_payload: dict):
+    incident_id = (result_payload or {}).get("incident_id")
+    if not incident_id:
+        return
+    incident = incidents_db.get(incident_id)
+    if not incident:
+        return
+
+    part3 = result_payload.get("part3")
+    part4 = result_payload.get("part4")
+    if part3:
+        incident["part3"] = part3
+        incident["status"] = "investigated"
+    if part4:
+        incident["part4"] = part4
+        incident["status"] = "completed"
+
+
+def _normalize_celery_job(task_id: str) -> dict:
+    if celery_app is None:
+        return {
+            "job_id": task_id,
+            "status": "failed",
+            "stage": "failed",
+            "progress": 100,
+            "message": "Celery app not configured",
+            "error": "Celery app not configured",
+        }
+
+    async_result = AsyncResult(task_id, app=celery_app)
+    state = async_result.state
+    info = async_result.info
+    meta = info if isinstance(info, dict) else {}
+
+    if state == "SUCCESS":
+        result_payload = async_result.result if isinstance(async_result.result, dict) else {}
+        _sync_incident_from_pipeline_result(result_payload)
+        return {
+            "job_id": task_id,
+            "incident_id": result_payload.get("incident_id") or meta.get("incident_id"),
+            "status": "completed",
+            "stage": result_payload.get("stage", "completed"),
+            "progress": int(result_payload.get("progress", 100)),
+            "message": result_payload.get("message", "Pipeline tamamlandi"),
+            "result": result_payload,
+            "error": None,
+        }
+
+    if state in ("FAILURE", "REVOKED"):
+        return {
+            "job_id": task_id,
+            "incident_id": meta.get("incident_id"),
+            "status": "failed",
+            "stage": "failed",
+            "progress": 100,
+            "message": "Pipeline hata ile sonlandi",
+            "result": None,
+            "error": str(info),
+        }
+
+    if state in ("STARTED", "PROGRESS", "RETRY"):
+        return {
+            "job_id": task_id,
+            "incident_id": meta.get("incident_id"),
+            "status": "running",
+            "stage": meta.get("stage", "running"),
+            "progress": int(meta.get("progress", 10)),
+            "message": meta.get("message", "Pipeline calisiyor"),
+            "result": None,
+            "error": None,
+        }
+
+    # PENDING and unknown
+    return {
+        "job_id": task_id,
+        "incident_id": meta.get("incident_id"),
+        "status": "queued",
+        "stage": "queued",
+        "progress": int(meta.get("progress", 0)),
+        "message": meta.get("message", "Kuyruga alindi"),
+        "result": None,
+        "error": None,
+    }
 
 # Helper function to transform V2 format to frontend format
 def transform_v2_to_frontend(part3_raw: dict) -> dict:
@@ -253,6 +408,18 @@ class InvestigationData(BaseModel):
     injuries: str = ""
     why_probe_answers: list[dict] | None = None
 
+
+class PipelineStartRequest(BaseModel):
+    """Asenkron RCA + ActionPlan pipeline baslatma payload'i."""
+    how_happened: str
+    location: str = ""
+    who_involved: str = ""
+    activities: str = ""
+    working_conditions: str = ""
+    safety_procedures: str = ""
+    injuries: str = ""
+    why_probe_answers: list[dict] | None = None
+
 class HitlQuestionsRequest(BaseModel):
     """Dinamik HITL soruları (knowledge_base / disambiguation tabanlı); LLM gerektirmez."""
 
@@ -275,6 +442,70 @@ class IncidentResponse(BaseModel):
     data: dict
     message: str = ""
 
+
+async def _run_pipeline_job(job_id: str, incident_id: str, payload: dict):
+    try:
+        _set_job_state(
+            job_id,
+            status="running",
+            stage="investigate",
+            progress=15,
+            message=_job_stage_message("investigate"),
+        )
+
+        investigation = InvestigationData(incident_id=incident_id, **payload)
+        part3_result = await investigate_incident(incident_id, investigation)
+
+        _set_job_state(
+            job_id,
+            status="running",
+            stage="actionplan",
+            progress=70,
+            message=_job_stage_message("actionplan"),
+            part3_summary={
+                "immediate": len((part3_result.get("data") or {}).get("immediate_causes") or []),
+                "underlying": len((part3_result.get("data") or {}).get("underlying_causes") or []),
+                "root": len((part3_result.get("data") or {}).get("root_causes") or []),
+            },
+        )
+
+        part4_result = await generate_action_plan(incident_id)
+
+        _set_job_state(
+            job_id,
+            status="completed",
+            stage="completed",
+            progress=100,
+            message=_job_stage_message("completed"),
+            result={
+                "incident_id": incident_id,
+                "part3": part3_result.get("data"),
+                "part4": part4_result.get("data"),
+            },
+            finished_at=_utc_now_iso(),
+            error=None,
+        )
+    except HTTPException as he:
+        _set_job_state(
+            job_id,
+            status="failed",
+            stage="failed",
+            progress=100,
+            message=_job_stage_message("failed"),
+            error=str(he.detail),
+            finished_at=_utc_now_iso(),
+        )
+    except Exception as exc:  # noqa: BLE001
+        _set_job_state(
+            job_id,
+            status="failed",
+            stage="failed",
+            progress=100,
+            message=_job_stage_message("failed"),
+            error=str(exc),
+            finished_at=_utc_now_iso(),
+        )
+
 @app.get("/")
 async def root():
     return {
@@ -284,6 +515,9 @@ async def root():
         "endpoints": [
             "/api/v1/incidents",
             "/api/v1/incidents/{id}/hitl/questions",
+            "/api/v1/incidents/{id}/pipeline/start",
+            "/api/v1/jobs/{job_id}",
+            "/ws/jobs/{job_id}",
             "/api/v1/health",
         ]
     }
@@ -346,6 +580,15 @@ async def hitl_dynamic_questions(incident_id: str, body: HitlQuestionsRequest):
         raise HTTPException(status_code=404, detail="Incident not found")
     bs = body.batch_size if body.batch_size and body.batch_size > 0 else 1
     bs = min(bs, 5)
+    payload_for_key = {
+        "incident_id": incident_id,
+        "body": body.model_dump(),
+    }
+    key = cache_key("hitl_questions", payload_for_key)
+    cached_payload = cache_get_json(key)
+    if cached_payload:
+        return {"success": True, "data": cached_payload, "cached": True}
+
     if (body.mode or "").lower() == "why_probe" or body.why_level > 0:
         payload = next_why_probe_questions(
             how_happened=body.how_happened or "",
@@ -365,7 +608,8 @@ async def hitl_dynamic_questions(incident_id: str, body: HitlQuestionsRequest):
             body.immediate_causes,
             bs,
         )
-    return {"success": True, "data": payload}
+    cache_set_json(key, payload, _hitl_cache_ttl_seconds())
+    return {"success": True, "data": payload, "cached": False}
 
 
 @app.post("/api/v1/incidents/{incident_id}/assessment")
@@ -428,24 +672,8 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
     part2_raw = incident.get("part2")
     
     # Ensure they are dicts, not None or strings
-    if not part1_raw or not isinstance(part1_raw, dict):
-        part1_data = {
-            "incident_id": incident_id,
-            "description": "To be reviewed - testing mode",
-            "brief_details": {},
-            "note": "Part 1 not completed - for testing purposes only"
-        }
-    else:
-        part1_data = part1_raw
-    
-    if not part2_raw or not isinstance(part2_raw, dict):
-        part2_data = {
-            "event_type": "Accident",
-            "investigation_level": "Medium level",
-            "note": "Part 2 not completed - for testing purposes only"
-        }
-    else:
-        part2_data = part2_raw
+    part1_data = part1_raw if part1_raw and isinstance(part1_raw, dict) else _default_part1_data(incident_id)
+    part2_data = part2_raw if part2_raw and isinstance(part2_raw, dict) else _default_part2_data()
     
     try:
         # V3.1 veya V2; çıktı aynı şema (transform_v2_to_frontend)
@@ -480,6 +708,130 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
         error_details = f"{str(e)}\n\nTraceback:\n{traceback.format_exc()}"
         print(f"❌ Part 3 ERROR: {error_details}")
         raise HTTPException(status_code=500, detail=error_details)
+
+
+@app.post("/api/v1/incidents/{incident_id}/pipeline/start")
+async def start_pipeline_job(incident_id: str, request: PipelineStartRequest):
+    """
+    Part 3 + Part 4 asenkron job baslatir.
+    Frontend, /api/v1/jobs/{job_id} endpoint'ini poll ederek canli akis gosterir.
+    """
+    if incident_id not in incidents_db:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    payload = request.model_dump()
+
+    if _use_celery_pipeline():
+        if run_pipeline_task is None:
+            raise HTTPException(status_code=503, detail="Celery task module not available.")
+
+        incident = incidents_db[incident_id]
+        part1_raw = incident.get("part1")
+        part2_raw = incident.get("part2")
+        part1_data = part1_raw if part1_raw and isinstance(part1_raw, dict) else _default_part1_data(incident_id)
+        part2_data = part2_raw if part2_raw and isinstance(part2_raw, dict) else _default_part2_data()
+
+        task = run_pipeline_task.delay(
+            incident_id=incident_id,
+            part1_data=part1_data,
+            part2_data=part2_data,
+            investigation_payload=payload,
+        )
+
+        return {
+            "success": True,
+            "data": {
+                "job_id": task.id,
+                "executor": "celery",
+                "status": "queued",
+                "stage": "queued",
+                "progress": 0,
+                "message": _job_stage_message("queued"),
+            },
+        }
+
+    if rootcause_agent is None:
+        raise HTTPException(status_code=503, detail="Service not ready. Root Cause Agent not initialized.")
+    if actionplan_agent is None:
+        raise HTTPException(status_code=503, detail="Service not ready. Action Plan Agent not initialized.")
+
+    job_id = f"job_{uuid.uuid4().hex[:12]}"
+    jobs_db[job_id] = {
+        "job_id": job_id,
+        "incident_id": incident_id,
+        "status": "queued",
+        "stage": "queued",
+        "progress": 0,
+        "message": _job_stage_message("queued"),
+        "created_at": _utc_now_iso(),
+        "updated_at": _utc_now_iso(),
+        "finished_at": None,
+        "result": None,
+        "error": None,
+    }
+    asyncio.create_task(_run_pipeline_job(job_id, incident_id, payload))
+
+    return {
+        "success": True,
+        "data": {
+            "job_id": job_id,
+            "executor": "inprocess",
+            "status": "queued",
+            "stage": "queued",
+            "progress": 0,
+            "message": _job_stage_message("queued"),
+        },
+    }
+
+
+@app.get("/api/v1/jobs/{job_id}")
+async def get_job_status(job_id: str):
+    if job_id in jobs_db:
+        return {"success": True, "data": jobs_db[job_id]}
+    if _use_celery_pipeline():
+        return {"success": True, "data": _normalize_celery_job(job_id)}
+    raise HTTPException(status_code=404, detail="Job not found")
+
+
+@app.websocket("/ws/jobs/{job_id}")
+async def job_status_ws(websocket: WebSocket, job_id: str):
+    """
+    Job durumunu websocket ile stream eder.
+    Frontend canli progres gosterimi icin kullanir.
+    """
+    await websocket.accept()
+    if job_id not in jobs_db and not _use_celery_pipeline():
+        await websocket.send_json(
+            {"success": False, "error": "Job not found", "job_id": job_id}
+        )
+        await websocket.close(code=1008, reason="Job not found")
+        return
+
+    last_payload = None
+    try:
+        while True:
+            job = jobs_db.get(job_id)
+            if job is None and _use_celery_pipeline():
+                job = _normalize_celery_job(job_id)
+            if not job:
+                await websocket.send_json(
+                    {"success": False, "error": "Job not found", "job_id": job_id}
+                )
+                await websocket.close(code=1008, reason="Job not found")
+                return
+
+            payload = {"success": True, "data": job}
+            payload_text = json.dumps(payload, sort_keys=True, default=str)
+            if payload_text != last_payload:
+                await websocket.send_json(payload)
+                last_payload = payload_text
+
+            if job.get("status") in ("completed", "failed"):
+                await websocket.close(code=1000, reason="Job finished")
+                return
+
+            await asyncio.sleep(1.0)
+    except WebSocketDisconnect:
+        return
 
 @app.post("/api/v1/incidents/{incident_id}/actionplan")
 async def generate_action_plan(incident_id: str):
@@ -564,6 +916,15 @@ async def health_check():
         "status": "healthy" if all_agents_ready else "degraded",
         "agents": agents_status,
         "rootcause_engine": rootcause_engine_info,
+        "models": {
+            "chat_default": resolve_openrouter_chat_model(),
+            "dspy": resolve_openrouter_dspy_model(),
+            "docx": resolve_openrouter_docx_model(),
+        },
+        "cache": {
+            "hitl_cache_ttl_seconds": _hitl_cache_ttl_seconds(),
+        },
+        "pipeline_executor": "celery" if _use_celery_pipeline() else "inprocess",
         "api_key_configured": bool(api_key),
         "api_key_source": "OPENROUTER_API_KEY" if os.getenv("OPENROUTER_API_KEY") else "OPENAI_API_KEY" if os.getenv("OPENAI_API_KEY") else "none",
         "incidents_count": len(incidents_db),
