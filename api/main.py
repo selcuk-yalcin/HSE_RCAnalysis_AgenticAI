@@ -26,7 +26,7 @@ from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.actionplan_agent import ActionPlanAgent
 from agents.claude_skill_pdf_agent import ClaudeSkillPDFAgent as PDFReportAgent
-from agents.hitl_question_service import next_hitl_questions
+from agents.hitl_question_service import next_hitl_questions, next_why_probe_questions
 
 # V3.1 (DSPy) öncelikli; dspy veya init hatasında V2'ye düşülür
 _RootCauseV3_1: Optional[Type] = None
@@ -251,6 +251,7 @@ class InvestigationData(BaseModel):
     working_conditions: str = ""
     safety_procedures: str = ""
     injuries: str = ""
+    why_probe_answers: list[dict] | None = None
 
 class HitlQuestionsRequest(BaseModel):
     """Dinamik HITL soruları (knowledge_base / disambiguation tabanlı); LLM gerektirmez."""
@@ -259,6 +260,11 @@ class HitlQuestionsRequest(BaseModel):
     root_cause_initial: str = ""
     answered_ids: list[str] = []
     immediate_causes: list[dict] | None = None
+    immediate_code: str = ""
+    why_level: int = 0
+    current_why_question: str = ""
+    previous_why_answer: str = ""
+    mode: str = "global"
     batch_size: int = 1
 
 class PDFGenerateRequest(BaseModel):
@@ -340,13 +346,25 @@ async def hitl_dynamic_questions(incident_id: str, body: HitlQuestionsRequest):
         raise HTTPException(status_code=404, detail="Incident not found")
     bs = body.batch_size if body.batch_size and body.batch_size > 0 else 1
     bs = min(bs, 5)
-    payload = next_hitl_questions(
-        body.how_happened or "",
-        body.root_cause_initial or "",
-        body.answered_ids or [],
-        body.immediate_causes,
-        bs,
-    )
+    if (body.mode or "").lower() == "why_probe" or body.why_level > 0:
+        payload = next_why_probe_questions(
+            how_happened=body.how_happened or "",
+            root_cause_initial=body.root_cause_initial or "",
+            answered_ids=body.answered_ids or [],
+            immediate_code=body.immediate_code or "",
+            why_level=max(1, body.why_level or 1),
+            current_why_question=body.current_why_question or "",
+            previous_why_answer=body.previous_why_answer or "",
+            batch_size=bs,
+        )
+    else:
+        payload = next_hitl_questions(
+            body.how_happened or "",
+            body.root_cause_initial or "",
+            body.answered_ids or [],
+            body.immediate_causes,
+            bs,
+        )
     return {"success": True, "data": payload}
 
 
@@ -441,7 +459,8 @@ async def investigate_incident(incident_id: str, investigation: InvestigationDat
                 "activities": investigation.activities,
                 "working_conditions": investigation.working_conditions,
                 "safety_procedures": investigation.safety_procedures,
-                "injuries": investigation.injuries
+                "injuries": investigation.injuries,
+                "why_probe_answers": investigation.why_probe_answers or [],
             }
         )
         

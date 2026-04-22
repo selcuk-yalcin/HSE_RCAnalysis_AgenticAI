@@ -377,6 +377,29 @@ class WhyChain(dspy.Module):
         self.validator = dspy.ChainOfThought(RootCauseValidator)
         self.diversity_checker = SemanticAnswerVerifier()
         self.enable_diversity = enable_diversity_check
+
+    @staticmethod
+    def _probe_context_for_level(
+        level: int,
+        probe_answers_by_level: Optional[Dict[int, List[Dict]]],
+    ) -> str:
+        """Aynı Why seviyesi için toplanan ara netleştirme cevaplarını düz metne çevir."""
+        if not probe_answers_by_level:
+            return ""
+        rows = probe_answers_by_level.get(level) or []
+        if not rows:
+            return ""
+        lines = [
+            "",
+            f"[HITL PROBE CONTEXT - Why-{level}]",
+        ]
+        for item in rows:
+            q = (item or {}).get("question", "")
+            a = (item or {}).get("answer", "")
+            h = (item or {}).get("hsg_hint", "")
+            if q or a:
+                lines.append(f"- ({h}) S: {q} | C: {a}")
+        return "\n".join(lines)
     
     def forward(
         self,
@@ -384,7 +407,8 @@ class WhyChain(dspy.Module):
         immediate_cause: Dict,
         taxonomy_c: str,
         taxonomy_d: str,
-        previous_why_answers: List[str] = None
+        previous_why_answers: List[str] = None,
+        probe_answers_by_level: Optional[Dict[int, List[Dict]]] = None,
     ) -> Dict:
         """
         Tam 5-Why zinciri
@@ -431,11 +455,14 @@ class WhyChain(dspy.Module):
             taxonomy = (taxonomy + "\n" + taxonomy_d) if level >= 5 else taxonomy
 
             incident_ctx = incident_summary
+            probe_ctx = self._probe_context_for_level(level, probe_answers_by_level)
             if level == 1:
                 incident_ctx = (
                     "Why-1 cevabı, sorulan birincil zararlı mekanizmaya (ör. akıma kapılma, canlı devreye "
                     "temas) doğrudan yanıt vermelidir; genel prosedür özeti değil.\n\n" + incident_summary
                 )
+            if probe_ctx:
+                incident_ctx = incident_ctx + "\n\n" + probe_ctx
 
             answer_result = self.why_answer(
                 question=question,
@@ -744,6 +771,18 @@ class RootCauseAgentV3_1:
         
         used_root_codes: List[str] = []
         all_previous_why_answers: List[str] = []
+        probe_by_branch_and_level: Dict[int, Dict[int, List[Dict]]] = {}
+
+        if investigation_data and isinstance(investigation_data, dict):
+            raw_probe_answers = investigation_data.get("why_probe_answers") or []
+            for item in raw_probe_answers:
+                if not isinstance(item, dict):
+                    continue
+                b = int(item.get("branch_number") or 0)
+                l = int(item.get("why_level") or 0)
+                if b <= 0 or l <= 0:
+                    continue
+                probe_by_branch_and_level.setdefault(b, {}).setdefault(l, []).append(item)
         
         for idx, immediate_cause in enumerate(immediate_causes, 1):
             print(f"\n{'=' * 80}")
@@ -758,7 +797,8 @@ class RootCauseAgentV3_1:
                 immediate_cause=immediate_cause,
                 taxonomy_c=get_category_text('C'),
                 taxonomy_d=get_category_text('D'),
-                previous_why_answers=all_previous_why_answers
+                previous_why_answers=all_previous_why_answers,
+                probe_answers_by_level=probe_by_branch_and_level.get(idx, {}),
             )
             
             root_cause = chain_result.get("root_cause", {})
@@ -920,7 +960,25 @@ class RootCauseAgentV3_1:
         
         for fw in answers:
             lines.append(f"Why-{fw.get('why_level')}: {fw.get('user_answer')}")
-        
+
+        probe_answers = investigation_data.get("why_probe_answers", [])
+        if probe_answers:
+            lines.extend(
+                [
+                    "",
+                    "-" * 60,
+                    "WHY-LEVEL NETLEŞTİRME CEVAPLARI",
+                    "-" * 60,
+                ]
+            )
+            for pa in probe_answers:
+                b = pa.get("branch_number", "?")
+                w = pa.get("why_level", "?")
+                q = pa.get("question", "")
+                a = pa.get("answer", "")
+                if q or a:
+                    lines.append(f"B{b}/Why-{w}: {q} => {a}")
+
         return summary + "\n".join(lines)
     
     def _print_branch_summary(self, branch: Dict):

@@ -154,3 +154,146 @@ def next_hitl_questions(
         "remaining_after_batch": max(0, len(pending) - len(batch)),
         "done": len(pending) == 0,
     }
+
+
+def build_why_probe_question_pool(
+    how_happened: str,
+    root_cause_initial: str,
+    immediate_code: str = "",
+    why_level: int = 1,
+    current_why_question: str = "",
+    previous_why_answer: str = "",
+) -> list[dict[str, Any]]:
+    """
+    Why zinciri içinde ara netleştirme soruları üretir.
+
+    Sıra:
+      1) Immediate code için disambiguation
+      2) Code-specific taxonomy soruları
+      3) Eksik bilgi kategorileri (HybridInputProcessor + QuestionEngine)
+    """
+    from hitl_test.question_engine import QuestionEngine
+
+    focus_codes: list[str] = []
+    if immediate_code:
+        focus_codes.append(immediate_code.upper())
+    for code in extract_hs_codes("\n".join([root_cause_initial or "", current_why_question or ""])):
+        if code not in focus_codes:
+            focus_codes.append(code)
+    focus_codes = focus_codes[:3]
+
+    pool: list[dict[str, Any]] = []
+    seen_q: set[str] = set()
+
+    # 1) Disambiguation (hedef immediate code)
+    if focus_codes:
+        causes = [{"code": c, "cause_tr": c} for c in focus_codes]
+        for row in build_questions_for_causes(causes)[:4]:
+            soru = row.get("soru") or ""
+            if not soru or soru.lower() in seen_q:
+                continue
+            seen_q.add(soru.lower())
+            qid = _stable_id("wp-d", str(why_level), row.get("code", ""), soru)
+            pool.append(
+                {
+                    "id": qid,
+                    "source": "why_probe_disambiguation",
+                    "code": row.get("code", ""),
+                    "cause_desc": row.get("cause_desc", ""),
+                    "hsg245": row.get("hsg245", ""),
+                    "soru": soru,
+                    "yönler": row.get("yönler") or {},
+                    "why_level": why_level,
+                }
+            )
+
+    # 2) Code-specific questions (knowledge_base bağlı template'ler)
+    qe = QuestionEngine()
+    for i, row in enumerate(qe.get_code_specific_questions(focus_codes)[:6]):
+        soru = row.get("question") or ""
+        code = row.get("hsg245_code", "")
+        if not soru or soru.lower() in seen_q:
+            continue
+        seen_q.add(soru.lower())
+        qid = _stable_id("wp-c", str(why_level), code, str(i), soru)
+        pool.append(
+            {
+                "id": qid,
+                "source": "why_probe_code_specific",
+                "code": code,
+                "cause_desc": row.get("code_description", ""),
+                "hsg245": code,
+                "soru": soru,
+                "yönler": {},
+                "why_level": why_level,
+            }
+        )
+
+    # 3) Gap questions (kontekst eksikleri)
+    full_text = "\n\n".join(
+        s
+        for s in (
+            how_happened or "",
+            root_cause_initial or "",
+            current_why_question or "",
+            previous_why_answer or "",
+        )
+        if s.strip()
+    )
+    for row in _taxonomy_gap_questions(full_text, max_categories=2, per_cat=1):
+        soru = row.get("soru") or ""
+        if not soru or soru.lower() in seen_q:
+            continue
+        seen_q.add(soru.lower())
+        row["id"] = _stable_id("wp-kb", str(why_level), row["id"], soru)
+        row["source"] = "why_probe_taxonomy_gap"
+        row["why_level"] = why_level
+        pool.append(row)
+
+    return pool[:12]
+
+
+def next_why_probe_questions(
+    how_happened: str,
+    root_cause_initial: str,
+    answered_ids: list[str],
+    immediate_code: str = "",
+    why_level: int = 1,
+    current_why_question: str = "",
+    previous_why_answer: str = "",
+    batch_size: int = 1,
+) -> dict[str, Any]:
+    """
+    Why-level ara sorular: her seviyede daha net sebep ayrımı için döngüsel API.
+    """
+    answered = set(answered_ids or [])
+    pool = build_why_probe_question_pool(
+        how_happened=how_happened,
+        root_cause_initial=root_cause_initial,
+        immediate_code=immediate_code,
+        why_level=why_level,
+        current_why_question=current_why_question,
+        previous_why_answer=previous_why_answer,
+    )
+    pending = [q for q in pool if q.get("id") not in answered]
+    batch = pending[: max(1, batch_size)]
+
+    def _shape(q: dict) -> dict[str, Any]:
+        return {
+            "id": q["id"],
+            "source": q.get("source", "why_probe"),
+            "hsg_hint": q.get("hsg245", ""),
+            "code": q.get("code", ""),
+            "cause_desc": q.get("cause_desc", ""),
+            "question_tr": q.get("soru", ""),
+            "question_en": q.get("soru", ""),
+            "yönler": q.get("yönler") or {},
+            "why_level": q.get("why_level", why_level),
+        }
+
+    return {
+        "questions": [_shape(q) for q in batch],
+        "total_pool": len(pool),
+        "remaining_after_batch": max(0, len(pending) - len(batch)),
+        "done": len(pending) == 0,
+    }
