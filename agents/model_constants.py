@@ -2,9 +2,9 @@
 OpenRouter varsayilan model secimi (agents geneli).
 
 Kullanim:
-- Varsayilan (kod): anthropic/claude-sonnet-4.5
-- Preset ile hizli gecis: OPENROUTER_MODEL_PRESET=gemini_flash
-- Tam model override: OPENROUTER_DEFAULT_MODEL=google/gemini-2.5-flash
+- Varsayilan (kod): google/gemini-2.5-flash
+- Daha guc modellere gecmek icin: OPENROUTER_MODEL_PRESET=sonnet
+- Tam model override: OPENROUTER_DEFAULT_MODEL=anthropic/claude-sonnet-4.5
 
 Not:
 - DSPy icin OPENROUTER_DSPY_MODEL,
@@ -17,12 +17,13 @@ Tum sistemi test amacli tek degiskenle zorlamak icin:
 
 import os
 
-_DEFAULT_MODEL = "anthropic/claude-sonnet-4.5"
+_DEFAULT_MODEL = "google/gemini-2.5-flash"
 _MODEL_PRESETS = {
-    "sonnet": "anthropic/claude-sonnet-4.5",
-    "claude_sonnet": "anthropic/claude-sonnet-4.5",
+    "flash": "google/gemini-2.5-flash",
     "gemini_flash": "google/gemini-2.5-flash",
     "gemini-2.5-flash": "google/gemini-2.5-flash",
+    "sonnet": "anthropic/claude-sonnet-4.5",
+    "claude_sonnet": "anthropic/claude-sonnet-4.5",
 }
 
 

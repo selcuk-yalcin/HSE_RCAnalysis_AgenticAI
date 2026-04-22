@@ -74,8 +74,9 @@ def main():
     
     try:
         agent = OverviewAgent()
+        from agents.model_constants import resolve_openrouter_chat_model
         print("✅ Agent başarıyla oluşturuldu")
-        print("   Model: anthropic/claude-sonnet-4.5")
+        print(f"   Model: {resolve_openrouter_chat_model()}")
         print("   API: OpenRouter")
     except Exception as e:
         print(f"❌ Agent oluşturma hatası: {e}")
@@ -87,7 +88,7 @@ def main():
     print("\n" + "─"*80)
     print("🌐 ONLİNE TEST BAŞLIYOR (Gerçek API Çağrısı)")
     print("─"*80)
-    print("\n⏳ Lütfen bekleyin, Claude API'ye istek gönderiliyor...")
+    print("\n⏳ Lütfen bekleyin, OpenRouter üzerinden istek gönderiliyor...")
     print("   (Bu işlem 5-15 saniye sürebilir)\n")
     
     try:

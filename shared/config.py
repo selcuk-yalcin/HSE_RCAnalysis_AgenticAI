@@ -10,10 +10,15 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+# Varsayılan üretim modeli (OpenRouter id); OPENAI_MODEL ile doğrudan override edilebilir.
+_DEFAULT_LLM_MODEL = (
+    (os.getenv("OPENROUTER_DEFAULT_MODEL") or "").strip() or "google/gemini-2.5-flash"
+)
+
 # OpenAI Configuration
 OPENAI_CONFIG = {
     "api_key": os.getenv("OPENAI_API_KEY"),
-    "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+    "model": os.getenv("OPENAI_MODEL", _DEFAULT_LLM_MODEL),
     "temperature": float(os.getenv("OPENAI_TEMPERATURE", "0.3")),
     "max_tokens": 4000
 }
@@ -40,7 +45,7 @@ class Config:
     
     # OpenAI Configuration
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    OPENAI_MODEL = os.getenv("OPENAI_MODEL", _DEFAULT_LLM_MODEL)
     OPENAI_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.3"))
     
     # OpenRouter Configuration

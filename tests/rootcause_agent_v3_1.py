@@ -25,14 +25,16 @@ sys.path.insert(0, str(project_root))
 # .env dosyasını yükle
 load_dotenv()
 
+from agents.model_constants import resolve_openrouter_dspy_model
+
 # ============================================================================
-# DSPY YAPINDIRMA - OpenRouter ile Claude Sonnet 4.5
+# DSPY YAPINDIRMA - OpenRouter (varsayılan: Gemini Flash)
 # ============================================================================
 
 def configure_dspy():
     """DSPy'yi OpenRouter ile yapılandır"""
     print("\n" + "="*80)
-    print("🔧 DSPY YAPINDIRILIYOR (OpenRouter + Claude Sonnet 4.5)")
+    print("🔧 DSPY YAPINDIRILIYOR (OpenRouter)")
     print("="*80)
     
     openrouter_key = os.getenv("OPENROUTER_API_KEY")
@@ -41,10 +43,11 @@ def configure_dspy():
     
     print(f"✅ API Key bulundu: {openrouter_key[:20]}...")
     
+    model_id = resolve_openrouter_dspy_model()
     # DSPy OpenAI wrapper ile OpenRouter
     try:
         lm = dspy.OpenAI(
-            model="anthropic/claude-sonnet-4.5",
+            model=model_id,
             api_key=openrouter_key,
             api_base="https://openrouter.ai/api/v1",
             model_type="chat",
@@ -53,7 +56,7 @@ def configure_dspy():
         )
         dspy.settings.configure(lm=lm)
         print("✅ DSPy başarıyla yapılandırıldı")
-        print(f"   Model: anthropic/claude-sonnet-4.5")
+        print(f"   Model: {model_id}")
         print(f"   API Base: https://openrouter.ai/api/v1")
         return True
     except Exception as e:
