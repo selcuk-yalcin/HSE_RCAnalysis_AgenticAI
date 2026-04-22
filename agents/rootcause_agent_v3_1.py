@@ -27,12 +27,14 @@ Fallback mekanizması mevcut
 """
 
 from openai import OpenAI
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 import os
 import sys
 import dspy
 from pathlib import Path
 import json
+import re
+from pydantic import BaseModel, ValidationError, validator
 
 # ============================================================================
 # IMPORTS - Knowledge Base & Utils
@@ -282,6 +284,54 @@ class ImmediateCauseFinder(dspy.Module):
     def __init__(self):
         super().__init__()
         self.finder = dspy.ChainOfThought(ImmediateCauseIdentifier)
+
+    @staticmethod
+    def _looks_like_primary_mechanism(text: str) -> bool:
+        t = (text or "").lower()
+        mechanism_keywords = (
+            "düşt", "çarp", "temas", "sıkış", "ezil", "yan", "kes", "delin",
+            "elektrik", "akıma", "şok", "zehir", "maruz", "boğul", "patla", "devril",
+        )
+        weak_keywords = (
+            "prosed", "izin", "ptw", "denetim", "yönetim", "eğitim", "talimat",
+            "kültür", "liderlik", "politika", "gözetim",
+        )
+        has_mech = any(k in t for k in mechanism_keywords)
+        too_abstract = any(k in t for k in weak_keywords)
+        return has_mech and not too_abstract
+
+    def _promote_primary_mechanism(self, causes: List[Dict]) -> List[Dict]:
+        if not causes:
+            return causes
+        if self._looks_like_primary_mechanism(causes[0].get("cause_tr", "")):
+            return causes
+        for idx, c in enumerate(causes[1:], start=1):
+            if self._looks_like_primary_mechanism(c.get("cause_tr", "")):
+                reordered = [c] + causes[:idx] + causes[idx + 1 :]
+                return reordered
+        return causes
+
+    @staticmethod
+    def _normalize_causes(causes: List[Dict]) -> List[Dict]:
+        norm: List[Dict] = []
+        for c in causes:
+            if not isinstance(c, dict):
+                continue
+            code = str(c.get("code", "")).strip().upper()
+            cat = str(c.get("category_type", "")).strip().upper()
+            if not cat and code:
+                cat = code[0]
+            cat = cat if cat in ("A", "B") else ""
+            norm.append(
+                {
+                    "code": code,
+                    "standard_title_tr": str(c.get("standard_title_tr", "")).strip(),
+                    "category_type": cat,
+                    "cause_tr": str(c.get("cause_tr", "")).strip(),
+                    "evidence_tr": str(c.get("evidence_tr", "")).strip(),
+                }
+            )
+        return norm
     
     def forward(
         self,
@@ -306,7 +356,8 @@ class ImmediateCauseFinder(dspy.Module):
         causes = _parse_array_field(raw, label="ImmediateCauseFinder.causes")
 
         # Max 5 cause
-        causes = causes[:5]
+        causes = self._normalize_causes(causes)[:5]
+        causes = self._promote_primary_mechanism(causes)
 
         return {
             "causes": causes,
@@ -320,6 +371,13 @@ class SemanticAnswerVerifier(dspy.Module):
     def __init__(self):
         super().__init__()
         self.diversifier = dspy.ChainOfThought(AnswerDiversifier)
+
+    @staticmethod
+    def _normalize_text(text: str) -> str:
+        t = (text or "").lower()
+        t = re.sub(r"\b[abcd]\d+\.\d+\b", " ", t, flags=re.IGNORECASE)
+        t = re.sub(r"[^a-z0-9çğıöşü\s]", " ", t)
+        return " ".join(t.split())
     
     def is_semantically_similar(
         self,
@@ -334,10 +392,10 @@ class SemanticAnswerVerifier(dspy.Module):
         if not previous_answers:
             return False
         
-        new_words = set(new_answer.lower().split())
+        new_words = set(self._normalize_text(new_answer).split())
         
         for prev in previous_answers:
-            prev_words = set(prev.lower().split())
+            prev_words = set(self._normalize_text(prev).split())
             
             # Jaccard similarity
             if prev_words and new_words:
@@ -354,16 +412,68 @@ class SemanticAnswerVerifier(dspy.Module):
         self,
         question: str,
         previous_answers: List[str]
-    ) -> str:
+    ) -> Optional[str]:
         """Eğer benzer cevap varsa, diversify et"""
         if self.is_semantically_similar(question, previous_answers, threshold=0.75):
             result = self.diversifier(
                 question=question,
                 previous_similar_answers="\n".join(previous_answers[-3:])  # Son 3'ü göster
             )
-            return result.diverse_answer
-        
+            diverse_answer = getattr(result, "diverse_answer", None)
+            if isinstance(diverse_answer, str) and diverse_answer.strip():
+                return diverse_answer.strip()
+            # Bazı DSPy sürümlerinde Prediction string'e serialize olabilir.
+            if isinstance(result, str) and result.strip():
+                return result.strip()
         return None  # Diversification gerekli değil
+
+
+class WhyStepModel(BaseModel):
+    level: int
+    question_tr: str
+    answer_tr: str
+    code: str = ""
+
+    @validator("level")
+    def _valid_level(cls, v: int) -> int:
+        if v < 1:
+            return 1
+        if v > 5:
+            return 5
+        return v
+
+    @validator("question_tr", "answer_tr")
+    def _strip_text(cls, v: str) -> str:
+        return (v or "").strip()
+
+    @validator("code")
+    def _normalize_code(cls, v: str) -> str:
+        return (v or "").strip().upper()
+
+
+class RootCauseModel(BaseModel):
+    code: str = ""
+    cause_tr: str
+    category_type: str = ""
+    explanation_tr: str = ""
+    confidence: float = 0.8
+
+    @validator("code", "category_type")
+    def _norm_upper(cls, v: str) -> str:
+        return (v or "").strip().upper()
+
+    @validator("cause_tr", "explanation_tr")
+    def _strip_fields(cls, v: str) -> str:
+        return (v or "").strip()
+
+
+def _validate_model_dict(model_cls: Any, payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Pydantic v1/v2 uyumlu model doğrulama ve dict dönüşü."""
+    if hasattr(model_cls, "model_validate"):  # pydantic v2
+        obj = model_cls.model_validate(payload)
+        return obj.model_dump()
+    obj = model_cls.parse_obj(payload)  # pydantic v1
+    return obj.dict()
 
 
 class WhyChain(dspy.Module):
@@ -428,8 +538,9 @@ class WhyChain(dspy.Module):
             previous_why_answers = []
         
         chain = []
-        current_answer = immediate_cause.get("cause_tr", "")
+        current_answer_raw = immediate_cause.get("cause_tr", "")
         current_code = immediate_cause.get("code", "")
+        previous_question_raw = ""
         all_answers_in_chain = []
         
         # Why 1-5 zinciri
@@ -439,7 +550,12 @@ class WhyChain(dspy.Module):
                 previous_for_question = _why1_question_seed(incident_summary, immediate_cause)
                 level_label = "Why-1 — BİRİNCİL zararlı mekanizma (ör. elektrik: akıma kapılma/temas)"
             else:
-                previous_for_question = current_answer
+                previous_for_question = (
+                    f"Önceki Why sorusu:\n{previous_question_raw}\n\n"
+                    f"Önceki Why cevabı:\n{current_answer_raw}\n\n"
+                    "GÖREV: Bu cevabı açıklayan bir alt-seviye neden sorusu üret. "
+                    "Aynı seviyede tekrar etme; daha derine in."
+                )
                 level_label = f"Why-{level}"
 
             # 1. SORU OLUŞTUR (Why-1: mekanizma odaklı tohum; Why-2+: önceki cevaptan türet)
@@ -469,32 +585,42 @@ class WhyChain(dspy.Module):
                 incident_context=incident_ctx,
                 taxonomy_codes=taxonomy
             )
-            answer = strip_hse_codes((answer_result.answer or "").strip())
-            code = answer_result.hsg245_code
-            question = strip_hse_codes(question)
+            answer_raw = (answer_result.answer or "").strip()
+            code = str(getattr(answer_result, "hsg245_code", "") or "").strip().upper()
+            question_raw = (question or "").strip()
+            question_display = strip_hse_codes(question_raw)
+            answer_display = strip_hse_codes(answer_raw)
             
             # 3. SEMANTİK FARKLILIĞA KARŞI KONTROL (V3.1 FEATURE)
             if self.enable_diversity and level >= 2:
                 combined_prev = previous_why_answers + all_answers_in_chain
                 
                 diverse_check = self.diversity_checker(
-                    question=question,
+                    question=question_raw,
                     previous_answers=combined_prev
                 )
                 
                 if diverse_check:
                     # Diversified version mevcutsa kullan
-                    answer = strip_hse_codes(str(diverse_check).strip())
-            
-            chain.append({
+                    answer_raw = diverse_check
+                    answer_display = strip_hse_codes(answer_raw)
+
+            step_payload = {
                 "level": level,
-                "question_tr": question,
-                "answer_tr": answer,
-                "code": code
-            })
+                "question_tr": question_display,
+                "answer_tr": answer_display,
+                "code": code,
+            }
+            try:
+                step_data = _validate_model_dict(WhyStepModel, step_payload)
+            except ValidationError:
+                step_data = step_payload
             
-            all_answers_in_chain.append(answer)
-            current_answer = answer
+            chain.append(step_data)
+            
+            all_answers_in_chain.append(answer_raw)
+            current_answer_raw = answer_raw
+            previous_question_raw = question_raw
             current_code = code
         
         # 4. ROOT CAUSE DOĞRULAMA (C/D kategorisinde olmalı)
@@ -506,13 +632,17 @@ class WhyChain(dspy.Module):
             code=final_code
         )
         
-        root_cause_data = {
+        root_cause_payload = {
             "code": final_code,
-            "cause_tr": strip_hse_codes(final_answer),
+            "cause_tr": final_answer,
             "category_type": validation.category,
             "explanation_tr": f"5-Why zincirinin sonucu: {final_answer}",
             "confidence": float(validation.confidence) if validation.confidence else 0.8
         }
+        try:
+            root_cause_data = _validate_model_dict(RootCauseModel, root_cause_payload)
+        except ValidationError:
+            root_cause_data = root_cause_payload
         
         return {
             "whys": chain,
