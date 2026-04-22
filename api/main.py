@@ -26,6 +26,7 @@ from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.actionplan_agent import ActionPlanAgent
 from agents.claude_skill_pdf_agent import ClaudeSkillPDFAgent as PDFReportAgent
+from agents.hitl_question_service import next_hitl_questions
 
 # V3.1 (DSPy) öncelikli; dspy veya init hatasında V2'ye düşülür
 _RootCauseV3_1: Optional[Type] = None
@@ -251,6 +252,15 @@ class InvestigationData(BaseModel):
     safety_procedures: str = ""
     injuries: str = ""
 
+class HitlQuestionsRequest(BaseModel):
+    """Dinamik HITL soruları (knowledge_base / disambiguation tabanlı); LLM gerektirmez."""
+
+    how_happened: str = ""
+    root_cause_initial: str = ""
+    answered_ids: list[str] = []
+    immediate_causes: list[dict] | None = None
+    batch_size: int = 1
+
 class PDFGenerateRequest(BaseModel):
     incident_id: str
     
@@ -267,7 +277,8 @@ async def root():
         "status": "healthy",
         "endpoints": [
             "/api/v1/incidents",
-            "/api/v1/health"
+            "/api/v1/incidents/{id}/hitl/questions",
+            "/api/v1/health",
         ]
     }
 
@@ -319,6 +330,25 @@ async def create_incident(incident: IncidentCreate):
             status_code=500, 
             detail=f"Error creating incident: {str(e)}"
         )
+
+@app.post("/api/v1/incidents/{incident_id}/hitl/questions")
+async def hitl_dynamic_questions(incident_id: str, body: HitlQuestionsRequest):
+    """
+    Sıralı HITL soruları: HSG245 disambiguation bankası + QuestionEngine (taxonomy / kb).
+    """
+    if incident_id not in incidents_db:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    bs = body.batch_size if body.batch_size and body.batch_size > 0 else 1
+    bs = min(bs, 5)
+    payload = next_hitl_questions(
+        body.how_happened or "",
+        body.root_cause_initial or "",
+        body.answered_ids or [],
+        body.immediate_causes,
+        bs,
+    )
+    return {"success": True, "data": payload}
+
 
 @app.post("/api/v1/incidents/{incident_id}/assessment")
 async def add_assessment(incident_id: str, assessment: AssessmentData):

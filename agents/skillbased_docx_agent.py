@@ -2960,7 +2960,7 @@ class SkillBasedDocxAgent:
         """Sistemsel faktörler HTML."""
         html = """
         <div class="section" id="contributing-factors">
-            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
+            <div class="section-header">6. DİĞER OLASI SİSTEMSEL FAKTÖRLER</div>
             
             <table>
                 <thead>

@@ -7,7 +7,7 @@ Akış:
 2. System Analysis: OverviewAgent + AssessmentAgent
 3. Question Generation: Knowledge Base ile entegre sorular
 4. User Q&A: 5-Why zincirine göre detay toplama
-5. Root Cause Analysis: RootCauseAgentV2
+5. Root Cause Analysis: RootCauseAgentV3_1
 6. Report Generation: SkillBasedDocxAgent
 1. KULLANICI OLAY AÇIKLAMASI GİRER
    └─ (İlk başta kısıtlı bilgi: "Elektrik çarpması oldu")
