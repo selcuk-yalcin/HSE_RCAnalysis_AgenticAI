@@ -115,6 +115,24 @@ def extract_json_array_from_response(response_text: str, default: Optional[list]
             return json.loads(text)
         except json.JSONDecodeError:
             pass
+
+        # Fallback: salvage object-by-object from malformed arrays
+        # Example: truncated/mixed output like:
+        # [ {..}, {..   <-- missing closing brackets
+        salvaged = []
+        for match in re.finditer(r'\{[^{}]*\}', text, re.DOTALL):
+            chunk = match.group(0).strip()
+            if not chunk:
+                continue
+            try:
+                obj = json.loads(chunk)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(obj, dict):
+                salvaged.append(obj)
+        if salvaged:
+            print(f"⚠️  JSON array malformed; salvaged {len(salvaged)} object(s)")
+            return salvaged
         
         print(f"❌ Could not extract valid JSON array from response")
         return default

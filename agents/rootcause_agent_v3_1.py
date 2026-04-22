@@ -230,9 +230,13 @@ class ImmediateCauseIdentifier(dspy.Signature):
     category_b_codes = dspy.InputField(desc="B Kategorisi (koşullar) kodlar")
     
     causes = dspy.OutputField(
-        desc="JSON listesi - max 5 neden: {code, standard_title_tr, category_type, cause_tr, evidence_tr}. "
-             "İlk neden (causes[0]) mümkünse olayın BİRİNCİL zararlı tesir cümlesi olmalıdır "
-             "(ör. elektrik: akıma kapılma/canlı devreye temas); prosedür ihlalleri sonraki öğelerde."
+        desc=(
+            "SADECE ve SADECE gecerli JSON ARRAY dondur. Markdown, aciklama, code fence YASAK. "
+            "Format: [{code, standard_title_tr, category_type, cause_tr, evidence_tr}, ...]. "
+            "En fazla 5 neden. Her cause_tr kisa ve net olmalı (maks ~180 karakter). "
+            "Ilk neden (causes[0]) birincil zararlı mekanizmayı hedeflesin "
+            "(ör. elektrikte akıma kapılma/canlı devreye temas); prosedür ihlali sonraya kalsın."
+        )
     )
 
 
@@ -283,7 +287,8 @@ class ImmediateCauseFinder(dspy.Module):
     
     def __init__(self):
         super().__init__()
-        self.finder = dspy.ChainOfThought(ImmediateCauseIdentifier)
+        # Predict, CoT'a gore daha az "yorumlu" / JSON disi metin uretir.
+        self.finder = dspy.Predict(ImmediateCauseIdentifier)
 
     @staticmethod
     def _looks_like_primary_mechanism(text: str) -> bool:
@@ -319,9 +324,13 @@ class ImmediateCauseFinder(dspy.Module):
                 continue
             code = str(c.get("code", "")).strip().upper()
             cat = str(c.get("category_type", "")).strip().upper()
-            if not cat and code:
-                cat = code[0]
-            cat = cat if cat in ("A", "B") else ""
+            # "B - Unsafe Condition" gibi formatlarda ilk karakteri yakala.
+            if cat and cat[0] in ("A", "B"):
+                cat = cat[0]
+            elif code:
+                cat = code[0] if code[0] in ("A", "B") else ""
+            else:
+                cat = ""
             norm.append(
                 {
                     "code": code,
@@ -332,6 +341,48 @@ class ImmediateCauseFinder(dspy.Module):
                 }
             )
         return norm
+
+    @staticmethod
+    def _minimal_fallback_causes(incident_summary: str) -> List[Dict]:
+        """
+        LLM JSON'i tamamen bozulursa analizi sifira dusurmemek icin
+        metinden basit bir fallback immediate-cause listesi uret.
+        """
+        t = (incident_summary or "").lower()
+        causes: List[Dict] = []
+
+        if any(k in t for k in ("düş", "dus", "yüksek", "yuksek", "ankraj", "emniyet kemeri", "lanyard")):
+            causes.append(
+                {
+                    "code": "B4.4",
+                    "standard_title_tr": "Yüksekliklerde Yetersiz Koruma / Düşme Riski",
+                    "category_type": "B",
+                    "cause_tr": "Yüksekte çalışma sırasında düşmeye karşı koruma ve bağlantı uygulaması yetersizdi.",
+                    "evidence_tr": "Olay metninde yüksekte çalışma/düşme ve bağlantı eksikliği belirtiliyor.",
+                }
+            )
+        if any(k in t for k in ("prosed", "ptw", "iş izni", "is izni", "talimat")):
+            causes.append(
+                {
+                    "code": "A1.1",
+                    "standard_title_tr": "Bireysel Kural/Prosedür İhlali",
+                    "category_type": "A",
+                    "cause_tr": "Çalışma sırasında prosedür veya iş izni koşulları tam uygulanmadı.",
+                    "evidence_tr": "Olay anlatımında prosedür/izin uygulamasına dair boşluk var.",
+                }
+            )
+
+        if not causes:
+            causes.append(
+                {
+                    "code": "B4.4",
+                    "standard_title_tr": "Yüksekliklerde Yetersiz Koruma / Düşme Riski",
+                    "category_type": "B",
+                    "cause_tr": "Doğrudan neden metinden net ayrışmadı; düşme riski odaklı ilk neden kullanıldı.",
+                    "evidence_tr": "LLM immediate-cause JSON çıktısı parse edilemedi.",
+                }
+            )
+        return causes[:2]
     
     def forward(
         self,
@@ -355,9 +406,30 @@ class ImmediateCauseFinder(dspy.Module):
         raw = getattr(result, "causes", "") or ""
         causes = _parse_array_field(raw, label="ImmediateCauseFinder.causes")
 
+        # 1. denemede parse bossa, daha kati bir istemle 2. deneme.
+        if not causes:
+            strict_summary = (
+                incident_summary.strip()
+                + "\n\n[STRICT OUTPUT RULE]\n"
+                + "Sadece gecerli JSON ARRAY dondur. "
+                + "Aciklama, markdown, code fence veya ek metin yazma."
+            )
+            retry = self.finder(
+                incident_summary=strict_summary,
+                category_a_codes=category_a,
+                category_b_codes=category_b,
+            )
+            retry_raw = getattr(retry, "causes", "") or ""
+            causes = _parse_array_field(retry_raw, label="ImmediateCauseFinder.causes.retry")
+
         # Max 5 cause
         causes = self._normalize_causes(causes)[:5]
         causes = self._promote_primary_mechanism(causes)
+
+        # Hala bos ise minimal fallback ile zinciri ayakta tut.
+        if not causes:
+            print("⚠️  Immediate causes boş kaldı; minimal fallback causes uygulanıyor.")
+            causes = self._minimal_fallback_causes(incident_summary)
 
         return {
             "causes": causes,
