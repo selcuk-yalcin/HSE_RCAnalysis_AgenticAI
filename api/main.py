@@ -46,6 +46,7 @@ from shared.tenant_auth import resolve_tenant_id
 from shared.hybrid_cache import hybrid_get, hybrid_set
 from shared.oracle_memory import merge_oracle_into_investigation, upsert_context, list_recent
 from shared.ops_celery import celery_inspect_snapshot
+from shared.redis_client import get_redis_client
 from agents.pattern_analyzer import aggregate_root_cause_codes, summarize_status
 
 try:
@@ -201,6 +202,62 @@ def _jobs(tenant_id: str) -> dict:
     return get_tenant_store(tenant_id).jobs_db
 
 
+_INCIDENT_REDIS_TTL_SECONDS = max(
+    3600,
+    int((os.getenv("INCIDENT_REDIS_TTL_SECONDS") or "2592000").strip() or "2592000"),
+)
+
+
+def _incident_redis_key(tenant_id: str, incident_id: str) -> str:
+    return f"hse:incident:{tenant_id}:{incident_id}"
+
+
+def _save_incident_record(tenant_id: str, incident_id: str, incident: dict) -> None:
+    """Store incident in local memory and Redis for cross-instance consistency."""
+    _incidents(tenant_id)[incident_id] = incident
+    client = get_redis_client()
+    if client is None:
+        return
+    try:
+        client.setex(
+            _incident_redis_key(tenant_id, incident_id),
+            _INCIDENT_REDIS_TTL_SECONDS,
+            json.dumps(incident, ensure_ascii=False, default=str),
+        )
+    except Exception:  # noqa: BLE001
+        # Redis write is best effort; in-memory remains source of truth for this process.
+        pass
+
+
+def _load_incident_record(tenant_id: str, incident_id: str) -> Optional[dict]:
+    store = _incidents(tenant_id)
+    incident = store.get(incident_id)
+    if incident:
+        return incident
+
+    client = get_redis_client()
+    if client is None:
+        return None
+    try:
+        raw = client.get(_incident_redis_key(tenant_id, incident_id))
+        if not raw:
+            return None
+        incident = json.loads(raw)
+        if isinstance(incident, dict):
+            store[incident_id] = incident
+            return incident
+    except Exception:  # noqa: BLE001
+        return None
+    return None
+
+
+def _require_incident_record(tenant_id: str, incident_id: str) -> dict:
+    incident = _load_incident_record(tenant_id, incident_id)
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    return incident
+
+
 def _utc_now_iso() -> str:
     return datetime.utcnow().isoformat() + "Z"
 
@@ -259,6 +316,7 @@ def _sync_incident_from_pipeline_result(result_payload: dict):
     if part4:
         incident["part4"] = part4
         incident["status"] = "completed"
+    _save_incident_record(tenant_id, incident_id, incident)
 
 
 def _normalize_celery_job(task_id: str) -> dict:
@@ -479,10 +537,7 @@ async def _investigate_core(tenant_id: str, incident_id: str, investigation: Inv
             status_code=503,
             detail="Service not ready. Root Cause Agent not initialized. Please check OPENROUTER_API_KEY environment variable.",
         )
-    store = _incidents(tenant_id)
-    if incident_id not in store:
-        raise HTTPException(status_code=404, detail="Incident not found")
-    incident = store[incident_id]
+    incident = _require_incident_record(tenant_id, incident_id)
     part1_raw = incident.get("part1")
     part2_raw = incident.get("part2")
     part1_data = part1_raw if part1_raw and isinstance(part1_raw, dict) else _default_part1_data(incident_id)
@@ -506,8 +561,9 @@ async def _investigate_core(tenant_id: str, incident_id: str, investigation: Inv
             },
         )
         part3_data = transform_v2_to_frontend(part3_raw)
-        store[incident_id]["part3"] = part3_data
-        store[incident_id]["status"] = "investigated"
+        incident["part3"] = part3_data
+        incident["status"] = "investigated"
+        _save_incident_record(tenant_id, incident_id, incident)
         return {"success": True, "data": part3_data}
     except Exception as e:
         import traceback
@@ -522,10 +578,7 @@ async def _actionplan_core(tenant_id: str, incident_id: str) -> dict:
             status_code=503,
             detail="Service not ready. Action Plan Agent not initialized. Please check OPENROUTER_API_KEY environment variable.",
         )
-    store = _incidents(tenant_id)
-    if incident_id not in store:
-        raise HTTPException(status_code=404, detail="Incident not found")
-    incident = store[incident_id]
+    incident = _require_incident_record(tenant_id, incident_id)
     if not incident.get("part3"):
         raise HTTPException(status_code=400, detail="Investigation not completed")
     part4_data = actionplan_agent.generate_action_plan(
@@ -536,8 +589,9 @@ async def _actionplan_core(tenant_id: str, incident_id: str) -> dict:
             "severity": incident["part2"]["investigation_level"],
         }
     )
-    store[incident_id]["part4"] = part4_data
-    store[incident_id]["status"] = "completed"
+    incident["part4"] = part4_data
+    incident["status"] = "completed"
+    _save_incident_record(tenant_id, incident_id, incident)
     return {"success": True, "data": part4_data}
 
 
@@ -658,7 +712,7 @@ async def create_incident(tenant_id: TenantId, incident: IncidentCreate):
         
         # Store in database
         incident_id = part1_data["ref_no"]
-        _incidents(tenant_id)[incident_id] = {
+        incident_record = {
             "id": incident_id,
             "tenant_id": tenant_id,
             "part1": part1_data,
@@ -668,6 +722,7 @@ async def create_incident(tenant_id: TenantId, incident: IncidentCreate):
             "created_at": datetime.now().isoformat(),
             "status": "created"
         }
+        _save_incident_record(tenant_id, incident_id, incident_record)
         
         return IncidentResponse(
             success=True,
@@ -685,8 +740,7 @@ async def hitl_dynamic_questions(tenant_id: TenantId, incident_id: str, body: Hi
     """
     Sıralı HITL soruları: HSG245 disambiguation bankası + QuestionEngine (taxonomy / kb).
     """
-    if incident_id not in _incidents(tenant_id):
-        raise HTTPException(status_code=404, detail="Incident not found")
+    _require_incident_record(tenant_id, incident_id)
     bs = body.batch_size if body.batch_size and body.batch_size > 0 else 1
     bs = min(bs, 5)
     payload_for_key = {
@@ -738,11 +792,8 @@ async def add_assessment(tenant_id: TenantId, incident_id: str, assessment: Asse
             detail="Service not ready. Assessment Agent not initialized. Please check OPENROUTER_API_KEY environment variable."
         )
     
-    if incident_id not in _incidents(tenant_id):
-        raise HTTPException(status_code=404, detail="Incident not found")
-    
     try:
-        incident = _incidents(tenant_id)[incident_id]
+        incident = _require_incident_record(tenant_id, incident_id)
         
         # Process with Assessment Agent
         part2_data = assessment_agent.assess_incident(
@@ -755,8 +806,9 @@ async def add_assessment(tenant_id: TenantId, incident_id: str, assessment: Asse
         )
         
         # Update database
-        _incidents(tenant_id)[incident_id]["part2"] = part2_data
-        _incidents(tenant_id)[incident_id]["status"] = "assessed"
+        incident["part2"] = part2_data
+        incident["status"] = "assessed"
+        _save_incident_record(tenant_id, incident_id, incident)
         
         return {
             "success": True,
@@ -782,15 +834,13 @@ async def start_pipeline_job(tenant_id: TenantId, incident_id: str, request: Pip
     Part 3 + Part 4 asenkron job baslatir.
     Frontend, /api/v1/jobs/{job_id} endpoint'ini poll ederek canli akis gosterir.
     """
-    if incident_id not in _incidents(tenant_id):
-        raise HTTPException(status_code=404, detail="Incident not found")
+    incident = _require_incident_record(tenant_id, incident_id)
     payload = merge_oracle_into_investigation(tenant_id, request.model_dump())
 
     if _use_celery_pipeline():
         if run_pipeline_task is None:
             raise HTTPException(status_code=503, detail="Celery task module not available.")
 
-        incident = _incidents(tenant_id)[incident_id]
         part1_raw = incident.get("part1")
         part2_raw = incident.get("part2")
         part1_data = part1_raw if part1_raw and isinstance(part1_raw, dict) else _default_part1_data(incident_id)
@@ -920,12 +970,11 @@ async def get_incident(tenant_id: TenantId, incident_id: str):
     """
     Get complete incident data
     """
-    if incident_id not in _incidents(tenant_id):
-        raise HTTPException(status_code=404, detail="Incident not found")
-    
+    incident = _require_incident_record(tenant_id, incident_id)
+
     return {
         "success": True,
-        "data": _incidents(tenant_id)[incident_id]
+        "data": incident
     }
 
 @app.get("/api/v1/incidents")
