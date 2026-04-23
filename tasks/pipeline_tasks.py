@@ -66,6 +66,7 @@ def run_pipeline_task(
     part1_data: Dict[str, Any],
     part2_data: Dict[str, Any],
     investigation_payload: Dict[str, Any],
+    tenant_id: str = "default",
 ) -> Dict[str, Any]:
     from agents.actionplan_agent import ActionPlanAgent
     from agents.rootcause_agent_v2 import RootCauseAgentV2
@@ -83,25 +84,30 @@ def run_pipeline_task(
         state="PROGRESS",
         meta={
             "incident_id": incident_id,
+            "tenant_id": tenant_id,
             "stage": "investigate",
             "progress": 20,
             "message": "Kok neden analizi calisiyor",
         },
     )
 
+    inv = {
+        "location": investigation_payload.get("location", ""),
+        "who_involved": investigation_payload.get("who_involved", ""),
+        "how_happened": investigation_payload.get("how_happened", ""),
+        "activities": investigation_payload.get("activities", ""),
+        "working_conditions": investigation_payload.get("working_conditions", ""),
+        "safety_procedures": investigation_payload.get("safety_procedures", ""),
+        "injuries": investigation_payload.get("injuries", ""),
+        "why_probe_answers": investigation_payload.get("why_probe_answers", []) or [],
+        "oracle_context": investigation_payload.get("oracle_context", ""),
+        "output_language": investigation_payload.get("output_language", ""),
+    }
+
     part3_raw = rootcause_agent.analyze_root_causes(
         part1_data,
         part2_data,
-        {
-            "location": investigation_payload.get("location", ""),
-            "who_involved": investigation_payload.get("who_involved", ""),
-            "how_happened": investigation_payload.get("how_happened", ""),
-            "activities": investigation_payload.get("activities", ""),
-            "working_conditions": investigation_payload.get("working_conditions", ""),
-            "safety_procedures": investigation_payload.get("safety_procedures", ""),
-            "injuries": investigation_payload.get("injuries", ""),
-            "why_probe_answers": investigation_payload.get("why_probe_answers", []) or [],
-        },
+        inv,
     )
     part3_data = _transform_v2_to_frontend(part3_raw)
 
@@ -109,6 +115,7 @@ def run_pipeline_task(
         state="PROGRESS",
         meta={
             "incident_id": incident_id,
+            "tenant_id": tenant_id,
             "stage": "actionplan",
             "progress": 75,
             "message": "Aksiyon plani olusturuluyor",
@@ -125,6 +132,7 @@ def run_pipeline_task(
     )
 
     return {
+        "tenant_id": tenant_id,
         "incident_id": incident_id,
         "part3": part3_data,
         "part4": part4_data,

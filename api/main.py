@@ -2,7 +2,7 @@
 FastAPI Backend for HSE Investigation System
 Connects admin panel with AI agents
 """
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Depends, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -13,7 +13,7 @@ import asyncio
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Tuple, Type
+from typing import Annotated, Optional, Tuple, Type
 import json
 from celery.result import AsyncResult
 
@@ -36,7 +36,17 @@ from agents.model_constants import (
     resolve_openrouter_dspy_model,
     resolve_openrouter_docx_model,
 )
-from shared.redis_client import cache_key, get_json as cache_get_json, set_json as cache_set_json
+from shared.tenant_store import (
+    get_tenant_store,
+    total_incidents_across_tenants,
+    all_tenants_summary,
+    DEFAULT_TENANT_ID,
+)
+from shared.tenant_auth import resolve_tenant_id
+from shared.hybrid_cache import hybrid_get, hybrid_set
+from shared.oracle_memory import merge_oracle_into_investigation, upsert_context, list_recent
+from shared.ops_celery import celery_inspect_snapshot
+from agents.pattern_analyzer import aggregate_root_cause_codes, summarize_status
 
 try:
     from celery_app import celery_app
@@ -58,6 +68,8 @@ app = FastAPI(
     description="Backend API for HSG245 Multi-Agent Investigation System",
     version="1.0.0"
 )
+
+TenantId = Annotated[str, Depends(resolve_tenant_id)]
 
 # CORS for Vercel admin panel
 app.add_middleware(
@@ -181,9 +193,12 @@ async def startup_event():
         # Don't crash - let healthcheck show the error
         pass
 
-# In-memory storage (replace with database in production)
-incidents_db = {}
-jobs_db = {}
+def _incidents(tenant_id: str) -> dict:
+    return get_tenant_store(tenant_id).incidents_db
+
+
+def _jobs(tenant_id: str) -> dict:
+    return get_tenant_store(tenant_id).jobs_db
 
 
 def _utc_now_iso() -> str:
@@ -201,8 +216,8 @@ def _job_stage_message(stage: str) -> str:
     return mapping.get(stage, stage)
 
 
-def _set_job_state(job_id: str, **kwargs):
-    job = jobs_db.get(job_id)
+def _set_job_state(tenant_id: str, job_id: str, **kwargs):
+    job = _jobs(tenant_id).get(job_id)
     if not job:
         return
     job.update(kwargs)
@@ -230,7 +245,9 @@ def _sync_incident_from_pipeline_result(result_payload: dict):
     incident_id = (result_payload or {}).get("incident_id")
     if not incident_id:
         return
-    incident = incidents_db.get(incident_id)
+    tenant_id = (result_payload or {}).get("tenant_id") or "default"
+    store = _incidents(tenant_id)
+    incident = store.get(incident_id)
     if not incident:
         return
 
@@ -265,6 +282,7 @@ def _normalize_celery_job(task_id: str) -> dict:
         _sync_incident_from_pipeline_result(result_payload)
         return {
             "job_id": task_id,
+            "tenant_id": result_payload.get("tenant_id") or meta.get("tenant_id"),
             "incident_id": result_payload.get("incident_id") or meta.get("incident_id"),
             "status": "completed",
             "stage": result_payload.get("stage", "completed"),
@@ -277,6 +295,7 @@ def _normalize_celery_job(task_id: str) -> dict:
     if state in ("FAILURE", "REVOKED"):
         return {
             "job_id": task_id,
+            "tenant_id": meta.get("tenant_id"),
             "incident_id": meta.get("incident_id"),
             "status": "failed",
             "stage": "failed",
@@ -289,6 +308,7 @@ def _normalize_celery_job(task_id: str) -> dict:
     if state in ("STARTED", "PROGRESS", "RETRY"):
         return {
             "job_id": task_id,
+            "tenant_id": meta.get("tenant_id"),
             "incident_id": meta.get("incident_id"),
             "status": "running",
             "stage": meta.get("stage", "running"),
@@ -301,6 +321,7 @@ def _normalize_celery_job(task_id: str) -> dict:
     # PENDING and unknown
     return {
         "job_id": task_id,
+        "tenant_id": meta.get("tenant_id"),
         "incident_id": meta.get("incident_id"),
         "status": "queued",
         "stage": "queued",
@@ -407,6 +428,8 @@ class InvestigationData(BaseModel):
     safety_procedures: str = ""
     injuries: str = ""
     why_probe_answers: list[dict] | None = None
+    output_language: str = ""  # e.g. en, tr — passed to root cause agent
+    oracle_context: str = ""  # optional; merged server-side from Oracle store when empty
 
 
 class PipelineStartRequest(BaseModel):
@@ -419,6 +442,7 @@ class PipelineStartRequest(BaseModel):
     safety_procedures: str = ""
     injuries: str = ""
     why_probe_answers: list[dict] | None = None
+    output_language: str = ""
 
 class HitlQuestionsRequest(BaseModel):
     """Dinamik HITL soruları (knowledge_base / disambiguation tabanlı); LLM gerektirmez."""
@@ -436,16 +460,91 @@ class HitlQuestionsRequest(BaseModel):
 
 class PDFGenerateRequest(BaseModel):
     incident_id: str
-    
+
+
+class OracleContextBody(BaseModel):
+    summary: str
+    incident_id: str = ""
+
+
 class IncidentResponse(BaseModel):
     success: bool
     data: dict
     message: str = ""
 
 
-async def _run_pipeline_job(job_id: str, incident_id: str, payload: dict):
+async def _investigate_core(tenant_id: str, incident_id: str, investigation: InvestigationData) -> dict:
+    if rootcause_agent is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Service not ready. Root Cause Agent not initialized. Please check OPENROUTER_API_KEY environment variable.",
+        )
+    store = _incidents(tenant_id)
+    if incident_id not in store:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    incident = store[incident_id]
+    part1_raw = incident.get("part1")
+    part2_raw = incident.get("part2")
+    part1_data = part1_raw if part1_raw and isinstance(part1_raw, dict) else _default_part1_data(incident_id)
+    part2_data = part2_raw if part2_raw and isinstance(part2_raw, dict) else _default_part2_data()
+    inv_dump = investigation.model_dump()
+    try:
+        part3_raw = rootcause_agent.analyze_root_causes(
+            part1_data,
+            part2_data,
+            {
+                "location": investigation.location,
+                "who_involved": investigation.who_involved,
+                "how_happened": investigation.how_happened,
+                "activities": investigation.activities,
+                "working_conditions": investigation.working_conditions,
+                "safety_procedures": investigation.safety_procedures,
+                "injuries": investigation.injuries,
+                "why_probe_answers": investigation.why_probe_answers or [],
+                "oracle_context": (inv_dump.get("oracle_context") or ""),
+                "output_language": (inv_dump.get("output_language") or ""),
+            },
+        )
+        part3_data = transform_v2_to_frontend(part3_raw)
+        store[incident_id]["part3"] = part3_data
+        store[incident_id]["status"] = "investigated"
+        return {"success": True, "data": part3_data}
+    except Exception as e:
+        import traceback
+        error_details = f"{str(e)}\n\nTraceback:\n{traceback.format_exc()}"
+        print(f"❌ Part 3 ERROR: {error_details}")
+        raise HTTPException(status_code=500, detail=error_details) from e
+
+
+async def _actionplan_core(tenant_id: str, incident_id: str) -> dict:
+    if actionplan_agent is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Service not ready. Action Plan Agent not initialized. Please check OPENROUTER_API_KEY environment variable.",
+        )
+    store = _incidents(tenant_id)
+    if incident_id not in store:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    incident = store[incident_id]
+    if not incident.get("part3"):
+        raise HTTPException(status_code=400, detail="Investigation not completed")
+    part4_data = actionplan_agent.generate_action_plan(
+        {
+            "root_causes": incident["part3"]["root_causes"],
+            "underlying_causes": incident["part3"]["underlying_causes"],
+            "immediate_causes": incident["part3"]["immediate_causes"],
+            "severity": incident["part2"]["investigation_level"],
+        }
+    )
+    store[incident_id]["part4"] = part4_data
+    store[incident_id]["status"] = "completed"
+    return {"success": True, "data": part4_data}
+
+
+async def _run_pipeline_job(job_id: str, incident_id: str, tenant_id: str, payload: dict):
     try:
         _set_job_state(
+            tenant_id,
             job_id,
             status="running",
             stage="investigate",
@@ -453,10 +552,15 @@ async def _run_pipeline_job(job_id: str, incident_id: str, payload: dict):
             message=_job_stage_message("investigate"),
         )
 
-        investigation = InvestigationData(incident_id=incident_id, **payload)
-        part3_result = await investigate_incident(incident_id, investigation)
+        merged_inv = merge_oracle_into_investigation(
+            tenant_id, {**payload, "incident_id": incident_id}
+        )
+        investigation = InvestigationData(**merged_inv)
+
+        part3_result = await _investigate_core(tenant_id, incident_id, investigation)
 
         _set_job_state(
+            tenant_id,
             job_id,
             status="running",
             stage="actionplan",
@@ -469,15 +573,17 @@ async def _run_pipeline_job(job_id: str, incident_id: str, payload: dict):
             },
         )
 
-        part4_result = await generate_action_plan(incident_id)
+        part4_result = await _actionplan_core(tenant_id, incident_id)
 
         _set_job_state(
+            tenant_id,
             job_id,
             status="completed",
             stage="completed",
             progress=100,
             message=_job_stage_message("completed"),
             result={
+                "tenant_id": tenant_id,
                 "incident_id": incident_id,
                 "part3": part3_result.get("data"),
                 "part4": part4_result.get("data"),
@@ -487,6 +593,7 @@ async def _run_pipeline_job(job_id: str, incident_id: str, payload: dict):
         )
     except HTTPException as he:
         _set_job_state(
+            tenant_id,
             job_id,
             status="failed",
             stage="failed",
@@ -497,6 +604,7 @@ async def _run_pipeline_job(job_id: str, incident_id: str, payload: dict):
         )
     except Exception as exc:  # noqa: BLE001
         _set_job_state(
+            tenant_id,
             job_id,
             status="failed",
             stage="failed",
@@ -523,7 +631,7 @@ async def root():
     }
 
 @app.post("/api/v1/incidents/create", response_model=IncidentResponse)
-async def create_incident(incident: IncidentCreate):
+async def create_incident(tenant_id: TenantId, incident: IncidentCreate):
     """
     Part 1: Create new incident and process with Overview Agent
     Returns incident ID and Part 1 data
@@ -550,8 +658,9 @@ async def create_incident(incident: IncidentCreate):
         
         # Store in database
         incident_id = part1_data["ref_no"]
-        incidents_db[incident_id] = {
+        _incidents(tenant_id)[incident_id] = {
             "id": incident_id,
+            "tenant_id": tenant_id,
             "part1": part1_data,
             "part2": None,
             "part3": None,
@@ -572,22 +681,22 @@ async def create_incident(incident: IncidentCreate):
         )
 
 @app.post("/api/v1/incidents/{incident_id}/hitl/questions")
-async def hitl_dynamic_questions(incident_id: str, body: HitlQuestionsRequest):
+async def hitl_dynamic_questions(tenant_id: TenantId, incident_id: str, body: HitlQuestionsRequest):
     """
     Sıralı HITL soruları: HSG245 disambiguation bankası + QuestionEngine (taxonomy / kb).
     """
-    if incident_id not in incidents_db:
+    if incident_id not in _incidents(tenant_id):
         raise HTTPException(status_code=404, detail="Incident not found")
     bs = body.batch_size if body.batch_size and body.batch_size > 0 else 1
     bs = min(bs, 5)
     payload_for_key = {
+        "tenant_id": tenant_id,
         "incident_id": incident_id,
         "body": body.model_dump(),
     }
-    key = cache_key("hitl_questions", payload_for_key)
-    cached_payload = cache_get_json(key)
+    cached_payload, src = hybrid_get(tenant_id, "hitl_questions", payload_for_key)
     if cached_payload:
-        return {"success": True, "data": cached_payload, "cached": True}
+        return {"success": True, "data": cached_payload, "cached": True, "cache_layer": src}
 
     if (body.mode or "").lower() == "why_probe" or body.why_level > 0:
         payload = next_why_probe_questions(
@@ -608,12 +717,18 @@ async def hitl_dynamic_questions(incident_id: str, body: HitlQuestionsRequest):
             body.immediate_causes,
             bs,
         )
-    cache_set_json(key, payload, _hitl_cache_ttl_seconds())
-    return {"success": True, "data": payload, "cached": False}
+    hybrid_set(
+        tenant_id,
+        "hitl_questions",
+        payload_for_key,
+        payload,
+        _hitl_cache_ttl_seconds(),
+    )
+    return {"success": True, "data": payload, "cached": False, "cache_layer": "miss"}
 
 
 @app.post("/api/v1/incidents/{incident_id}/assessment")
-async def add_assessment(incident_id: str, assessment: AssessmentData):
+async def add_assessment(tenant_id: TenantId, incident_id: str, assessment: AssessmentData):
     """
     Part 2: Add assessment with Assessment Agent
     """
@@ -623,11 +738,11 @@ async def add_assessment(incident_id: str, assessment: AssessmentData):
             detail="Service not ready. Assessment Agent not initialized. Please check OPENROUTER_API_KEY environment variable."
         )
     
-    if incident_id not in incidents_db:
+    if incident_id not in _incidents(tenant_id):
         raise HTTPException(status_code=404, detail="Incident not found")
     
     try:
-        incident = incidents_db[incident_id]
+        incident = _incidents(tenant_id)[incident_id]
         
         # Process with Assessment Agent
         part2_data = assessment_agent.assess_incident(
@@ -640,8 +755,8 @@ async def add_assessment(incident_id: str, assessment: AssessmentData):
         )
         
         # Update database
-        incidents_db[incident_id]["part2"] = part2_data
-        incidents_db[incident_id]["status"] = "assessed"
+        _incidents(tenant_id)[incident_id]["part2"] = part2_data
+        _incidents(tenant_id)[incident_id]["status"] = "assessed"
         
         return {
             "success": True,
@@ -651,80 +766,31 @@ async def add_assessment(incident_id: str, assessment: AssessmentData):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/incidents/{incident_id}/investigate")
-async def investigate_incident(incident_id: str, investigation: InvestigationData):
+async def investigate_incident(tenant_id: TenantId, incident_id: str, investigation: InvestigationData):
     """
     Part 3: Full investigation with Root Cause Agent
     NOTE: Can work standalone with just incident description for testing
     """
-    if rootcause_agent is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Service not ready. Root Cause Agent not initialized. Please check OPENROUTER_API_KEY environment variable."
-        )
-    
-    if incident_id not in incidents_db:
-        raise HTTPException(status_code=404, detail="Incident not found")
-    
-    incident = incidents_db[incident_id]
-    
-    # Part 1 & Part 2 are now optional - will use defaults if not available
-    part1_raw = incident.get("part1")
-    part2_raw = incident.get("part2")
-    
-    # Ensure they are dicts, not None or strings
-    part1_data = part1_raw if part1_raw and isinstance(part1_raw, dict) else _default_part1_data(incident_id)
-    part2_data = part2_raw if part2_raw and isinstance(part2_raw, dict) else _default_part2_data()
-    
-    try:
-        # V3.1 veya V2; çıktı aynı şema (transform_v2_to_frontend)
-        part3_raw = rootcause_agent.analyze_root_causes(
-            part1_data,
-            part2_data,
-            {
-                "location": investigation.location,
-                "who_involved": investigation.who_involved,
-                "how_happened": investigation.how_happened,
-                "activities": investigation.activities,
-                "working_conditions": investigation.working_conditions,
-                "safety_procedures": investigation.safety_procedures,
-                "injuries": investigation.injuries,
-                "why_probe_answers": investigation.why_probe_answers or [],
-            }
-        )
-        
-        # Transform V2 format to frontend-compatible format
-        part3_data = transform_v2_to_frontend(part3_raw)
-        
-        # Update database
-        incidents_db[incident_id]["part3"] = part3_data
-        incidents_db[incident_id]["status"] = "investigated"
-        
-        return {
-            "success": True,
-            "data": part3_data
-        }
-    except Exception as e:
-        import traceback
-        error_details = f"{str(e)}\n\nTraceback:\n{traceback.format_exc()}"
-        print(f"❌ Part 3 ERROR: {error_details}")
-        raise HTTPException(status_code=500, detail=error_details)
+    inv_dict = merge_oracle_into_investigation(tenant_id, investigation.model_dump())
+    investigation = InvestigationData(**inv_dict)
+    return await _investigate_core(tenant_id, incident_id, investigation)
 
 
 @app.post("/api/v1/incidents/{incident_id}/pipeline/start")
-async def start_pipeline_job(incident_id: str, request: PipelineStartRequest):
+async def start_pipeline_job(tenant_id: TenantId, incident_id: str, request: PipelineStartRequest):
     """
     Part 3 + Part 4 asenkron job baslatir.
     Frontend, /api/v1/jobs/{job_id} endpoint'ini poll ederek canli akis gosterir.
     """
-    if incident_id not in incidents_db:
+    if incident_id not in _incidents(tenant_id):
         raise HTTPException(status_code=404, detail="Incident not found")
-    payload = request.model_dump()
+    payload = merge_oracle_into_investigation(tenant_id, request.model_dump())
 
     if _use_celery_pipeline():
         if run_pipeline_task is None:
             raise HTTPException(status_code=503, detail="Celery task module not available.")
 
-        incident = incidents_db[incident_id]
+        incident = _incidents(tenant_id)[incident_id]
         part1_raw = incident.get("part1")
         part2_raw = incident.get("part2")
         part1_data = part1_raw if part1_raw and isinstance(part1_raw, dict) else _default_part1_data(incident_id)
@@ -735,6 +801,7 @@ async def start_pipeline_job(incident_id: str, request: PipelineStartRequest):
             part1_data=part1_data,
             part2_data=part2_data,
             investigation_payload=payload,
+            tenant_id=tenant_id,
         )
 
         return {
@@ -755,8 +822,9 @@ async def start_pipeline_job(incident_id: str, request: PipelineStartRequest):
         raise HTTPException(status_code=503, detail="Service not ready. Action Plan Agent not initialized.")
 
     job_id = f"job_{uuid.uuid4().hex[:12]}"
-    jobs_db[job_id] = {
+    _jobs(tenant_id)[job_id] = {
         "job_id": job_id,
+        "tenant_id": tenant_id,
         "incident_id": incident_id,
         "status": "queued",
         "stage": "queued",
@@ -768,7 +836,7 @@ async def start_pipeline_job(incident_id: str, request: PipelineStartRequest):
         "result": None,
         "error": None,
     }
-    asyncio.create_task(_run_pipeline_job(job_id, incident_id, payload))
+    asyncio.create_task(_run_pipeline_job(job_id, incident_id, tenant_id, payload))
 
     return {
         "success": True,
@@ -784,22 +852,29 @@ async def start_pipeline_job(incident_id: str, request: PipelineStartRequest):
 
 
 @app.get("/api/v1/jobs/{job_id}")
-async def get_job_status(job_id: str):
-    if job_id in jobs_db:
-        return {"success": True, "data": jobs_db[job_id]}
+async def get_job_status(job_id: str, tenant_id: str = Query(DEFAULT_TENANT_ID)):
+    """In-process jobs require matching tenant query param or X-Tenant-ID header."""
+    tid = tenant_id.strip() or DEFAULT_TENANT_ID
+    if job_id in _jobs(tid):
+        return {"success": True, "data": _jobs(tid)[job_id]}
     if _use_celery_pipeline():
         return {"success": True, "data": _normalize_celery_job(job_id)}
     raise HTTPException(status_code=404, detail="Job not found")
 
 
 @app.websocket("/ws/jobs/{job_id}")
-async def job_status_ws(websocket: WebSocket, job_id: str):
+async def job_status_ws(
+    websocket: WebSocket,
+    job_id: str,
+    tenant_id: str = Query(DEFAULT_TENANT_ID),
+):
     """
     Job durumunu websocket ile stream eder.
     Frontend canli progres gosterimi icin kullanir.
     """
     await websocket.accept()
-    if job_id not in jobs_db and not _use_celery_pipeline():
+    tid = (tenant_id or DEFAULT_TENANT_ID).strip() or DEFAULT_TENANT_ID
+    if job_id not in _jobs(tid) and not _use_celery_pipeline():
         await websocket.send_json(
             {"success": False, "error": "Job not found", "job_id": job_id}
         )
@@ -809,7 +884,7 @@ async def job_status_ws(websocket: WebSocket, job_id: str):
     last_payload = None
     try:
         while True:
-            job = jobs_db.get(job_id)
+            job = _jobs(tid).get(job_id)
             if job is None and _use_celery_pipeline():
                 job = _normalize_celery_job(job_id)
             if not job:
@@ -834,67 +909,76 @@ async def job_status_ws(websocket: WebSocket, job_id: str):
         return
 
 @app.post("/api/v1/incidents/{incident_id}/actionplan")
-async def generate_action_plan(incident_id: str):
+async def generate_action_plan(tenant_id: TenantId, incident_id: str):
     """
     Part 4: Generate action plan with ActionPlan Agent
     """
-    if actionplan_agent is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Service not ready. Action Plan Agent not initialized. Please check OPENROUTER_API_KEY environment variable."
-        )
-    
-    if incident_id not in incidents_db:
-        raise HTTPException(status_code=404, detail="Incident not found")
-    
-    incident = incidents_db[incident_id]
-    
-    if not incident["part3"]:
-        raise HTTPException(status_code=400, detail="Investigation not completed")
-    
-    try:
-        # Process with ActionPlan Agent
-        part4_data = actionplan_agent.generate_action_plan({
-            "root_causes": incident["part3"]["root_causes"],
-            "underlying_causes": incident["part3"]["underlying_causes"],
-            "immediate_causes": incident["part3"]["immediate_causes"],
-            "severity": incident["part2"]["investigation_level"]
-        })
-        
-        # Update database
-        incidents_db[incident_id]["part4"] = part4_data
-        incidents_db[incident_id]["status"] = "completed"
-        
-        return {
-            "success": True,
-            "data": part4_data
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return await _actionplan_core(tenant_id, incident_id)
 
 @app.get("/api/v1/incidents/{incident_id}")
-async def get_incident(incident_id: str):
+async def get_incident(tenant_id: TenantId, incident_id: str):
     """
     Get complete incident data
     """
-    if incident_id not in incidents_db:
+    if incident_id not in _incidents(tenant_id):
         raise HTTPException(status_code=404, detail="Incident not found")
     
     return {
         "success": True,
-        "data": incidents_db[incident_id]
+        "data": _incidents(tenant_id)[incident_id]
     }
 
 @app.get("/api/v1/incidents")
-async def list_incidents():
+async def list_incidents(tenant_id: TenantId):
     """
     List all incidents
     """
     return {
         "success": True,
-        "data": list(incidents_db.values()),
-        "count": len(incidents_db)
+        "data": list(_incidents(tenant_id).values()),
+        "count": len(_incidents(tenant_id)),
+        "tenant_id": tenant_id,
     }
+
+
+async def _probe_redis_ms() -> tuple[bool, Optional[float]]:
+    import time
+    from shared.redis_client import get_redis_client
+
+    t0 = time.perf_counter()
+    client = get_redis_client()
+    if client is None:
+        return False, None
+    try:
+        client.ping()
+        return True, (time.perf_counter() - t0) * 1000
+    except Exception:  # noqa: BLE001
+        return False, None
+
+
+async def _probe_mongo_ms() -> tuple[bool, Optional[float]]:
+    import time
+
+    uri = (os.getenv("MONGODB_URI") or "").strip()
+    if not uri:
+        return False, None
+    t0 = time.perf_counter()
+
+    def _ping():
+        try:
+            from pymongo import MongoClient
+            from pymongo.server_api import ServerApi
+
+            c = MongoClient(uri, server_api=ServerApi("1"), serverSelectionTimeoutMS=3000)
+            c.admin.command("ping")
+            return True
+        except Exception:  # noqa: BLE001
+            return False
+
+    ok = await asyncio.to_thread(_ping)
+    ms = (time.perf_counter() - t0) * 1000
+    return ok, ms if ok else None
+
 
 @app.get("/api/v1/health")
 async def health_check():
@@ -911,6 +995,9 @@ async def health_check():
     
     # Check for API key
     api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+
+    redis_ok, redis_ms = await _probe_redis_ms()
+    mongo_ok, mongo_ms = await _probe_mongo_ms()
     
     return {
         "status": "healthy" if all_agents_ready else "degraded",
@@ -923,25 +1010,93 @@ async def health_check():
         },
         "cache": {
             "hitl_cache_ttl_seconds": _hitl_cache_ttl_seconds(),
+            "hybrid": {"redis_ping_ms": redis_ms, "redis_ok": redis_ok, "mongo_ping_ms": mongo_ms, "mongo_ok": mongo_ok},
         },
+        "rag": {"enabled": _env_bool("ROOTCAUSE_USE_RAG", False)},
         "pipeline_executor": "celery" if _use_celery_pipeline() else "inprocess",
         "api_key_configured": bool(api_key),
         "api_key_source": "OPENROUTER_API_KEY" if os.getenv("OPENROUTER_API_KEY") else "OPENAI_API_KEY" if os.getenv("OPENAI_API_KEY") else "none",
-        "incidents_count": len(incidents_db),
+        "incidents_count": total_incidents_across_tenants(),
+        "tenants_summary": all_tenants_summary(),
         "timestamp": datetime.now().isoformat()
     }
 
+
+@app.post("/api/v1/oracle/context")
+async def post_oracle_context(tenant_id: TenantId, body: OracleContextBody):
+    ok = upsert_context(tenant_id, body.summary, incident_id=body.incident_id)
+    return {"success": ok, "tenant_id": tenant_id}
+
+
+@app.get("/api/v1/oracle/context")
+async def get_oracle_context(tenant_id: TenantId):
+    return {"success": True, "data": list_recent(tenant_id)}
+
+
+@app.get("/api/v1/ops/celery")
+async def ops_celery(x_ops_key: Optional[str] = Header(None, alias="X-Ops-Key")):
+    expected = (os.getenv("OPS_API_KEY") or "").strip()
+    if expected and x_ops_key != expected:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return {"success": True, "data": celery_inspect_snapshot(celery_app)}
+
+
+@app.get("/api/v1/analytics/patterns")
+async def analytics_patterns(tenant_id: TenantId):
+    incidents = list(_incidents(tenant_id).values())
+    return {
+        "success": True,
+        "tenant_id": tenant_id,
+        "status_breakdown": summarize_status(incidents),
+        "root_cause_codes": aggregate_root_cause_codes(incidents),
+    }
+
+
+@app.post("/api/v1/experimental/voice-bridge")
+async def voice_bridge_stub():
+    """Placeholder for future STT/TTS integration."""
+    return {
+        "success": False,
+        "message": "Not implemented — connect Whisper/browser STT and forward text to existing investigation APIs.",
+    }
+
+
+@app.get("/api/v1/experimental/parallel-probes")
+async def experimental_parallel_probes():
+    """Runs Redis + Mongo probes concurrently via asyncio.gather."""
+    import time
+
+    t0 = time.perf_counter()
+    r2, m2 = await asyncio.gather(_probe_redis_ms(), _probe_mongo_ms())
+    wall_ms = (time.perf_counter() - t0) * 1000
+    return {
+        "success": True,
+        "gather_wall_ms": round(wall_ms, 3),
+        "redis": {"ok": r2[0], "ms": r2[1]},
+        "mongo": {"ok": m2[0], "ms": m2[1]},
+    }
+
+
+@app.get("/api/v1/experimental/meta-learning")
+async def meta_learning_info():
+    return {
+        "success": True,
+        "status": "planned",
+        "requirements": "Collect 30–50 cold-start incidents; run DSPy offline optimization; promote prompts to production.",
+    }
+
+
 @app.post("/api/v1/reports/generate")
-async def generate_pdf_report(request: PDFGenerateRequest):
+async def generate_pdf_report(tenant_id: TenantId, request: PDFGenerateRequest):
     """
     Generate PDF report for completed incident
     """
     incident_id = request.incident_id
     
-    if incident_id not in incidents_db:
+    if incident_id not in _incidents(tenant_id):
         raise HTTPException(status_code=404, detail="Incident not found")
     
-    incident = incidents_db[incident_id]
+    incident = _incidents(tenant_id)[incident_id]
     
     if incident["status"] != "completed":
         raise HTTPException(

@@ -170,6 +170,22 @@ class RootCauseAgentV2:
         # HITL cevapları varsa özete ekle — her olayda farklı kök neden üretilmesini sağlar
         incident_summary = self._append_hitl_answers(incident_summary, investigation_data)
 
+        if investigation_data and isinstance(investigation_data, dict):
+            oc = (investigation_data.get("oracle_context") or "").strip()
+            if oc:
+                incident_summary = (
+                    "[Organizational memory / prior context]\n"
+                    + oc
+                    + "\n\n"
+                    + incident_summary
+                )
+            lang = (investigation_data.get("output_language") or "").strip().lower()
+            if lang.startswith("en"):
+                incident_summary = (
+                    "[Instruction: produce analysis text in English where applicable]\n"
+                    + incident_summary
+                )
+
         print(f"\n📋 OLAY ÖZETİ (ilk 300 karakter):\n{incident_summary[:300]}...\n")
 
         rca_data = {
