@@ -10,6 +10,8 @@ from celery import Celery
 
 
 REDIS_URL = (os.getenv("REDIS_URL") or "redis://localhost:6379/0").strip()
+BROKER_HEARTBEAT = int((os.getenv("CELERY_BROKER_HEARTBEAT") or "30").strip() or "30")
+BROKER_POOL_LIMIT = int((os.getenv("CELERY_BROKER_POOL_LIMIT") or "10").strip() or "10")
 
 celery_app = Celery(
     "hse_rca_tasks",
@@ -28,5 +30,18 @@ celery_app.conf.update(
     task_time_limit=1800,
     task_soft_time_limit=1500,
     result_expires=3600,
+    broker_heartbeat=BROKER_HEARTBEAT,
+    broker_heartbeat_checkrate=2,
+    broker_pool_limit=BROKER_POOL_LIMIT,
+    broker_connection_retry_on_startup=True,
+    broker_connection_max_retries=None,  # keep retrying on transient Railway/Redis blips
+    broker_transport_options={
+        "socket_connect_timeout": 30,
+        "socket_timeout": 30,
+        "socket_keepalive": True,
+        "retry_on_timeout": True,
+        "health_check_interval": 30,
+        "visibility_timeout": 3600,
+    },
 )
 
