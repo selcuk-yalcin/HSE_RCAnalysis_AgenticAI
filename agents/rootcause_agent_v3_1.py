@@ -169,6 +169,42 @@ def _openrouter_litellm_model() -> str:
     return f"openrouter/{raw.lstrip('/')}"
 
 
+def _clean_env_secret(value: Optional[str]) -> str:
+    """Normalize secret values copied from dashboards (quotes/newlines/spaces)."""
+    if not value:
+        return ""
+    v = str(value).strip()
+    if (v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'")):
+        v = v[1:-1].strip()
+    return v
+
+
+def _resolve_openrouter_api_key() -> str:
+    """
+    Resolve API key robustly for worker environments.
+    Raises a clear error before DSPy/LiteLLM call when key is missing.
+    """
+    candidates = [
+        ("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY")),
+        ("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY")),
+    ]
+    for name, raw in candidates:
+        key = _clean_env_secret(raw)
+        if key:
+            return key
+
+    # Fail-fast with actionable diagnostics instead of ambiguous 401 in deep stack.
+    presence = {
+        name: ("set" if raw is not None else "unset")
+        for name, raw in candidates
+    }
+    raise RuntimeError(
+        "OpenRouter API key missing in worker runtime. "
+        f"Env presence: {presence}. "
+        "Set OPENROUTER_API_KEY (and optionally OPENAI_API_KEY) on the Celery worker service and redeploy."
+    )
+
+
 def _why1_question_seed(incident_summary: str, immediate_cause: Dict) -> str:
     """Why-1 için LLM girdisi: zincir doğrudan neden cümlesinden başlasın; olay özetini tekrarlatma."""
     cause_tr = (immediate_cause.get("cause_tr") or "").strip()
@@ -804,7 +840,7 @@ class RootCauseAgentV3_1:
         """
         
         # OpenAI/OpenRouter setup (OpenRouter OpenAI-compatible /chat/completions)
-        api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY")
+        api_key = _resolve_openrouter_api_key()
         _api_base = _normalize_openrouter_api_base()
         self.client = OpenAI(
             base_url=_api_base,
@@ -816,6 +852,11 @@ class RootCauseAgentV3_1:
             model=_openrouter_litellm_model(),
             api_base=_api_base,
             api_key=api_key,
+            extra_headers={
+                "Authorization": f"Bearer {api_key}",
+                "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://inferaworld.com"),
+                "X-Title": os.getenv("OPENROUTER_APP_NAME", "HSE-RCAnalysis"),
+            },
             max_tokens=4000
         )
         dspy.configure(lm=dspy_lm)
