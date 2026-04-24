@@ -847,16 +847,19 @@ class RootCauseAgentV3_1:
             api_key=api_key
         )
 
-        # DSPy LM — model adı 'openrouter/...' olmalı (LiteLLM + OpenRouter)
+        # Ensure LiteLLM env is always set before dspy.LM init — worker containers may
+        # load env at startup and not pick up changes. Setting explicitly guarantees it.
+        os.environ["OPENROUTER_API_KEY"] = api_key
+        os.environ["OPENAI_API_KEY"] = api_key
+
+        # DSPy LM — model MUST use 'openrouter/...' prefix so LiteLLM routes to OpenRouter.
+        # Do NOT pass api_base together with openrouter/ prefix:
+        # LiteLLM handles the URL internally for known providers (openrouter/).
+        # Passing api_base alongside the prefix causes a routing conflict where LiteLLM
+        # switches to generic OpenAI-compat mode and drops the Authorization header → 401.
         dspy_lm = dspy.LM(
             model=_openrouter_litellm_model(),
-            api_base=_api_base,
             api_key=api_key,
-            extra_headers={
-                "Authorization": f"Bearer {api_key}",
-                "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "https://inferaworld.com"),
-                "X-Title": os.getenv("OPENROUTER_APP_NAME", "HSE-RCAnalysis"),
-            },
             max_tokens=4000
         )
         dspy.configure(lm=dspy_lm)
