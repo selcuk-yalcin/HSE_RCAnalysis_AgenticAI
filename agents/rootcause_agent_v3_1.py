@@ -862,8 +862,15 @@ class RootCauseAgentV3_1:
         os.environ["OPENROUTER_API_KEY"] = api_key
         os.environ["OPENAI_API_KEY"] = api_key
         os.environ["OPENROUTER_API_BASE"] = _api_base
+        os.environ.setdefault("OR_SITE_URL", "https://inferaworld.com")
+        os.environ.setdefault("OR_APP_NAME", "Infera RCA")
 
         dspy_model = _openrouter_litellm_model()
+        openrouter_headers = {
+            "Authorization": f"Bearer {api_key}",
+            "HTTP-Referer": os.environ["OR_SITE_URL"],
+            "X-Title": os.environ["OR_APP_NAME"],
+        }
         print(
             "🔐 OpenRouter DSPy config: "
             f"model={dspy_model}, api_base={_api_base}, "
@@ -877,6 +884,7 @@ class RootCauseAgentV3_1:
             model=dspy_model,
             api_key=api_key,
             api_base=_api_base,
+            extra_headers=openrouter_headers,
             max_tokens=4000
         )
         dspy.configure(lm=dspy_lm)

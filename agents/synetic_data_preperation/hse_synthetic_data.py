@@ -406,10 +406,17 @@ try:
                 os.environ["OPENROUTER_API_KEY"] = key
                 os.environ["OPENAI_API_KEY"] = key
                 os.environ["OPENROUTER_API_BASE"] = api_base
+                os.environ.setdefault("OR_SITE_URL", "https://inferaworld.com")
+                os.environ.setdefault("OR_APP_NAME", "Infera RCA")
                 self.lm = dspy.LM(
                     model=model,
                     api_key=key,
                     api_base=api_base,
+                    extra_headers={
+                        "Authorization": f"Bearer {key}",
+                        "HTTP-Referer": os.environ["OR_SITE_URL"],
+                        "X-Title": os.environ["OR_APP_NAME"],
+                    },
                     max_tokens=4000,
                 )
             else:
