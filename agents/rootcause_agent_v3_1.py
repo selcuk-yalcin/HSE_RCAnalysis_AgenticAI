@@ -179,6 +179,15 @@ def _clean_env_secret(value: Optional[str]) -> str:
     return v
 
 
+def _mask_secret(value: str) -> str:
+    """Log a secret safely while still proving the worker received one."""
+    if not value:
+        return "unset"
+    if len(value) <= 12:
+        return f"set(len={len(value)})"
+    return f"{value[:7]}...{value[-4:]}(len={len(value)})"
+
+
 def _resolve_openrouter_api_key() -> str:
     """
     Resolve API key robustly for worker environments.
@@ -847,19 +856,27 @@ class RootCauseAgentV3_1:
             api_key=api_key
         )
 
-        # Ensure LiteLLM env is always set before dspy.LM init — worker containers may
-        # load env at startup and not pick up changes. Setting explicitly guarantees it.
+        # Ensure LiteLLM env is always set before dspy.LM init. For OpenRouter,
+        # LiteLLM specifically reads OPENROUTER_API_KEY / OPENROUTER_API_BASE
+        # when routing models with the openrouter/ provider prefix.
         os.environ["OPENROUTER_API_KEY"] = api_key
         os.environ["OPENAI_API_KEY"] = api_key
+        os.environ["OPENROUTER_API_BASE"] = _api_base
+
+        dspy_model = _openrouter_litellm_model()
+        print(
+            "🔐 OpenRouter DSPy config: "
+            f"model={dspy_model}, api_base={_api_base}, "
+            f"key={_mask_secret(api_key)}"
+        )
 
         # DSPy LM — model MUST use 'openrouter/...' prefix so LiteLLM routes to OpenRouter.
-        # Do NOT pass api_base together with openrouter/ prefix:
-        # LiteLLM handles the URL internally for known providers (openrouter/).
-        # Passing api_base alongside the prefix causes a routing conflict where LiteLLM
-        # switches to generic OpenAI-compat mode and drops the Authorization header → 401.
+        # api_base is also supplied because some DSPy/LiteLLM versions do not
+        # reliably pick up OPENROUTER_API_BASE from env during worker runtime.
         dspy_lm = dspy.LM(
-            model=_openrouter_litellm_model(),
+            model=dspy_model,
             api_key=api_key,
+            api_base=_api_base,
             max_tokens=4000
         )
         dspy.configure(lm=dspy_lm)

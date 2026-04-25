@@ -50,6 +50,13 @@ def _resolve_llm_api_key(explicit: Optional[str] = None) -> str:
         "veya --api-key ile geçin."
     )
 
+
+def _openrouter_api_base() -> str:
+    base = (os.getenv("OPENROUTER_API_BASE") or "https://openrouter.ai/api/v1").strip().rstrip("/")
+    while "/v1/v1" in base:
+        base = base.replace("/v1/v1", "/v1", 1)
+    return base
+
 # ─────────────────────────────────────────────
 # 1. SEED TAXONOMY
 # ─────────────────────────────────────────────
@@ -394,14 +401,20 @@ try:
             api_key: Optional[str] = None,
         ):
             key = _resolve_llm_api_key(api_key)
-            # openrouter/ prefix ile LiteLLM doğru uca gider; api_base ile birlikte
-            # verilmemeli (401 Missing Authentication header riski).
             if model.startswith("openrouter/"):
+                api_base = _openrouter_api_base()
                 os.environ["OPENROUTER_API_KEY"] = key
                 os.environ["OPENAI_API_KEY"] = key
+                os.environ["OPENROUTER_API_BASE"] = api_base
+                self.lm = dspy.LM(
+                    model=model,
+                    api_key=key,
+                    api_base=api_base,
+                    max_tokens=4000,
+                )
             else:
                 os.environ["OPENAI_API_KEY"] = key
-            self.lm = dspy.LM(model=model, api_key=key, max_tokens=4000)
+                self.lm = dspy.LM(model=model, api_key=key, max_tokens=4000)
             dspy.configure(lm=self.lm)
             self.incident_gen = dspy.ChainOfThought(IncidentGenerator)
             self.why_gen = dspy.ChainOfThought(FiveWhyGenerator)
