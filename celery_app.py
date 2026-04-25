@@ -8,6 +8,11 @@ import os
 
 from celery import Celery
 
+# Worker startup fingerprint — bump on each deploy verification cycle so logs
+# clearly show whether the running container has the latest code.
+WORKER_BUILD_TAG = "rca-worker@2026-04-25T15:30Z openrouter-headers-v3"
+print(f"🛠️  Celery worker module loaded — build={WORKER_BUILD_TAG}")
+
 
 REDIS_URL = (os.getenv("REDIS_URL") or "redis://localhost:6379/0").strip()
 BROKER_HEARTBEAT = int((os.getenv("CELERY_BROKER_HEARTBEAT") or "30").strip() or "30")
