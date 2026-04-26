@@ -104,6 +104,40 @@ and which C/D code is being produced.
 
 ---
 
+## P0.4 — Railway Worker Replica Autoscaling (1..5 On-Demand)
+
+**Goal**: Prevent long queue waits by scaling worker capacity between 1 and 5 replicas
+only when needed, while keeping idle cost low.
+
+**Current state**:
+- Celery process autoscaling is configured in worker runtime (`prefork`, autoscale min/max).
+- Replica scaling policy is still mostly manual from Railway UI.
+
+**Tasks**:
+- [ ] Add Railway service scaling profile for worker:
+  - idle baseline: `replicas=1`
+  - burst profile: `replicas=2..5`
+- [ ] Define queue-based trigger policy:
+  - if queued jobs > N for T seconds, increase replicas by 1 (max 5)
+  - if queue is empty for cooldown window, decrease replicas by 1 (min 1)
+- [ ] Document operational toggles in runbook (`CELERY_AUTOSCALE_MIN/MAX`, replica override).
+- [ ] Add ops endpoint/metric that reports current queue depth + active workers.
+- [ ] Validate no starvation between interactive and batch analysis (optional queue split if needed).
+
+**Acceptance criteria**:
+- Under low traffic, worker remains at 1 replica.
+- Under burst traffic, replicas scale up to max 5 without manual intervention.
+- After burst ends, replicas return to 1 automatically.
+- Median wait time from `queued` to `running` improves for concurrent runs.
+
+**Related files**:
+- `scripts/railway_celery_worker.sh`
+- `tasks/pipeline_tasks.py`
+- `api/main.py`
+- `shared/ops_celery.py`
+
+---
+
 ## P1.1 — Synthetic Data Generation Pipeline (Internal)
 
 **Goal**: Generate realistic synthetic data to optimize HSE 5-Why trainsets with DSPy MIPROv2.
