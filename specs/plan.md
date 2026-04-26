@@ -30,6 +30,10 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
   - Job status + websocket endpoint.
 - Worker: `tasks/pipeline_tasks.py` + `celery_app.py`
   - Executes root cause and action plan stages asynchronously.
+  - Runtime scaling strategy (Railway):
+    - Default `prefork` pool with Celery autoscale.
+    - Scale range: min 1, max 5 worker processes per container.
+    - Goal: avoid always-on high concurrency while handling burst traffic.
 - Agents: `agents/`
   - `rootcause_agent_v3_1.py` as primary RCA engine,
   - `rootcause_agent_v2.py` fallback,

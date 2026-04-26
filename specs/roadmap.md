@@ -6,7 +6,7 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.1 Multi-Tenant User Management
 
-- Persistent tenant/user registry in MongoDB.
+- Persistent tenant/user registry in Redis.
 - Admin tenant and user management APIs.
 - Role-based authorization on pipeline and incident operations.
 - Frontend tenant header propagation.
@@ -24,6 +24,31 @@ Source: synchronized from root `TODO.md`.
 - Enriched job payload fields for UI.
 - Live timeline component in chat UI.
 - WebSocket reconnect and robust failure UX.
+
+### P0.4 Worker OpenRouter 401 Stabilization
+
+- Eliminate `Missing Authentication header` failures in Step 3 (Celery worker).
+- Enforce deploy/runtime parity between API and worker services.
+- Add deterministic startup diagnostics for auth/debug visibility.
+- Verify worker is running latest commit via build fingerprint and deploy metadata.
+- Add clear runbook for Railway redeploy + env parity checks.
+- Acceptance:
+  - Worker logs show build fingerprint and OpenRouter runtime config on startup.
+  - HITL flow reaches Part 3+Part 4 completion without OpenRouter 401.
+  - Same env/config behavior is reproducible after restart and redeploy.
+
+### P0.5 Worker Burst Scaling Without Always-On High Load
+
+- Configure Celery worker autoscaling for burst traffic.
+- Default runtime profile:
+  - `CELERY_POOL=prefork`
+  - `CELERY_AUTOSCALE_MAX=5`
+  - `CELERY_AUTOSCALE_MIN=1`
+- Keep baseline resource usage low while allowing temporary parallel RCA jobs.
+- Acceptance:
+  - Idle worker runs at min process count.
+  - Under queue pressure worker scales up to configured max.
+  - Scale-down occurs automatically after queue drains.
 
 ## P1 (Near-Term)
 

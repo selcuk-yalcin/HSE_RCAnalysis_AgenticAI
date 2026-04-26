@@ -520,6 +520,54 @@ class PDFGenerateRequest(BaseModel):
     incident_id: str
 
 
+def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
+    """Generate DOCX + HTML + decision tree artifacts and return absolute paths."""
+    if pdf_agent is None:
+        raise HTTPException(status_code=503, detail="Report agent is not initialized")
+
+    incident = _require_incident_record(tenant_id, incident_id)
+    if incident.get("status") != "completed":
+        raise HTTPException(
+            status_code=400,
+            detail="All parts must be completed before generating report",
+        )
+
+    try:
+        investigation_data = {
+            "ref_no": incident_id,
+            "part1": incident["part1"],
+            "part2": incident["part2"],
+            "part3": incident["part3"],
+            "part4": {
+                "actions": [
+                    {
+                        "measure": m["measure"],
+                        "responsible": m["responsible"],
+                        "target_date": m["target_date"],
+                    }
+                    for m in incident["part4"]["control_measures"]
+                ]
+            },
+        }
+
+        docx_path = Path(pdf_agent.generate_report(investigation_data)).resolve()
+        html_path = docx_path.with_suffix(".html")
+        decision_tree_path = docx_path.with_name(f"{docx_path.stem}_decision_tree.html")
+
+        if not html_path.exists():
+            raise HTTPException(status_code=500, detail="HTML report file could not be generated")
+
+        return {
+            "docx_path": str(docx_path),
+            "html_path": str(html_path.resolve()),
+            "decision_tree_path": str(decision_tree_path.resolve()),
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Error generating report: {exc}") from exc
+
+
 class OracleContextBody(BaseModel):
     summary: str
     incident_id: str = ""
@@ -1141,54 +1189,75 @@ async def generate_pdf_report(tenant_id: TenantId, request: PDFGenerateRequest):
     Generate PDF report for completed incident
     """
     incident_id = request.incident_id
-    
-    if incident_id not in _incidents(tenant_id):
-        raise HTTPException(status_code=404, detail="Incident not found")
-    
-    incident = _incidents(tenant_id)[incident_id]
-    
-    if incident["status"] != "completed":
-        raise HTTPException(
-            status_code=400, 
-            detail="All parts must be completed before generating report"
-        )
-    
-    try:
-        # Prepare complete investigation data for PDF
-        investigation_data = {
-            "ref_no": incident_id,
-            "part1": incident["part1"],
-            "part2": incident["part2"],
-            "part3": incident["part3"],
-            "part4": {
-                "actions": [
-                    {
-                        "measure": m["measure"],
-                        "responsible": m["responsible"],
-                        "target_date": m["target_date"]
-                    }
-                    for m in incident["part4"]["control_measures"]
-                ]
-            }
-        }
-        
-        # Generate PDF using PDF Report Agent
-        filepath = pdf_agent.generate_report(investigation_data)
-        
-        # Return file response
-        return FileResponse(
-            filepath,
-            media_type='application/pdf',
-            filename=f"HSG245_Report_{incident_id}.pdf",
-            headers={
-                "Content-Disposition": f"attachment; filename=HSG245_Report_{incident_id}.pdf"
-            }
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error generating PDF report: {str(e)}"
-        )
+    artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    filepath = artifacts["docx_path"]
+    return FileResponse(
+        filepath,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename=f"HSG245_Report_{incident_id}.docx",
+        headers={
+            "Content-Disposition": f"attachment; filename=HSG245_Report_{incident_id}.docx"
+        },
+    )
+
+
+@app.post("/api/v1/reports/html")
+async def generate_html_report(tenant_id: TenantId, request: PDFGenerateRequest):
+    """
+    Generate HTML report artifacts and return URLs for preview/download.
+    """
+    incident_id = request.incident_id
+    artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    return {
+        "success": True,
+        "data": {
+            "incident_id": incident_id,
+            "html_url": f"/api/v1/reports/{incident_id}/html?download=0",
+            "html_download_url": f"/api/v1/reports/{incident_id}/html?download=1",
+            "decision_tree_url": f"/api/v1/reports/{incident_id}/decision-tree?download=0",
+            "decision_tree_download_url": f"/api/v1/reports/{incident_id}/decision-tree?download=1",
+            "html_path": artifacts["html_path"],
+            "decision_tree_path": artifacts["decision_tree_path"],
+        },
+    }
+
+
+@app.get("/api/v1/reports/{incident_id}/html")
+async def get_html_report(
+    tenant_id: TenantId,
+    incident_id: str,
+    download: int = Query(0),
+):
+    artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    html_path = artifacts["html_path"]
+    filename = f"HSG245_Report_{incident_id}.html"
+    disposition = "attachment" if int(download) == 1 else "inline"
+    return FileResponse(
+        html_path,
+        media_type="text/html; charset=utf-8",
+        filename=filename,
+        headers={"Content-Disposition": f"{disposition}; filename={filename}"},
+    )
+
+
+@app.get("/api/v1/reports/{incident_id}/decision-tree")
+async def get_decision_tree_report(
+    tenant_id: TenantId,
+    incident_id: str,
+    download: int = Query(0),
+):
+    artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    decision_tree_path = artifacts["decision_tree_path"]
+    if not Path(decision_tree_path).exists():
+        raise HTTPException(status_code=404, detail="Decision tree file not found")
+    filename = f"HSG245_Report_{incident_id}_decision_tree.html"
+    disposition = "attachment" if int(download) == 1 else "inline"
+    return FileResponse(
+        decision_tree_path,
+        media_type="text/html; charset=utf-8",
+        filename=filename,
+        headers={"Content-Disposition": f"{disposition}; filename={filename}"},
+    )
 
 if __name__ == "__main__":
     import uvicorn

@@ -31,6 +31,10 @@
 - Railway:
   - API service (`uvicorn api.main:app`)
   - Worker service (`python -m celery -A celery_app:celery_app worker ...`)
+  - Worker scaling policy:
+    - `CELERY_POOL=prefork`
+    - `--autoscale=5,1` via `CELERY_AUTOSCALE_MAX=5`, `CELERY_AUTOSCALE_MIN=1`
+    - Expected behavior: idle load keeps 1 process; queued load scales up to 5
   - Redis service
 - Vercel for admin panel.
 
