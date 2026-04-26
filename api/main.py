@@ -30,6 +30,7 @@ from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.actionplan_agent import ActionPlanAgent
 from agents.claude_skill_pdf_agent import ClaudeSkillPDFAgent as PDFReportAgent
+from agents.skillbased_docx_agent import SkillBasedDocxAgent
 from agents.hitl_question_service import next_hitl_questions, next_why_probe_questions
 from agents.model_constants import (
     resolve_openrouter_chat_model,
@@ -533,24 +534,30 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
         )
 
     try:
-        investigation_data = {
+        part3_data = incident.get("part3") or {}
+        part3_v2 = part3_data.get("_v2_raw") if isinstance(part3_data, dict) else None
+        report_payload = {
             "ref_no": incident_id,
-            "part1": incident["part1"],
-            "part2": incident["part2"],
-            "part3": incident["part3"],
-            "part4": {
-                "actions": [
-                    {
-                        "measure": m["measure"],
-                        "responsible": m["responsible"],
-                        "target_date": m["target_date"],
-                    }
-                    for m in incident["part4"]["control_measures"]
-                ]
-            },
+            "part1": incident.get("part1", {}),
+            "part2": incident.get("part2", {}),
+            # SkillBasedDocxAgent expects part3_rca (raw V2 preferred).
+            "part3_rca": part3_v2 if isinstance(part3_v2, dict) else part3_data,
+            "part4": incident.get("part4", {}),
         }
 
-        docx_path = Path(pdf_agent.generate_report(investigation_data)).resolve()
+        active_report_agent = pdf_agent
+        try:
+            docx_generated = active_report_agent.generate_report(report_payload)
+        except Exception as primary_exc:
+            # Railway runtime may not have local SKILL.md for ClaudeSkillPDFAgent.
+            # Fallback to SkillBasedDocxAgent to guarantee DOCX+HTML generation.
+            if "SKILL.md not loaded" not in str(primary_exc):
+                raise
+            print("⚠️  ClaudeSkillPDFAgent unavailable (SKILL.md missing). Falling back to SkillBasedDocxAgent.")
+            active_report_agent = SkillBasedDocxAgent()
+            docx_generated = active_report_agent.generate_report(report_payload)
+
+        docx_path = Path(docx_generated).resolve()
         html_path = docx_path.with_suffix(".html")
         decision_tree_path = docx_path.with_name(f"{docx_path.stem}_decision_tree.html")
 
