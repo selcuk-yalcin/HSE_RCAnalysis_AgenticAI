@@ -35,6 +35,10 @@
     - `CELERY_POOL=prefork`
     - `--autoscale=5,1` via `CELERY_AUTOSCALE_MAX=5`, `CELERY_AUTOSCALE_MIN=1`
     - Expected behavior: idle load keeps 1 process; queued load scales up to 5
+  - Reliability tuning targets:
+    - Celery heartbeat tolerance for long RCA tasks
+    - Redis broker visibility timeout aligned with long-running pipeline jobs
+    - Avoid single-worker CPU starvation in heavy sections
   - Redis service
 - Vercel for admin panel.
 
@@ -49,3 +53,4 @@
 - OpenRouter authentication consistency in worker runtime.
 - Frontend-to-backend tenant propagation consistency.
 - Streaming UX degradation when WebSocket is unavailable.
+- Action-plan LLM outputs occasionally violate strict JSON; parser hardening/retry is required.

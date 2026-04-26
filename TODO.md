@@ -52,18 +52,31 @@ questions and increasing depth at each Why level.
 - Answers are passed to Part 3 as `why_probe_answers`.
 
 **Tasks**:
+- [ ] Remove generic opening questions in HITL start.
+  - First card must show incident summary and a clear note:
+    - \"Analizi tamamlamak icin olayla ilgili sorular soracagiz.\"
 - [ ] Add LLM-based incident-specific question generator using incident summary +
   immediate code via `dspy.Predict` (new module: `agents/hitl_dynamic_llm.py`).
+- [ ] After first immediate-cause extraction, generate deeper follow-up questions from
+  `agents/knowledge_base.py` (incident + immediate/root cause context aware).
+- [ ] Force question type to selectable options (multi-choice style) so answers are
+  machine-consumable for deterministic RCA depth increase.
 - [ ] Add fallback to LLM in `hitl_question_service` when quality score is below threshold.
 - [ ] Inject previous answer keywords into next Why question for chain continuity.
 - [ ] Add per-Why-level progress indicator (5-step) in frontend.
 - [ ] Add \"skip\" / \"I don't know\" options and define RCA handling behavior.
 - [ ] Persist HITL logs per tenant in Mongo for training data.
+- [ ] Remove duplicated/secondary Why chain widgets from frontend; keep a single primary
+  large-area live flow panel for analysis progression.
 
 **Acceptance criteria**:
 - Across 5 scenario categories (fall, electric, chemical, crush, train odor), HITL
   generates at least 3 incident-specific questions and filters generic questions.
 - HITL answers are referenced directly in Part 3 RCA chains.
+- The first HITL screen never starts with taxonomy-generic prompts; it starts with
+  incident summary + analysis notice and then incident-specific selectable questions.
+- RCA branch depth and root-cause diversity improve across repeated runs of the same
+  incident family (less \"same root cause every time\" behavior).
 
 **Related files**:
 - `agents/hitl_question_service.py`
@@ -134,6 +147,63 @@ only when needed, while keeping idle cost low.
 - `scripts/railway_celery_worker.sh`
 - `tasks/pipeline_tasks.py`
 - `api/main.py`
+- `shared/ops_celery.py`
+
+---
+
+## P0.5 — Action Plan JSON Robustness and Parser Hardening
+
+**Goal**: Prevent malformed LLM JSON from degrading Part 4 quality and reduce fallback-only plans.
+
+**Current state**:
+- Action plan generation occasionally returns malformed JSON (comma/fence issues), then falls back.
+- Logs show parse errors in production, especially under long/complex outputs.
+
+**Tasks**:
+- [ ] Add strict Action Plan JSON schema validation before acceptance.
+- [ ] Add retry strategy for malformed JSON responses (schema-guided regeneration).
+- [ ] Add \"json-only\" sanitizer/parser:
+  - strip markdown fences,
+  - sanitize trailing commas,
+  - extract first valid JSON object safely.
+- [ ] Add parser telemetry fields (`parse_attempts`, `sanitized`, `fallback_reason`) to logs.
+- [ ] Add tests for malformed outputs (missing comma, fence wrapper, truncated object).
+
+**Acceptance criteria**:
+- >=95% of action-plan responses parse without fallback on staging regression set.
+- Fallback path remains available, but parse failures are explicitly classified and logged.
+
+**Related files**:
+- `agents/actionplan_agent.py`
+- `tasks/pipeline_tasks.py`
+- `tests/`
+
+---
+
+## P0.6 — Celery Reliability Under Long RCA Runs
+
+**Goal**: Reduce heartbeat drift warnings and stabilize long-running concurrent RCA processing.
+
+**Current state**:
+- Worker uses `prefork` + autoscale but still shows heartbeat drift/missed heartbeat warnings under load.
+- Long single-task CPU pressure can delay worker bookkeeping.
+
+**Tasks**:
+- [ ] Keep `prefork` + autoscale runtime defaults (`min=1`, `max=5`) and document per-env overrides.
+- [ ] Tune Celery heartbeat-related settings and broker visibility timeout for long tasks.
+- [ ] Split/limit CPU-heavy sections or add cooperative checkpoints to avoid single-process blocking.
+- [ ] Add queue-depth + worker-heartbeat health surface in ops endpoint.
+- [ ] Add load test scenario for 3-5 parallel RCA runs with acceptable queue wait and no task loss.
+
+**Acceptance criteria**:
+- No task loss/duplication in 3-5 parallel RCA runs.
+- Heartbeat drift warnings are significantly reduced and monitored with clear thresholds.
+- Queue latency remains within defined SLO during burst load.
+
+**Related files**:
+- `celery_app.py`
+- `scripts/railway_celery_worker.sh`
+- `tasks/pipeline_tasks.py`
 - `shared/ops_celery.py`
 
 ---

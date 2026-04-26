@@ -14,9 +14,12 @@ Source: synchronized from root `TODO.md`.
 ### P0.2 5-Step Incident-Specific HITL
 
 - Add LLM-driven incident-specific HITL question generator.
+- Remove generic first-step prompts; start with incident summary + analysis notice.
+- After first immediate-cause stage, generate deeper selectable questions from `agents/knowledge_base.py`.
 - Fallback from static logic to LLM by quality threshold.
 - Improve Why-chain continuity and answer handling options.
 - Persist HITL logs for training reuse.
+- Keep a single primary large-area frontend analysis flow (remove duplicated secondary Why widgets).
 
 ### P0.3 Frontend Live Streaming
 
@@ -49,6 +52,20 @@ Source: synchronized from root `TODO.md`.
   - Idle worker runs at min process count.
   - Under queue pressure worker scales up to configured max.
   - Scale-down occurs automatically after queue drains.
+
+### P0.6 Action Plan JSON Robustness
+
+- Enforce stricter Action Plan JSON schema validation.
+- Add retry and \"json-only\" sanitizer parser for malformed outputs.
+- Sanitize markdown fences and trailing commas before parsing.
+- Add parse telemetry and malformed-output regression tests.
+
+### P0.7 Celery Long-Run Reliability
+
+- Keep `prefork + autoscale` as baseline worker runtime.
+- Tune heartbeat and broker visibility timeout for long RCA tasks.
+- Reduce single-worker CPU blocking with staged checkpoints.
+- Add 3-5 parallel-run reliability/load validation and ops visibility.
 
 ## P1 (Near-Term)
 

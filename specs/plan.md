@@ -14,6 +14,10 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 
 1. User submits incident form (Part 1 + Part 2 bootstrap).
 2. HITL questioning refines context with incident-specific prompts.
+   - Entry UX should start with incident summary and an explicit analysis notice,
+     not taxonomy-generic opening questions.
+   - After initial immediate-cause extraction, deepening questions should be
+     generated contextually from `agents/knowledge_base.py` and answered via selectable options.
 3. Async pipeline starts (Part 3 + Part 4).
 4. User observes progress via WebSocket/polling.
 5. User exports report artifacts.
@@ -34,6 +38,10 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
     - Default `prefork` pool with Celery autoscale.
     - Scale range: min 1, max 5 worker processes per container.
     - Goal: avoid always-on high concurrency while handling burst traffic.
+  - Reliability hardening requirements:
+    - Heartbeat/visibility-timeout tuning for long RCA tasks,
+    - Reduced CPU-blocking critical sections,
+    - 3–5 concurrent analysis stability without task loss.
 - Agents: `agents/`
   - `rootcause_agent_v3_1.py` as primary RCA engine,
   - `rootcause_agent_v2.py` fallback,
@@ -47,6 +55,8 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 - Fail-safe fallback from V3.1 to V2 for root cause engine.
 - Build/deploy resilience on Railway.
 - Deterministic operational visibility for worker/job status.
+- Action Plan JSON must be schema-valid or recoverable via retry/sanitizer path
+  (markdown-fence/trailing-comma tolerant pre-parser).
 
 ## Spec Ownership
 
