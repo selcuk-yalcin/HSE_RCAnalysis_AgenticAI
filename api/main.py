@@ -4,7 +4,7 @@ Connects admin panel with AI agents
 """
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Depends, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 import sys
 import os
@@ -1237,12 +1237,15 @@ async def get_html_report(
 ):
     artifacts = _generate_report_artifacts(tenant_id, incident_id)
     html_path = artifacts["html_path"]
+    if not Path(html_path).exists():
+        raise HTTPException(status_code=404, detail="HTML report file not found")
     filename = f"HSG245_Report_{incident_id}.html"
     disposition = "attachment" if int(download) == 1 else "inline"
-    return FileResponse(
-        html_path,
+    with open(html_path, "rb") as f:
+        html_bytes = f.read()
+    return Response(
+        content=html_bytes,
         media_type="text/html; charset=utf-8",
-        filename=filename,
         headers={"Content-Disposition": f"{disposition}; filename={filename}"},
     )
 
@@ -1259,10 +1262,11 @@ async def get_decision_tree_report(
         raise HTTPException(status_code=404, detail="Decision tree file not found")
     filename = f"HSG245_Report_{incident_id}_decision_tree.html"
     disposition = "attachment" if int(download) == 1 else "inline"
-    return FileResponse(
-        decision_tree_path,
+    with open(decision_tree_path, "rb") as f:
+        decision_tree_bytes = f.read()
+    return Response(
+        content=decision_tree_bytes,
         media_type="text/html; charset=utf-8",
-        filename=filename,
         headers={"Content-Disposition": f"{disposition}; filename={filename}"},
     )
 
