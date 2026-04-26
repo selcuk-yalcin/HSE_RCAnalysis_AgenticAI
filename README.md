@@ -1,218 +1,318 @@
-# HSE Root Cause Analysis - AI Agent System
+# HSE Root Cause Analysis — DeepWhy Agentic AI
 
-Multi-agent root cause investigation system based on HSG245 framework.
+An HSG245-based multi-agent Root Cause Analysis platform. It includes a DSPy-driven
+5-Why chain, Human-in-the-Loop (HITL) interactive analysis, an asynchronous
+FastAPI + Celery + Redis pipeline, and a React-based admin panel.
+
+> Backend: `agents/`, `api/`, `tasks/`, `shared/` — Frontend: `admin_pan/Admin/src/rca-frontend/`
+> Production deployment: Railway (API + Worker + Redis), admin panel on Vercel.
+
+## High-Level Architecture
+
+```
+                         ┌────────────────────────────┐
+                         │   Admin Panel (Vercel)     │
+                         │  admin_pan/Admin           │
+                         │  src/rca-frontend          │
+                         └─────────────┬──────────────┘
+                                       │  REST + WebSocket
+                                       ▼
+                         ┌────────────────────────────┐
+                         │   FastAPI (api/main.py)    │
+                         │  Multitenant + HITL + Jobs │
+                         └─────────────┬──────────────┘
+            ┌──────────────────────────┼──────────────────────────┐
+            ▼                          ▼                          ▼
+   ┌────────────────┐         ┌────────────────┐         ┌────────────────┐
+   │ Overview /     │         │ Hybrid Cache   │         │ Celery Worker  │
+   │ Assessment     │         │ Redis + Mongo  │         │ tasks/         │
+   │ Agents         │         │ + Tenant Store │         │ pipeline_tasks │
+   └────────────────┘         └────────────────┘         └────────┬───────┘
+                                                                  ▼
+                                                  ┌──────────────────────────────┐
+                                                  │ RootCauseAgentV3.1 (DSPy)    │
+                                                  │ + BranchCritic + ActionPlan  │
+                                                  │ + SkillBasedDocxAgent (DOCX) │
+                                                  └──────────────────────────────┘
+```
 
 ## 📂 Project Structure
 
 ```
-HSE_AgenticAI/
-├── agents/              # AI Agents (Overview, Investigation, etc.)
-├── api/                 # FastAPI Backend
-├── shared/              # Shared configuration and utilities
-├── admin/              # Admin Panel (Submodule - Separate repo)
-├── examples/            # Test files
-└── requirements.txt     # Python dependencies
+HSE_RCAnalysis_AgenticAI/
+├── agents/                          # AI agents (HSG245 4-Part flow)
+│   ├── overview_agent.py            # Part 1 — Overview
+│   ├── assessment_agent.py          # Part 2 — Initial Assessment
+│   ├── rootcause_agent_v3_1.py      # Part 3 — DSPy 5-Why (active)
+│   ├── rootcause_agent_v2.py        # Part 3 — V2 fallback
+│   ├── branch_critic.py             # Cross-branch duplication guard
+│   ├── actionplan_agent.py          # Part 4 — Action Plan
+│   ├── skillbased_docx_agent.py     # DOCX reports (OpenRouter)
+│   ├── claude_skill_pdf_agent.py    # PDF reports
+│   ├── orchestrator.py              # Pipeline coordinator
+│   ├── pattern_analyzer.py          # Tenant root-cause analytics
+│   ├── hitl_question_service.py     # Dynamic HITL question generation
+│   ├── hitl_disambiguation_bank.py  # HSG245 disambiguation templates
+│   ├── knowledge_base.py            # HSG245 taxonomy
+│   ├── model_constants.py           # OpenRouter model resolution
+│   ├── synetic_data_preperation/    # Synthetic data for DSPy MIPRO
+│   └── v3_vector_search/            # RAG (experimental)
+│
+├── api/
+│   └── main.py                      # FastAPI: incident, HITL, pipeline, WS
+├── tasks/
+│   └── pipeline_tasks.py            # Celery tasks (Part3 + Part4)
+├── shared/
+│   ├── tenant_store.py              # Multi-tenant in-memory store
+│   ├── tenant_auth.py               # X-Tenant-ID / X-API-Key resolver
+│   ├── hybrid_cache.py              # L1 Redis + L2 MongoDB cache
+│   ├── oracle_memory.py             # Per-tenant context (Mongo)
+│   ├── redis_client.py              # Redis helpers
+│   └── ops_celery.py                # Celery introspection
+├── celery_app.py                    # Celery app + broker config
+├── hitl_test/                       # HITL experiments + question engine
+│
+├── admin_pan/                       # Admin panel (submodule)
+│   └── Admin/src/rca-frontend/
+│       ├── RcaFrontendHub.jsx       # Form + interactive analysis host
+│       ├── components/
+│       │   ├── IncidentForm.jsx     # Manual form
+│       │   ├── ChatInterface.jsx    # HITL + live pipeline flow
+│       │   ├── QuestionFlow.jsx     # Legacy fixed question flow
+│       │   ├── Message.jsx          # Chat message UI
+│       │   └── Header.jsx
+│       └── utils/
+│           ├── investigationPayload.js
+│           ├── hitlKbQuestions.js
+│           └── translations.js
+│       └── ../services/
+│           ├── hsg245Api.js         # REST + WS gateway client
+│           └── agentApi.js
+│
+├── outputs/                         # Test outputs (HTML, DOCX, JSON)
+├── tests/                           # Scenario-based integration tests
+├── requirements.txt
+├── Procfile                         # Railway: web (uvicorn)
+├── Procfile.worker                  # Railway: worker (celery)
+├── scripts/railway_celery_worker.sh
+└── railway.json
 ```
 
-## 🔗 Repository Structure
+## 🤖 Core Agents (HSG245 4-Part Flow)
 
-This project uses **two separate repositories**:
+| Step | Agent | Responsibility |
+| ---- | ---- | ----- |
+| Part 1 | `OverviewAgent` | Structure incident basics (ref no, datetime, brief details). |
+| Part 2 | `AssessmentAgent` | Type, severity, RIDDOR, investigation level. |
+| Part 3 | `RootCauseAgentV3_1` (DSPy) | A/B immediate causes + 5-Why branches + C/D root causes. |
+| Part 3+ | `BranchCriticAgent` | Cross-branch duplicate detection + LLM regenerate. |
+| Part 4 | `ActionPlanAgent` | Immediate/Short/Long-term action planning. |
+| Report | `SkillBasedDocxAgent` / `ClaudeSkillPDFAgent` | DOCX/PDF report generation. |
 
-### 1. Backend/Agents (This Repo)
-- **Repository**: `HSE_RCAnalysis_AgenticAI`
-- **Content**: AI agents, FastAPI backend, shared utilities
-- **Deployment**: Vercel (API)
+V3.1 architecture:
 
-### 2. Admin Panel (Submodule)
-- **Repository**: `admin_pan`
-- **Content**: Next.js/React admin interface
-- **Deployment**: Vercel (Frontend)
-- **URL**: https://inferaworld-admin.vercel.app
+```
+RootCauseAgentV3_1
+├── ImmediateCauseFinder        (A/B categories)
+├── WhyChain                    (DSPy 5-Why module)
+│   ├── SemanticAnswerVerifier  (in-chain repetition guard)
+│   ├── WhyQuestion / WhyAnswer (type-safe)
+│   └── RootCauseValidator      (C/D validation)
+├── MetaRootCauseSynthesizer    (shared systemic root)
+└── BranchCriticAgent           (cross-branch critic + regenerate)
+```
 
-## 🚀 Installation
+If `RootCauseAgentV3_1` import/init fails, the system automatically falls back to
+`RootCauseAgentV2` (`agents/__init__.py`).
+
+## 🌐 FastAPI Backend (`api/main.py`)
+
+Main endpoints (multi-tenant with `X-Tenant-ID` or `X-API-Key`):
+
+| Method | Path | Description |
+| ------ | ---- | -------- |
+| `POST` | `/api/v1/incidents/create` | Part 1 — create incident |
+| `POST` | `/api/v1/incidents/{id}/assessment` | Part 2 — assessment |
+| `POST` | `/api/v1/incidents/{id}/hitl/questions` | Dynamic HITL question batch (global / why_probe) |
+| `POST` | `/api/v1/incidents/{id}/investigate` | Part 3 — synchronous RCA (fallback path) |
+| `POST` | `/api/v1/incidents/{id}/pipeline/start` | Part 3 + Part 4 async job (Celery) |
+| `GET`  | `/api/v1/jobs/{job_id}` | Job status (in-process or Celery) |
+| `WS`   | `/ws/jobs/{job_id}` | Job progress streaming |
+| `POST` | `/api/v1/incidents/{id}/actionplan` | Part 4 — action plan |
+| `GET`  | `/api/v1/incidents/{id}` | Get incident |
+| `GET`  | `/api/v1/incidents` | List incidents |
+| `POST` | `/api/v1/oracle/context` | Write tenant context |
+| `GET`  | `/api/v1/oracle/context` | Read tenant context |
+| `GET`  | `/api/v1/analytics/patterns` | Root cause code analytics |
+| `POST` | `/api/v1/incidents/{id}/pdf` | Generate PDF report |
+| `GET`  | `/api/v1/health` | Health + agent status |
+
+Tenant resolution priority (`shared/tenant_auth.py`):
+1. `X-API-Key` → `TENANT_API_KEYS_JSON` map (`{"sk-xxx": "tenant_slug"}`)
+2. `X-Tenant-ID` header
+3. `default`
+
+Incidents are persisted in both tenant in-memory store and Redis
+(`hse:incident:{tenant}:{id}`) for cross-instance consistency.
+
+## 🧠 Celery Pipeline (`tasks/pipeline_tasks.py`)
+
+`pipeline_start` submits `run_pipeline_task` to the worker through Redis broker.
+Worker:
+
+1. `RootCauseAgentV3_1.analyze_root_causes(part1, part2, investigation)` — Part 3
+2. `ActionPlanAgent.generate_action_plan(...)` — Part 4
+3. Publishes stage/progress via `update_state(stage=investigate|actionplan|completed, ...)`
+4. API syncs incident store using result payload + `tenant_id`
+
+Frontend `runPipelineJobWithPolling` first attempts WebSocket progress; if unavailable,
+it falls back to HTTP polling.
+
+## 🎨 Frontend (`admin_pan/Admin/src/rca-frontend/`)
+
+Two-tab React experience hosted by `RcaFrontendHub.jsx`:
+
+- **Manual Form (`IncidentForm.jsx`)**: HSG245-aligned, sectioned form with
+  test-scenario prefill support (`utils/testScenarios.js`).
+- **Interactive Analysis (`ChatInterface.jsx`)**: After form submission:
+  1. Runs `createIncident` (Part 1) + `addAssessment` (Part 2).
+  2. Switches to chat using `hitlSeed` prop.
+  3. Calls `fetchHitlQuestions` for ordered HSG245 disambiguation + taxonomy-gap
+     question batches (`global` or `why_probe` mode).
+  4. Requests the next question after each answer; depth advances 1→5 per branch.
+  5. Starts Part 3 + Part 4 with `runPipelineJobWithPolling` when questions are done.
+  6. Shows live stages over WebSocket (`Queued → Investigate → ActionPlan → Completed`).
+  7. Allows report generation (`generatePDFReport`) after completion.
+
+REST + WS client: `admin_pan/Admin/src/services/hsg245Api.js`.
+Helpers: `utils/investigationPayload.js`, `utils/hitlKbQuestions.js`.
+
+## 🛠️ HITL (Human-in-the-Loop) Flow
+
+`agents/hitl_question_service.py` supports two modes:
+
+- **global**: `build_hitl_question_pool` — disambiguation + missing taxonomy questions.
+- **why_probe**: `build_why_probe_question_pool` — focused follow-up questions at each
+  Why level (1..5) for selected immediate code(s).
+
+Answers are transformed into `why_probe_answers` and injected into Part 3 RCA,
+so the model can reach incident-specific depth.
+
+## 🌍 Multi-Tenant + Context
+
+- `shared/tenant_store.py` keeps isolated `incidents_db` and `jobs_db` per tenant.
+- `shared/hybrid_cache.py` provides tenant-namespaced L1 Redis + L2 MongoDB cache
+  (for HITL and derived payloads).
+- `shared/oracle_memory.py` stores long-lived tenant context (MongoDB), injected into
+  RCA requests (`merge_oracle_into_investigation`).
+
+## 🚀 Kurulum
 
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 18+ (for admin panel)
-- OpenAI API Key ([Get one here](https://platform.openai.com/api-keys))
-
-### Backend Setup
-
-```bash
-# Clone repository (with submodules)
-git clone --recurse-submodules https://github.com/selcuk-yalcin/HSE_RCAnalysis_AgenticAI.git
-cd HSE_AgenticAI
-
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Setup environment variables
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
-nano .env
-
-# Test installation
-python examples/test_pdf_agent.py
-
-# Start the API server
-python -m uvicorn api.main:app --reload
-# API will be available at http://localhost:8000
-```
-
-### Admin Panel Setup
-
-```bash
-# Navigate to admin panel folder
-cd admin
-
-# Install Node.js dependencies
-npm install
-
-# Start admin panel
-npm run dev
-# Admin panel will be available at http://localhost:3000
-```
-
-### Environment Variables
-
-See [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) for detailed configuration.
-
-**Required:**
-- `OPENAI_API_KEY` - Your OpenAI API key
-
-**Optional:**
-- `OPENAI_MODEL` - Model to use (default: gpt-4o-mini)
-- `OPENAI_TEMPERATURE` - Creativity (default: 0.7)
-- `PORT` - API port (default: 8000)
-
-## 🔄 Git Workflow
-
-### Backend Changes
-
-```bash
-# Commit backend files
-git add agents/ api/ shared/
-git commit -m "feat: Update agents"
-git push origin main
-```
-
-### Admin Panel Changes
-
-```bash
-# Navigate to admin panel folder
-cd admin
-
-# Commit changes to admin_pan repo
-git add .
-git commit -m "feat: Update admin UI"
-git push origin main
-
-# Return to main repo
-cd ..
-
-# Update submodule reference
-git add admin
-git commit -m "chore: Update admin panel submodule"
-git push origin main
-```
-
-## 📡 API Endpoints
-
-- `GET /` - API status
-- `POST /api/v1/incidents` - Create new incident
-- `GET /api/v1/health` - Health check
-
-## 🛠️ Technologies
+- Node.js 18+
+- Redis (Docker locally recommended)
+- Optional: MongoDB (hybrid cache + oracle context)
+- OpenRouter API key (`OPENROUTER_API_KEY`)
 
 ### Backend
-- Python 3.11+
-- FastAPI
-- OpenAI GPT-4o-mini
-- PDFPlumber
-
-### Admin Panel (Submodule)
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-
-## 🆕 Root Cause Agent V3.1 (NEW - INACTIVE)
-
-**Status**: ✅ Ready for Testing | 🔒 Production Safe (Not Active)
-
-### What's New?
-
-V3.1 introduces **DSPy-powered 5-Why analysis** with significant improvements over V2.5:
-
-- **80% reduction** in repeated root causes (vs 50% in V2.5)
-- **83% reduction** in chain breakage (30% → 5%)
-- **Type-safe chain continuity** via DSPy signatures
-- **Modular architecture** (4 independent modules)
-- **Semantic answer verification** (prevents similar answers)
-- **Chain quality metrics** (0-1 score per branch)
-
-### Files
-
-```
-agents/rootcause_agent_v3_1.py       # Main implementation (28KB, 1100+ lines)
-test_rootcause_v3_1.py               # Test suite (3 real-world cases)
-V3_1_ACTIVATION_GUIDE.py             # Step-by-step deployment guide
-V3_1_ARCHITECTURE.md                 # Full documentation
-V3_1_IMPLEMENTATION_SUMMARY.txt      # Quick reference
-V3_1_FINAL_STATUS.txt                # Current status report
-```
-
-### Quick Start (Testing)
 
 ```bash
-# Install DSPy
-pip install dspy-ai
+git clone --recurse-submodules https://github.com/selcuk-yalcin/HSE_RCAnalysis_AgenticAI.git
+cd HSE_RCAnalysis_AgenticAI
 
-# Run tests
-python test_rootcause_v3_1.py
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 
-# Verbose output
-python test_rootcause_v3_1.py --verbose
+cp .env.example .env  # OPENROUTER_API_KEY, REDIS_URL, MONGODB_URI, etc.
 
-# Compare with V2.5
-python test_rootcause_v3_1.py --compare
+# API
+uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Celery worker (separate terminal)
+sh scripts/railway_celery_worker.sh
+# veya:
+python -m celery -A celery_app:celery_app worker --loglevel=info --concurrency=1 --pool=solo
 ```
 
-### Activation (After Testing)
+### Admin Panel
 
-V3.1 is **currently INACTIVE** to ensure production safety. To activate:
-
-1. **Test successfully** (all 3 cases pass, chain quality > 90%)
-2. **Update app.py**:
-   ```python
-   # Replace V2.5 import with:
-   from agents.rootcause_agent_v3_1 import RootCauseAgentV3_1
-   rca_agent = RootCauseAgentV3_1(use_rag=False, enable_diversity_check=True)
-   ```
-3. **Deploy** with fallback option (recommended)
-
-See `V3_1_ACTIVATION_GUIDE.py` for detailed instructions.
-
-### Why Not Active Yet?
-
-- **Testing phase**: Needs validation with real-world cases
-- **Production safety**: V2.5 is stable and working
-- **User control**: Activation decision left to user after testing
-- **Fallback ready**: Can switch back to V2.5 instantly if needed
-
-### Architecture
-
+```bash
+cd admin_pan/Admin
+npm install
+npm run dev    # http://localhost:5173
 ```
-RootCauseAgentV3_1
-├── ImmediateCauseFinder (A/B categories)
-├── WhyChain (5-Why with DSPy)
-│   ├── SemanticAnswerVerifier (NEW - prevents repeats)
-│   ├── WhyQuestion (type-safe)
-│   ├── WhyAnswer (type-safe)
-│   └── RootCauseValidator (C/D validation)
-└── MetaRootCauseSynthesizer (common root)
+
+### Key Environment Variables
+
+| Variable | Description |
+| -------- | -------- |
+| `OPENROUTER_API_KEY` | Required for LLM calls |
+| `OPENROUTER_BASE_URL` | Default `https://openrouter.ai/api/v1` |
+| `OPENROUTER_DSPY_MODEL` | e.g. `google/gemini-2.5-flash` |
+| `OPENROUTER_DOCX_MODEL` | Model for DOCX report generation |
+| `OPENROUTER_MODEL_PRESET` | `flash` / `sonnet` |
+| `REDIS_URL` | Celery broker + cache |
+| `MONGODB_URI` | Hybrid cache + oracle (optional) |
+| `INCIDENT_REDIS_TTL_SECONDS` | Incident cache TTL |
+| `TENANT_API_KEYS_JSON` | `{"sk-...": "tenant_slug"}` mapping |
+| `ROOTCAUSE_USE_RAG` | Enable RAG with `1` (experimental) |
+| `ROOTCAUSE_ENGINE` | Force `v2` engine |
+| `CELERY_POOL` / `CELERY_CONCURRENCY` | Worker tuning |
+
+## 🔁 Development Workflow
+
+```bash
+# Backend changes
+git add agents/ api/ shared/ tasks/ celery_app.py
+git commit -m "feat: ..."
+git push origin main
+
+# Admin panel (submodule)
+cd admin_pan
+git add . && git commit -m "feat: ..." && git push origin main
+cd ..
+git add admin_pan && git commit -m "chore: bump admin submodule" && git push
 ```
+
+## 🧪 Tests
+
+Scenario-based integration tests under `tests/`:
+
+- `test_train_odor_incident_dspy.py`
+- `test_high_potential_near_miss_dspy.py`
+- `test_property_damage_dspy.py`
+- `test_ak05_yuksekten_dusme_dspy.py`
+- `test_undesired_circumstance_dspy.py`
+
+Set `OPENROUTER_API_KEY` or `OPENAI_API_KEY` before running tests.
+
+```bash
+python tests/test_train_odor_incident_dspy.py
+```
+
+## 🧭 Spec-Driven Development
+
+This project follows a spec-driven workflow in Cursor.
+
+- Core specs live under `specs/`:
+  - `specs/plan.md`
+  - `specs/roadmap.md`
+  - `specs/tech-stack.md`
+  - `specs/README.md`
+- Cursor rule: `.cursor/rules/spec-driven-workflow.mdc` (`alwaysApply: true`)
+- Recommended change flow:
+  1. Align scope with `specs/plan.md` and `specs/roadmap.md`
+  2. Update specs for non-trivial changes
+  3. Implement code
+  4. Sync docs/specs after implementation
+
+## 📈 Roadmap
+
+See `TODO.md` for the active roadmap
+(multi-tenant user management, synthetic data + MIPROv2, frontend streaming,
+HITL depth, etc.).
 
 ## License
 
