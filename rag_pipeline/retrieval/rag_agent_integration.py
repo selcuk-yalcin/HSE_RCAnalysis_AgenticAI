@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 RAG Agent Integration - Retrieval-Augmented Analysis
 ====================================================
@@ -15,7 +17,7 @@ Kullanım:
 
 import sys
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import Any, List, Dict, Optional, Tuple
 import os
 from dotenv import load_dotenv
 import json
@@ -24,10 +26,16 @@ import json
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from rag_pipeline.retrieval.query_mongodb_vector_store import MongoVectorRetriever
+# MongoVectorRetriever'ı import zamanında değil; SentenceTransformers + PyMongo ağır.
+# Aksi halde rootcause_agent yüklerken tüm RAG "unavailable" görünüyor.
 
 # Ortam değişkenlerini yükle
 load_dotenv()
+
+
+def _lazy_mongo_vector_retriever_class():
+    from rag_pipeline.retrieval.query_mongodb_vector_store import MongoVectorRetriever
+    return MongoVectorRetriever
 
 
 class RAGAnalyzer:
@@ -36,7 +44,7 @@ class RAGAnalyzer:
     MongoDB'den alınan context ile LLM prompt'ını zenginleştirir.
     """
     
-    def __init__(self, retriever: Optional[MongoVectorRetriever] = None):
+    def __init__(self, retriever: Any = None):
         """
         RAG Analyzer'ı başlatır.
         
@@ -47,11 +55,18 @@ class RAGAnalyzer:
             self.retriever = retriever
         else:
             try:
-                self.retriever = MongoVectorRetriever()
-                print("✓ RAG Analyzer başlatıldı.")
+                MVR = _lazy_mongo_vector_retriever_class()
+                self.retriever = MVR()
+                if self.retriever and getattr(self.retriever, "connected", False):
+                    print("✓ RAG Analyzer başlatıldı (Mongo vector + embedding).")
+                else:
+                    print(
+                        "⚠️  RAG Analyzer: vektör arama devre dışı (ST/Mongo yok); "
+                        "keyword RAG ve analiz devam eder."
+                    )
             except Exception as e:
                 print(f"❌ Retriever başlatılamadı: {e}")
-                print("   MongoDB veritabanınız erişilebilir olduğundan emin olun.")
+                print("   MongoDB / torch / sentence-transformers kontrol edin.")
                 self.retriever = None
     
     def get_context_for_query(

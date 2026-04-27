@@ -915,10 +915,8 @@ class RootCauseAgentV3_1:
                 print(f"⚠️  BranchCritic init başarısız: {e}")
                 self.branch_critic = None
 
-        # RAG: use_rag=True iken asıl enjeksiyon analyze_root_causes içinde
-        # _build_rag_context_block() ile MongoDB (abs_guidance_chunks + taxonomy_items) keyword
-        # aramasıdır; MONGODB_URI yoksa blok boş kalır. Aşağıdaki RAGAnalyzer, vektör aramayı
-        # başlatır ancak V3.1 analiz hattında şu an kullanılmamaktadır.
+        # RAG: (1) keyword: _build_rag_context_block — abs_guidance_chunks + taxonomy_items
+        # (2) vektör: RAGAnalyzer + MongoVectorRetriever — _vector_rag_excerpt (ROOTCAUSE_USE_VECTOR_RAG=1)
         self.use_rag = use_rag
         self.rag_analyzer = None
         if use_rag and RAG_AVAILABLE:
@@ -996,6 +994,39 @@ class RootCauseAgentV3_1:
             for r in tax_rows:
                 lines.append(f"- {r[:260]}")
         return "\n".join(lines).strip()
+
+    def _vector_rag_excerpt(self, query_text: str) -> str:
+        """
+        Mongo vektör indeksinden (taxonomy) benzerlik özet — RAGAnalyzer retriever açıksa.
+        Kapatmak: ROOTCAUSE_USE_VECTOR_RAG=0
+        """
+        if not self.use_rag:
+            return ""
+        if (os.getenv("ROOTCAUSE_USE_VECTOR_RAG") or "1").strip().lower() in (
+            "0", "false", "no", "off",
+        ):
+            return ""
+        if not self.rag_analyzer:
+            return ""
+        r = getattr(self.rag_analyzer, "retriever", None)
+        if r is None or not getattr(r, "connected", False):
+            return ""
+        q = (query_text or "")[:4000]
+        if not q.strip():
+            return ""
+        try:
+            ctx = self.rag_analyzer.get_context_for_query(
+                query=q, k=5, language="tr", include_exclusions=True
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"⚠️  Vector RAG get_context failed: {e}")
+            return ""
+        if (ctx or {}).get("status") != "success":
+            return ""
+        kb = (ctx.get("knowledge_base_excerpt") or "").strip()
+        if not kb:
+            return ""
+        return f"[RAG VECTOR / TAXONOMY RETRIEVAL]\n{kb[:5000]}"
     
     # ─────────────────────────────────────────────────────────────────────────
     # MAIN ENTRY POINT
@@ -1075,6 +1106,11 @@ class RootCauseAgentV3_1:
         if rag_block:
             incident_summary = f"{incident_summary}\n\n{rag_block}"
             print("🔍 RAG context injected from Mongo (ABS + taxonomy)")
+
+        vblock = self._vector_rag_excerpt(incident_summary)
+        if vblock:
+            incident_summary = f"{incident_summary}\n\n{vblock}"
+            print("🔍 RAG vector taxonomy context injected (MongoVectorRetriever)")
 
         if investigation_data and isinstance(investigation_data, dict):
             oc = (investigation_data.get("oracle_context") or "").strip()

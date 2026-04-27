@@ -19,8 +19,9 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
-from sentence_transformers import SentenceTransformer
 import json
+
+# sentence_transformers → torch ağır; sadece MongoVectorRetriever() anında yüklenir
 
 # Proje kök dizinini Python path'e ekle
 project_root = Path(__file__).parent.parent.parent
@@ -44,13 +45,22 @@ class MongoVectorRetriever:
         Args:
             model_name: SentenceTransformer modeli adı (multilingual desteği için)
         """
-        print(f"🤖 Sentence Transformer modeli yükleniyor: {model_name}")
-        self.model = SentenceTransformer(model_name)
+        self.model = None
         self.client = None
         self.db = None
         self.collection = None
         self.connected = False
-        
+        try:
+            from sentence_transformers import SentenceTransformer  # noqa: WPS433
+
+            print(f"🤖 Sentence Transformer modeli yükleniyor: {model_name}")
+            self.model = SentenceTransformer(model_name)
+        except Exception as e:  # noqa: BLE001
+            print(
+                f"⚠️  SentenceTransformer yüklenemedi; vektör RAG bu process için kapalı. "
+                f"Torch/sentence-transformers kurulumunu kontrol edin. Detay: {e}"
+            )
+            return
         # MongoDB'ye bağlan
         self._connect_to_db()
     
