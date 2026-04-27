@@ -13,6 +13,7 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 ## Core User Flows
 
 1. User submits incident form (Part 1 + Part 2 bootstrap).
+   - User can attach extra photos/documents as incident evidence.
 2. HITL questioning refines context with incident-specific prompts.
    - Entry UX should start with incident summary and an explicit analysis notice,
      not taxonomy-generic opening questions.
@@ -21,6 +22,21 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 3. Async pipeline starts (Part 3 + Part 4).
 4. User observes progress via WebSocket/polling.
 5. User exports report artifacts.
+
+## Evidence Attachment and Multimodal Context
+
+- Incident intake should support file attachments (photos, PDFs, office docs, scans).
+- Attached evidence should be processed and summarized into structured context for analysis:
+  - OCR/text extraction from documents,
+  - optional image captioning/object cues for photos,
+  - metadata capture (filename, type, uploader, upload time, tenant scope).
+- HITL and RCA prompts should consume attachment-derived evidence as supplemental context,
+  while preserving explicit traceability to attachment sources.
+- Evidence handling should respect security and compliance:
+  - tenant-isolated storage paths,
+  - file type and size validation,
+  - malware/unsafe file screening policy,
+  - retention/deletion controls aligned with tenant policy.
 
 ## System Architecture
 
@@ -57,6 +73,56 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 - Deterministic operational visibility for worker/job status.
 - Action Plan JSON must be schema-valid or recoverable via retry/sanitizer path
   (markdown-fence/trailing-comma tolerant pre-parser).
+
+## ABS-Guided Learning and Retrieval Strategy
+
+- Use `knowlodge_base/ABSG_Consulting_Inc_Root_Cause_Map_Guidance_Document_1703.pdf`
+  as the primary methodology reference for:
+  - Causal-factor-first analysis,
+  - Why-tree expansion before coding,
+  - Multi-root-cause treatment and recommendation depth.
+- Synthetic DSPy data generation must stay aligned with ABS guidance:
+  - Build incident variants from causal factors and management system gaps,
+  - Avoid generic endpoint labels ("human error", "training lack") unless supported by chain evidence,
+  - Preserve explicit traceability from Why steps to final root-cause statements.
+- HITL deepening must follow form-safe behavior:
+  - Ask targeted deep-dive questions per emerging root-cause branch,
+  - Do not re-ask fields already captured in incident form data,
+  - Request additional evidence (timeline, procedure, supervision, maintenance, barrier status)
+    only when needed to disambiguate competing root-cause paths.
+- RAG must be optional but production-ready:
+  - Retrieve ABS/taxonomy context to guide question generation and root-cause coding,
+  - Keep tenant-scoped retrieval boundaries,
+  - Keep deterministic fallback path when retrieval is unavailable.
+
+## UX and Report Consistency Requirements
+
+- Report artifacts must honor user-selected language end-to-end:
+  - investigation/output language selected in frontend should propagate to report generation,
+  - static report shell labels (DOCX/HTML headings) must not stay Turkish when another language is selected.
+- Visual consistency target:
+  - report output theme should align with admin panel primary/secondary palette.
+- Interactive entry behavior:
+  - switching to interactive analysis should open chat-first experience immediately.
+- Pipeline transparency:
+  - while root cause and report stages run, users should see continuously streaming progress
+    and Why-chain lines to reduce waiting friction.
+
+## Report Productization Requirements
+
+- Cover page personalization:
+  - first page should be user-editable with alternative templates (e.g. formal, executive, minimal).
+  - user should be able to switch template variant before export.
+- DOCX and HTML structural parity:
+  - section hierarchy/order should remain aligned between Word and HTML versions.
+  - HSG/technical code clutter should be removable from user-facing report body.
+  - final code-removal policy should be confirmed with Baris Bey before production lock.
+- Branding controls:
+  - optional logo upload/selection per tenant and per report.
+  - logo should be placeable in cover/header/footer zones based on template.
+- Document authenticity/protection:
+  - support configurable watermark/hologram overlay in output artifacts.
+  - watermark/hologram should support draft/final modes and tenant-level defaults.
 
 ## Spec Ownership
 

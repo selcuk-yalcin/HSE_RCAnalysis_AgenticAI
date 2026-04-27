@@ -544,10 +544,18 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
             "part3_rca": part3_v2 if isinstance(part3_v2, dict) else part3_data,
             "part4": incident.get("part4", {}),
         }
+        preferred_language = (
+            (incident.get("output_language") or "").strip()
+            or ((part3_v2 or {}).get("output_language") if isinstance(part3_v2, dict) else "")
+            or (part3_data.get("output_language") if isinstance(part3_data, dict) else "")
+        )
 
         active_report_agent = pdf_agent
         try:
-            docx_generated = active_report_agent.generate_report(report_payload)
+            docx_generated = active_report_agent.generate_report(
+                report_payload,
+                preferred_language=preferred_language,
+            )
         except Exception as primary_exc:
             # Railway runtime may not have local SKILL.md for ClaudeSkillPDFAgent.
             # Fallback to SkillBasedDocxAgent to guarantee DOCX+HTML generation.
@@ -555,7 +563,10 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
                 raise
             print("⚠️  ClaudeSkillPDFAgent unavailable (SKILL.md missing). Falling back to SkillBasedDocxAgent.")
             active_report_agent = SkillBasedDocxAgent()
-            docx_generated = active_report_agent.generate_report(report_payload)
+            docx_generated = active_report_agent.generate_report(
+                report_payload,
+                preferred_language=preferred_language,
+            )
 
         docx_path = Path(docx_generated).resolve()
         html_path = docx_path.with_suffix(".html")
@@ -616,6 +627,7 @@ async def _investigate_core(tenant_id: str, incident_id: str, investigation: Inv
             },
         )
         part3_data = transform_v2_to_frontend(part3_raw)
+        incident["output_language"] = (inv_dump.get("output_language") or "").strip()
         incident["part3"] = part3_data
         incident["status"] = "investigated"
         _save_incident_record(tenant_id, incident_id, incident)

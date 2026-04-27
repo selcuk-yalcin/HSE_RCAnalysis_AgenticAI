@@ -91,6 +91,123 @@ ROOT_CAUSE_COLORS = [
 ]
 
 
+REPORT_LABELS = {
+    "tr": {
+        "cover_title": "KÖK NEDEN ANALİZİ RAPORU",
+        "cover_subtitle": "Profesyonel Araştırma ve Analiz Raporu",
+        "cover_confidentiality": "GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR",
+        "ref_no": "Referans No",
+        "date": "Tarih",
+        "location": "Lokasyon",
+        "incident_type": "Olay Tipi",
+        "incident_summary": "OLAY ÖZETİ",
+    },
+    "en": {
+        "cover_title": "ROOT CAUSE ANALYSIS REPORT",
+        "cover_subtitle": "Professional Investigation and Analysis Report",
+        "cover_confidentiality": "CONFIDENTIAL - ACCESS LIMITED TO AUTHORIZED PERSONNEL ONLY",
+        "ref_no": "Reference No",
+        "date": "Date",
+        "location": "Location",
+        "incident_type": "Incident Type",
+        "incident_summary": "INCIDENT SUMMARY",
+    },
+}
+
+
+def _label(lang_code: str, key: str) -> str:
+    normalized = (lang_code or "tr").strip().lower()
+    # For non-TR languages, keep static labels in English instead of Turkish.
+    bucket = REPORT_LABELS["tr"] if normalized == "tr" else REPORT_LABELS["en"]
+    return bucket.get(key, key)
+
+
+def _translate_html_static_labels(html: str, lang_code: str) -> str:
+    if (lang_code or "tr").lower() == "tr":
+        return html
+    # Keep static report shell in English for non-TR languages.
+    replacements = {
+        "YÖNETİCİ ÖZETİ": "EXECUTIVE SUMMARY",
+        "Olay Özeti": "Incident Summary",
+        "Temel Bulgular": "Key Findings",
+        "Acil Eylemler": "Immediate Actions",
+        "OLAY BİLGİLERİ": "INCIDENT DETAILS",
+        "Detaylı Bilgi Tablosu": "Detailed Information Table",
+        "Olay Detayları": "Incident Details",
+        "Kronolojik Olay Akışı": "Chronological Incident Timeline",
+        "ANALİZ YÖNTEMİ - 5 WHY": "ANALYSIS METHOD - 5 WHY",
+        "Analiz Ekibi": "Analysis Team",
+        "Kök Neden": "Root Cause",
+        "META KÖK NEDEN ANALİZİ": "META ROOT CAUSE ANALYSIS",
+        "Sistemik Zayıflık": "Systemic Weakness",
+        "SİSTEMSEL FAKTÖRLER": "SYSTEMIC FACTORS",
+        "DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER": "CORRECTIVE AND PREVENTIVE ACTIONS",
+        "CIKARILAN DERSLER": "LESSONS LEARNED",
+        "SONUC VE ONERILER": "CONCLUSION AND RECOMMENDATIONS",
+        "ONAY VE IMZA SAYFASI": "APPROVAL AND SIGNATURE PAGE",
+        "Kök Nedenler": "Root Causes",
+        "Tarih": "Date",
+        "İsim": "Name",
+        "Rol": "Role",
+        "Ünvan": "Title",
+    }
+    translated = html
+    for tr_text, en_text in replacements.items():
+        translated = translated.replace(tr_text, en_text)
+    return translated
+
+
+def _translate_docx_static_labels(doc: Document, lang_code: str) -> None:
+    if (lang_code or "tr").lower() == "tr":
+        return
+    replacements = {
+        "YÖNETİCİ ÖZETİ": "EXECUTIVE SUMMARY",
+        "Olay Özeti": "Incident Summary",
+        "Temel Bulgular": "Key Findings",
+        "Acil Eylemler": "Immediate Actions",
+        "OLAY BİLGİLERİ": "INCIDENT DETAILS",
+        "Detaylı Bilgi Tablosu": "Detailed Information Table",
+        "Olay Detayları": "Incident Details",
+        "Kronolojik Olay Akışı": "Chronological Incident Timeline",
+        "ANALİZ YÖNTEMİ - 5 WHY": "ANALYSIS METHOD - 5 WHY",
+        "Analiz Ekibi": "Analysis Team",
+        "Kök Neden": "Root Cause",
+        "META KÖK NEDEN ANALİZİ": "META ROOT CAUSE ANALYSIS",
+        "Sistemik Zayıflık": "Systemic Weakness",
+        "SİSTEMSEL FAKTÖRLER": "SYSTEMIC FACTORS",
+        "DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER": "CORRECTIVE AND PREVENTIVE ACTIONS",
+        "CIKARILAN DERSLER": "LESSONS LEARNED",
+        "SONUC VE ONERILER": "CONCLUSION AND RECOMMENDATIONS",
+        "ONAY VE IMZA SAYFASI": "APPROVAL AND SIGNATURE PAGE",
+        "Tarih": "Date",
+        "İsim": "Name",
+        "Rol": "Role",
+        "Ünvan": "Title",
+    }
+
+    def _translate_text(text: str) -> str:
+        if not text:
+            return text
+        out = text
+        for tr_text, en_text in replacements.items():
+            out = out.replace(tr_text, en_text)
+        return out
+
+    for paragraph in doc.paragraphs:
+        original = paragraph.text
+        translated = _translate_text(original)
+        if translated != original:
+            paragraph.text = translated
+
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                original = cell.text
+                translated = _translate_text(original)
+                if translated != original:
+                    cell.text = translated
+
+
 # 
 # CLAUDE CONTENT PROMPT
 # 
@@ -440,19 +557,19 @@ def _add_page_break(doc):
 # RAPOR BÖLÜM FONKSİYONLARI
 # 
 
-def _build_cover(doc, cover: dict):
+def _build_cover(doc, cover: dict, lang_code: str = "tr"):
     for _ in range(3):
         doc.add_paragraph()
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p.add_run(cover.get("title", "KÖK NEDEN ANALİZİ RAPORU"))
+    run = p.add_run(cover.get("title", _label(lang_code, "cover_title")))
     run.bold = True
     run.font.size = Pt(26)
     run.font.color.rgb = COLOR["dark_blue"]
     doc.add_paragraph()
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p.add_run(cover.get("subtitle", "Profesyonel Araştırma ve Analiz Raporu"))
+    run = p.add_run(cover.get("subtitle", _label(lang_code, "cover_subtitle")))
     run.font.size = Pt(14)
     run.font.color.rgb = COLOR["mid_blue"]
     run.italic = True
@@ -465,18 +582,23 @@ def _build_cover(doc, cover: dict):
     _set_cell_margins(cell, 120, 120, 200, 200)
     p = cell.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p.add_run(cover.get("confidentiality", "GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR"))
+    run = p.add_run(cover.get("confidentiality", _label(lang_code, "cover_confidentiality")))
     run.bold = True
     run.font.size = Pt(10)
     run.font.color.rgb = COLOR["white"]
     doc.add_paragraph()
     _add_info_table(doc, {
-        "Referans No": cover.get("ref_no", "N/A"),
-        "Tarih": cover.get("date", "N/A"),
-        "Lokasyon": cover.get("location", "N/A"),
-        "Olay Tipi": cover.get("incident_type", "N/A"),
+        _label(lang_code, "ref_no"): cover.get("ref_no", "N/A"),
+        _label(lang_code, "date"): cover.get("date", "N/A"),
+        _label(lang_code, "location"): cover.get("location", "N/A"),
+        _label(lang_code, "incident_type"): cover.get("incident_type", "N/A"),
     }, COLOR["dark_blue"])
-    _add_colored_box(doc, "OLAY ÖZETİ", strip_hse_codes(str(cover.get("incident_summary_short", "") or "")), COLOR["dark_blue"])
+    _add_colored_box(
+        doc,
+        _label(lang_code, "incident_summary"),
+        strip_hse_codes(str(cover.get("incident_summary_short", "") or "")),
+        COLOR["dark_blue"],
+    )
     _add_page_break(doc)
 
 
@@ -1026,6 +1148,7 @@ class SkillBasedDocxAgent:
         investigation_data: Dict,
         output_path: str = "outputs/hse_report.docx",
         timeout_seconds: int = 600,
+        preferred_language: str = "",
     ) -> str:
         """
         Investigation data'dan kapsamlı DOCX rapor üretir.
@@ -1050,7 +1173,16 @@ class SkillBasedDocxAgent:
             or raw_data.get("part1", {}).get("description", "")
             or json.dumps(raw_data, ensure_ascii=False)[:800]
         )
-        lang = detect_language(source_text)
+        preferred = (preferred_language or "").strip().lower()
+        forced_lang_map = {
+            "tr": {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr", "font_hint": ""},
+            "en": {"code": "en", "name": "English", "rtl": False, "html_lang": "en", "font_hint": ""},
+            "de": {"code": "de", "name": "German", "rtl": False, "html_lang": "de", "font_hint": ""},
+            "fr": {"code": "fr", "name": "French", "rtl": False, "html_lang": "fr", "font_hint": ""},
+            "es": {"code": "es", "name": "Spanish", "rtl": False, "html_lang": "es", "font_hint": ""},
+            "ar": {"code": "ar", "name": "Arabic", "rtl": True, "html_lang": "ar", "font_hint": "Arial Unicode MS"},
+        }
+        lang = forced_lang_map.get(preferred) or detect_language(source_text)
         print(f" Tespit edilen dil: {lang['name']} ({lang['code']}) | RTL: {lang['rtl']}")
         # 
 
@@ -1167,7 +1299,7 @@ class SkillBasedDocxAgent:
 
         print("-" * 50)
 
-        minimal = {"cover": {"title": "KÖK NEDEN ANALİZİ RAPORU"}}
+        minimal = {"cover": {"title": _label(lang.get("code", "tr"), "cover_title")}}
         def _request_and_parse(payload: Dict, label: str) -> Optional[Dict]:
             try:
                 response = requests.post(
@@ -1330,6 +1462,7 @@ class SkillBasedDocxAgent:
 
     def _build_docx(self, content: Dict, output_path: str, lang: Optional[Dict] = None) -> None:
         lang = lang or {"code": "tr", "name": "Turkish", "rtl": False}
+        lang_code = (lang.get("code") or "tr").lower()
         doc = Document()
         section = doc.sections[0]
         section.page_width = Cm(21.59)
@@ -1339,7 +1472,7 @@ class SkillBasedDocxAgent:
         section.top_margin = Cm(2.54)
         section.bottom_margin = Cm(2.54)
 
-        _build_cover(doc, content.get("cover", {}))
+        _build_cover(doc, content.get("cover", {}), lang_code)
         _build_executive_summary(doc, content.get("executive_summary", {}), content.get("root_causes", []))
         _build_incident_details(doc, content.get("incident_details", {}))
         _build_analysis_method(doc, content.get("analysis_method", {}))
@@ -1357,6 +1490,7 @@ class SkillBasedDocxAgent:
         _build_lessons_learned(doc, content.get("lessons_learned", {}))
         _build_conclusion(doc, content.get("conclusion", {}))
         _build_signature_page(doc)
+        _translate_docx_static_labels(doc, lang_code)
 
         # RTL dil desteği (Arapça, İbranice vb.)
         if lang.get("rtl"):
@@ -1422,6 +1556,7 @@ class SkillBasedDocxAgent:
         """Modern, responsive ve düzenlenebilir HTML rapor şablonu."""
         lang = lang or {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr"}
         html_lang = lang.get("html_lang", "tr")
+        lang_code = (lang.get("code") or "tr").lower()
         is_rtl = lang.get("rtl", False)
         dir_attr = ' dir="rtl"' if is_rtl else ''
         rtl_css = """
@@ -1449,7 +1584,7 @@ class SkillBasedDocxAgent:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{cover.get('title', 'KÖK NEDEN ANALİZİ RAPORU')}</title>
+    <title>{cover.get('title', _label(lang_code, 'cover_title'))}</title>
     <style>
         * {{
             margin: 0;
@@ -1473,7 +1608,7 @@ class SkillBasedDocxAgent:
         }}
         
         .cover {{
-            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 80px 40px;
             text-align: center;
@@ -1509,14 +1644,14 @@ class SkillBasedDocxAgent:
         }}
         
         .info-item {{
-            background: #D6E4F0;
+            background: #eef2ff;
             padding: 15px;
-            border-left: 4px solid #1B3A5C;
+            border-left: 4px solid #667eea;
         }}
         
         .info-label {{
             font-weight: bold;
-            color: #1B3A5C;
+            color: #667eea;
             font-size: 0.9em;
         }}
         
@@ -1526,7 +1661,7 @@ class SkillBasedDocxAgent:
         }}
         
         .incident-summary {{
-            background: #1B3A5C;
+            background: #667eea;
             color: white;
             padding: 20px;
             margin: 30px 0;
@@ -1543,7 +1678,7 @@ class SkillBasedDocxAgent:
         }}
         
         .section-header {{
-            background: #1B3A5C;
+            background: #667eea;
             color: white;
             padding: 15px 20px;
             margin: 30px 0 20px 0;
@@ -1553,12 +1688,12 @@ class SkillBasedDocxAgent:
         }}
         
         .subsection-header {{
-            color: #2E6DA4;
+            color: #764ba2;
             font-size: 1.1em;
             font-weight: bold;
             margin: 25px 0 15px 0;
             padding-bottom: 5px;
-            border-bottom: 2px solid #2E6DA4;
+            border-bottom: 2px solid #764ba2;
         }}
         
         .paragraph {{

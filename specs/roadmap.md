@@ -67,6 +67,31 @@ Source: synchronized from root `TODO.md`.
 - Reduce single-worker CPU blocking with staged checkpoints.
 - Add 3-5 parallel-run reliability/load validation and ops visibility.
 
+### P0.8 Multilingual Report + Interactive UX Stream
+
+- Propagate selected frontend language to investigate/report pipeline (`output_language`).
+- Ensure report shell labels (DOCX + HTML) follow selected language (minimum: non-TR must not render Turkish headers).
+- Align report visual palette with admin panel theme tokens.
+- Interactive analysis must open chat-first and show active chatbot surface immediately.
+- Stream live root-cause/progress lines in Agent Pipeline area during analysis/report generation.
+
+### P0.9 Report Template, Branding, and Hologram
+
+- Add editable and alternative cover-page templates for report generation.
+- Keep DOCX and HTML report structures aligned section-by-section.
+- Add user-facing option to hide/remove technical code identifiers from report body.
+- Confirm final code-visibility policy with Baris Bey before release.
+- Add optional logo insertion support (tenant-level default + per-report override).
+- Add watermark/hologram support for draft/final report modes.
+
+### P1.7 Evidence Attachments in Analysis Flow
+
+- Add incident-level file upload support (photo + document evidence).
+- Add backend attachment ingestion pipeline (validation, storage, metadata indexing).
+- Extract attachment context (OCR/text and image cues) for RCA/HITL prompt augmentation.
+- Show attachment-derived evidence summary in interactive analysis view.
+- Keep tenant-isolated attachment storage and configurable retention policy.
+
 ## P1 (Near-Term)
 
 ### P1.1 Synthetic Data Pipeline
@@ -99,6 +124,25 @@ Source: synchronized from root `TODO.md`.
 - Managed embeddings and vector store.
 - Tenant-isolated vector namespaces.
 - Controlled RAG prompt injection strategy.
+
+### P1.6 ABS-Guided DSPy Training + Deep HITL
+
+- Extend `agents/synetic_data_preperation/hse_synthetic_data.py` to produce
+  ABS-aligned Why chains (causal-factor-first, management-system-gap-aware).
+- Build training/eval set variants from ABS style patterns:
+  - multiple plausible root causes per causal factor,
+  - evidence-based questioning and recommendation linkage.
+- Add HITL deep-question policy:
+  - ask branch-specific disambiguation questions at each Why depth,
+  - skip data already present in form payload,
+  - enforce evidence collection prompts for timeline/procedure/maintenance/supervision.
+- Integrate RAG into root-cause and HITL phases with controlled retrieval:
+  - query only relevant ABS/taxonomy chunks,
+  - inject concise citations into prompts,
+  - keep fallback to non-RAG prompts when confidence is low.
+- Railway vector DB decision:
+  - primary: MongoDB Atlas Vector Search (tenant namespace, managed ops),
+  - avoid local file-based FAISS/Chroma persistence in production workers.
 
 ## P2 (Mid-Term)
 

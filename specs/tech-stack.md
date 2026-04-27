@@ -25,6 +25,10 @@
 - Tenant-scoped in-memory stores (`shared/tenant_store.py`).
 - Redis for broker, result backend, and cache.
 - Hybrid cache strategy: Redis L1 + Mongo L2.
+- Vector retrieval for RAG (Railway target):
+  - Primary store: MongoDB Atlas Vector Search (`rca.taxonomy` style collections).
+  - Embeddings: managed API embeddings preferred for production cost/runtime stability.
+  - Avoid local file-based vector stores for production worker pods.
 
 ## Deployment
 

@@ -189,7 +189,7 @@ only when needed, while keeping idle cost low.
 - Long single-task CPU pressure can delay worker bookkeeping.
 
 **Tasks**:
-- [ ] Keep `prefork` + autoscale runtime defaults (`min=1`, `max=5`) and document per-env overrides.
+- [x] Keep `prefork` + autoscale runtime defaults (`min=1`, `max=5`) and document per-env overrides.
 - [ ] Tune Celery heartbeat-related settings and broker visibility timeout for long tasks.
 - [ ] Split/limit CPU-heavy sections or add cooperative checkpoints to avoid single-process blocking.
 - [ ] Add queue-depth + worker-heartbeat health surface in ops endpoint.
@@ -205,6 +205,128 @@ only when needed, while keeping idle cost low.
 - `scripts/railway_celery_worker.sh`
 - `tasks/pipeline_tasks.py`
 - `shared/ops_celery.py`
+
+---
+
+## P0.8 — Multilingual Report Output + Interactive UX Flow
+
+**Goal**: Keep report language and UI flow consistent with user language/theme selection while improving perceived progress during RCA execution.
+
+**Current state**:
+- Interactive analysis exists but live root-cause flow is mostly visible in chat panel, not strongly surfaced in pipeline banner.
+- Report generator has Turkish-heavy static shell labels in `agents/skillbased_docx_agent.py`.
+- Frontend language selection is not consistently propagated to report output pipeline.
+
+**Tasks**:
+- [x] Propagate selected frontend language to investigation payload (`output_language`).
+- [x] Persist `output_language` in incident and pass it to report generation path in API.
+- [x] Add language-aware report defaults for cover/title/subtitle/confidentiality in `skillbased_docx_agent.py`.
+- [x] Add non-TR static HTML shell label fallback (English) to avoid Turkish-only report chrome.
+- [x] Align HTML report visual palette with admin panel primary/secondary theme colors.
+- [x] Stream Why-flow lines in Agent Pipeline banner while interactive RCA runs.
+- [ ] Expand full static label localization for DOCX/HTML shell to all supported UI languages (de/fr/es/ar parity).
+- [ ] Add end-to-end tests validating selected language propagation from UI -> investigate -> report artifacts.
+
+**Acceptance criteria**:
+- If user selects non-TR language, report shell does not stay fully Turkish.
+- Agent pipeline area shows live progression and Why lines during long runs.
+- Report and admin panel color language is visually consistent.
+
+**Related files**:
+- `admin_pan/Admin/src/rca-frontend/RcaFrontendHub.jsx`
+- `admin_pan/Admin/src/rca-frontend/components/ChatInterface.jsx`
+- `admin_pan/Admin/src/rca-frontend/utils/investigationPayload.js`
+- `api/main.py`
+- `agents/skillbased_docx_agent.py`
+
+---
+
+## P0.9 — Report Template Flexibility, Branding, and Hologram
+
+**Goal**: Make report output customizable and brand-consistent while preserving DOCX/HTML parity and introducing authenticity overlays.
+
+**Current state**:
+- Report cover is mostly static and generated from fixed shell structure.
+- DOCX and HTML outputs share content source but still diverge in static shell behavior/styling details.
+- Logo and watermark/hologram controls are not exposed as user options.
+
+**Tasks**:
+- [ ] Add alternative cover templates (formal/executive/minimal) and make first page editable before export.
+- [ ] Add API/report payload fields for template selection (tenant default + per-report override).
+- [ ] Enforce DOCX/HTML section parity with a shared section map (same order, same major headings).
+- [ ] Add "hide technical codes" option in report generation (for customer-facing exports).
+- [ ] Confirm final code visibility/removal policy with Baris Bey and lock product decision.
+- [ ] Add optional logo support:
+  - tenant logo upload/storage,
+  - logo placement rules (cover/header/footer),
+  - fallback behavior when no logo exists.
+- [ ] Add watermark/hologram support:
+  - draft/final mode variants,
+  - configurable text/graphic overlay,
+  - export-safe rendering for DOCX/HTML/PDF.
+- [ ] Add regression tests validating:
+  - template selection affects first page,
+  - DOCX/HTML section parity,
+  - code-hidden mode removes code markers from final artifact,
+  - logo and hologram options render correctly.
+
+**Acceptance criteria**:
+- User can choose and edit the first-page template before final export.
+- DOCX and HTML outputs stay structurally aligned for all core sections.
+- Technical code markers are removable based on report setting.
+- Logo and watermark/hologram options are configurable and visibly applied in outputs.
+- Baris Bey-approved policy is reflected in production defaults for code visibility.
+
+**Related files**:
+- `agents/skillbased_docx_agent.py`
+- `agents/claude_skill_pdf_agent.py`
+- `api/main.py`
+- `admin_pan/Admin/src/rca-frontend/`
+- `generate_docx_report.py`
+
+---
+
+## P1.7 — Evidence Attachments (Photo + Document) in RCA
+
+**Goal**: Let users upload extra photos/documents and ensure these attachments are considered during HITL and root-cause analysis.
+
+**Current state**:
+- Incident flow is mostly text-first; no end-to-end attachment-to-analysis context pipeline is standardized.
+- Prompt context does not systematically include evidence extracted from uploaded files.
+
+**Tasks**:
+- [ ] Add frontend upload UI for incident attachments (multi-file, progress, remove/retry).
+- [ ] Add API endpoints for attachment upload/list/delete under incident scope.
+- [ ] Add storage strategy (tenant + incident scoped paths) and metadata model.
+- [ ] Add file validation and safety controls:
+  - allowlist MIME/extension policy,
+  - max file size/count limits,
+  - virus/malicious-file scanning hook.
+- [ ] Add extraction pipeline:
+  - OCR/text extraction for PDF/image docs,
+  - parser for office/text formats where applicable,
+  - image evidence summary (caption/key objects) for photos.
+- [ ] Inject attachment evidence summary into HITL and RCA prompt payloads with source references.
+- [ ] Add UI block in interactive analysis showing "considered evidence" list.
+- [ ] Add retention and delete policy for attachments (tenant-configurable).
+- [ ] Add regression tests:
+  - upload success/failure cases,
+  - extraction quality smoke tests,
+  - proof that RCA prompt includes attachment-derived context.
+
+**Acceptance criteria**:
+- User can upload photos/documents per incident and view them before analysis.
+- Analysis pipeline includes extracted attachment evidence in prompt context.
+- HITL/root-cause outputs visibly reference relevant uploaded evidence where applicable.
+- Attachments remain tenant-isolated and enforce upload security constraints.
+
+**Related files**:
+- `admin_pan/Admin/src/rca-frontend/components/IncidentForm.jsx`
+- `admin_pan/Admin/src/services/hsg245Api.js`
+- `api/main.py`
+- `agents/hitl_question_service.py`
+- `agents/rootcause_agent_v3_1.py`
+- `shared/tenant_store.py`
 
 ---
 
@@ -332,6 +454,58 @@ operational flow.
 - [ ] Use managed vector store (MongoDB Atlas Vector or Pinecone).
 - [ ] Feed RAG context into WhyChain prompts.
 - [ ] Isolate vector namespaces per tenant.
+
+---
+
+## P1.6 — ABS-Guided Synthetic DSPy + Deep HITL + Railway Vector DB
+
+**Goal**: Use ABS Root Cause Map guidance to generate higher-quality synthetic DSPy data,
+deepen root-cause reasoning with HITL, and activate production-safe RAG on Railway.
+
+**Current state**:
+- ABS guidance source is available: `knowlodge_base/ABSG_Consulting_Inc_Root_Cause_Map_Guidance_Document_1703.pdf`.
+- Synthetic generator exists: `agents/synetic_data_preperation/hse_synthetic_data.py`.
+- Current RAG code includes Mongo-oriented indexing/retrieval scripts but still uses local embedding models.
+- Root-cause flow has HITL, but deep-dive question policy is not yet evidence-driven per branch.
+
+**Tasks**:
+- [ ] Update `hse_synthetic_data.py` for ABS-aligned generation:
+  - causal-factor-first narrative,
+  - management-system-gap deepening,
+  - multi-root-cause possibility per incident context.
+- [ ] Add ABS-style evaluation metrics in DSPy training:
+  - causal continuity score,
+  - anti-generic penalty (`human error`, `training lack` without evidence),
+  - recommendation-to-root-cause traceability score.
+- [ ] Add form-aware HITL deep questioning:
+  - ask only missing information (do not repeat existing form fields),
+  - ask branch-specific evidence questions at each Why depth,
+  - support "insufficient evidence" state and request follow-up proof.
+- [ ] RAG activation strategy:
+  - chunk ABS guidance + taxonomy by section/node and store with metadata (`source`, `section`, `node_code`),
+  - retrieve top-k context per Why stage with confidence threshold,
+  - inject concise retrieved evidence into HITL and Why prompts.
+- [ ] Railway vector DB selection and migration:
+  - standardize on MongoDB Atlas Vector Search as primary store,
+  - add tenant namespace/key strategy for retrieval isolation,
+  - remove production dependency on local file-based vector persistence.
+- [ ] Add acceptance test pack:
+  - 5 representative incident families,
+  - compare non-RAG vs RAG-enabled RCA depth/quality,
+  - verify no duplicate form questions during HITL deepening.
+
+**Acceptance criteria**:
+- Synthetic dataset quality improves with fewer generic root-cause endings on dev set.
+- HITL asks deeper and more specific branch questions without re-asking captured form data.
+- RAG context improves code/path consistency while preserving fallback behavior when retrieval fails.
+- Railway deployment uses managed vector storage (MongoDB Atlas Vector Search) and tenant isolation.
+
+**Related files**:
+- `agents/synetic_data_preperation/hse_synthetic_data.py`
+- `agents/rootcause_agent_v3_1.py`
+- `agents/hitl_question_service.py`
+- `rag_pipeline/indexing/build_mongodb_vector_store.py`
+- `rag_pipeline/retrieval/query_mongodb_vector_store.py`
 
 ---
 
