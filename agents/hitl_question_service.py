@@ -7,10 +7,14 @@ from __future__ import annotations
 
 import hashlib
 import re
+import os
+import json
 from typing import Any
+from openai import OpenAI
 
 from agents.hitl_disambiguation_bank import build_questions_for_causes
 from agents.hgs_taxonomy import parse_hsg_taxonomy_items, infer_codes_from_text
+from agents.model_constants import resolve_openrouter_chat_model
 
 _HS_CODE_RE = re.compile(r"\b([ABCD][0-9]+\.[0-9]+)\b", re.IGNORECASE)
 _GENERIC_PATTERNS = (
@@ -18,6 +22,57 @@ _GENERIC_PATTERNS = (
     "risk değerlendirmesi yapılmış mıydı",
     "risk degerlendirmesi yapilmis miydi",
 )
+_GENERIC_QUESTION_REGEXES = (
+    r"olay\s+öncesi\s+son\s+\d+\s+saat",
+    r"kaç\s+saatlik\s+vardiya",
+    r"fazla\s+mesai",
+    r"olay\s+s[ıi]ras[ıi]nda\s+ba[sş]ka\s+kimler",
+    r"g[öo]zetmen/formen\s+olay\s+s[ıi]ras[ıi]nda",
+    r"hangi\s+ekipman/alet\s+kullan[ıi]ld[ıi]",
+    r"bu\s+i[sş]\s+i[çc]in\s+hangi\s+kkd",
+    r"çal[ıi][sş]an\s+gerekli\s+t[üu]m\s+kkd",
+)
+
+_INCIDENT_SIGNAL_HINTS = {
+    r"olay\s+öncesi\s+son\s+\d+\s+saat|kaç\s+saatlik\s+vardiya|fazla\s+mesai": (
+        "vardiya",
+        "mesai",
+        "yorgun",
+        "uyku",
+        "nobet",
+        "shift",
+        "fatigue",
+    ),
+    r"olay\s+s[ıi]ras[ıi]nda\s+ba[sş]ka\s+kimler|g[öo]zetmen/formen": (
+        "tanik",
+        "gorgu",
+        "formen",
+        "gözetmen",
+        "gozetmen",
+        "supervisor",
+        "witness",
+        "ekip",
+        "yalniz",
+        "yalnız",
+    ),
+    r"hangi\s+ekipman/alet|ekipman|alet": (
+        "ekipman",
+        "iskele",
+        "merdiven",
+        "platform",
+        "tool",
+        "equipment",
+        "makine",
+    ),
+    r"\bkkd\b|ppe|kişisel\s+koruyucu|kisisel\s+koruyucu": (
+        "kkd",
+        "baret",
+        "kemer",
+        "lanyard",
+        "ppe",
+        "koruyucu",
+    ),
+}
 
 _KNOWN_FIELD_GUARD_PATTERNS = {
     "risk_assessment": (r"risk\s+de[ğg]erlendirmesi",),
@@ -33,6 +88,8 @@ try:
     _TAXONOMY_ITEMS = parse_hsg_taxonomy_items("agents/knowledge.json")
 except Exception:
     _TAXONOMY_ITEMS = []
+
+_HITL_LLM_ENABLED = (os.getenv("HITL_USE_LLM") or "1").strip().lower() in ("1", "true", "yes", "on")
 
 
 def extract_hs_codes(text: str) -> list[str]:
@@ -119,8 +176,10 @@ def _build_deep_questions_from_taxonomy(code: str, why_level: int) -> list[dict]
 def _filter_questions(
     questions: list[dict[str, Any]],
     known_fields: list[str] | None,
+    incident_context: str = "",
 ) -> list[dict[str, Any]]:
     known = {str(k or "").strip().lower() for k in (known_fields or []) if str(k or "").strip()}
+    context_low = str(incident_context or "").lower()
     out: list[dict[str, Any]] = []
     for q in questions:
         text = str(q.get("soru") or "").strip()
@@ -128,6 +187,22 @@ def _filter_questions(
             continue
         low = text.lower()
         if any(p in low for p in _GENERIC_PATTERNS):
+            continue
+        # Hard-filter generic checklist style prompts unless incident text carries matching signals.
+        blocked = False
+        for generic_rx in _GENERIC_QUESTION_REGEXES:
+            if re.search(generic_rx, low, flags=re.IGNORECASE):
+                signal_keywords = ()
+                for signal_rx, hints in _INCIDENT_SIGNAL_HINTS.items():
+                    if re.search(signal_rx, generic_rx, flags=re.IGNORECASE):
+                        signal_keywords = hints
+                        break
+                if signal_keywords and not any(k in context_low for k in signal_keywords):
+                    blocked = True
+                elif not signal_keywords:
+                    blocked = True
+                break
+        if blocked:
             continue
         skip = False
         for field in known:
@@ -176,6 +251,134 @@ def _taxonomy_gap_questions(full_text: str, max_categories: int = 4, per_cat: in
     return out
 
 
+def _extract_json_array(text: str) -> list[dict[str, Any]]:
+    if not text:
+        return []
+    s = text.strip()
+    if s.startswith("```"):
+        first_nl = s.find("\n")
+        if first_nl != -1:
+            s = s[first_nl + 1 :]
+        if s.rstrip().endswith("```"):
+            s = s.rstrip()[:-3].rstrip()
+    try:
+        data = json.loads(s)
+        if isinstance(data, list):
+            return [x for x in data if isinstance(x, dict)]
+    except Exception:
+        pass
+    m = re.search(r"\[[\s\S]*\]", s)
+    if not m:
+        return []
+    try:
+        data = json.loads(m.group(0))
+        if isinstance(data, list):
+            return [x for x in data if isinstance(x, dict)]
+    except Exception:
+        return []
+    return []
+
+
+def _taxonomy_prompt_context(focus_codes: list[str], max_items: int = 4) -> str:
+    if not focus_codes or not _TAXONOMY_ITEMS:
+        return ""
+    rows: list[str] = []
+    for code in focus_codes[:max_items]:
+        item = next((x for x in _TAXONOMY_ITEMS if x.code == code), None)
+        if not item:
+            continue
+        choose = "; ".join(item.choose_if[:2])
+        not_this = "; ".join(item.not_this_if[:1])
+        rows.append(
+            f"- {item.code} | {item.title} | choose_if: {choose} | not_this_if: {not_this}"
+        )
+    return "\n".join(rows)
+
+
+def _llm_question_candidates(
+    *,
+    how_happened: str,
+    root_cause_initial: str,
+    focus_codes: list[str],
+    why_level: int = 1,
+    current_why_question: str = "",
+    previous_why_answer: str = "",
+    known_fields: list[str] | None = None,
+    max_questions: int = 6,
+) -> list[dict[str, Any]]:
+    if not _HITL_LLM_ENABLED:
+        return []
+    api_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
+    if not api_key:
+        return []
+    taxonomy_ctx = _taxonomy_prompt_context(focus_codes)
+    if not taxonomy_ctx:
+        return []
+    model = resolve_openrouter_chat_model()
+    if not model.startswith("openrouter/"):
+        model = f"openrouter/{model}"
+
+    known = ", ".join(known_fields or [])
+    prompt = f"""
+Sen HSE RCA HITL soru asistanısın.
+Yalnızca olayla doğrudan ilgili, dalı derinleştiren, non-generic sorular üret.
+
+Olay özeti:
+{how_happened}
+
+İlk kök neden çıktısı:
+{root_cause_initial}
+
+Why seviyesi: {why_level}
+Mevcut Why sorusu: {current_why_question}
+Önceki Why cevabı: {previous_why_answer}
+Bilinen form alanları (bunları tekrar sorma): {known}
+
+Taxonomy odak kodları:
+{taxonomy_ctx}
+
+Kurallar:
+- Generic checklist soru üretme (tarih/saat, son 2 saat, vardiya, fazla mesai, tanık kimdi, formen orada mı, hangi ekipman, hangi KKD gibi çıplak şablonlar yasak).
+- Sorular doğrudan bu olay metnindeki kanıta/eksik kanıta bağlı olsun.
+- Her soru belirli bir kodu ayrıştırmaya hizmet etsin.
+- Türkçe, kısa, net.
+- JSON array döndür: [{{"question_tr":"...","code":"A1.1","reason":"neden bu soru"}}]
+- En fazla {max_questions} soru.
+""".strip()
+
+    try:
+        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.2,
+            max_tokens=1200,
+        )
+        content = (resp.choices[0].message.content or "").strip()
+        items = _extract_json_array(content)
+        out: list[dict[str, Any]] = []
+        for i, it in enumerate(items[:max_questions], start=1):
+            q = str(it.get("question_tr") or "").strip()
+            code = str(it.get("code") or "").strip().upper()
+            if not q:
+                continue
+            out.append(
+                {
+                    "id": _stable_id("llm", str(why_level), code, str(i), q),
+                    "source": "why_probe_llm",
+                    "code": code,
+                    "cause_desc": code,
+                    "hsg245": code,
+                    "soru": q,
+                    "yönler": {},
+                    "why_level": why_level,
+                }
+            )
+        return out
+    except Exception:
+        return []
+
+
 def build_hitl_question_pool(
     how_happened: str,
     root_cause_initial: str,
@@ -185,6 +388,7 @@ def build_hitl_question_pool(
     API + Gradio için tek havuz: önce immediate cause disambiguation, sonra eksik kategori soruları.
     """
     causes = _immediate_causes_from_payload(immediate_causes, root_cause_initial or "")
+    focus_codes = [str((c or {}).get("code") or "").strip().upper() for c in causes if (c or {}).get("code")]
     disamb_raw = build_questions_for_causes(causes)
     pool: list[dict[str, Any]] = []
     seen_q: set[str] = set()
@@ -218,6 +422,21 @@ def build_hitl_question_pool(
         seen_q.add(soru.lower())
         pool.append(row)
 
+    llm_rows = _llm_question_candidates(
+        how_happened=how_happened or "",
+        root_cause_initial=root_cause_initial or "",
+        focus_codes=focus_codes[:4],
+        why_level=1,
+        known_fields=[],
+        max_questions=6,
+    )
+    for row in llm_rows:
+        soru = str(row.get("soru") or "").strip()
+        if not soru or soru.lower() in seen_q:
+            continue
+        seen_q.add(soru.lower())
+        pool.insert(0, row)
+
     return pool[:20]
 
 
@@ -236,6 +455,7 @@ def next_hitl_questions(
     pool = _filter_questions(
         build_hitl_question_pool(how_happened, root_cause_initial, immediate_causes),
         known_fields=known_fields,
+        incident_context="\n".join([how_happened or "", root_cause_initial or ""]),
     )
     pending = [q for q in pool if q.get("id") not in answered]
     batch = pending[: max(1, batch_size)]
@@ -291,6 +511,24 @@ def build_why_probe_question_pool(
     seen_q: set[str] = set()
 
     # 1) Code-grounded deep questions directly from taxonomy item.
+    llm_rows = _llm_question_candidates(
+        how_happened=how_happened or "",
+        root_cause_initial=root_cause_initial or "",
+        focus_codes=focus_codes,
+        why_level=why_level,
+        current_why_question=current_why_question or "",
+        previous_why_answer=previous_why_answer or "",
+        known_fields=known_fields or [],
+        max_questions=6,
+    )
+    for row in llm_rows:
+        soru = row.get("soru") or ""
+        if not soru or soru.lower() in seen_q:
+            continue
+        seen_q.add(soru.lower())
+        pool.append(row)
+
+    # 2) Code-grounded deep questions directly from taxonomy item.
     for code in focus_codes:
         for row in _build_deep_questions_from_taxonomy(code, why_level):
             soru = row.get("soru") or ""
@@ -299,7 +537,7 @@ def build_why_probe_question_pool(
             seen_q.add(soru.lower())
             pool.append(row)
 
-    # 2) Disambiguation (hedef immediate code)
+    # 3) Disambiguation (hedef immediate code)
     if focus_codes:
         causes = [{"code": c, "cause_tr": c} for c in focus_codes]
         for row in build_questions_for_causes(causes)[:4]:
@@ -321,7 +559,7 @@ def build_why_probe_question_pool(
                 }
             )
 
-    # 3) Code-specific questions (knowledge_base bağlı template'ler)
+    # 4) Code-specific questions (knowledge_base bağlı template'ler)
     qe = QuestionEngine()
     for i, row in enumerate(qe.get_code_specific_questions(focus_codes)[:6]):
         soru = row.get("question") or ""
@@ -343,7 +581,16 @@ def build_why_probe_question_pool(
             }
         )
 
-    return _filter_questions(pool[:14], known_fields=known_fields)
+    incident_ctx = "\n".join(
+        [
+            how_happened or "",
+            root_cause_initial or "",
+            current_why_question or "",
+            previous_why_answer or "",
+            " ".join(focus_codes),
+        ]
+    )
+    return _filter_questions(pool[:14], known_fields=known_fields, incident_context=incident_ctx)
 
 
 def next_why_probe_questions(

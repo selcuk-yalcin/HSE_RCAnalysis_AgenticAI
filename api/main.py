@@ -14,6 +14,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Optional, Tuple, Type
+import inspect
 import json
 from celery.result import AsyncResult
 
@@ -29,7 +30,6 @@ from agents.overview_agent import OverviewAgent
 from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.actionplan_agent import ActionPlanAgent
-from agents.claude_skill_pdf_agent import ClaudeSkillPDFAgent as PDFReportAgent
 from agents.skillbased_docx_agent import SkillBasedDocxAgent
 from agents.hitl_question_service import next_hitl_questions, next_why_probe_questions
 from agents.model_constants import (
@@ -182,8 +182,10 @@ async def startup_event():
         actionplan_agent = ActionPlanAgent()
         print("✅ Action Plan Agent initialized")
         
-        pdf_agent = PDFReportAgent()
-        print("✅ PDF Report Agent initialized")
+        # Primary report generator: SkillBasedDocxAgent (DOCX + HTML + decision tree).
+        # ClaudeSkillPDFAgent may exist in codebase but is not primary in API flow.
+        pdf_agent = SkillBasedDocxAgent()
+        print("✅ Report Agent initialized (SkillBasedDocxAgent)")
         
         print("🎉 All agents ready!")
         print(f"🔑 Using API Key: {api_key[:20]}...{api_key[-10:]}")
@@ -503,7 +505,7 @@ class PipelineStartRequest(BaseModel):
     output_language: str = ""
 
 class HitlQuestionsRequest(BaseModel):
-    """Dinamik HITL soruları (knowledge_base / disambiguation tabanlı); LLM gerektirmez."""
+    """Dinamik HITL soruları (LLM + taxonomy öncelikli, rule-based fallback)."""
 
     how_happened: str = ""
     root_cause_initial: str = ""
@@ -571,23 +573,22 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
             or (part3_data.get("output_language") if isinstance(part3_data, dict) else "")
         )
 
+        def _call_generate_report(agent_obj, payload, preferred_lang: str):
+            sig = inspect.signature(agent_obj.generate_report)
+            if "preferred_language" in sig.parameters:
+                return agent_obj.generate_report(payload, preferred_language=preferred_lang)
+            return agent_obj.generate_report(payload)
+
         active_report_agent = pdf_agent
         try:
-            docx_generated = active_report_agent.generate_report(
-                report_payload,
-                preferred_language=preferred_language,
-            )
+            docx_generated = _call_generate_report(active_report_agent, report_payload, preferred_language)
         except Exception as primary_exc:
-            # Railway runtime may not have local SKILL.md for ClaudeSkillPDFAgent.
-            # Fallback to SkillBasedDocxAgent to guarantee DOCX+HTML generation.
-            if "SKILL.md not loaded" not in str(primary_exc):
+            # Ensure API always tries SkillBasedDocxAgent as safe fallback.
+            if isinstance(active_report_agent, SkillBasedDocxAgent):
                 raise
-            print("⚠️  ClaudeSkillPDFAgent unavailable (SKILL.md missing). Falling back to SkillBasedDocxAgent.")
+            print("⚠️  Primary report agent failed. Falling back to SkillBasedDocxAgent.")
             active_report_agent = SkillBasedDocxAgent()
-            docx_generated = active_report_agent.generate_report(
-                report_payload,
-                preferred_language=preferred_language,
-            )
+            docx_generated = _call_generate_report(active_report_agent, report_payload, preferred_language)
 
         docx_path = Path(docx_generated).resolve()
         html_path = docx_path.with_suffix(".html")
