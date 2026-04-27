@@ -90,6 +90,17 @@ def run_pipeline_task(
             "message": "Kok neden analizi calisiyor",
         },
     )
+    # Cooperative checkpoint to keep state updates flowing on long RCA runs.
+    self.update_state(
+        state="PROGRESS",
+        meta={
+            "incident_id": incident_id,
+            "tenant_id": tenant_id,
+            "stage": "investigate",
+            "progress": 30,
+            "message": "RCA branch generation in progress",
+        },
+    )
 
     inv = {
         "location": investigation_payload.get("location", ""),
@@ -110,6 +121,16 @@ def run_pipeline_task(
         inv,
     )
     part3_data = _transform_v2_to_frontend(part3_raw)
+    self.update_state(
+        state="PROGRESS",
+        meta={
+            "incident_id": incident_id,
+            "tenant_id": tenant_id,
+            "stage": "investigate",
+            "progress": 60,
+            "message": "RCA completed, preparing action plan",
+        },
+    )
 
     self.update_state(
         state="PROGRESS",

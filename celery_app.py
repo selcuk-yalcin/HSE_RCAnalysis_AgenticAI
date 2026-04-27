@@ -17,6 +17,8 @@ print(f"🛠️  Celery worker module loaded — build={WORKER_BUILD_TAG}")
 REDIS_URL = (os.getenv("REDIS_URL") or "redis://localhost:6379/0").strip()
 BROKER_HEARTBEAT = int((os.getenv("CELERY_BROKER_HEARTBEAT") or "30").strip() or "30")
 BROKER_POOL_LIMIT = int((os.getenv("CELERY_BROKER_POOL_LIMIT") or "10").strip() or "10")
+VISIBILITY_TIMEOUT = int((os.getenv("CELERY_VISIBILITY_TIMEOUT") or "7200").strip() or "7200")
+HEALTH_CHECK_INTERVAL = int((os.getenv("CELERY_HEALTH_CHECK_INTERVAL") or "20").strip() or "20")
 
 celery_app = Celery(
     "hse_rca_tasks",
@@ -45,8 +47,9 @@ celery_app.conf.update(
         "socket_timeout": 30,
         "socket_keepalive": True,
         "retry_on_timeout": True,
-        "health_check_interval": 30,
-        "visibility_timeout": 3600,
+        "health_check_interval": HEALTH_CHECK_INTERVAL,
+        "visibility_timeout": VISIBILITY_TIMEOUT,
     },
+    worker_prefetch_multiplier=1,
 )
 

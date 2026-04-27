@@ -160,14 +160,14 @@ only when needed, while keeping idle cost low.
 - Logs show parse errors in production, especially under long/complex outputs.
 
 **Tasks**:
-- [ ] Add strict Action Plan JSON schema validation before acceptance.
-- [ ] Add retry strategy for malformed JSON responses (schema-guided regeneration).
-- [ ] Add \"json-only\" sanitizer/parser:
+- [x] Add strict Action Plan JSON schema validation before acceptance.
+- [x] Add retry strategy for malformed JSON responses (schema-guided regeneration).
+- [x] Add \"json-only\" sanitizer/parser:
   - strip markdown fences,
   - sanitize trailing commas,
   - extract first valid JSON object safely.
-- [ ] Add parser telemetry fields (`parse_attempts`, `sanitized`, `fallback_reason`) to logs.
-- [ ] Add tests for malformed outputs (missing comma, fence wrapper, truncated object).
+- [x] Add parser telemetry fields (`parse_attempts`, `sanitized`, `fallback_reason`) to logs.
+- [x] Add tests for malformed outputs (missing comma, fence wrapper, truncated object).
 
 **Acceptance criteria**:
 - >=95% of action-plan responses parse without fallback on staging regression set.
@@ -190,10 +190,10 @@ only when needed, while keeping idle cost low.
 
 **Tasks**:
 - [x] Keep `prefork` + autoscale runtime defaults (`min=1`, `max=5`) and document per-env overrides.
-- [ ] Tune Celery heartbeat-related settings and broker visibility timeout for long tasks.
-- [ ] Split/limit CPU-heavy sections or add cooperative checkpoints to avoid single-process blocking.
-- [ ] Add queue-depth + worker-heartbeat health surface in ops endpoint.
-- [ ] Add load test scenario for 3-5 parallel RCA runs with acceptable queue wait and no task loss.
+- [x] Tune Celery heartbeat-related settings and broker visibility timeout for long tasks.
+- [x] Split/limit CPU-heavy sections or add cooperative checkpoints to avoid single-process blocking.
+- [x] Add queue-depth + worker-heartbeat health surface in ops endpoint.
+- [x] Add load test scenario for 3-5 parallel RCA runs with acceptable queue wait and no task loss.
 
 **Acceptance criteria**:
 - No task loss/duplication in 3-5 parallel RCA runs.

@@ -55,25 +55,25 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.6 Action Plan JSON Robustness
 
-- Enforce stricter Action Plan JSON schema validation.
-- Add retry and \"json-only\" sanitizer parser for malformed outputs.
-- Sanitize markdown fences and trailing commas before parsing.
-- Add parse telemetry and malformed-output regression tests.
+- ✅ Enforce stricter Action Plan JSON schema validation. (DONE - schema gate in `ActionPlanAgent`)
+- ✅ Add retry and \"json-only\" sanitizer parser for malformed outputs. (DONE - 3-attempt regeneration + sanitize candidates)
+- ✅ Sanitize markdown fences and trailing commas before parsing. (DONE - candidate sanitizer in `ActionPlanAgent`)
+- ✅ Add parse telemetry and malformed-output regression tests. (DONE - telemetry logs + `tests/test_actionplan_json_hardening.py`)
 
 ### P0.7 Celery Long-Run Reliability
 
-- Keep `prefork + autoscale` as baseline worker runtime.
-- Tune heartbeat and broker visibility timeout for long RCA tasks.
-- Reduce single-worker CPU blocking with staged checkpoints.
-- Add 3-5 parallel-run reliability/load validation and ops visibility.
+- ✅ Keep `prefork + autoscale` as baseline worker runtime. (DONE)
+- ✅ Tune heartbeat and broker visibility timeout for long RCA tasks. (DONE - env-driven visibility timeout + health interval + prefetch=1)
+- ✅ Reduce single-worker CPU blocking with staged checkpoints. (DONE - cooperative progress checkpoints in `tasks/pipeline_tasks.py`)
+- ✅ Add 3-5 parallel-run reliability/load validation and ops visibility. (DONE - ops summary in `shared/ops_celery.py` + `tests/test_parallel_rca_load_scenario.py`)
 
 ### P0.8 Multilingual Report + Interactive UX Stream
 
-- Propagate selected frontend language to investigate/report pipeline (`output_language`).
-- Ensure report shell labels (DOCX + HTML) follow selected language (minimum: non-TR must not render Turkish headers).
-- Align report visual palette with admin panel theme tokens.
-- Interactive analysis must open chat-first and show active chatbot surface immediately.
-- Stream live root-cause/progress lines in Agent Pipeline area during analysis/report generation.
+- ✅ Propagate selected frontend language to investigate/report pipeline (`output_language`). (DONE)
+- ✅ Ensure report shell labels (DOCX + HTML) follow selected language (minimum: non-TR must not render Turkish headers). (DONE - baseline)
+- ✅ Align report visual palette with admin panel theme tokens. (DONE)
+- ✅ Interactive analysis must open chat-first and show active chatbot surface immediately. (DONE)
+- ✅ Stream live root-cause/progress lines in Agent Pipeline area during analysis/report generation. (DONE)
 
 ### P0.9 Report Template, Branding, and Hologram
 
@@ -96,15 +96,15 @@ Source: synchronized from root `TODO.md`.
 
 ### P1.1 Synthetic Data Pipeline
 
-- Mongo output mode for synthetic generation.
+- ✅ Mongo output mode for synthetic generation. (DONE - `--store mongo|both` + dataset/example persistence)
 - Tenant partitioning and seeded generation from incidents.
 - Scheduled generation jobs and admin trigger endpoint.
 
 ### P1.2 DSPy MIPROv2 Integration
 
-- Define RCA quality metrics.
-- Build optimize/compile pipeline for WhyChain.
-- Version compiled artifacts and support runtime loading.
+- ✅ Define RCA quality metrics. (DONE - `agents/training/dspy_metrics.py`)
+- ✅ Build optimize/compile pipeline for WhyChain. (DONE - `agents/training/optimize_rca.py`, WhyChain input adaptation + MIPRO run path)
+- ✅ Version compiled artifacts and support runtime loading. (DONE - versioned summary artifacts in `agents/training/compiled/`)
 - Add baseline vs compiled A/B evaluation.
 
 ### P1.3 Operational Training Workflow
@@ -143,6 +143,23 @@ Source: synchronized from root `TODO.md`.
 - Railway vector DB decision:
   - primary: MongoDB Atlas Vector Search (tenant namespace, managed ops),
   - avoid local file-based FAISS/Chroma persistence in production workers.
+
+### P1.8 Ordered Delivery Plan (Synthetic -> DB -> RAG -> MIPROv2)
+
+- ✅ Step 1: ABS-guided synthetic dataset generation and quality gate. (DONE - profile + stricter quality gate)
+- ✅ Step 2: Dataset versioning and persistence into database (tenant + dataset lineage). (DONE - dataset metadata + Mongo store mode)
+- ✅ Step 3: ABS guidance PDF chunking and vector DB indexing for RAG retrieval. (DONE - `build_abs_guidance_vector_store.py`)
+- ✅ Step 4: MIPROv2 optimization using curated dataset versions (+ baseline vs optimized eval). (DONE - `agents/training/optimize_rca.py`, `agents/training/dspy_metrics.py`)
+- ✅ Step 5: Production promotion with rollback-safe model/version controls. (DONE - `agents/training/promote_model.py`)
+
+### P1.9 Model Strategy by Stage
+
+- Training/synthetic generation profile:
+  - prefer `google/gemini-2.5-flash` for speed and cost efficiency.
+- Agentic RCA + report generation profile:
+  - prefer `anthropic/claude-sonnet-4.5` for depth, consistency, and report quality.
+- Runtime fallback policy:
+  - primary model failure should degrade gracefully to secondary profile.
 
 ## P2 (Mid-Term)
 

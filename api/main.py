@@ -521,6 +521,19 @@ class PDFGenerateRequest(BaseModel):
     incident_id: str
 
 
+def _validate_artifact_paths(artifacts: dict) -> bool:
+    if not isinstance(artifacts, dict):
+        return False
+    required = ("docx_path", "html_path", "decision_tree_path")
+    for key in required:
+        val = (artifacts.get(key) or "").strip()
+        if not val:
+            return False
+        if not Path(val).exists():
+            return False
+    return True
+
+
 def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
     """Generate DOCX + HTML + decision tree artifacts and return absolute paths."""
     if pdf_agent is None:
@@ -534,6 +547,14 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
         )
 
     try:
+        cached_artifacts = incident.get("report_artifacts") or {}
+        if _validate_artifact_paths(cached_artifacts):
+            return {
+                "docx_path": str(Path(cached_artifacts["docx_path"]).resolve()),
+                "html_path": str(Path(cached_artifacts["html_path"]).resolve()),
+                "decision_tree_path": str(Path(cached_artifacts["decision_tree_path"]).resolve()),
+            }
+
         part3_data = incident.get("part3") or {}
         part3_v2 = part3_data.get("_v2_raw") if isinstance(part3_data, dict) else None
         report_payload = {
@@ -574,12 +595,19 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
 
         if not html_path.exists():
             raise HTTPException(status_code=500, detail="HTML report file could not be generated")
+        if not decision_tree_path.exists():
+            raise HTTPException(status_code=500, detail="Decision tree report file could not be generated")
 
-        return {
+        artifacts = {
             "docx_path": str(docx_path),
             "html_path": str(html_path.resolve()),
             "decision_tree_path": str(decision_tree_path.resolve()),
+            "generated_at": datetime.utcnow().isoformat() + "Z",
         }
+        incident["report_artifacts"] = artifacts
+        _save_incident_record(tenant_id, incident_id, incident)
+
+        return artifacts
     except HTTPException:
         raise
     except Exception as exc:

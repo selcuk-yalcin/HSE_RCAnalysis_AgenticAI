@@ -260,6 +260,11 @@ npm run dev    # http://localhost:5173
 | `ROOTCAUSE_USE_RAG` | Enable RAG with `1` (experimental) |
 | `ROOTCAUSE_ENGINE` | Force `v2` engine |
 | `CELERY_POOL` / `CELERY_CONCURRENCY` | Worker tuning |
+| `CELERY_AUTOSCALE_MAX` / `CELERY_AUTOSCALE_MIN` | Prefork autoscale range |
+| `CELERY_VISIBILITY_TIMEOUT` | Redis visibility timeout for long tasks |
+| `CELERY_HEARTBEAT_INTERVAL` | Worker heartbeat interval |
+| `CELERY_DISABLE_MINGLE` / `CELERY_DISABLE_GOSSIP` | Reduce cross-worker heartbeat drift warnings |
+| `CELERY_WORKER_UID` | Run worker as non-root user (default `1000`) |
 
 ## 🔁 Development Workflow
 

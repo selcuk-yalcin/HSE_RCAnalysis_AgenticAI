@@ -8,7 +8,8 @@ from typing import Dict, List
 from datetime import datetime, timedelta
 import json
 import os
-from .json_parser import extract_json_from_response, safe_json_parse
+import re
+from .json_parser import safe_json_parse
 from .model_constants import OPENROUTER_DEFAULT_CHAT_MODEL
 
 
@@ -184,45 +185,134 @@ Generate at least 2-3 actions per category. Be specific and practical.
 
 Return ONLY valid JSON.
 """
-        
+
+        schema_feedback = ""
+        parse_attempts = 0
         try:
-            response = self.client.chat.completions.create(
-                model=OPENROUTER_DEFAULT_CHAT_MODEL,#actual model 
-                #model = "deepseek/deepseek-r1-0528:free" # test model rofesyonel Plan Yaz
-                messages=[
-                    {
-                        "role": "user", 
-                        "content": prompt
+            for attempt in range(1, 4):
+                parse_attempts = attempt
+                final_prompt = prompt
+                if schema_feedback:
+                    final_prompt += (
+                        "\n\nPrevious output was invalid.\n"
+                        f"Validation feedback: {schema_feedback}\n"
+                        "Regenerate as strict JSON object only, no markdown/code fences."
+                    )
+
+                response = self.client.chat.completions.create(
+                    model=OPENROUTER_DEFAULT_CHAT_MODEL,  # actual model
+                    messages=[{"role": "user", "content": final_prompt}],
+                    temperature=0.0,
+                    max_tokens=2000,
+                    extra_headers={
+                        "anthropic-version": "2023-06-01"  # Prompt caching desteği
                     }
-                ],
-                temperature=0.0,
-                max_tokens=2000,
-                extra_headers={
-                    "anthropic-version": "2023-06-01"  # Prompt caching desteği
-                }
+                )
+
+                result_text = (response.choices[0].message.content or "").strip()
+                result, parse_info = self._parse_action_plan_response(result_text)
+                if result and self._validate_action_plan_schema(result):
+                    print(
+                        f"✅ Action plan generated successfully "
+                        f"(parse_attempts={attempt}, sanitized={parse_info.get('sanitized')})"
+                    )
+                    return result
+
+                schema_feedback = parse_info.get("error") or "Schema validation failed."
+                print(
+                    f"⚠️  Action plan parse/schema failed "
+                    f"(attempt={attempt}, sanitized={parse_info.get('sanitized')}): {schema_feedback}"
+                )
+
+            print(
+                "⚠️  Using fallback action plan "
+                f"(parse_attempts={parse_attempts}, fallback_reason=invalid_json_or_schema)"
             )
-            
-            result_text = response.choices[0].message.content.strip()
-            
-            # Use robust JSON parser
-            result = safe_json_parse(
-                result_text,
-                context="Action Plan Generation",
-                default=None
-            )
-            
-            # If parsing failed, use fallback
-            if result is None or not result:
-                print("⚠️  Using fallback action plan")
-                return self._generate_fallback_actions()
-            
-            print("✅ Action plan generated successfully")
-            return result
-            
+            return self._generate_fallback_actions()
+
         except Exception as e:
             print(f"⚠️  Error generating actions with AI: {e}")
             # Fallback to default actions
             return self._generate_fallback_actions()
+
+    def _parse_action_plan_response(self, text: str):
+        info = {"sanitized": False, "error": ""}
+        if not text:
+            info["error"] = "Empty response"
+            return None, info
+
+        # 1) First, try existing parser directly.
+        parsed = safe_json_parse(text, context="Action Plan Generation", default=None)
+        if isinstance(parsed, dict) and parsed:
+            return parsed, info
+
+        # 2) Try sanitized candidates.
+        for candidate in self._json_candidates(text):
+            info["sanitized"] = True
+            parsed = safe_json_parse(candidate, context="Action Plan Generation (sanitized)", default=None)
+            if isinstance(parsed, dict) and parsed:
+                return parsed, info
+
+        info["error"] = "Could not extract valid JSON object."
+        return None, info
+
+    def _json_candidates(self, text: str) -> List[str]:
+        candidates: List[str] = []
+        raw = (text or "").strip()
+        if not raw:
+            return candidates
+
+        # Remove markdown fences if present.
+        if raw.startswith("```"):
+            raw = re.sub(r"^```[a-zA-Z0-9_-]*\s*", "", raw)
+            raw = re.sub(r"\s*```$", "", raw)
+            raw = raw.strip()
+
+        candidates.append(raw)
+
+        # Extract first JSON object range.
+        start = raw.find("{")
+        end = raw.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            candidates.append(raw[start:end + 1].strip())
+
+        # Remove trailing commas before object/array close.
+        for c in list(candidates):
+            candidates.append(re.sub(r",\s*([}\]])", r"\1", c))
+
+        # Unique order-preserving
+        uniq: List[str] = []
+        for c in candidates:
+            if c and c not in uniq:
+                uniq.append(c)
+        return uniq
+
+    def _validate_action_plan_schema(self, payload: Dict) -> bool:
+        required_keys = ["control_measures", "immediate", "short_term", "long_term", "responsible", "deadlines"]
+        for key in required_keys:
+            if key not in payload:
+                return False
+
+        if not isinstance(payload.get("control_measures"), list):
+            return False
+        if not all(isinstance(payload.get(k), list) for k in ("immediate", "short_term", "long_term")):
+            return False
+        if not isinstance(payload.get("responsible"), dict) or not isinstance(payload.get("deadlines"), dict):
+            return False
+
+        allowed_category = {"immediate", "short_term", "long_term"}
+        allowed_control_type = {"elimination", "substitution", "engineering", "administrative", "ppe"}
+        for item in payload.get("control_measures", []):
+            if not isinstance(item, dict):
+                return False
+            for field in ("measure", "responsible", "target_date", "category", "control_type"):
+                if not item.get(field):
+                    return False
+            if item.get("category") not in allowed_category:
+                return False
+            if item.get("control_type") not in allowed_control_type:
+                return False
+        return True
     
     def _format_causes_list(self, causes: List) -> str:
         """Format causes list for prompt"""

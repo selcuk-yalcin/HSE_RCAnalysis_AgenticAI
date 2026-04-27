@@ -7,7 +7,7 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 - Structured incident intake,
 - Interactive Human-in-the-Loop (HITL) questioning,
 - DSPy-powered 5-Why root cause analysis,
-- Action planning and report generation (PDF/DOCX),
+- Action planning and report generation (PDF/DOCX/HTML),
 - Multi-tenant API and async execution.
 
 ## Core User Flows
@@ -73,6 +73,10 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 - Deterministic operational visibility for worker/job status.
 - Action Plan JSON must be schema-valid or recoverable via retry/sanitizer path
   (markdown-fence/trailing-comma tolerant pre-parser).
+- Worker stability for long RCA runs must include:
+  - heartbeat-safe broker settings (`visibility_timeout`, `prefetch=1` for long tasks),
+  - explicit handling/monitoring of heartbeat drift and missed-heartbeat warnings,
+  - infrastructure-level clock synchronization (NTP) and non-root runtime policy.
 
 ## ABS-Guided Learning and Retrieval Strategy
 

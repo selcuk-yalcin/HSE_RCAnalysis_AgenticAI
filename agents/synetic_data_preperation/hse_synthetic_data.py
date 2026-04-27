@@ -19,11 +19,18 @@ import argparse
 import json
 import os
 import random
+import re
 import time
+import uuid
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional, Tuple
+from openai import OpenAI
 
+try:
+    from pymongo import MongoClient
+except Exception:  # noqa: BLE001
+    MongoClient = None
 
 def _clean_env_secret(value: Optional[str]) -> str:
     """Dashboard'dan kopyalanan tırnak/boşluk gibi gürültüyü temizle."""
@@ -33,6 +40,35 @@ def _clean_env_secret(value: Optional[str]) -> str:
     if (v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'")):
         v = v[1:-1].strip()
     return v
+
+
+def _safe_json_parse_local(text: str, default=None):
+    """Minimal local JSON parser fallback for script mode."""
+    if default is None:
+        default = {}
+    s = str(text or "").strip()
+    if not s:
+        return default
+    try:
+        return json.loads(s)
+    except Exception:
+        pass
+    # strip code fences
+    if s.startswith("```"):
+        s = s.split("\n", 1)[-1]
+        if s.endswith("```"):
+            s = s[:-3]
+    s = s.strip()
+    # extract first object
+    i = s.find("{")
+    j = s.rfind("}")
+    if i != -1 and j != -1 and j > i:
+        candidate = s[i : j + 1]
+        try:
+            return json.loads(candidate)
+        except Exception:
+            return default
+    return default
 
 
 def _resolve_llm_api_key(explicit: Optional[str] = None) -> str:
@@ -124,11 +160,11 @@ class HSEIncident:
     description: str          # Ham olay anlatımı
     location: str
     time_of_day: str
-    contributing_factors: list[str]
-    why_chain: list[WhyStep]
+    contributing_factors: List[str]
+    why_chain: List[WhyStep]
     root_cause: str
-    corrective_actions: list[str]
-    preventive_measures: list[str]
+    corrective_actions: List[str]
+    preventive_measures: List[str]
     severity: str             # "minör" / "orta" / "ciddi" / "ölümcül"
     is_negative_example: bool = False
     negative_reason: Optional[str] = None  # Neden yanlış örnek?
@@ -154,6 +190,60 @@ class HSEIncident:
             "is_negative_example": self.is_negative_example,
             "negative_reason": self.negative_reason,
         }
+
+
+def _fetch_abs_context(query: str, k: int = 3) -> str:
+    """Fetch ABS guidance snippets with block-type aware ranking."""
+    if MongoClient is None:
+        return ""
+    mongo_uri = os.getenv("MONGODB_URI", "").strip()
+    if not mongo_uri:
+        return ""
+    try:
+        client = MongoClient(mongo_uri)
+        col = client["rca"]["abs_guidance_chunks"]
+        block_weights = {
+            "definitions_typical_issues": 1.25,
+            "typical_recommendations": 1.15,
+            "notes": 1.0,
+            "examples": 0.95,
+            "general": 0.9,
+        }
+
+        tokens = [t for t in re.findall(r"[A-Za-z0-9_/-]+", (query or "").lower()) if len(t) >= 3]
+        token_regex = "|".join(re.escape(t) for t in tokens[:8])
+        mongo_filter = {"text": {"$regex": token_regex, "$options": "i"}} if token_regex else {}
+
+        candidates = list(
+            col.find(
+                mongo_filter,
+                {"_id": 0, "section_hint": 1, "page_start": 1, "text": 1, "block_type": 1},
+            ).limit(max(40, k * 10))
+        )
+        if not candidates:
+            candidates = list(
+                col.find({}, {"_id": 0, "section_hint": 1, "page_start": 1, "text": 1, "block_type": 1}).limit(max(10, k))
+            )
+
+        def _score(doc: dict) -> float:
+            text_l = str(doc.get("text") or "").lower()
+            hits = sum(1 for t in tokens if t in text_l)
+            weight = block_weights.get(str(doc.get("block_type") or "general"), 1.0)
+            return (hits + 1.0) * weight
+
+        docs = sorted(candidates, key=_score, reverse=True)[:k]
+        client.close()
+        parts = []
+        for d in docs:
+            txt = str(d.get("text") or "").replace("\n", " ").strip()
+            if len(txt) > 320:
+                txt = txt[:320] + "..."
+            parts.append(
+                f"[p.{d.get('page_start', '?')}|{d.get('section_hint', 'general')}|{d.get('block_type', 'general')}] {txt}"
+            )
+        return "\n".join(parts)
+    except Exception:
+        return ""
 
 
 # ─────────────────────────────────────────────
@@ -269,6 +359,8 @@ class MockHSEGenerator:
         incident_type: str,
         root_cause_category: str,
         incident_id: str,
+        language: str = "tr",
+        abs_context: str = "",
     ) -> HSEIncident:
         """Şablondan seçerek ya da varyasyon üretir"""
         # Matching template bul yoksa ilki kullan
@@ -337,6 +429,8 @@ class MockHSEGenerator:
 # DSPy import — kurulu değilse mock'a düş
 try:
     import dspy
+    if not hasattr(dspy, "Signature") or not hasattr(dspy, "ChainOfThought"):
+        raise ImportError("Incompatible dspy package detected (missing Signature/ChainOfThought).")
 
     class IncidentGenerator(dspy.Signature):
         """HSE uzmanı olarak gerçekçi iş kazası senaryosu üret."""
@@ -433,16 +527,24 @@ try:
             incident_type: str,
             root_cause_category: str,
             incident_id: str,
+            language: str = "tr",
+            abs_context: str = "",
         ) -> HSEIncident:
             # Adım 1: Olay üret
+            lang_hint = (
+                "Return ALL outputs in English only."
+                if str(language).lower().startswith("en")
+                else "Turkish output is acceptable."
+            )
+            context_hint = f"\nABS reference context:\n{abs_context}\n" if abs_context else ""
             inc = self.incident_gen(
-                sector=sector,
+                sector=f"{sector}\n{lang_hint}{context_hint}",
                 incident_type=incident_type,
                 root_cause_category=root_cause_category,
             )
             # Adım 2: 5 Why zinciri üret
             why = self.why_gen(
-                incident_description=inc.incident_description,
+                incident_description=f"{inc.incident_description}\n{lang_hint}{context_hint}",
                 sector=sector,
                 root_cause_category=root_cause_category,
             )
@@ -520,15 +622,95 @@ try:
 
     DSPY_AVAILABLE = True
 
-except ImportError:
+except Exception:
     DSPY_AVAILABLE = False
+
+
+# Real-mode fallback when modern DSPy runtime is unavailable.
+class OpenRouterHSEGenerator:
+    def __init__(self, model: str = "openrouter/google/gemini-2.5-flash", api_key: Optional[str] = None):
+        key = _resolve_llm_api_key(api_key)
+        self.model = model
+        self.client = OpenAI(base_url=_openrouter_api_base(), api_key=key)
+
+    def _chat(self, prompt: str) -> str:
+        resp = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.2,
+            max_tokens=1800,
+        )
+        return (resp.choices[0].message.content or "").strip()
+
+    def generate(
+        self,
+        sector: str,
+        incident_type: str,
+        root_cause_category: str,
+        incident_id: str,
+        language: str = "tr",
+        abs_context: str = "",
+    ) -> HSEIncident:
+        lang = "English" if str(language).lower().startswith("en") else "Turkish"
+        prompt = f"""
+You are an HSE root cause analyst.
+Generate one realistic incident and 5-Why chain.
+Output language MUST be {lang}.
+
+Sector: {sector}
+Incident type: {incident_type}
+Root-cause category target: {root_cause_category}
+ABS context (use as reference): {abs_context or "N/A"}
+
+Return strict JSON only with keys:
+description, location, time_of_day, severity, why_chain, root_cause, contributing_factors, corrective_actions, preventive_measures
+
+where why_chain is array of exactly 5 items:
+{{"depth":1,"question":"...","answer":"...","is_root_cause":false}}
+... last item is_root_cause=true.
+"""
+        txt = self._chat(prompt)
+        data = _safe_json_parse_local(txt, default={}) or {}
+        chain_raw = data.get("why_chain") or []
+        chain = []
+        for i, item in enumerate(chain_raw[:5]):
+            chain.append(
+                WhyStep(
+                    depth=int(item.get("depth", i + 1)),
+                    question=str(item.get("question", f"Why {i+1}?")),
+                    answer=str(item.get("answer", "")),
+                    is_root_cause=bool(item.get("is_root_cause", i == 4)),
+                )
+            )
+        while len(chain) < 5:
+            idx = len(chain) + 1
+            chain.append(WhyStep(depth=idx, question=f"Why {idx}?", answer="insufficient detail", is_root_cause=(idx == 5)))
+
+        return HSEIncident(
+            incident_id=incident_id,
+            sector=sector,
+            incident_type=incident_type,
+            root_cause_category=root_cause_category,
+            description=str(data.get("description", "")),
+            location=str(data.get("location", "")),
+            time_of_day=str(data.get("time_of_day", "")),
+            contributing_factors=[str(x) for x in (data.get("contributing_factors") or [])][:6],
+            why_chain=chain,
+            root_cause=str(data.get("root_cause", "")),
+            corrective_actions=[str(x) for x in (data.get("corrective_actions") or [])][:6],
+            preventive_measures=[str(x) for x in (data.get("preventive_measures") or [])][:6],
+            severity=str(data.get("severity", "medium")),
+        )
+
+    def generate_negative(self, base: HSEIncident, incident_id: str) -> HSEIncident:
+        return MockHSEGenerator().generate_negative(base=base, incident_id=incident_id)
 
 
 # ─────────────────────────────────────────────
 # 5. KALİTE FİLTRESİ
 # ─────────────────────────────────────────────
 
-def quality_score(incident: HSEIncident) -> tuple[float, list[str]]:
+def quality_score(incident: HSEIncident, profile: str = "default") -> Tuple[float, List[str]]:
     """
     0–1 arası kalite skoru ve sorun listesi döner.
     DSPy metriğinde de benzer mantık kullanılır.
@@ -576,7 +758,77 @@ def quality_score(incident: HSEIncident) -> tuple[float, list[str]]:
         issues.append("Düzeltici aksiyon yetersiz")
         score -= 0.1
 
+    # ABS-guided strict profile: daha derin ve tekrarsız zincir zorla
+    if profile == "abs":
+        if not incident.is_negative_example and len(incident.why_chain) < 5:
+            issues.append("ABS profilinde 5 adım Why zinciri zorunlu")
+            score -= 0.2
+        answers = [str(step.answer or "").strip().lower() for step in incident.why_chain]
+        if len(set(answers)) < max(1, len(answers) - 1):
+            issues.append("Why cevaplarında tekrar/parafraz döngüsü yüksek")
+            score -= 0.15
+        if not incident.is_negative_example:
+            short_answers = [a for a in answers if len(a.split()) < 4]
+            if short_answers:
+                issues.append("ABS profilinde bazı Why cevapları fazla kısa")
+                score -= 0.1
+
     return max(0.0, round(score, 2)), issues
+
+
+def _build_dataset_id(dataset_id: Optional[str], profile: str) -> str:
+    if dataset_id and str(dataset_id).strip():
+        return str(dataset_id).strip()
+    ts = time.strftime("%Y%m%d_%H%M%S")
+    suffix = str(uuid.uuid4())[:8]
+    return f"{profile}_synthetic_{ts}_{suffix}"
+
+
+def _persist_to_mongo(
+    splits: dict,
+    dataset_meta: dict,
+    mongo_db: str,
+    dataset_collection: str,
+    example_collection: str,
+) -> None:
+    try:
+        from pymongo import MongoClient
+    except Exception as exc:  # noqa: BLE001
+        raise RuntimeError("Mongo store seçildi ama pymongo kurulu değil.") from exc
+
+    mongo_uri = os.getenv("MONGODB_URI", "").strip()
+    if not mongo_uri:
+        raise RuntimeError("Mongo store seçildi ama MONGODB_URI bulunamadı.")
+
+    client = MongoClient(mongo_uri)
+    db = client[mongo_db]
+    ds_col = db[dataset_collection]
+    ex_col = db[example_collection]
+
+    ds_col.insert_one(dataset_meta)
+
+    docs = []
+    for split_name, examples in splits.items():
+        for ex in examples:
+            docs.append(
+                {
+                    "dataset_id": dataset_meta["dataset_id"],
+                    "tenant_id": dataset_meta["tenant_id"],
+                    "profile": dataset_meta["profile"],
+                    "source": dataset_meta["source"],
+                    "split": split_name,
+                    "created_at": dataset_meta["created_at"],
+                    "example": ex.to_dspy_example(),
+                }
+            )
+    if docs:
+        ex_col.insert_many(docs)
+
+    ds_col.create_index("dataset_id", unique=True)
+    ds_col.create_index([("tenant_id", 1), ("created_at", -1)])
+    ex_col.create_index([("dataset_id", 1), ("split", 1)])
+    ex_col.create_index([("tenant_id", 1), ("created_at", -1)])
+    client.close()
 
 
 # ─────────────────────────────────────────────
@@ -591,6 +843,15 @@ def run_pipeline(
     api_key: Optional[str] = None,
     model: str = "openrouter/google/gemini-2.5-flash",
     output_dir: str = ".",
+    profile: str = "default",
+    store: str = "files",
+    tenant_id: str = "default",
+    dataset_id: Optional[str] = None,
+    mongo_db: str = "rca",
+    mongo_dataset_collection: str = "hse_5why_datasets",
+    mongo_example_collection: str = "hse_5why_examples",
+    language: str = "tr",
+    use_abs_context: bool = False,
 ) -> dict:
     """
     Ana pipeline.
@@ -603,14 +864,20 @@ def run_pipeline(
         api_key: OpenRouter veya OpenAI anahtarı (real modda; yoksa ortam)
         model: LiteLLM model stringi (örn. openrouter/google/gemini-2.5-flash)
         output_dir: JSONL dosyaları buraya yazılır
+        profile: kalite profili (default|abs)
+        store: files|mongo|both
+        tenant_id: dataset tenant kimliği
+        dataset_id: opsiyonel sürüm kimliği
 
     Returns:
         Üretim istatistikleri
     """
     if mode == "real":
-        if not DSPY_AVAILABLE:
-            raise RuntimeError("dspy-ai kurulu değil: pip install dspy-ai")
-        generator = DSPyHSEGenerator(model=model, api_key=api_key)
+        if DSPY_AVAILABLE:
+            generator = DSPyHSEGenerator(model=model, api_key=api_key)
+        else:
+            print("⚠️  DSPy runtime unavailable, using OpenRouter fallback generator.")
+            generator = OpenRouterHSEGenerator(model=model, api_key=api_key)
     else:
         generator = MockHSEGenerator()
 
@@ -619,8 +886,8 @@ def run_pipeline(
     print(f"  Hedef: {n} pozitif + {int(n*negative_ratio)} negatif örnek")
     print(f"{'='*55}\n")
 
-    positives: list[HSEIncident] = []
-    negatives: list[HSEIncident] = []
+    positives: List[HSEIncident] = []
+    negatives: List[HSEIncident] = []
     skipped = 0
 
     # Kombinasyon listesi oluştur
@@ -644,8 +911,10 @@ def run_pipeline(
                 incident_type=incident_type,
                 root_cause_category=rc_cat,
                 incident_id=inc_id,
+                language=language,
+                abs_context=_fetch_abs_context(f"{sector} {incident_type} {rc_cat}", k=3) if use_abs_context else "",
             )
-            score, issues = quality_score(incident)
+            score, issues = quality_score(incident, profile=profile)
 
             if score >= quality_threshold:
                 positives.append(incident)
@@ -696,19 +965,56 @@ def run_pipeline(
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    for split_name, examples in splits.items():
-        filepath = output_path / f"hse_5why_{split_name}.jsonl"
-        with open(filepath, "w", encoding="utf-8") as f:
-            for ex in examples:
-                f.write(json.dumps(ex.to_dspy_example(), ensure_ascii=False) + "\n")
-        print(f"\n  → {filepath}  ({len(examples)} örnek)")
+    resolved_dataset_id = _build_dataset_id(dataset_id, profile)
+    created_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    dataset_meta = {
+        "dataset_id": resolved_dataset_id,
+        "tenant_id": tenant_id,
+        "profile": profile,
+        "source": "abs_guided" if profile == "abs" else "synthetic_default",
+        "language": language,
+        "use_abs_context": bool(use_abs_context),
+        "mode": mode,
+        "model": model,
+        "created_at": created_at,
+        "n_total": len(all_examples),
+        "n_positive": len(positives),
+        "n_negative": len(negatives),
+        "splits": {k: len(v) for k, v in splits.items()},
+    }
 
-    # DSPy dspy.Example formatında da kaydet (doğrudan trainset olarak kullanılabilir)
-    dspy_trainset_path = output_path / "hse_dspy_trainset.json"
-    dspy_trainset = [ex.to_dspy_example() for ex in splits["train"]]
-    with open(dspy_trainset_path, "w", encoding="utf-8") as f:
-        json.dump(dspy_trainset, f, ensure_ascii=False, indent=2)
-    print(f"  → {dspy_trainset_path}  (DSPy trainset formatı)")
+    if store in ("files", "both"):
+        for split_name, examples in splits.items():
+            filepath = output_path / f"hse_5why_{split_name}.jsonl"
+            with open(filepath, "w", encoding="utf-8") as f:
+                for ex in examples:
+                    f.write(json.dumps(ex.to_dspy_example(), ensure_ascii=False) + "\n")
+            print(f"\n  → {filepath}  ({len(examples)} örnek)")
+
+        # DSPy dspy.Example formatında da kaydet (doğrudan trainset olarak kullanılabilir)
+        dspy_trainset_path = output_path / "hse_dspy_trainset.json"
+        dspy_trainset = [ex.to_dspy_example() for ex in splits["train"]]
+        with open(dspy_trainset_path, "w", encoding="utf-8") as f:
+            json.dump(dspy_trainset, f, ensure_ascii=False, indent=2)
+        print(f"  → {dspy_trainset_path}  (DSPy trainset formatı)")
+
+        metadata_path = output_path / "hse_dataset_metadata.json"
+        with open(metadata_path, "w", encoding="utf-8") as f:
+            json.dump(dataset_meta, f, ensure_ascii=False, indent=2)
+        print(f"  → {metadata_path}  (dataset metadata)")
+
+    if store in ("mongo", "both"):
+        _persist_to_mongo(
+            splits=splits,
+            dataset_meta=dataset_meta,
+            mongo_db=mongo_db,
+            dataset_collection=mongo_dataset_collection,
+            example_collection=mongo_example_collection,
+        )
+        print(
+            f"  → MongoDB ({mongo_db}.{mongo_dataset_collection}, "
+            f"{mongo_db}.{mongo_example_collection}) dataset_id={resolved_dataset_id}"
+        )
 
     stats = {
         "toplam_uretilen": len(all_examples),
@@ -720,6 +1026,10 @@ def run_pipeline(
         "test": len(splits["test"]),
         "sektör_dagilimi": {},
         "ciddiyet_dagilimi": {},
+        "dataset_id": resolved_dataset_id,
+        "tenant_id": tenant_id,
+        "profile": profile,
+        "store": store,
     }
     for ex in positives:
         stats["sektör_dagilimi"][ex.sector] = stats["sektör_dagilimi"].get(ex.sector, 0) + 1
@@ -786,6 +1096,29 @@ if __name__ == "__main__":
     parser.add_argument("--quality", type=float, default=0.6,
                         help="Minimum kalite skoru (varsayılan: 0.6)")
     parser.add_argument(
+        "--profile",
+        choices=["default", "abs"],
+        default="default",
+        help="Kalite profili (default|abs). abs daha sıkı kalite kapısı uygular.",
+    )
+    parser.add_argument(
+        "--store",
+        choices=["files", "mongo", "both"],
+        default="files",
+        help="Çıktı hedefi: sadece dosya, sadece mongo veya ikisi",
+    )
+    parser.add_argument("--language", choices=["tr", "en"], default="tr", help="Üretim dili")
+    parser.add_argument(
+        "--use-abs-context",
+        action="store_true",
+        help="ABS chunk context'ini prompta enjekte et (Mongo abs_guidance_chunks)",
+    )
+    parser.add_argument("--tenant-id", default="default", help="Dataset tenant kimliği")
+    parser.add_argument("--dataset-id", default=None, help="Opsiyonel dataset sürüm kimliği")
+    parser.add_argument("--mongo-db", default="rca", help="Mongo veritabanı adı")
+    parser.add_argument("--mongo-dataset-collection", default="hse_5why_datasets", help="Mongo dataset koleksiyonu")
+    parser.add_argument("--mongo-example-collection", default="hse_5why_examples", help="Mongo örnek koleksiyonu")
+    parser.add_argument(
         "--model",
         default="openrouter/google/gemini-2.5-flash",
         help="DSPy / LiteLLM model (real modda, örn. openrouter/google/gemini-2.5-flash)",
@@ -807,4 +1140,13 @@ if __name__ == "__main__":
         api_key=args.api_key,
         model=args.model,
         output_dir=args.output,
+        profile=args.profile,
+        store=args.store,
+        tenant_id=args.tenant_id,
+        dataset_id=args.dataset_id,
+        mongo_db=args.mongo_db,
+        mongo_dataset_collection=args.mongo_dataset_collection,
+        mongo_example_collection=args.mongo_example_collection,
+        language=args.language,
+        use_abs_context=args.use_abs_context,
     )
