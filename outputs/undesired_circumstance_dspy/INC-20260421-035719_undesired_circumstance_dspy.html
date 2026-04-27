@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260421-035719";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260421-035719</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">21.04.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Pres Hattı - Sac Besleme Bölgesi</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Güvensiz Durum</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">Pres hattında koruyucu ışık perdesi devreye girmeden makine hareketi gözlemlenmiş, ciddi ezilme/amputasyon riski oluşmuş ancak yaralanma meydana gelmemiştir. Olay, sensör hatası ve vardiya baskısı nedeniyle arızalı ekipmanla çalışmaya devam edilmesi sonucu meydana gelmiştir.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">24 Nisan 2026 tarihinde, saat 11:20'de Pres Hattı'nın Sac Besleme Bölgesi'nde bir güvensiz durum meydana gelmiştir. Hat sorumlusu tarafından rapor edilen olayda, koruyucu ışık perdesi devreye girmeden makine hareketinin gözlemlendiği belirtilmiştir. Çalışanın eli tehlikeli bölgeye yakın olmasına rağmen herhangi bir yaralanma olmamıştır. Ancak bu durum, ciddi ezilme veya amputasyon potansiyeli taşımaktaydı. Olayın hemen ardından acil durdurma sistemi devreye sokularak hat durdurulmuş ve bakım ekibi olay yerine çağrılmıştır.</div>
+<div class="paragraph" contenteditable="true">Olayın hemen ardından, hat sorumlusu tarafından acil durdurma sistemi aktive edilerek pres hattı durdurulmuştur. Durum derhal bakım ekibine bildirilmiş ve ekip olay yerine intikal etmiştir. Bu hızlı müdahale sayesinde herhangi bir yaralanma veya maddi hasar meydana gelmemiştir. Olay, H&S Görevlisi tarafından değerlendirilmiş ve orta düzeyde bir araştırma başlatılmasına karar verilmiştir.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Işık perdesi alarm sistemi arızalıydı ve koruyucu sistem devreye girmedi.</li>
+<li contenteditable="true">Vardiya baskısı ve üretim hedefleri nedeniyle arızalı ekipmanla çalışmaya devam edildi.</li>
+<li contenteditable="true">Güvenlik kontrol sistemleri bypass edilmiş veya devre dışı bırakılmıştı.</li>
+<li contenteditable="true">İş prosedürü ihlali yaşandı; arızalı ekipmanla çalışmaya devam etme kuralı çiğnendi.</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Acil durdurma ile hattın durdurulması</td>
+                        <td contenteditable="true">Hat Sorumlusu</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Bakım ekibinin olay yerine çağrılması</td>
+                        <td contenteditable="true">Hat Sorumlusu</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Olayın H&S Görevlisine bildirilmesi</td>
+                        <td contenteditable="true">Hat Sorumlusu</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Pres hattının güvenli hale getirilmesi</td>
+                        <td contenteditable="true">Bakım Ekibi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260421-035719</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">24.04.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">11:20</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Pres Hattı - Sac Besleme Bölgesi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Pres Hattı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Hat Sorumlusu (Rapor Eden)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Pres Makinesi, Işık Perdesi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Sac</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Belirtilmemiş</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Normal</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Belirtilmemiş</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Güvensiz Durum</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Yaralanma yok, maddi hasar yok</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 (Potansiyel)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Yok</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Hat Sorumlusu</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Hayır</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Uygulanmadı</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:10</div>
+                    <div class="timeline-event" contenteditable="true">Hatta sensör hatası ikazı görüldü.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:20</div>
+                    <div class="timeline-event" contenteditable="true">Işık perdesi aktif değilken pres stroku aldı, makine hareketi gözlemlendi.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:21</div>
+                    <div class="timeline-event" contenteditable="true">Acil durdurma ile hat durduruldu.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">11:28</div>
+                    <div class="timeline-event" contenteditable="true">Bakım ekibi alana çağrıldı.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Neden tekniği, olay zincirindeki her bir adımın 'Neden?' sorusuyla sorgulanması esasına dayanır. Bu olayda, pres hattında ışık perdesi devreye girmeden makine hareketinin gözlemlenmesi gibi doğrudan nedenlerden başlayarak, sensör hatasının neden giderilmediği, vardiya baskısının neden güvenlikten ödün vermeye yol açtığı ve yönetim sistemlerinin bu duruma neden izin verdiği gibi sorularla derinlemesine bir analiz yapılmıştır. Her bir 'Neden?' sorusunun cevabı, bir sonraki sorunun temelini oluşturarak, organizasyonel ve kültürel faktörlere kadar inen bir neden-sonuç zinciri oluşturulmuştur. Bu sayede, olayın temelinde yatan sistemik zayıflıklar ve yönetimsel eksiklikler net bir şekilde belirlenmiştir.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü</td>
+                        <td contenteditable="true">Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk gibi bireysel faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Prosedür eksikliği, iletişim bozukluğu, yönetim kararları, politika yetersizlikleri</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Ekipman arızası, tasarım hatası, fiziksel yük, ergonomi sorunları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Çevresel Faktör</td>
+                        <td contenteditable="true">Hava koşulları, aydınlatma, gürültü, sıcaklık, alan düzeni</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">H&S Officer</td>
+                        <td contenteditable="true">Baş Araştırmacı</td>
+                        <td contenteditable="true">26.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Line Manager</td>
+                        <td contenteditable="true">Departman Temsilcisi</td>
+                        <td contenteditable="true">26.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Maintenance Supervisor</td>
+                        <td contenteditable="true">Teknik Uzman</td>
+                        <td contenteditable="true">26.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Technical Expert (Automation/Safety Systems)</td>
+                        <td contenteditable="true">Teknik Uzman</td>
+                        <td contenteditable="true">26.04.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - Işık Perdesi Alarm Sistemi Arızası</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Pres hattında koruyucu ışık perdesi alarm sistemi arızalıydı. 11:10'da sensör hatası uyarısı kaydedilmesine rağmen, 11:20'de ışık perdesi aktif değilken pres stroku alındı ve makine hareketi engellenmedi. Bu durum, koruyucu sistemin işlevini yerine getiremediğini ve potansiyel bir tehlike oluşturduğunu göstermektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Işık perdesi alarm sistemi arızalıydı; sensör hatası nedeniyle koruyucu sistem devreye girmedi ve pres hareketi engellenmedi.</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden 11:10'da kaydedilen sensör hatası nedeniyle ışık perdesi koruyucu sistemi 11:20'de devreye girmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ 11:10'da kaydedilen sensör hatası, ışık perdesi koruyucu sisteminin işlevini sağlayan elektrik/elektronik devresini kesmiştir. Sistem 11:20'de devreye girmedi çünkü sensör hatasının makine operatörü tarafından hemen düzeltilmemesi veya bakım ekibine bildirilmemesi, vardiya baskısı ve üretim hedefleri nedeniyle arızalı sistem ile çalışmaya devam edilmesi kararı, koruyucu interlock sisteminin bypass edilmesine veya geçici çözümlere izin verilmesi ve sensör hatası durumunda sistemin otomatik olarak "güvenli duruma" geçmemesi veya alarm protokolünün etkinleştirilmemesi gibi nedenler bulunmaktadır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden vardiya baskısı ve üretim hedefleri, arızalı koruyucu interlock sistemine rağmen makinenin çalışmasına izin verme kararını belirleyecek kadar etkin hale gelmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Vardiya baskısı ve üretim hedefleri, arızalı koruyucu interlock sistemine rağmen makinenin çalışmasına izin verme kararını belirleyecek kadar etkin hale gelmiştir çünkü iş hattında kısa vadeli üretim hedeflerinin karşılanması, güvenlik kontrol sistemlerinin çalışmazlığına ilişkin riskin yönetim tarafından kabul edilebilir görülmüştür. Vardiya sorumlusu ve operatör, geçici çözümlerin ve bypass sisteminin kalıcılaştığı bir ortamda çalışmakta, arızalı ekipmanla devam etmenin "normal" kabul edildiği bir kültür oluşmuştur. Yönetim tarafından koruyucu sistemin arızalanması sonrası bakım ve onarım için gerekli kaynak ve zaman tahsisi yapılmamış, acil durdurma ve bypass alternatif yollar kullanılmıştır. Üretim kesintisinin maliyeti, güvenlik riskinden daha ağır basmış ve bu değerlendirme hat operatörlerine telkin edilmiştir. Temel neden, organizasyonda güvenlik yönetim sisteminin, üretim baskısına karşı yeterli dirençli olmayan bir yapıya ve kurumsal kültüre sahip olmasıdır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden üretim hedeflerini güvenlik kontrol sistemlerinin arızalanmasından daha yüksek önceliğe alan yönetim kararlarının kökeninde, organizasyonun risk değerlendirmesi ve karar alma süreçleri bu şekilde yapılandırılmıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonun risk değerlendirmesi ve karar alma süreçleri, üretim hedeflerini güvenlik kontrol sistemlerinden daha yüksek önceliğe alan bir yapı ile kurgulanmıştır. Sensör arızası oluştuğunda, riski yeniden değerlendirmek yerine vardiya baskısı altında operasyona devam kararı alınmıştır. Kısa vadeli üretim hedefleri, gerçek zamanlı güvenlik tehdit sinyallerine karşı üstün tutulmuştur. Işık perdesinin bypass edilmesi ile sistem kontrol mekanizması devre dışı bırakılmış, bu da planlı bir tasarım değişikliğine dönüşmüştür. Arızalanmış güvenlik cihazları için formal durdurma/devreye alma prosedürleri ve yönetim onayı sistemi bulunmamaktadır. Bu yapı, güvenlik açıklamalarının operasyonel baskı altında sistematik olarak tolere edilebileceği bir kültürü yaratmıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden güvenlik kontrol sistemlerinin devre dışı bırakılmasını ve geçici çözümleri tolere eden organizasyonel risk tanımlaması ve öncelik hiyerarşisi, yönetim sistemlerinin performans ölçütleri ve hesap verebilirlik mekanizmalarında benimsenmiş ve kurumsallaşmıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonel risk tanımlaması ve öncelik hiyerarşisinde güvenlik kontrol sistemlerinin devre dışı bırakılması ve geçici çözümlerin tolere edilmesi, yönetim sistemlerinin performans ölçütlerinin ve hesap verebilirlik mekanizmalarında benimsenmiştir çünkü vardiya hedefleri ile güvenlik arasında bir çatışma yaratılmış ve bu çatışmada güvenlik kontrolleri (ışık perdesi gibi) üretim hızı önündeki engeller olarak tanımlanmıştır. Makine arızaları durumunda bile üretim devam ettirilme baskısı, geçici çözümleri (sensöre rağmen çalışmaya devam etme) organizasyonel norm haline getirmiştir. Yönetim sisteminin performans ölçütleri (üretim sayısı, hızı) güvenlik performans göstergeleri (kontrol sistemi işlevselliği, arıza bildirimi, devreye alma süresi) karşısında ağırlıklı konumdadır ve bu tercih sisteme kurumsallaşmıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden yönetim sisteminin performans ölçütleri, güvenlik performans göstergelerini karşısında ağırlıklı ve baskın konumda tutulacak şekilde tasarlanmış ve bu tercih dış baskılar tarafından desteklenmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Rapor doğrudan yönetim sisteminin neden bu şekilde tasarlandığını açıklamaz. Ancak "vardiya baskısı nedeniyle arızayla çalışmaya devam edilmiş" olması ve "geçici çözümlerin kalıcı hale gelmiş" olması, üretim hedeflerinin güvenlik hedeflerine baskın kılındığını gösterir. Bu tercih, müşteri talepleri ve finansal hedefler gibi dış baskılardan kaynaklanabilir. Çünkü makine arızasına rağmen (sensör hatası) üretim devam ettirilmeye çalışılmıştır. Sistemik olarak, liderlik seviyesinde güvenlik yatırımları (sensör bakımı, ışık perdesi kontrolü) üretim çıktı hedeflerine karşı düşük önceliklendirilmiştir.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Zayıf Liderlik Taahhüdü ve Üretim Baskısı)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Zayıf Liderlik Taahhüdü ve Üretim Baskısı</div>
+                <div class="box-content" contenteditable="true">Yönetim sisteminin tasarımında, üretim hedefleri güvenlik hedeflerine baskın kılınmıştır. Bu durum, vardiya baskısı ve finansal hedefler gibi dış etkenlerle desteklenmiş, güvenlik yatırımları düşük öncelikli hale gelmiştir. Sonuç olarak, arızalı ekipmanla çalışmaya devam etme kararı alınmış ve geçici çözümler kalıcı hale gelmiştir.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kısa vadeli üretim hedeflerinin güvenlik risklerinden daha öncelikli görülmesi.</li>
+<li contenteditable="true">Arızalı ekipmanla çalışmaya devam etmenin 'normal' kabul edildiği bir kültürün oluşması.</li>
+<li contenteditable="true">Güvenlik sistemlerinin arızalanması sonrası bakım ve onarım için yeterli kaynak ve zaman tahsis edilmemesi.</li>
+<li contenteditable="true">Üretim kesintisinin maliyetinin, güvenlik riskinden daha ağır basması ve bu değerlendirmenin hat operatörlerine telkin edilmesi.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - Güvenlik Sistemi Bypass Edilmesi</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Işık perdesi koruyucu sistemi bypass edilmiş veya devre dışı bırakılmış durumdaydı. Çalışanlara arızalı makine ile çalışmaya devam etme talimatı verilmişti. Raporda 'geçici çözümlerin kalıcı hale geldiği' ve 'vardiya baskısı nedeniyle arıza ile çalışmaya devam edildiği' belirtilmiştir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Işık perdesi koruyucu sistemi bypass edilmiş veya devre dışı bırakılmış durumdaydı; çalışanlara arızalı makine ile çalışmaya devam talimatı verilmişti.</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden koruyucu ışık perdesi sistemi sensör hatası sırasında makine hareketi sırasında aktif hale gelmedi / tehlikeli bölgeyi tespit etmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Koruyucu ışık perdesi sistemi sensör hatası sırasında aktif hale gelmedi/tehlikeli bölgeyi tespit etmedi çünkü sistem bypass edilmiş veya devre dışı bırakılmış olabilir. Vardiya baskısı nedeniyle arızalı durumda makinenin çalıştırılmaya devam edilmesi, koruyucu ışık perdesinin güvenlik fonksiyonunun neutralize edilmesine neden olmuştur. Sensör hatası meydana geldiğinde, sistem otomatik olarak makineyi güvenli duruma (durdurma) getirmek yerine, baskı altındaki operatörlerin sistemi devre dışı bırakmasına müsaade etmiştir. Tasarım açısından fail-safe mekanizması (sensör arızasında makineyi otomatik durdurma) yeterli şekilde uygulanmamış veya işletme prosedürleri bu mekanizmayı ortadan kaldırmıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden sensör hatası meydana geldiğinde makinenin çalışmaya devam etmesine izin verilen prosedürler oluşturulmuş ve operatörlerin güvenlik sistemini bypass etmesi için vardiya baskısı oluşmuştur?</div>
+                    <div class="why-answer" contenteditable="true">→ Sensör hatası meydana geldiğinde makinenin çalışmaya devam etmesine izin veren prosedürler oluşturulması, temel olarak üretim sürekliliğini koruma amacıyla vardiya baskısı ve zaman baskısı nedeniyle gerçekleşmiştir. Olay raporundan anlaşıldığı üzere, "vardiya baskısı nedeniyle arıza ile çalışmaya devam edilmiş" ve "geçici çözümler kalıcı hale gelmiştir." Bu durum, güvenlik prosedürlerinin üretim hedefleri karşısında ikincil konuma itilmesi ve yönetim tarafından bu risk davranışlarının tolere edilmesi sonucunda ortaya çıkmıştır. Koruyucu sistemin bypass edilebilmesi için prosedürlerin oluşturulması, kasıtlı bir tasarım kararından ziyade, operasyonel baskı ve yetersiz mühendislik kontrol sisteminin bir sonucudur.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden vardiya baskısına rağmen arızalı makineyle çalışmaya devam etme kararını mümkün kılan ve geçici çözümlerin kalıcılaşmasına izin veren yönetim kontrol sistemleri yetersiz kalmıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim kontrol sistemleri aşağıdaki nedenlerle yetersiz kalmıştır: Üretim hedefleri ve vardiya baskısı karşısında makine arızasında durdurma yerine devam etme kararı alınmasını engelleyecek politikalar ve uygulamalar bulunmamaktadır. Sensör hatası tespit edildiğinde makineyi derhal durdurma ve bakım çağırma prosedürü uygulanmamıştır. Geçici çözümlerle çalışmaya devam edilmiştir. Işık perdesi bypass edilmesini engelleyecek teknik kilitler, yazılımsal kısıtlamalar veya prosedür kontrolleri eksiktir. Geçici güvenlik çözümlerinin ne zaman kalıcıya dönüştürüleceğine dair zaman çizelgesi, sorumluluk tanımı ve izleme sistemi bulunmamaktadır. Bilinen güvenlik kusurları (sensör hatası, bypass) ile çalışmaya devam etme kararını kimlerin, hangi kriterlerle, hangi riskler kabul edilerek vereceğine dair resmi prosedür yoktur.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden işletme kontrol sistemleri - özellikle vardiya baskısında arıza prosedürünü uygulamama ve güvenlik bypass kontrollerinin eksik olması - yeterince tasarlanmamış, uygulanmamış veya sürdürülememiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ İşletme kontrol sistemleri yetersiz olmuştur çünkü tasarım düzeyinde ışık perdesi bypass edilebilir durumda tasarlanmış, güvenlik sisteminin failsafe mekanizması eksiktir. Sensör hatası durumunda sistemin otomatik olarak güvenli duruma geçmesi için gerekli interlocking kontrolü bulunmamaktadır. Uygulama düzeyinde vardiya baskısı altında arıza prosedürü uygulanmamıştır. Sensör hatası oluştuktan sonra makine çalıştırılmaya devam edilmesi, işletme kontrol prosedürünün (arıza durumunda durma) ihlal edildiğini gösterir. Bypass kontrolleri (güvenlik kontrolü mekanizmaları) eksiktir. Sürdürülebilirlik düzeyinde geçici çözümlerin kalıcı hale gelmesi, sistemin periyodik gözden geçirilmesi, güncellenmesi ve uygunluğunun doğrulanması proseslerinin eksik olduğunu gösterir. Vardiya sorumlusunun arızaya rağmen çalışmaya devam etmesi, yönetim baskısı kontrol mekanizmasının eksikliğini işaret eder.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden işletme kontrol mekanizmaları (interlock controls, failsafe sistemler, arıza prosedürleri ve periyodik gözden geçirme süreçleri) tasarım ve yönetim aşamalarında kurulamamış, vardiya baskısı altında güvenlik protokollerinin ihlal edilmesine karşı örgütsel direnç mekanizması bulunmamaktadır?</div>
+                    <div class="why-answer" contenteditable="true">→ İşletme kontrol mekanizmaları tasarım ve yönetim aşamalarında kurulamamıştır çünkü pres hattında belirlenmiş olması gereken interlock kontrolü ve failsafe sistemleri (sensör hatası durumunda makineyi durdurma) fiziksel olarak uygulanmamış veya işlevsel değildir. Işık perdesi "bypass edilebilir" durumdadır. Hat sorumlusu, sensör hatası ikazı almasına rağmen hattı durdurmayarak devam ettirmiştir. Bu, üretim hedefine karşı güvenlik protokolünün ikinci düzeyde tutulduğunu gösterir. Bypass edilen kontrollerin periyodik olarak denetlenmesi veya arıza prosedürlerinin takip edilmesi için sistem-düzey bir mekanizma tasarlanmamıştır. Geçici çözümlerin kalıcı hale gelmesi (bypass'in sürdürülmesi), yönetim seviyesinde bu duruma müdahale edilmediğini ve güvenlik protokolü ihlallerine karşı müdahale sisteminin olmadığını gösterir. Sonuç olarak, tasarım aşamasında failsafe kontrol sistemi kurulmamış ve yönetim süreçlerinde bu eksikliğe karşı hiçbir düzeltici mekanizma oluşturulmamıştır.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Risk Kontrollerinin Uygulanmaması)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Risk Kontrollerinin Uygulanmaması</div>
+                <div class="box-content" contenteditable="true">İşletme kontrol mekanizmaları, tasarım ve yönetim aşamalarında yeterince kurulmamıştır. Failsafe sistemlerin eksikliği, ışık perdesinin bypass edilebilir olması ve arıza durumunda makineyi durdurma prosedürlerinin uygulanmaması, güvenlik protokollerinin ihlal edilmesine yol açmıştır. Geçici çözümlerin kalıcı hale gelmesi ve periyodik gözden geçirme süreçlerinin eksikliği, bu durumun sistemik bir zayıflık olduğunu göstermektedir.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Kontrol tasarımında eksiklikler (interlock ve failsafe sistemlerin yetersizliği).</li>
+<li contenteditable="true">Vardiya baskısı altında güvenlik protokollerinin ihlal edilmesine tolerans gösterilmesi.</li>
+<li contenteditable="true">Bypass edilen kontrollerin periyodik denetim ve arıza prosedürlerinin takibi için sistem-düzey mekanizmaların eksikliği.</li>
+<li contenteditable="true">Yönetim seviyesinde güvenlik protokolü ihlallerine karşı müdahale sisteminin olmaması.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - İş Prosedürü İhlali</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Sensör hatası tespit edilmesine rağmen pres hattı durdurulmamış ve arızalı ışık perdesiyle çalışmaya devam edilmiştir. Bu durum, arızalı ekipmanla çalışmaya başlanması ve devam edilmesi kuralının ihlal edildiğini göstermektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">İş prosedürü ihlali; arızalı ekipmanla çalışmaya başlanması ve devam edilmesi kuralının ihlal edilmesi.</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden sensör hatası tespit edilmesine rağmen pres hattı arızalı ışık perdesiyle çalışmaya devam etti?</div>
+                    <div class="why-answer" contenteditable="true">→ Pres hattı sensör hatası tespit edilmesine rağmen arızalı ışık perdesiyle çalışmaya devam etti çünkü vardiya baskısı ve üretim hedefleri karşısında güvenlik protokollerinden taviz verildi. Makine operatörü/yönetimi, arızanın geçici bir sorun olarak değerlendirip, kalıcı çözüm yerine geçici workaround (ışık perdesini bypass etme) uygulamaya karar verdi. Bu karar, makine güvenliği prosedürünün ihlali anlamına gelir ve acil durdurma mekanizmasının devre dışı kalmasına neden olmuştur.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden vardiya baskısı ve üretim hedefleri karşısında güvenlik protokollerinden taviz verilme kararı alınmış, yönetim seviyesinde bu tür acil durumlarda üretime devam etme yetkisi verilmiştir?</div>
+                    <div class="why-answer" contenteditable="true">→ Vardiya baskısı ve üretim hedefleri karşısında güvenlik protokollerinden taviz verilme kararı alınmasının temel nedeni, üretim çıktısının işletme için finansal/operasyonel olarak güvenlik risklerinden daha ağırlıklı değerlendirilmesidir. Yönetim seviyesinde, sensör hatası gibi acil durumlarda üretime devam etme yetkisi verilmesi, risk kabul politikasının resmi olarak uygulandığını göstermektedir. Rapordaki "geçici çözümlerin kalıcı hale gelmesi" ise, bu kararın sistem içinde kurumsal bir uygulamaya dönüştüğünü ve güvenlik yönetim sisteminde kontrol mekanizmalarının başarısız olduğunu ifade etmektedir.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden yönetim seviyesinde üretim hedeflerinin güvenlik risklerine karşı daha ağırlıklı değerlendirilmesini sağlayan sistemsel faktörler ve performans değerlendirme kriterleri bu şekilde yapılandırılmıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Yönetim seviyesinde üretim hedeflerinin güvenlik risklerine karşı daha ağırlıklı değerlendirilmesini sağlayan sistemsel faktörler şunlardır: Vardiya/üretim hedefleri güvenlik metrikleri (kazasız gün, tehlikeli durum bildirim sayısı) ile eşit ağırlıkta değerlendirilmemiştir, bu da vardiya baskısı oluşturmuştur. Hat sorumluları ve operatörler üretim hedefini tutturma üzerine değerlendirilirken, güvenlik protokollerini ihlal etmekten kaynaklı cezalandırma mekanizması zayıftır, bu da arızalı makinede çalışmaya devam etme kararı alınmasına yol açmıştır. Bakım bütçesinin yetersizliği veya bakım süresinin üretim hedefine saymadığı durumlar mevcuttur, bu da "geçici çözümlerin kalıcı hale gelmesi" ifadesiyle gösterilmektedir. Vardiya baskısının oluşması, alt seviyelerin güvenlik kararını vermekte özerkliğinin olmaması anlamına gelmektedir.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden üretim performansı hedeflerinin, güvenlik metrikleri ile eşit ağırlıkta değerlendirilmemesine ve bakım maliyetlerinin üretim hedefine dahil edilmemesine neden, organizasyon üst yönetiminin kurumsal stratejisi ve finansal önceliklendirmesi yönelik karar alma yapısında yer almıştır?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyon üst yönetimi, kurumsal stratejisinde üretim KPI'larını güvenlik metrikleriyle eşit düzeyde değerlendirmemiş ve bakım maliyetlerini üretim hedefine dahil etmemiştir. Bu yapı, çalışan seviyesinde "vardiya baskısı" olarak tezahür etmiş ve arızalı ekipmanla (sensör hatası olan ışık perdesi) çalışmaya devam edilmesine yol açmıştır. Geçici çözümlerin kalıcı hale gelmesi, kısa vadeli finansal hedeflerin uzun vadeli güvenlik yatırımlarından öncelendiğini göstermektedir. Sonuç olarak, teknoloji başarısızlığı (ışık perdesinin bypass edilmesi) ve insan davranışı (uyarıya rağmen çalışmaya devam), temel olarak yönetim tarafından belirlenen finansal önceliklendirmeye bağlıdır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden üst yönetimin kurumsal stratejisinde üretim KPI'larını güvenlik metrikleriyle eşit düzeyde değerlendirmemesinin altında yatan, şirketin rekabet ortamındaki konumu, hissedar beklentileri veya sektörel uygulamalar nedir?</div>
+                    <div class="why-answer" contenteditable="true">→ Üst yönetimin üretim KPI'larını güvenlik metrikleriyle eşit düzeyde değerlendirmemesinin altında üç temel faktör yatmaktadır: Sektörel uygulamalar ve pazar baskısı; imalat sektöründe, arızadan kaynaklanan üretim kaybının anında ölçülebilir finansal etkisi vardır. Buna karşılık, güvenlik yatırımının getirisi "kaza olmayan durum" olarak belirsiz kalır. Düşük marjlı ürün piyasasında rekabet eden şirketlerde, bu asimetri işletme hedeflerini güvenlik hedeflerinin üstüne yerleştirir. Hissedar ve finansal raporlama mekanizmaları; halka açık veya finansman sağlayıcılarından bağımlı şirketlerde, kısa dönem karlılık göstergeleri düzenli izlenir ve raporlanırken; güvenlik metrikleri ancak ciddi kaza sonrası kamuya açıklanır. Bu raporlama asimetrisini yönetim, bütçe ve stratejik kaynak tahsisinde yansıtır. Kurumsal kültür ve risk algısı (başlangıç normalizasyonu); "Arızalarla çalışmak imalatın parçası", ancak "ciddi kazalar nadir" inancı, yönetimi geçici çözümleri kabul etmeye yönlendirir. Sensör arızasıyla çalışmaya devam etmek, kısa dönemde maliyet tasarrufu olarak değerlendirilir; güvenlik zincirinin zayıflaması, "bugün olmadığı için" tehlike olarak algılanmaz.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden (Üst Yönetimin Finansal Önceliklendirmesi ve Güvenlik Kültürü Eksikliği)</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Üst Yönetimin Finansal Önceliklendirmesi ve Güvenlik Kültürü Eksikliği</div>
+                <div class="box-content" contenteditable="true">Üst yönetim, kurumsal stratejisinde üretim performans göstergelerini güvenlik metrikleriyle eşit düzeyde değerlendirmemiş ve bakım maliyetlerini üretim hedeflerine dahil etmemiştir. Bu durum, sektörel baskılar, hissedar beklentileri ve zayıf bir güvenlik kültürüyle birleşerek, arızalı ekipmanla çalışmaya devam etme ve güvenlik protokollerini ihlal etme kararlarının alınmasına yol açmıştır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Üretim KPI'larının güvenlik metriklerinden daha öncelikli tutulması.</li>
+<li contenteditable="true">Bakım maliyetlerinin üretim hedeflerine dahil edilmemesi.</li>
+<li contenteditable="true">Kısa vadeli finansal hedeflerin uzun vadeli güvenlik yatırımlarından öncelenmesi.</li>
+<li contenteditable="true">Kurumsal kültürde risk algısının zayıf olması ve 'arızalarla çalışmak normaldir' inancı.</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İletişim Eksikliği</td>
+                        <td contenteditable="true">Sensör hatası uyarısının ardından bakım ekibine zamanında ve etkin bir şekilde bildirim yapılmaması, arızalı ekipmanla çalışmaya devam etme kararının alınmasında etkili olmuştur.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Eğitim Yetersizliği</td>
+                        <td contenteditable="true">Operatörlerin ve vardiya sorumlularının, güvenlik sistemleri arızalandığında izlenecek prosedürler ve acil durum müdahaleleri konusunda yeterli eğitim almamış olması veya bu eğitimlerin etkinliğinin düşük olması.</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim Eksikliği</td>
+                        <td contenteditable="true">Vardiya amirleri ve yöneticiler tarafından güvenlik protokollerine uyumun yeterince denetlenmemesi ve arızalı ekipmanla çalışmaya devam etme gibi riskli davranışlara göz yumulması.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Kültürel Faktörler</td>
+                        <td contenteditable="true">Üretim hedeflerinin güvenlikten daha öncelikli görüldüğü, geçici çözümlerin kalıcı hale geldiği ve risklerin tolere edildiği bir şirket kültürünün varlığı.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Bakım Yönetimi Eksikliği</td>
+                        <td contenteditable="true">Güvenlik sistemlerinin periyodik bakım ve kontrollerinin yetersiz olması, sensör hatalarının zamanında tespit edilip giderilmemesi ve bypass mekanizmalarının kontrolsüz bırakılması.</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Pres hattındaki tüm güvenlik sensörlerinin ve ışık perdelerinin detaylı kontrolü ve bakımı yapılması, arızalı olanların derhal değiştirilmesi.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Bakım Müdürü</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm güvenlik sensörlerinin %100 çalışır durumda olması</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Güvenlik sistemlerinin bypass edilmesini engelleyecek teknik kilitler ve yazılımsal kısıtlamalar getirilmesi.</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Mühendislik Departmanı</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Bypass edilemez güvenlik sistemi oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Arızalı ekipmanla çalışmaya devam etmeyi yasaklayan ve acil durdurma prosedürlerini içeren revize edilmiş iş prosedürlerinin oluşturulması ve tüm çalışanlara duyurulması.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Prosedürlere uyum oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Tüm operatörlere, vardiya sorumlularına ve bakım ekibine güvenlik sistemleri, acil durdurma prosedürleri ve arıza durumunda yapılması gerekenler hakkında zorunlu eğitim verilmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Vardiya amirleri ve yöneticiler için güvenlik denetim ve gözetim programı oluşturulması, riskli davranışların tespiti ve düzeltilmesi için mekanizmalar geliştirilmesi.</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">Üretim Müdürü</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Haftalık denetim sayısı ve bulgu kapatma oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Üretim hedefleri ile güvenlik hedefleri arasında dengeli bir performans değerlendirme sistemi oluşturulması ve güvenlik metriklerinin KPI'lara dahil edilmesi.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Genel Müdür</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Güvenlik KPI'larının performans değerlendirmesine entegrasyonu</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Geçici çözümlerin kalıcı hale gelmesini engelleyecek bir yönetim sistemi oluşturulması, geçici çözümler için onay süreci ve zaman sınırlamaları getirilmesi.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Geçici çözüm sayısı ve kalıcılaşma oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Şirket genelinde güvenlik kültürünü geliştirmeye yönelik bir program başlatılması, çalışan katılımının teşvik edilmesi ve güvenlik bilincinin artırılması.</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">İK Müdürü</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Güvenlik anket sonuçlarında iyileşme</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Üst yönetimin güvenlik taahhüdünü güçlendirecek ve güvenlik yatırımlarına öncelik verilmesini sağlayacak stratejik kararlar alınması.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">Üst Yönetim</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Güvenlik bütçesinde artış ve yatırım projeleri</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Risk değerlendirme süreçlerinin revize edilmesi ve potansiyel ciddi yaralanma risklerinin daha etkin bir şekilde yönetilmesi için metodolojilerin güncellenmesi.</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">6 ay</td>
+                        <td contenteditable="true">Risk değerlendirme revizyon oranı</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Güvenlik sistemlerinin arızalanması durumunda, üretim baskısı ne olursa olsun makineyi derhal durdurma ve yetkili bakım ekibini çağırma prosedürleri tavizsiz uygulanmalıdır. Bu, potansiyel ciddi yaralanmaları önlemenin ilk adımıdır.
+• Geçici çözümlerin kalıcı hale gelmesine asla izin verilmemelidir. Her geçici çözüm için belirli bir süre ve kalıcı çözüm planı oluşturulmalı, bu planlar düzenli olarak takip edilmelidir.
+• Güvenlik sistemlerinin bypass edilmesini engelleyecek teknik ve idari kontroller güçlendirilmelidir. Operatörlerin güvenlik sistemlerini devre dışı bırakmasını önleyecek mekanizmalar kurulmalıdır.
+• Üretim hedefleri ile güvenlik hedefleri arasında dengeli bir önceliklendirme sağlanmalıdır. Güvenlik, hiçbir zaman üretim hızının veya maliyet tasarrufunun önüne geçmemelidir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Kurumsal güvenlik kültürü, üst yönetimden en alt seviyeye kadar tüm çalışanların katılımıyla sürekli olarak geliştirilmelidir. Güvenliğin bir değer olduğu ve taviz verilemez olduğu bilinci yerleştirilmelidir.
+• Güvenlik yönetim sistemi, üretim baskısına karşı dirençli olacak şekilde tasarlanmalı ve uygulanmalıdır. Risk değerlendirme, prosedür oluşturma, eğitim ve denetim süreçleri entegre bir şekilde yürütülmelidir.
+• Güvenlik altyapısına yapılan yatırımlar, kısa vadeli finansal hedeflerden bağımsız olarak önceliklendirilmelidir. Failsafe sistemler, sensör bakımı ve güvenlik kontrolleri için yeterli kaynak tahsis edilmelidir.
+• Performans değerlendirme ve teşvik sistemleri, güvenlik performansını da içerecek şekilde revize edilmelidir. Çalışanların güvenli davranışları ödüllendirilmeli, riskli davranışlar ise uygun şekilde ele alınmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Tüm çalışanlara, güvenlik sistemlerinin önemi, arızalanması durumunda izlenecek prosedürler ve bypass etmenin sonuçları hakkında açık ve düzenli iletişim sağlanmalıdır.
+• Güvenlik ihlalleri ve potansiyel riskler hakkında şeffaf bir raporlama ve geri bildirim mekanizması oluşturulmalıdır. Çalışanlar, herhangi bir riskli durumu bildirmekten çekinmemelidir.
+• Yönetim, güvenlik konularında liderlik taahhüdünü düzenli olarak tüm organizasyona iletmelidir. Güvenlik toplantıları, bültenler ve görsel materyallerle sürekli farkındalık yaratılmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm operatörlere ve bakım personeline, pres makinelerinin güvenlik sistemleri, sensörlerin işleyişi ve arıza durumunda yapılması gerekenler hakkında kapsamlı teknik eğitimler verilmelidir.
+• Vardiya sorumluları ve yöneticiler için risk yönetimi, acil durum prosedürleri ve güvenlik denetimi konularında özel eğitim programları düzenlenmelidir.
+• Güvenlik kültürünü geliştirmeye yönelik, davranışsal güvenlik ve risk algısı eğitimleri tüm çalışanlara periyodik olarak verilmelidir.
+• Yeni işe başlayan veya görev değişikliği yapan çalışanlar için, ilgili makine ve ekipmanların güvenlik prosedürleri hakkında detaylı oryantasyon ve işbaşı eğitimleri zorunlu hale getirilmelidir.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">Bu kök neden analizi, pres hattında yaşanan güvensiz durumun sadece teknik bir arızadan ibaret olmadığını, aksine derinlemesine organizasyonel ve kültürel zafiyetlerden kaynaklandığını açıkça ortaya koymuştur. Olay, ışık perdesi sensör arızasıyla başlamış olsa da, vardiya baskısı, üretim hedeflerinin güvenlikten öncelikli tutulması, güvenlik sistemlerinin bypass edilebilir olması ve iş prosedürü ihlalleri gibi faktörler zincirleme bir etki yaratmıştır. Üst yönetimin güvenlik altyapısına yetersiz kaynak tahsisi ve zayıf kurumsal güvenlik kültürü, bu tür olayların temelini oluşturan meta kök neden olarak belirlenmiştir. Bu durum, organizasyonun risk algısında ve karar alma süreçlerinde ciddi eksiklikler olduğunu göstermektedir. Olayın yaralanmayla sonuçlanmaması şans eseri olup, benzer durumların gelecekte daha ciddi sonuçlar doğurma potansiyeli taşımaktadır. Bu nedenle, kapsamlı ve sistemik düzeltici ve önleyici faaliyetlerin acilen hayata geçirilmesi gerekmektedir.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Pres hattındaki tüm güvenlik sensörleri ve ışık perdeleri acilen kontrol edilerek arızalı olanlar değiştirilecek ve işlevsellikleri test edilecektir (1 hafta).</li>
+<li contenteditable="true">Güvenlik sistemlerinin bypass edilmesini engelleyecek teknik kilitler ve yazılımsal kısıtlamalar derhal uygulanacaktır (2 hafta).</li>
+<li contenteditable="true">Arızalı ekipmanla çalışmayı yasaklayan ve acil durdurma prosedürlerini içeren revize edilmiş iş prosedürleri oluşturulacak ve tüm ilgili personele duyurulacaktır (1 ay).</li>
+<li contenteditable="true">Tüm operatörlere, vardiya sorumlularına ve bakım ekibine güvenlik sistemleri ve acil durum prosedürleri hakkında zorunlu eğitimler verilecektir (1 ay).</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Üretim hedefleri ile güvenlik hedefleri arasında dengeli bir performans değerlendirme sistemi oluşturulacak ve güvenlik metrikleri KPI'lara entegre edilecektir (3 ay).</li>
+<li contenteditable="true">Geçici çözümlerin kalıcı hale gelmesini engelleyecek bir yönetim sistemi kurulacak, onay süreçleri ve zaman sınırlamaları belirlenecektir (3 ay).</li>
+<li contenteditable="true">Şirket genelinde güvenlik kültürünü geliştirmeye yönelik kapsamlı bir program başlatılacak, çalışan katılımı ve güvenlik bilinci artırılacaktır (6 ay).</li>
+<li contenteditable="true">Üst yönetimin güvenlik taahhüdünü güçlendirecek ve güvenlik yatırımlarına öncelik verilmesini sağlayacak stratejik kararlar alınacak, risk değerlendirme süreçleri revize edilecektir (6 ay).</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Seviyesi</td>
+                        <td class="current" contenteditable="true">Yüksek (Ciddi yaralanma potansiyeli)</td>
+                        <td class="target" contenteditable="true">Düşük (Kontrollü ve kabul edilebilir)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Prosedür Uyum Oranı</td>
+                        <td class="current" contenteditable="true">%60 (Arızalı ekipmanla çalışma ve bypass)</td>
+                        <td class="target" contenteditable="true">%95 (Tavizsiz uyum)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Eğitim Kapsamı</td>
+                        <td class="current" contenteditable="true">Temel (Güvenlik sistemleri ve acil durumlar eksik)</td>
+                        <td class="target" contenteditable="true">Kapsamlı (Teknik, prosedürel ve kültürel)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Bakım Periyodu</td>
+                        <td class="current" contenteditable="true">Reaktif (Arıza sonrası müdahale)</td>
+                        <td class="target" contenteditable="true">Proaktif (Periyodik ve önleyici bakım)</td>
+                    </tr>
+
+                    <tr>
+                        <td>Denetim Sıklığı</td>
+                        <td class="current" contenteditable="true">Aylık (Yetersiz gözetim)</td>
+                        <td class="target" contenteditable="true">Haftalık (Etkin saha denetimi)</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            <p style="font-size: 13px; color: #555; margin: 8px 0 12px;">
+                Üstten alta: OLAY → soru (kesik çerçeve) → cevap → kök neden. Yazdırırken dikey A4 için uygundur.
+            </p>
+            <div id="decision-tree-diagram" style="background: white; padding: 12px; border: 1px solid #ddd; width: 100%; min-height: min(95vh, 1400px); overflow: auto;">
+                <div class="mermaid" style="width: 100%; min-height: 90vh;">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden 11:10'da kaydedilen sensor hatası nedeniyle ışık perdesi koruyucu<br/>sistemi (D4.1 - İnterlok sistemi) 11:20'de devreye girmedi?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["11:10'da kaydedilen sensor hatası, ışık perdesi koruyucu sisteminin<br/>(interlock - D4.1) işlevini sağlayan elektrik/elektronik devresini<br/>kesmiştir. Sistem 11:20'de devreye girmedi çünkü: 1. **Teknik neden**:<br/>Sensor hatasının makine operatörü tarafından hemen düzeltilmemesi veya<br/>bakım ekibine bildirilmemesi 2. **Yönetimsel neden**: Vardiya baskısı ve<br/>üretim hedefleri nedeniyle arızalı sistem ile çalışmaya devam edilmesi<br/>kararı 3. **Kontrol eksikliği**: Koruyucu interlock sisteminin bypass<br/>edilmesine veya geçici çözümlere izin verilmesi; ışık perdesi<br/>kontrollerinin periyodik olarak yapılmaması ve bakım prosedürlerinin<br/>uygulanmaması 4. **Sistem tasarım sorunu**: Sensor hatası durumunda<br/>sistem otomatik olarak 'güvenli duruma' geçmemesi veya alarm<br/>protokolünün etkinleştirilmemesi"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden vardiya baskısı ve üretim hedefleri, operatörün ve yönetimin<br/>arızalı koruyucu interlock sistemine rağmen makinenin çalışmasına izin<br/>verme kararını belirleyecek kadar etkin hale gelmiştir?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Vardiya baskısı ve üretim hedefleri, arızalı koruyucu interlock<br/>sistemine rağmen makinenin çalışmasına izin verme kararını belirleyecek<br/>kadar etkin hale gelmiştir çünkü: (1) İş hattında kısa vadeli üretim<br/>hedeflerinin karşılanması, güvenlik kontrol sistemlerinin çalışmazlığına<br/>ilişkin riskin yönetim tarafından kabul edilebilir görülmüştür; (2)<br/>Vardiya sorumlusu ve operatör, geçici çözümlerin ve bypass sisteminin<br/>kalıcılaştığı bir ortamda çalışmakta, arızalı ekipmanla devam etmenin<br/>'normal' kabul edildiği kültür oluşmuştur; (3) Yönetim tarafından<br/>koruyucu sistemin arızalanması sonrası bakım ve onarım için gerekli<br/>kaynak ve zaman tahsisi yapılmamış, acil durdurma ve bypass alternatif<br/>yollar kullanılmıştır; (4) Üretim kesintisinin maliyeti, güvenlik<br/>riskinden daha ağır basılmış ve bu değerlendirme hat operatörlerine<br/>telkin edilmiştir; (5) Temel neden: Organizasyonda güvenlik yönetim<br/>sistemi, üretim baskısına karşı yeterli dirençli olmayan bir yapıya ve<br/>kurumsal kültüre sahip olmasıdır."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Üretim hedeflerini güvenlik kontrol sistemlerinin arızalanmasından daha<br/>yüksek önceliğe alan yönetim kararlarının kökeninde, organizasyonun risk<br/>değerlendirmesi ve karar alma süreçleri nasıl yapılandırılmıştır?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Organizasyonun risk değerlendirmesi ve karar alma süreçleri, üretim<br/>hedeflerini güvenlik kontrol sistemlerinden daha yüksek önceliğe alan<br/>bir yapı ile kurgulanmıştır. Spesifik olarak: 1. **Risk Toleransı<br/>Tanımlaması**: Sensör arızası oluştuğunda, riski yeniden değerlendirmek<br/>yerine vardiya baskısı altında operasyona devam kararı alınmıştır. 2.<br/>**Öncelik Hiyerarşisi**: Kısa vadeli üretim hedefleri, gerçek zamanlı<br/>güvenlik tehdit sinyallerine karşı üstün tutulmuştur. 3. **Geçici<br/>Çözümlerin Kalıcılaşması**: Işık perdesinin bypass edilmesi ile sistem<br/>kontrol mekanizması devre dışı bırakılmıştır, bu da planlı bir tasarım<br/>değişikliğine dönüşmüştür. 4. **İlaçlama Prosedürlerinin Eksikliği**:<br/>Arızalanmış güvenlik cihazları için formal durdurma/devreye alma<br/>prosedürleri ve yönetim onayı sistemi bulunmamaktadır. Bu yapı, güvenlik<br/>açıklamalarının operasyonel baskı altında sistematik olarak toleranse<br/>edilebileceği bir kültürü yaratmıştır."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden güvenlik kontrol sistemlerinin devre dışı bırakılmasını ve geçici<br/>çözümleri tolere eden organizasyonel risk tanımlaması ve öncelik<br/>hiyerarşisi, yönetim sistemlerinin performans ölçütleri ve hesap<br/>verebilirlik mekanizmalarında benimsenmiş ve kurumsallaşmıştır ?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Organizasyonel risk tanımlaması ve öncelik hiyerarşisinde güvenlik<br/>kontrol sistemlerinin devre dışı bırakılması ve geçici çözümlerin tolere<br/>edilmesi, yönetim sistemlerinin performans ölçütlerinin ve hesap<br/>verebilirlik mekanizmalarında benimsenmiştir çünkü: Vardiya hedefleri<br/>ile güvenlik arasında bir çatışma yaratılmış ve bu çatışmada güvenlik<br/>kontrolleri (ışık perdesi gibi) üretim hızı önündeki engellerdir<br/>şeklinde tanımlanmıştır. Makine arızaları durumunda bile üretim devam<br/>ettirilme baskısı, geçici çözümleri (sensöre rağmen çalışmaya devam<br/>etme) organizasyonel norm haline getirmiştir. Yönetim sisteminin<br/>performans ölçütleri (üretim sayısı, hızı) güvenlik performans<br/>göstergeleri (kontrol sistemi işlevselliği, arıza bildirimi, devreye<br/>alma süresi) karşısında ağırlıklı konumdadır ve bu tercih sisteme<br/>kurumsallaşmıştır."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden yönetim sisteminin performans ölçütleri (D1.1 - Performans<br/>hedefleri tanımı), güvenlik performans göstergelerini (D1.2 - Güvenlik<br/>hedefleri tanımı) karşısında ağırlıklı ve baskın konumda tutulacak<br/>şekilde tasarlanmış ve bu tercih dış baskılar (müşteri talepleri,<br/>finansal hedefler, pazar rekabeti) tarafından desteklenmiştir?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Rapor doğrudan yönetim sisteminin neden bu şekilde tasarlandığını<br/>açıklamaz. Ancak 'vardiya baskısı nedeniyle arızayla çalışmaya devam<br/>edilmiş' olması ve 'geçici çözümlerin kalıcı hale gelmiş' olması, üretim<br/>hedeflerinin güvenlik hedeflerine baskın kılındığını gösterir. Bu<br/>tercih, müşteri talepleri ve finansal hedefler gibi dış baskılardan<br/>kaynaklanabilir. Çünkü makine arızasına rağmen (sensor hatası) üretim<br/>devam ettirilmeye çalışılmıştır. Sistemik olarak, liderlik seviyesinde<br/>güvenlik yatırımları (sensör bakımı, isık perdesi kontrolü) üretim çıktı<br/>hedeflerine karşı düşük önceliklendirilmiştir."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Rapor doğrudan yönetim sisteminin neden bu şekilde tasarlandığını<br/>açıklamaz. Ancak 'vardiya baskısı nedeniyle arızayla çalışmaya devam<br/>edilmiş' olması ve 'geçici çözümlerin kalıcı hale gelmiş' olması, üretim<br/>hedeflerinin güvenlik hedeflerine baskın kılındığını gösterir. Bu<br/>tercih, müşteri talepleri ve finansal hedefler gibi dış baskılardan<br/>kaynaklanabilir. Çünkü makine arızasına rağmen (sensor hatası) üretim<br/>devam ettirilmeye çalışılmıştır. Sistemik olarak, liderlik seviyesinde<br/>güvenlik yatırımları (sensör bakımı, isık perdesi kontrolü) üretim çıktı<br/>hedeflerine karşı düşük önceliklendirilmiştir."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden koruyucu işık perdesi sistemi sensör hatası sırasında makine<br/>hareketi sırasında aktif hale gelmedi / tehlikeli bölgeyi tespit etmedi?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Koruyucu ışık perdesi sistemi sensör hatası sırasında aktif hale<br/>gelmedi/tehlikeli bölgeyi tespit etmedi çünkü: Sistem bypass edilmiş<br/>veya devre dışı bırakılmış olabilir. Vardiya baskısı nedeniyle arızalı<br/>durumda makinenin çalıştırılmaya devam edilmesi, koruyucu ışık<br/>perdesinin güvenlik fonksiyonunun neutralize edilmesine neden olmuştur.<br/>Sensör hatası meydana geldiğinde, sistem otomatik olarak makineyi<br/>güvenli duruma (durdurma) getirmek yerine, baskı altındaki operatörlerin<br/>sistemi devre dışı bırakmasına müsaade etmiştir. Tasarım açısından<br/>fail-safe mekanizması (sensör arızasında makineyi otomatik durdurma)<br/>yeterli şekilde uygulanmamış veya işletme prosedürleri bu mekanizmayı<br/>ortadan kaldırmıştır."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden sensör hatası meydana geldiğinde (D5.3 - Koruyucu Sistem<br/>Başarısızlığı) makinenin çalışmaya devam etmesine izin verilen<br/>prosedürler oluşturulmuş ve operatörlerin güvenlik sistemini bypass<br/>etmesi için vardiya baskısı oluşmuştur?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Sensör hatası meydana geldiğinde makinenin çalışmaya devam etmesine<br/>izin veren prosedürler oluşturulması, temel olarak üretim sürekliliğini<br/>koruma amacıyla vardiya baskısı ve zaman baskısı nedeniyle<br/>gerçekleşmiştir. Olay raporundan anlaşıldığı üzere, 'vardiya baskısı<br/>nedeniyle arıza ile çalışmaya devam edilmiş' ve 'geçici çözümler kalıcı<br/>hale gelmiştir.' Bu durum, güvenlik prosedürlerinin üretim hedefleri<br/>karşısında ikincil konuma itilmesi ve yönetim tarafından bu risk<br/>davranışlarının tolere edilmesi sonucunda ortaya çıkmıştır. Koruyucu<br/>sistemin bypass edilebilmesi için prosedürlerin oluşturulması, kasıtlı<br/>bir tasarım kararından ziyade, operasyonel baskı ve yetersiz mühendislik<br/>kontrol sisteminin bir sonucudur."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Vardiya baskısına rağmen arızalı makineyle çalışmaya devam etme<br/>kararını mümkün kılan ve geçici çözümlerin kalıcılaşmasına izin veren<br/>yönetim kontrol sistemleri (D4.1 - İşletme Kontrol) neden yetersiz<br/>kalmıştır?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Yönetim kontrol sistemleri (D4.1 - İşletme Kontrol) aşağıdaki<br/>nedenlerle yetersiz kalmıştır: 1. **Vardiya Baskısı Yönetimi<br/>Eksikliği**: Üretim hedefleri ve vardiya baskısı karşısında makine<br/>arızasında durdurma yerine devam etme kararı alınmasını engelleyecek<br/>politikalar ve uygulamalar bulunmamaktadır. 2. **Arıza Yönetim Prosedürü<br/>Yetersizliği**: Sensor hatası tespit edildiğinde (11:10) makineyi derhal<br/>durdurma ve bakım çağırma prosedürü uygulanmamıştır. Geçici çözümlerle<br/>çalışmaya devam edilmiştir. 3. **Güvenlik Sistem Bypass Kontrolü**: Işık<br/>perdesi bypass edilmesini engelleyecek teknik kilitler, yazılımsal<br/>kısıtlamalar veya prosedür kontrolleri eksiktir. 4. **Geçici Çözümlerin<br/>Kalıcılaşma Mekanizması**: Geçici güvenlik çözümlerinin ne zaman<br/>kalıcıya dönüştürüleceğine dair zaman çizelgesi, sorumluluk tanımı ve<br/>izleme sistemi bulunmamaktadır. 5. **Riski Kabul Etme Kararı<br/>Prosedürü**: Bilinen güvenlik kusurları (sensor hatası, bypass) ile<br/>çalışmaya devam etme kararını kimler, hangi kriterlerle, hangi riskler<br/>kabul edilerek vereceğine dair resmi prosedür yoktur."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Neden işletme kontrol sistemleri - özellikle vardiya baskısında arıza<br/>prosedürünü uygulamama ve güvenlik bypass kontrollerinin eksik olması -<br/>yeterince tasarlanmamış, uygulanmamış veya sürdürülememiştir?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["İşletme kontrol sistemleri yetersiz olmuştur çünkü: **Tasarım<br/>Düzeyinde**: Isık perdesi bypass edilebilir durumda tasarlanmış,<br/>güvenlik sisteminin failsafe mekanizması eksiktir. Sensor hatası<br/>durumunda sistemin otomatik olarak güvenli duruma geçmesi için gerekli<br/>interlocking kontrolü bulunmamaktadır. **Uygulama Düzeyinde**: Vardiya<br/>baskısı altında arıza prosedürü uygulanmamıştır. Sensor hatası<br/>oluştuktan sonra makine çalıştırılmaya devam edilmesi, işletme kontrol<br/>prosedürünün (arıza durumunda durma) ihlal edildiğini gösterir. Bypass<br/>kontrolleri (güvenlik kontrolü mekanizmaları) eksiktir.<br/>**Sürdürülebilirlik Düzeyinde**: Geçici çözümlerin kalıcı hale gelmesi,<br/>sistemin periyodik gözden geçirilmesi, güncellenmesi ve uygunluğunun<br/>doğrulanması proseslerinin eksik olduğunu gösterir. Vardiya sorumlusunun<br/>arızaya rağmen çalışmaya devam etmesi, yönetim baskısı kontrol<br/>mekanizmasının eksikliğini işaret eder."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Neden işletme kontrol mekanizmaları (interlock controls, failsafe<br/>sistemler, arıza prosedürleri ve periyodik gözden geçirme süreçleri)<br/>tasarım ve yönetim aşamalarında kurulamamış, vardiya baskısı altında<br/>güvenlik protokollerinin ihlal edilmesine karşı örgütsel direnç<br/>mekanizması bulunmamaktadır (D4.2 - İşletme Yönetim Kontrolü)?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["İşletme kontrol mekanizmaları tasarım ve yönetim aşamalarında<br/>kurulamamıştır çünkü: 1. **Kontrol Tasarımı Eksikliği**: Pres hattında<br/>belirlenmiş olması gereken interlock kontrolü ve failsafe sistemleri<br/>(sensör hatası durumunda makineyi durdurma) fiziksel olarak uygulanmamış<br/>veya işlevsel değildir. Işık perdesi 'bypass edilebilir' durumdadır. 2.<br/>**Vardiya Baskısı Toleransı**: Hat sorumlulusu, sensör hatası ikazı<br/>almasına rağmen (11:10) hattı durdurmayarak devam ettirmiştir. Bu,<br/>üretim hedefine karşı güvenlik protokolünün ikinci düzeyde tutulduğunu<br/>gösterir. 3. **Periyodik Gözden Geçirme Süreci Yoktur**: Bypass edilen<br/>kontrollerin (interlock'un bypass edilebilir hale gelmesi) periyodik<br/>olarak denetlenmesi veya arıza prosedürlerinin takip edilmesi için<br/>sistem-düzey bir mekanizma tasarlanmamıştır. 4. **Örgütsel Direnç<br/>Mekanizmasının Eksikliği**: Geçici çözümlerin kalıcı hale gelmesi<br/>(bypass'in sürdürülmesi), yönetim seviyesinde bu duruma müdahale<br/>edilmediğini ve güvenlik protokolü ihlallerine karşı müdahale sisteminin<br/>olmadığını gösterir. Sonuç: Tasarım aşamasında failsafe kontrol sistemi<br/>kurulmamış ve yönetim süreçlerinde bu eksikliğe karşı hiçbir düzeltici<br/>mekanizma oluşturulmamıştır."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>İşletme kontrol mekanizmaları tasarım ve yönetim aşamalarında<br/>kurulamamıştır çünkü: 1. **Kontrol Tasarımı Eksikliği**: Pres hattında<br/>belirlenmiş olması gereken interlock kontrolü ve failsafe sistemleri<br/>(sensör hatası durumunda makineyi durdurma) fiziksel olarak uygulanmamış<br/>veya işlevsel değildir. Işık perdesi 'bypass edilebilir' durumdadır. 2.<br/>**Vardiya Baskısı Toleransı**: Hat sorumlulusu, sensör hatası ikazı<br/>almasına rağmen (11:10) hattı durdurmayarak devam ettirmiştir. Bu,<br/>üretim hedefine karşı güvenlik protokolünün ikinci düzeyde tutulduğunu<br/>gösterir. 3. **Periyodik Gözden Geçirme Süreci Yoktur**: Bypass edilen<br/>kontrollerin (interlock'un bypass edilebilir hale gelmesi) periyodik<br/>olarak denetlenmesi veya arıza prosedürlerinin takip edilmesi için<br/>sistem-düzey bir mekanizma tasarlanmamıştır. 4. **Örgütsel Direnç<br/>Mekanizmasının Eksikliği**: Geçici çözümlerin kalıcı hale gelmesi<br/>(bypass'in sürdürülmesi), yönetim seviyesinde bu duruma müdahale<br/>edilmediğini ve güvenlik protokolü ihlallerine karşı müdahale sisteminin<br/>olmadığını gösterir. Sonuç: Tasarım aşamasında failsafe kontrol sistemi<br/>kurulmamış ve yönetim süreçlerinde bu eksikliğe karşı hiçbir düzeltici<br/>mekanizma oluşturulmamıştır."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden sensor hatası tespit edilmesine rağmen pres hattı arızalı ışık<br/>perdesiyle çalışmaya devam etti (D4.1 - Prosedür İhlali)?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Pres hattı sensor hatası tespit edilmesine rağmen arızalı ışık<br/>perdesiyle çalışmaya devam etti çünkü vardiya baskısı ve üretim<br/>hedefleri karşısında güvenlik protokollerinden taviz verildi. Makine<br/>operatörü/yönetimi, arızanın geçici bir sorun olarak değerlendirip,<br/>kalıcı çözüm yerine geçici workaround (ışık perdesini bypass etme)<br/>uygulamaya karar verdi. Bu karar, makine güvenliği prosedürünün ihlali<br/>anlamına gelir ve acil durdurma mekanizmasının devre dışı kalmasına<br/>neden olmuştur."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden vardiya baskısı ve üretim hedefleri karşısında güvenlik<br/>protokollerinden taviz verilme kararı alınmış, yönetim seviyesinde bu<br/>tür acil durumlarda (sensor hatası gibi) üretime devam etme yetkisi<br/>verilmiştir (D4.1 - Güvenlik Yönetim Sistemi)?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Vardiya baskısı ve üretim hedefleri karşısında güvenlik<br/>protokollerinden taviz verilme kararı alınmasının temel nedenü, üretim<br/>çıktısının işletme için finansal/operasyonel olarak güvenlik<br/>risklerinden daha ağırlıklı değerlendirilmesidir. Yönetim seviyesinde,<br/>sensor hatası gibi acil durumlarda üretime devam etme yetkisi verilmesi,<br/>risk kabul politikasının (risk acceptance) resmi olarak uygulandığını<br/>göstermektedir. Rapordaki 'geçici çözümlerin kalıcı hale gelmesi' ise,<br/>bu kararın sistem içinde kurumsal bir uygulamaya dönüştüğünü ve güvenlik<br/>yönetim sisteminde kontrol mekanizmalarının başarısız olduğunu ifade<br/>etmektedir."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Yönetim seviyesinde üretim hedeflerinin güvenlik risklerine karşı daha<br/>ağırlıklı değerlendirilmesi kararını alan sistemsel faktörler ve<br/>performans değerlendirme kriterleri nelerdir (örn: KPI yapısı, teşvik<br/>sistemi, bütçe kontrol mekanizmaları)?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Yönetim seviyesinde üretim hedeflerinin güvenlik risklerine karşı daha<br/>ağırlıklı değerlendirilmesini sağlayan sistemsel faktörler: 1. **KPI<br/>Yapısı (Performans Göstergeleri)**: Vardiya/üretim hedefleri güvenlik<br/>metrikleri (kazasız gün, tehlikeli durum bildirim sayısı) ile eşit<br/>ağırlıkta değerlendirilmemiş. Sonuç: Vardiya baskısı oluşmuş. 2.<br/>**Teşvik/Ceza Sistemi**: Hat sorumluları ve operatörler üretim hedefini<br/>tutturma üzerine değerlendirilirken, güvenlik protokollerini ihlal<br/>etmekten kaynaklı cezalandırma mekanizması zayıf. Sonuç: Arızalı<br/>makinede çalışmaya devam etme kararı alınmış. 3. **Bütçe Kontrol<br/>Mekanizmaları**: Bakım bütçetinin yetersizliği veya bakım süresinin<br/>üretim hedefine saymadığı durum. Raporda 'Gecici çözümler kalici hale<br/>gelmis' ifadesi bu sorunu göstermektedir. 4. **Hiyerarşik Baskı**:<br/>Vardiya baskısının oluşması, alt seviyelerin güvenlik kararını vermekte<br/>özerkliğinin olmaması anlamına gelmektedir."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Üretim performansı hedeflerinin (KPI), güvenlik metrikleri ile eşit<br/>ağırlıkta değerlendirilmemesine ve bakım maliyetlerinin üretim hedefine<br/>dahil edilmemesine neden, organizasyon üst yönetiminin kurumsal<br/>stratejisi ve finansal önceliklendirmesi yönelik karar alma yapısında<br/>yer almıştır ?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["Organizasyon üst yönetimi, kurumsal stratejisinde üretim KPI'larını<br/>güvenlik metrikleriyle eşit düzeyde değerlendirmemiş ve bakım<br/>maliyetlerini üretim hedefine dahil etmemiştir. Bu yapı, çalışan<br/>seviyesinde 'vardiya baskısı' olarak tezahür etmiş ve arızalı ekipmanla<br/>(sensor hatası olan ışık perdesi) çalışmaya devam edilmesine yol<br/>açmıştır. Geçici çözümlerin kalıcı hale gelmesi, kısa vadeli finansal<br/>hedeflerin uzun vadeli güvenlik yatırımlarından öncelendiğini<br/>göstermektedir. Sonuç olarak, teknoloji başarısızlığı (ışık perdesinin<br/>bypass edilmesi) ve insan davranışı (uyarıya rağmen çalışmaya devam),<br/>fundamentalde yönetim tarafından belirlenen finansal önceliklendirmeye<br/>bağlıdır."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Üst yönetimin kurumsal stratejisinde üretim KPI'larını güvenlik<br/>metrikleriyle eşit düzeyde değerlendirmemesinin altında yatan, şirketin<br/>rekabet ortamındaki konumu, hissedar beklentileri veya sektörel<br/>uygulamalar (industry standards - D4.1) nedir?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Üst yönetimin üretim KPI'larını güvenlik metrikleriyle eşit düzeyde<br/>değerlendirmemesinin altında üç temel faktör yatmaktadır: **1. Sektörel<br/>uygulamalar ve pazar baskısı**: Imalat sektöründe, arızadan kaynaklanan<br/>üretim kaybının (OEE düşüşü) anında ölçülebilir finansal etkisi vardır.<br/>Buna karşılık, güvenlik yatırımının getirisi 'kaza olmayan durum' olarak<br/>belirsiz kalır. Düşük marjlı ürün piyasasında rekabet eden şirketlerde,<br/>bu asimetri işletme hedeflerini güvenlik hedeflerinin üstüne<br/>yerleştirir. **2. Hissedar ve finansal raporlama mekanizmaları**: Halka<br/>açık veya finansman sağlayıcılarından bağımlı şirketlerde, kısa dönem<br/>karlılık göstergeleri (üretim hacmi, OEE, kapasite kullanımı) düzenli<br/>izlenir ve raporlanırken; güvenlik metrikleri ancak ciddi kaza sonrası<br/>kamuya açıklanır. Bu raporlama asimetrisini yönetim, bütçe ve stratejik<br/>kaynak tahsisinde yansıtır. **3. Kurumsal kültür ve risk algısı<br/>(başlangıç normalizasyonu)**: 'Arızalarla çalışmak imalatın parçası',<br/>ancak 'ciddi kazalar nadir' inancı, yönetimi geçici çözümleri kabul<br/>etmeye yönlendirir. Raporda görüldüğü gibi, sensor arızasıyla çalışmaya<br/>devam etmek, kısa dönemde maliyet tasarrufu olarak değerlendirilir;<br/>güvenlik zincirinin zayıflaması, 'bugün olmadığı için' tehlike olarak<br/>algılanmaz."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Üst yönetimin üretim KPI'larını güvenlik metrikleriyle eşit düzeyde<br/>değerlendirmemesinin altında üç temel faktör yatmaktadır: **1. Sektörel<br/>uygulamalar ve pazar baskısı**: Imalat sektöründe, arızadan kaynaklanan<br/>üretim kaybının (OEE düşüşü) anında ölçülebilir finansal etkisi vardır.<br/>Buna karşılık, güvenlik yatırımının getirisi 'kaza olmayan durum' olarak<br/>belirsiz kalır. Düşük marjlı ürün piyasasında rekabet eden şirketlerde,<br/>bu asimetri işletme hedeflerini güvenlik hedeflerinin üstüne<br/>yerleştirir. **2. Hissedar ve finansal raporlama mekanizmaları**: Halka<br/>açık veya finansman sağlayıcılarından bağımlı şirketlerde, kısa dönem<br/>karlılık göstergeleri (üretim hacmi, OEE, kapasite kullanımı) düzenli<br/>izlenir ve raporlanırken; güvenlik metrikleri ancak ciddi kaza sonrası<br/>kamuya açıklanır. Bu raporlama asimetrisini yönetim, bütçe ve stratejik<br/>kaynak tahsisinde yansıtır. **3. Kurumsal kültür ve risk algısı<br/>(başlangıç normalizasyonu)**: 'Arızalarla çalışmak imalatın parçası',<br/>ancak 'ciddi kazalar nadir' inancı, yönetimi geçici çözümleri kabul<br/>etmeye yönlendirir. Raporda görüldüğü gibi, sensor arızasıyla çalışmaya<br/>devam etmek, kısa dönemde maliyet tasarrufu olarak değerlendirilir;<br/>güvenlik zincirinin zayıflaması, 'bugün olmadığı için' tehlike olarak<br/>algılanmaz."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: false,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 20,
+                            nodeSpacing: 28,
+                            rankSpacing: 56,
+                            diagramPadding: 16
+                        },
+                        themeVariables: {
+                            fontSize: '14px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#222',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: false,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 20,
+                                    nodeSpacing: 28,
+                                    rankSpacing: 56,
+                                    diagramPadding: 16
+                                },
+                                themeVariables: {
+                                    fontSize: '14px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

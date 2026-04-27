@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }
+        header .top-title { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        header h1 { font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }
+        header .subtitle { font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+        #diagram-wrap {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }
+        #diagram-wrap .mermaid {
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }
+        #diagram-wrap svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden 11:10'da kaydedilen sensor hatası nedeniyle ışık perdesi koruyucu<br/>sistemi (D4.1 - İnterlok sistemi) 11:20'de devreye girmedi?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["11:10'da kaydedilen sensor hatası, ışık perdesi koruyucu sisteminin<br/>(interlock - D4.1) işlevini sağlayan elektrik/elektronik devresini<br/>kesmiştir. Sistem 11:20'de devreye girmedi çünkü: 1. **Teknik neden**:<br/>Sensor hatasının makine operatörü tarafından hemen düzeltilmemesi veya<br/>bakım ekibine bildirilmemesi 2. **Yönetimsel neden**: Vardiya baskısı ve<br/>üretim hedefleri nedeniyle arızalı sistem ile çalışmaya devam edilmesi<br/>kararı 3. **Kontrol eksikliği**: Koruyucu interlock sisteminin bypass<br/>edilmesine veya geçici çözümlere izin verilmesi; ışık perdesi<br/>kontrollerinin periyodik olarak yapılmaması ve bakım prosedürlerinin<br/>uygulanmaması 4. **Sistem tasarım sorunu**: Sensor hatası durumunda<br/>sistem otomatik olarak 'güvenli duruma' geçmemesi veya alarm<br/>protokolünün etkinleştirilmemesi"]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden vardiya baskısı ve üretim hedefleri, operatörün ve yönetimin<br/>arızalı koruyucu interlock sistemine rağmen makinenin çalışmasına izin<br/>verme kararını belirleyecek kadar etkin hale gelmiştir?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Vardiya baskısı ve üretim hedefleri, arızalı koruyucu interlock<br/>sistemine rağmen makinenin çalışmasına izin verme kararını belirleyecek<br/>kadar etkin hale gelmiştir çünkü: (1) İş hattında kısa vadeli üretim<br/>hedeflerinin karşılanması, güvenlik kontrol sistemlerinin çalışmazlığına<br/>ilişkin riskin yönetim tarafından kabul edilebilir görülmüştür; (2)<br/>Vardiya sorumlusu ve operatör, geçici çözümlerin ve bypass sisteminin<br/>kalıcılaştığı bir ortamda çalışmakta, arızalı ekipmanla devam etmenin<br/>'normal' kabul edildiği kültür oluşmuştur; (3) Yönetim tarafından<br/>koruyucu sistemin arızalanması sonrası bakım ve onarım için gerekli<br/>kaynak ve zaman tahsisi yapılmamış, acil durdurma ve bypass alternatif<br/>yollar kullanılmıştır; (4) Üretim kesintisinin maliyeti, güvenlik<br/>riskinden daha ağır basılmış ve bu değerlendirme hat operatörlerine<br/>telkin edilmiştir; (5) Temel neden: Organizasyonda güvenlik yönetim<br/>sistemi, üretim baskısına karşı yeterli dirençli olmayan bir yapıya ve<br/>kurumsal kültüre sahip olmasıdır."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Üretim hedeflerini güvenlik kontrol sistemlerinin arızalanmasından daha<br/>yüksek önceliğe alan yönetim kararlarının kökeninde, organizasyonun risk<br/>değerlendirmesi ve karar alma süreçleri nasıl yapılandırılmıştır?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Organizasyonun risk değerlendirmesi ve karar alma süreçleri, üretim<br/>hedeflerini güvenlik kontrol sistemlerinden daha yüksek önceliğe alan<br/>bir yapı ile kurgulanmıştır. Spesifik olarak: 1. **Risk Toleransı<br/>Tanımlaması**: Sensör arızası oluştuğunda, riski yeniden değerlendirmek<br/>yerine vardiya baskısı altında operasyona devam kararı alınmıştır. 2.<br/>**Öncelik Hiyerarşisi**: Kısa vadeli üretim hedefleri, gerçek zamanlı<br/>güvenlik tehdit sinyallerine karşı üstün tutulmuştur. 3. **Geçici<br/>Çözümlerin Kalıcılaşması**: Işık perdesinin bypass edilmesi ile sistem<br/>kontrol mekanizması devre dışı bırakılmıştır, bu da planlı bir tasarım<br/>değişikliğine dönüşmüştür. 4. **İlaçlama Prosedürlerinin Eksikliği**:<br/>Arızalanmış güvenlik cihazları için formal durdurma/devreye alma<br/>prosedürleri ve yönetim onayı sistemi bulunmamaktadır. Bu yapı, güvenlik<br/>açıklamalarının operasyonel baskı altında sistematik olarak toleranse<br/>edilebileceği bir kültürü yaratmıştır."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden güvenlik kontrol sistemlerinin devre dışı bırakılmasını ve geçici<br/>çözümleri tolere eden organizasyonel risk tanımlaması ve öncelik<br/>hiyerarşisi, yönetim sistemlerinin performans ölçütleri ve hesap<br/>verebilirlik mekanizmalarında benimsenmiş ve kurumsallaşmıştır ?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Organizasyonel risk tanımlaması ve öncelik hiyerarşisinde güvenlik<br/>kontrol sistemlerinin devre dışı bırakılması ve geçici çözümlerin tolere<br/>edilmesi, yönetim sistemlerinin performans ölçütlerinin ve hesap<br/>verebilirlik mekanizmalarında benimsenmiştir çünkü: Vardiya hedefleri<br/>ile güvenlik arasında bir çatışma yaratılmış ve bu çatışmada güvenlik<br/>kontrolleri (ışık perdesi gibi) üretim hızı önündeki engellerdir<br/>şeklinde tanımlanmıştır. Makine arızaları durumunda bile üretim devam<br/>ettirilme baskısı, geçici çözümleri (sensöre rağmen çalışmaya devam<br/>etme) organizasyonel norm haline getirmiştir. Yönetim sisteminin<br/>performans ölçütleri (üretim sayısı, hızı) güvenlik performans<br/>göstergeleri (kontrol sistemi işlevselliği, arıza bildirimi, devreye<br/>alma süresi) karşısında ağırlıklı konumdadır ve bu tercih sisteme<br/>kurumsallaşmıştır."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden yönetim sisteminin performans ölçütleri (D1.1 - Performans<br/>hedefleri tanımı), güvenlik performans göstergelerini (D1.2 - Güvenlik<br/>hedefleri tanımı) karşısında ağırlıklı ve baskın konumda tutulacak<br/>şekilde tasarlanmış ve bu tercih dış baskılar (müşteri talepleri,<br/>finansal hedefler, pazar rekabeti) tarafından desteklenmiştir?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Rapor doğrudan yönetim sisteminin neden bu şekilde tasarlandığını<br/>açıklamaz. Ancak 'vardiya baskısı nedeniyle arızayla çalışmaya devam<br/>edilmiş' olması ve 'geçici çözümlerin kalıcı hale gelmiş' olması, üretim<br/>hedeflerinin güvenlik hedeflerine baskın kılındığını gösterir. Bu<br/>tercih, müşteri talepleri ve finansal hedefler gibi dış baskılardan<br/>kaynaklanabilir. Çünkü makine arızasına rağmen (sensor hatası) üretim<br/>devam ettirilmeye çalışılmıştır. Sistemik olarak, liderlik seviyesinde<br/>güvenlik yatırımları (sensör bakımı, isık perdesi kontrolü) üretim çıktı<br/>hedeflerine karşı düşük önceliklendirilmiştir."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Rapor doğrudan yönetim sisteminin neden bu şekilde tasarlandığını<br/>açıklamaz. Ancak 'vardiya baskısı nedeniyle arızayla çalışmaya devam<br/>edilmiş' olması ve 'geçici çözümlerin kalıcı hale gelmiş' olması, üretim<br/>hedeflerinin güvenlik hedeflerine baskın kılındığını gösterir. Bu<br/>tercih, müşteri talepleri ve finansal hedefler gibi dış baskılardan<br/>kaynaklanabilir. Çünkü makine arızasına rağmen (sensor hatası) üretim<br/>devam ettirilmeye çalışılmıştır. Sistemik olarak, liderlik seviyesinde<br/>güvenlik yatırımları (sensör bakımı, isık perdesi kontrolü) üretim çıktı<br/>hedeflerine karşı düşük önceliklendirilmiştir."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden koruyucu işık perdesi sistemi sensör hatası sırasında makine<br/>hareketi sırasında aktif hale gelmedi / tehlikeli bölgeyi tespit etmedi?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Koruyucu ışık perdesi sistemi sensör hatası sırasında aktif hale<br/>gelmedi/tehlikeli bölgeyi tespit etmedi çünkü: Sistem bypass edilmiş<br/>veya devre dışı bırakılmış olabilir. Vardiya baskısı nedeniyle arızalı<br/>durumda makinenin çalıştırılmaya devam edilmesi, koruyucu ışık<br/>perdesinin güvenlik fonksiyonunun neutralize edilmesine neden olmuştur.<br/>Sensör hatası meydana geldiğinde, sistem otomatik olarak makineyi<br/>güvenli duruma (durdurma) getirmek yerine, baskı altındaki operatörlerin<br/>sistemi devre dışı bırakmasına müsaade etmiştir. Tasarım açısından<br/>fail-safe mekanizması (sensör arızasında makineyi otomatik durdurma)<br/>yeterli şekilde uygulanmamış veya işletme prosedürleri bu mekanizmayı<br/>ortadan kaldırmıştır."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden sensör hatası meydana geldiğinde (D5.3 - Koruyucu Sistem<br/>Başarısızlığı) makinenin çalışmaya devam etmesine izin verilen<br/>prosedürler oluşturulmuş ve operatörlerin güvenlik sistemini bypass<br/>etmesi için vardiya baskısı oluşmuştur?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Sensör hatası meydana geldiğinde makinenin çalışmaya devam etmesine<br/>izin veren prosedürler oluşturulması, temel olarak üretim sürekliliğini<br/>koruma amacıyla vardiya baskısı ve zaman baskısı nedeniyle<br/>gerçekleşmiştir. Olay raporundan anlaşıldığı üzere, 'vardiya baskısı<br/>nedeniyle arıza ile çalışmaya devam edilmiş' ve 'geçici çözümler kalıcı<br/>hale gelmiştir.' Bu durum, güvenlik prosedürlerinin üretim hedefleri<br/>karşısında ikincil konuma itilmesi ve yönetim tarafından bu risk<br/>davranışlarının tolere edilmesi sonucunda ortaya çıkmıştır. Koruyucu<br/>sistemin bypass edilebilmesi için prosedürlerin oluşturulması, kasıtlı<br/>bir tasarım kararından ziyade, operasyonel baskı ve yetersiz mühendislik<br/>kontrol sisteminin bir sonucudur."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Vardiya baskısına rağmen arızalı makineyle çalışmaya devam etme<br/>kararını mümkün kılan ve geçici çözümlerin kalıcılaşmasına izin veren<br/>yönetim kontrol sistemleri (D4.1 - İşletme Kontrol) neden yetersiz<br/>kalmıştır?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Yönetim kontrol sistemleri (D4.1 - İşletme Kontrol) aşağıdaki<br/>nedenlerle yetersiz kalmıştır: 1. **Vardiya Baskısı Yönetimi<br/>Eksikliği**: Üretim hedefleri ve vardiya baskısı karşısında makine<br/>arızasında durdurma yerine devam etme kararı alınmasını engelleyecek<br/>politikalar ve uygulamalar bulunmamaktadır. 2. **Arıza Yönetim Prosedürü<br/>Yetersizliği**: Sensor hatası tespit edildiğinde (11:10) makineyi derhal<br/>durdurma ve bakım çağırma prosedürü uygulanmamıştır. Geçici çözümlerle<br/>çalışmaya devam edilmiştir. 3. **Güvenlik Sistem Bypass Kontrolü**: Işık<br/>perdesi bypass edilmesini engelleyecek teknik kilitler, yazılımsal<br/>kısıtlamalar veya prosedür kontrolleri eksiktir. 4. **Geçici Çözümlerin<br/>Kalıcılaşma Mekanizması**: Geçici güvenlik çözümlerinin ne zaman<br/>kalıcıya dönüştürüleceğine dair zaman çizelgesi, sorumluluk tanımı ve<br/>izleme sistemi bulunmamaktadır. 5. **Riski Kabul Etme Kararı<br/>Prosedürü**: Bilinen güvenlik kusurları (sensor hatası, bypass) ile<br/>çalışmaya devam etme kararını kimler, hangi kriterlerle, hangi riskler<br/>kabul edilerek vereceğine dair resmi prosedür yoktur."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Neden işletme kontrol sistemleri - özellikle vardiya baskısında arıza<br/>prosedürünü uygulamama ve güvenlik bypass kontrollerinin eksik olması -<br/>yeterince tasarlanmamış, uygulanmamış veya sürdürülememiştir?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["İşletme kontrol sistemleri yetersiz olmuştur çünkü: **Tasarım<br/>Düzeyinde**: Isık perdesi bypass edilebilir durumda tasarlanmış,<br/>güvenlik sisteminin failsafe mekanizması eksiktir. Sensor hatası<br/>durumunda sistemin otomatik olarak güvenli duruma geçmesi için gerekli<br/>interlocking kontrolü bulunmamaktadır. **Uygulama Düzeyinde**: Vardiya<br/>baskısı altında arıza prosedürü uygulanmamıştır. Sensor hatası<br/>oluştuktan sonra makine çalıştırılmaya devam edilmesi, işletme kontrol<br/>prosedürünün (arıza durumunda durma) ihlal edildiğini gösterir. Bypass<br/>kontrolleri (güvenlik kontrolü mekanizmaları) eksiktir.<br/>**Sürdürülebilirlik Düzeyinde**: Geçici çözümlerin kalıcı hale gelmesi,<br/>sistemin periyodik gözden geçirilmesi, güncellenmesi ve uygunluğunun<br/>doğrulanması proseslerinin eksik olduğunu gösterir. Vardiya sorumlusunun<br/>arızaya rağmen çalışmaya devam etmesi, yönetim baskısı kontrol<br/>mekanizmasının eksikliğini işaret eder."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Neden işletme kontrol mekanizmaları (interlock controls, failsafe<br/>sistemler, arıza prosedürleri ve periyodik gözden geçirme süreçleri)<br/>tasarım ve yönetim aşamalarında kurulamamış, vardiya baskısı altında<br/>güvenlik protokollerinin ihlal edilmesine karşı örgütsel direnç<br/>mekanizması bulunmamaktadır (D4.2 - İşletme Yönetim Kontrolü)?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["İşletme kontrol mekanizmaları tasarım ve yönetim aşamalarında<br/>kurulamamıştır çünkü: 1. **Kontrol Tasarımı Eksikliği**: Pres hattında<br/>belirlenmiş olması gereken interlock kontrolü ve failsafe sistemleri<br/>(sensör hatası durumunda makineyi durdurma) fiziksel olarak uygulanmamış<br/>veya işlevsel değildir. Işık perdesi 'bypass edilebilir' durumdadır. 2.<br/>**Vardiya Baskısı Toleransı**: Hat sorumlulusu, sensör hatası ikazı<br/>almasına rağmen (11:10) hattı durdurmayarak devam ettirmiştir. Bu,<br/>üretim hedefine karşı güvenlik protokolünün ikinci düzeyde tutulduğunu<br/>gösterir. 3. **Periyodik Gözden Geçirme Süreci Yoktur**: Bypass edilen<br/>kontrollerin (interlock'un bypass edilebilir hale gelmesi) periyodik<br/>olarak denetlenmesi veya arıza prosedürlerinin takip edilmesi için<br/>sistem-düzey bir mekanizma tasarlanmamıştır. 4. **Örgütsel Direnç<br/>Mekanizmasının Eksikliği**: Geçici çözümlerin kalıcı hale gelmesi<br/>(bypass'in sürdürülmesi), yönetim seviyesinde bu duruma müdahale<br/>edilmediğini ve güvenlik protokolü ihlallerine karşı müdahale sisteminin<br/>olmadığını gösterir. Sonuç: Tasarım aşamasında failsafe kontrol sistemi<br/>kurulmamış ve yönetim süreçlerinde bu eksikliğe karşı hiçbir düzeltici<br/>mekanizma oluşturulmamıştır."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>İşletme kontrol mekanizmaları tasarım ve yönetim aşamalarında<br/>kurulamamıştır çünkü: 1. **Kontrol Tasarımı Eksikliği**: Pres hattında<br/>belirlenmiş olması gereken interlock kontrolü ve failsafe sistemleri<br/>(sensör hatası durumunda makineyi durdurma) fiziksel olarak uygulanmamış<br/>veya işlevsel değildir. Işık perdesi 'bypass edilebilir' durumdadır. 2.<br/>**Vardiya Baskısı Toleransı**: Hat sorumlulusu, sensör hatası ikazı<br/>almasına rağmen (11:10) hattı durdurmayarak devam ettirmiştir. Bu,<br/>üretim hedefine karşı güvenlik protokolünün ikinci düzeyde tutulduğunu<br/>gösterir. 3. **Periyodik Gözden Geçirme Süreci Yoktur**: Bypass edilen<br/>kontrollerin (interlock'un bypass edilebilir hale gelmesi) periyodik<br/>olarak denetlenmesi veya arıza prosedürlerinin takip edilmesi için<br/>sistem-düzey bir mekanizma tasarlanmamıştır. 4. **Örgütsel Direnç<br/>Mekanizmasının Eksikliği**: Geçici çözümlerin kalıcı hale gelmesi<br/>(bypass'in sürdürülmesi), yönetim seviyesinde bu duruma müdahale<br/>edilmediğini ve güvenlik protokolü ihlallerine karşı müdahale sisteminin<br/>olmadığını gösterir. Sonuç: Tasarım aşamasında failsafe kontrol sistemi<br/>kurulmamış ve yönetim süreçlerinde bu eksikliğe karşı hiçbir düzeltici<br/>mekanizma oluşturulmamıştır."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden sensor hatası tespit edilmesine rağmen pres hattı arızalı ışık<br/>perdesiyle çalışmaya devam etti (D4.1 - Prosedür İhlali)?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Pres hattı sensor hatası tespit edilmesine rağmen arızalı ışık<br/>perdesiyle çalışmaya devam etti çünkü vardiya baskısı ve üretim<br/>hedefleri karşısında güvenlik protokollerinden taviz verildi. Makine<br/>operatörü/yönetimi, arızanın geçici bir sorun olarak değerlendirip,<br/>kalıcı çözüm yerine geçici workaround (ışık perdesini bypass etme)<br/>uygulamaya karar verdi. Bu karar, makine güvenliği prosedürünün ihlali<br/>anlamına gelir ve acil durdurma mekanizmasının devre dışı kalmasına<br/>neden olmuştur."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden vardiya baskısı ve üretim hedefleri karşısında güvenlik<br/>protokollerinden taviz verilme kararı alınmış, yönetim seviyesinde bu<br/>tür acil durumlarda (sensor hatası gibi) üretime devam etme yetkisi<br/>verilmiştir (D4.1 - Güvenlik Yönetim Sistemi)?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Vardiya baskısı ve üretim hedefleri karşısında güvenlik<br/>protokollerinden taviz verilme kararı alınmasının temel nedenü, üretim<br/>çıktısının işletme için finansal/operasyonel olarak güvenlik<br/>risklerinden daha ağırlıklı değerlendirilmesidir. Yönetim seviyesinde,<br/>sensor hatası gibi acil durumlarda üretime devam etme yetkisi verilmesi,<br/>risk kabul politikasının (risk acceptance) resmi olarak uygulandığını<br/>göstermektedir. Rapordaki 'geçici çözümlerin kalıcı hale gelmesi' ise,<br/>bu kararın sistem içinde kurumsal bir uygulamaya dönüştüğünü ve güvenlik<br/>yönetim sisteminde kontrol mekanizmalarının başarısız olduğunu ifade<br/>etmektedir."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Yönetim seviyesinde üretim hedeflerinin güvenlik risklerine karşı daha<br/>ağırlıklı değerlendirilmesi kararını alan sistemsel faktörler ve<br/>performans değerlendirme kriterleri nelerdir (örn: KPI yapısı, teşvik<br/>sistemi, bütçe kontrol mekanizmaları)?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Yönetim seviyesinde üretim hedeflerinin güvenlik risklerine karşı daha<br/>ağırlıklı değerlendirilmesini sağlayan sistemsel faktörler: 1. **KPI<br/>Yapısı (Performans Göstergeleri)**: Vardiya/üretim hedefleri güvenlik<br/>metrikleri (kazasız gün, tehlikeli durum bildirim sayısı) ile eşit<br/>ağırlıkta değerlendirilmemiş. Sonuç: Vardiya baskısı oluşmuş. 2.<br/>**Teşvik/Ceza Sistemi**: Hat sorumluları ve operatörler üretim hedefini<br/>tutturma üzerine değerlendirilirken, güvenlik protokollerini ihlal<br/>etmekten kaynaklı cezalandırma mekanizması zayıf. Sonuç: Arızalı<br/>makinede çalışmaya devam etme kararı alınmış. 3. **Bütçe Kontrol<br/>Mekanizmaları**: Bakım bütçetinin yetersizliği veya bakım süresinin<br/>üretim hedefine saymadığı durum. Raporda 'Gecici çözümler kalici hale<br/>gelmis' ifadesi bu sorunu göstermektedir. 4. **Hiyerarşik Baskı**:<br/>Vardiya baskısının oluşması, alt seviyelerin güvenlik kararını vermekte<br/>özerkliğinin olmaması anlamına gelmektedir."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Üretim performansı hedeflerinin (KPI), güvenlik metrikleri ile eşit<br/>ağırlıkta değerlendirilmemesine ve bakım maliyetlerinin üretim hedefine<br/>dahil edilmemesine neden, organizasyon üst yönetiminin kurumsal<br/>stratejisi ve finansal önceliklendirmesi yönelik karar alma yapısında<br/>yer almıştır ?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["Organizasyon üst yönetimi, kurumsal stratejisinde üretim KPI'larını<br/>güvenlik metrikleriyle eşit düzeyde değerlendirmemiş ve bakım<br/>maliyetlerini üretim hedefine dahil etmemiştir. Bu yapı, çalışan<br/>seviyesinde 'vardiya baskısı' olarak tezahür etmiş ve arızalı ekipmanla<br/>(sensor hatası olan ışık perdesi) çalışmaya devam edilmesine yol<br/>açmıştır. Geçici çözümlerin kalıcı hale gelmesi, kısa vadeli finansal<br/>hedeflerin uzun vadeli güvenlik yatırımlarından öncelendiğini<br/>göstermektedir. Sonuç olarak, teknoloji başarısızlığı (ışık perdesinin<br/>bypass edilmesi) ve insan davranışı (uyarıya rağmen çalışmaya devam),<br/>fundamentalde yönetim tarafından belirlenen finansal önceliklendirmeye<br/>bağlıdır."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Üst yönetimin kurumsal stratejisinde üretim KPI'larını güvenlik<br/>metrikleriyle eşit düzeyde değerlendirmemesinin altında yatan, şirketin<br/>rekabet ortamındaki konumu, hissedar beklentileri veya sektörel<br/>uygulamalar (industry standards - D4.1) nedir?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Üst yönetimin üretim KPI'larını güvenlik metrikleriyle eşit düzeyde<br/>değerlendirmemesinin altında üç temel faktör yatmaktadır: **1. Sektörel<br/>uygulamalar ve pazar baskısı**: Imalat sektöründe, arızadan kaynaklanan<br/>üretim kaybının (OEE düşüşü) anında ölçülebilir finansal etkisi vardır.<br/>Buna karşılık, güvenlik yatırımının getirisi 'kaza olmayan durum' olarak<br/>belirsiz kalır. Düşük marjlı ürün piyasasında rekabet eden şirketlerde,<br/>bu asimetri işletme hedeflerini güvenlik hedeflerinin üstüne<br/>yerleştirir. **2. Hissedar ve finansal raporlama mekanizmaları**: Halka<br/>açık veya finansman sağlayıcılarından bağımlı şirketlerde, kısa dönem<br/>karlılık göstergeleri (üretim hacmi, OEE, kapasite kullanımı) düzenli<br/>izlenir ve raporlanırken; güvenlik metrikleri ancak ciddi kaza sonrası<br/>kamuya açıklanır. Bu raporlama asimetrisini yönetim, bütçe ve stratejik<br/>kaynak tahsisinde yansıtır. **3. Kurumsal kültür ve risk algısı<br/>(başlangıç normalizasyonu)**: 'Arızalarla çalışmak imalatın parçası',<br/>ancak 'ciddi kazalar nadir' inancı, yönetimi geçici çözümleri kabul<br/>etmeye yönlendirir. Raporda görüldüğü gibi, sensor arızasıyla çalışmaya<br/>devam etmek, kısa dönemde maliyet tasarrufu olarak değerlendirilir;<br/>güvenlik zincirinin zayıflaması, 'bugün olmadığı için' tehlike olarak<br/>algılanmaz."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Üst yönetimin üretim KPI'larını güvenlik metrikleriyle eşit düzeyde<br/>değerlendirmemesinin altında üç temel faktör yatmaktadır: **1. Sektörel<br/>uygulamalar ve pazar baskısı**: Imalat sektöründe, arızadan kaynaklanan<br/>üretim kaybının (OEE düşüşü) anında ölçülebilir finansal etkisi vardır.<br/>Buna karşılık, güvenlik yatırımının getirisi 'kaza olmayan durum' olarak<br/>belirsiz kalır. Düşük marjlı ürün piyasasında rekabet eden şirketlerde,<br/>bu asimetri işletme hedeflerini güvenlik hedeflerinin üstüne<br/>yerleştirir. **2. Hissedar ve finansal raporlama mekanizmaları**: Halka<br/>açık veya finansman sağlayıcılarından bağımlı şirketlerde, kısa dönem<br/>karlılık göstergeleri (üretim hacmi, OEE, kapasite kullanımı) düzenli<br/>izlenir ve raporlanırken; güvenlik metrikleri ancak ciddi kaza sonrası<br/>kamuya açıklanır. Bu raporlama asimetrisini yönetim, bütçe ve stratejik<br/>kaynak tahsisinde yansıtır. **3. Kurumsal kültür ve risk algısı<br/>(başlangıç normalizasyonu)**: 'Arızalarla çalışmak imalatın parçası',<br/>ancak 'ciddi kazalar nadir' inancı, yönetimi geçici çözümleri kabul<br/>etmeye yönlendirir. Raporda görüldüğü gibi, sensor arızasıyla çalışmaya<br/>devam etmek, kısa dönemde maliyet tasarrufu olarak değerlendirilir;<br/>güvenlik zincirinin zayıflaması, 'bugün olmadığı için' tehlike olarak<br/>algılanmaz."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
+                htmlLabels: true,
+                diagramPadding: 16
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
+                primaryColor: '#fff',
+                primaryTextColor: '#222',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>

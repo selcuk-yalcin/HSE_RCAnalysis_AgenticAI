@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }
+        header .top-title { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        header h1 { font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }
+        header .subtitle { font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+        #diagram-wrap {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }
+        #diagram-wrap .mermaid {
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }
+        #diagram-wrap svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden torque wrench, pedestal grating'in 40 mm aperitürü içinden<br/>geçerek 8 metre aşağıya düşmüştür?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Torque wrench, kullanımlar arasında crane pedestal grating'ine<br/>yerleştirilmiştir. Wrench'in 28 mm çapı, grating açıklıklarının 40 mm<br/>genişliğinden daha küçük olduğu için, wrench grating üzerine kaymaya ve<br/>yer değiştirmeye müsait hale gelmiştir. Wrench kontrol altında<br/>tutulmamış veya istinat noktası olmaması nedeniyle, mekanik hareket<br/>sonucu açıklıktan geçerek 8 metre aşağı düşmüştür."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Wrench kontrol altında tutulmamış ve grating açıklığından geçerek<br/>düşmüştür; işçilerin alet kullanımı ve depolanması sırasında uygun tutma<br/>prosedürü (D4.1 - İş Pozisyonu/Hata) veya araç güvenliği eğitimi neden<br/>yetersiz kalmıştır?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Wrench'in kontrol altında tutulamamasının nedeni, çalışanların yüksek<br/>risk alanlarında (özellikle 40mm açıklıklı grating) alet güvenli<br/>depolanması konusunda yeterli eğitim ve prosedür almamasıdır.<br/>Maintenance Technician Rovshan Sultanov ve Apprentice Murad Quliyev,<br/>alet kullanımı sırasında ara tutmalar için uygun saklama yerlerini<br/>tanımlamak üzere eğitilmemiştir. PTW GA-PTW-2026-0312'de grating<br/>açıklıklarından düşme riski spesifik hazard olarak tanımlanmadığından,<br/>çalışanlar bu riski göz önünde bulundurmadan wrench'i grating üzerine<br/>basitçe bırakmıştır. Eylül 2024'teki benzer bir olaydan sonra bile bu<br/>risk sistematik olarak ele alınmamış, müteakip PTW'lerde<br/>tekrarlanmamıştır. Sonuç olarak hata insan faktörü, prosedür eksikliği<br/>ve hazard tanımlama başarısızlığının kombinasyonudur."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Eylül 2024'teki benzer düşme olayı sonrası neden, grating<br/>açıklıklarından düşme riski PTW hazard tanımlama prosedürüne (D4.1 -<br/>Hazard Identification) sistematik olarak dahil edilmemiş ve bu bilgi<br/>müteakip bakım görevlerine aktarılmamıştır?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Eylül 2024'deki benzer düşme olayından sonra, grating açıklıklarından<br/>düşme riski PTW hazard tanımlama prosedürüne sistematik olarak dahil<br/>edilmemiştir çünkü: 1. **Tehike Veritabanı Entegrasyonunun Eksikliği**:<br/>Önceki olay (bolt düşmesi) ile Mart 2026 olayında aynı grating (40 mm<br/>aperture) yeniden sorun oluşturmasına rağmen, bu tehike 'grating<br/>aperture'lardan düşen objeler' olarak standart bir PTW hazard<br/>kategorisine dönüştürülmemiştir. 2. **PTW Hazard Checklist'inin<br/>Güncellememe Başarısızlığı**: Raporta göre 'PTW for pedestal maintenance<br/>did not identify dropped object risk from grating apertures as a<br/>specific hazard, despite a previous dropped object incident (September<br/>2024, bolt through same grating).' Bu açık eksiklik, Eylül 2024 olayı<br/>sonrası remedial action olarak PTW şablonlarına/checklist'lerine<br/>eklenmediğini gösterir. 3. **Bilgi Transfer Mekanizmasının Eksikliği**:<br/>Eylül 2024 olayı raporu ile Mart 2026 PTW prosedürü arasında bilgi<br/>bağlantısı kurulmamıştır. PTW hazard coordinator'u veya maintenance<br/>planner'ı, önceki olayı referans alan bir kontrol mekanizması<br/>kullanmamıştır. 4. **Korektif Önlemler İzleme Başarısızlığı**: D4.1<br/>hazard identification prosedürü, önceki olaylardan öğrenilen spesifik<br/>tehikeleri yeni PTW'lere sistematik olarak entegre etmek için devresel<br/>kontrol (periodic review) içermiyor olmalıdır. Sonuç: İki olay arasında<br/>17+ ay geçmesine rağmen, aynı fiziksel koşul (grating aperture) ve aynı<br/>risk mekanizması (küçük araçların düşmesi) tekrar etmiştir."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden PTW hazard identification prosedürü , önceki benzer olaylardan<br/>elde edilen spesifik tehike bilgisini yeni PTW şablonlarına sistematik<br/>olarak entegre etmek için devresel review ve geri beslenme mekanizması<br/>içermiyor?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["PTW hazard identification prosedürü , önceki benzer olaylardan (Eylül<br/>2024 cırtma olayı) elde edilen spesifik tehlike bilgisini yeni PTW<br/>şablonlarına sistematik olarak entegre etmek için devresel review ve<br/>geri beslenme mekanizması içermemektedir. Sonuç olarak, grating<br/>apertures (40 mm delikler) aracılığıyla torque wrench düşme riski, Mart<br/>2026 PTW'sinde tanımlanmamış ve çoğaltılmıştır. Bu, risk yönetimi<br/>sisteminin, tarihsel kazalardan öğrenme ve bu öğrenmeleri prosedürlere<br/>aktarma konusundaki başarısızlığını göstermektedir. Devresel gözden<br/>geçirme (periodic review), olaylar sonrası geri beslenme (post-incident<br/>feedback) ve şablon güncelleme mekanizmalarının olmaması, belirli<br/>çalışma ortamlarında tekrar eden tehlikelerin tanımlanmasını<br/>önlemektedir."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden, PTW hazard identification sisteminin tasarımında tekrarlanan<br/>tehlikeler için proaktif gözden geçirme (D4.1 - Hazard Identification &<br/>Risk Assessment) ve olay-sonrası şablon güncelleme prosedürü (D4.3 -<br/>Procedural Controls) kurumsal düzeyde entegre edilmemiş veya<br/>uygulanmamaktadır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["PTW hazard identification sisteminde tekrarlanan tehlikelerin proaktif<br/>gözden geçirilmesi ve olay-sonrası şablon güncelleme prosedürü kurumsal<br/>düzeyde entegre edilmemiştir çünkü: 1. **Başarısız Öğrenme Döngüsü**:<br/>September 2024'teki cıvata düşme olayı, '40 mm açıklıklı ızgaraların<br/>küçük araçları düşürmesi riski' olarak standart hale getirilmemiştir. Bu<br/>tehlike, önceki olaydan 18 ay sonra tekrar ortaya çıkmıştır. Kurumda,<br/>previous incidents'ten extracted lessons'ları PTW şablonlarına otomatik<br/>olarak dahil eden bir mekanizma yoktur. 2. **Sistemik Kontrol<br/>Eksikliği**: PTW-GA-PTW-2026-0312, aynı pedestal alanında aynı ızgara<br/>açıklıkları olmasına rağmen, dropped object'i özel bir tehlike olarak<br/>listelememiştir. Bu, change management veya MoC prosedürünün başarısız<br/>olduğunu gösterir - önceki olaydan elde edilen bilgiler yeni permit<br/>şablonlarına aktarılmamıştır. 3. **Hesap Verebilirlik Boşluğu**:<br/>Kimlerin, hangi aralıklarla, önceki olaylardan türetilen tehlikeleri<br/>review ettiği ve PTW şablonlarını güncellediği tanımlanmamıştır. Bu<br/>nedenle, tekrarlanan tehlikeler 'hiç kimsenin sorumluluğu' haline<br/>gelmiştir. **Sonuç**: Kurumsal düzeyde, incident analysis → learning<br/>extraction → PTW template update → validation döngüsü tasarlanmamıştır<br/>veya uygulanmamaktadır. Sonuç olarak, benzer tehlikeler sistematik<br/>olarak tekrar ortaya çıkmaktadır."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>PTW hazard identification sisteminde tekrarlanan tehlikelerin proaktif<br/>gözden geçirilmesi ve olay-sonrası şablon güncelleme prosedürü kurumsal<br/>düzeyde entegre edilmemiştir çünkü: 1. **Başarısız Öğrenme Döngüsü**:<br/>September 2024'teki cıvata düşme olayı, '40 mm açıklıklı ızgaraların<br/>küçük araçları düşürmesi riski' olarak standart hale getirilmemiştir. Bu<br/>tehlike, önceki olaydan 18 ay sonra tekrar ortaya çıkmıştır. Kurumda,<br/>previous incidents'ten extracted lessons'ları PTW şablonlarına otomatik<br/>olarak dahil eden bir mekanizma yoktur. 2. **Sistemik Kontrol<br/>Eksikliği**: PTW-GA-PTW-2026-0312, aynı pedestal alanında aynı ızgara<br/>açıklıkları olmasına rağmen, dropped object'i özel bir tehlike olarak<br/>listelememiştir. Bu, change management veya MoC prosedürünün başarısız<br/>olduğunu gösterir - önceki olaydan elde edilen bilgiler yeni permit<br/>şablonlarına aktarılmamıştır. 3. **Hesap Verebilirlik Boşluğu**:<br/>Kimlerin, hangi aralıklarla, önceki olaylardan türetilen tehlikeleri<br/>review ettiği ve PTW şablonlarını güncellediği tanımlanmamıştır. Bu<br/>nedenle, tekrarlanan tehlikeler 'hiç kimsenin sorumluluğu' haline<br/>gelmiştir. **Sonuç**: Kurumsal düzeyde, incident analysis → learning<br/>extraction → PTW template update → validation döngüsü tasarlanmamıştır<br/>veya uygulanmamaktadır. Sonuç olarak, benzer tehlikeler sistematik<br/>olarak tekrar ortaya çıkmaktadır."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden 28 mm çaplı torque wrench, 40 mm açıklıklı grating üzerine<br/>yerleştirildiğinde geçerek düşebilecek bir duruma geldi (D4.1 - Nesne<br/>Kontrol Başarısızlığı)?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Torque wrench, 28 mm çapındaki gövdesiyle 40 mm açıklıklı grating<br/>üzerine yerleştirildiğinde, wrench'in çapı grating deliklerinden daha<br/>küçük olduğu için stabilizasyonu sağlanamaz ve yerçekimi etkisinde<br/>wrench kaymaya ve düşmeye maruz kalır. Wrench'in çapı (28 mm) ile<br/>grating açıklığı (40 mm) arasındaki 12 mm fark, nesnenin kontrol altında<br/>tutulmasını imkânsız hale getirir. Wrench destek yüzeyini kaybederek<br/>boşluğa düşer ve 8 metre aşağıya serbest düşer."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden torque wrench'in 40 mm açıklıklı pedestal grating üzerine<br/>yerleştirilmesi, geçerli Permit to Work (PTW No. GA-PTW-2026-0312) ve<br/>maintenance prosedürlerinde (D4.1 - İş Kontrol Sistemi) dropped object<br/>riski olarak tanımlanmadı ve kontrol edilmedi?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Torque wrench'in 40 mm açıklıklı pedestal grating üzerine<br/>yerleştirilmesi dropped object riski olarak tanımlanmadı ve kontrol<br/>edilmedi çünkü: 1. **Hazard Identification Başarısızlığı**: PTW<br/>GA-PTW-2026-0312 hazırlanırken, grating aperture boyutları (40 mm) ile<br/>torque wrench çapı (28 mm) arasındaki uyumsuzluk ve potansiyel düşme<br/>riski sistematik olarak değerlendirilmedi. PTW şablonunda dropped object<br/>riski belirli bir hazard olarak listelenmedi. 2. **Önceki Olaydan Ders<br/>Alınmadı**: Eylül 2024'te aynı grating üzerinden bir bolt düşmesi olayı<br/>meydana gelmesine rağmen, bu bilgi PTW hazırlama prosedürüne veya risk<br/>register'ına yeterince entegre edilmedi. Tekrarlayan hazard tanınmadı.<br/>3. **D4.1 İş Kontrol Sistemi Uygulama Eksikliği**: Maintenance prosedürü<br/>, dropped object risk assessment'ını geçerli bir kontrol noktası olarak<br/>belirtmiş olmalı, ancak bu kontrol uygulanmadı veya PTW hazırlama ekibi<br/>tarafından bypass edilmiş görünmektedir. 4. **Kontrol Tedbirleri<br/>Eksikliği**: PTW'ye, araçların grating üzerine doğrudan<br/>yerleştirilmesini yasaklayan veya alternatif depolama yöntemi kullanan<br/>mitigasyon kontrolleri eklenmedi. 5. **Yönetimsel Boşluk**: PTW onay<br/>etmeden önce, dropped object risk'i kontrol etmek için HSE<br/>expertise'inin katılımı olmaması veya yetersiz olması."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Neden PTW GA-PTW-2026-0312 hazırlanırken, Eylül 2024'te aynı<br/>grating'den düşen bolt olayının ardından, dropped object riski için bir<br/>tekrarlayan hazard prosedürü veya grating aperture'ları ile ilgili<br/>teknik kontrol kriteri sisteme entegre edilmedi?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["PTW GA-PTW-2026-0312 hazırlanırken dropped object riski için<br/>tekrarlayan hazard prosedürü veya grating aperture'ları ile ilgili<br/>teknik kontrol kriteri sisteme entegre edilmedi çünkü: 1. **Olaylar<br/>Arası Öğrenme Eksikliği**: Eylül 2024'teki bolt düşme olayı sonrası,<br/>aynı grating'den kaynaklanan dropped object riski için platform HSE<br/>sisteminde güncelleme yapılmamış; önceki olayın sonuçları PTW<br/>checklist'ine veya teknik prosedürlere yansıtılmamıştır. 2. **Hazard<br/>İdentifikasyon Eksikliği**: 40 mm grating aperture'ları (28 mm torque<br/>wrench handle'ından büyük) potansiyel dropped object kaynağı olarak<br/>tanımlanmamıştır; bu grating konfigürasyonu için spesifik kontrol<br/>kriteri oluşturulmamıştır. 3. **Tekrarlayan Hazard Protokolü Yokluğu**:<br/>Aynı lokasyonda (Crane Pedestal, grating alan) tekrarlayan doğada olan<br/>dropped object riski için sistematik bir prosedür veya teknik kontrol<br/>kuralı oluşturulmamıştır. 4. **PTW Hazırlama Standartlarının<br/>Yetersizliği**: PTW hazırlama sürecinde grating aperture boyutları ile<br/>el aletleri boyutlarının karşılaştırılmasını gerektiren bir kriteria<br/>veya yazılı kontrol prosedürü mevcut değildir. 5. **Yönetimsel Kontrol<br/>Zayıflığı**: Eylül 2024 olayından sonra, platform HSE bölümü tarafından<br/>'tekrarlayan hazard' olarak kategorize edilen risklerin sisteme<br/>entegrasyonu sağlanmamıştır."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Neden, platform HSE sisteminde eylül 2024 dropped object olayından<br/>sonra, benzer grating aperture hazardı için teknik kontrol kriterlerinin<br/>ve PTW checklist güncellemelerinin sistematik olarak uygulanması<br/>sağlanmadı ve bu tür 'tekrarlayan hazard' bilgisi PTW hazırlayan<br/>teknisyenlere ve kontrol mercilerine aktarılmadı?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Platform HSE sisteminde eylül 2024 dropped object olayından sonra<br/>benzer grating aperture hazardı (D4.1 - Hazard tasarımı/kontrol) için<br/>teknik kontrol kriterlerinin ve PTW checklist güncellemelerinin<br/>sistematik olarak uygulanmaması, iki temel sistem başarısızlığından<br/>kaynaklanmıştır: **Birincisi:** Olay sonrası öğrenme ve düzeltme kontrol<br/>mekanizması çalışmamıştır. Eylül 2024'teki benzer olay (vida grating'ten<br/>düşmesi) ile Mart 2026'daki olay (torque wrench düşmesi) arasında 18<br/>aylık sürede, aynı grating aperture (40mm) ile ilgili yapılan tehlike<br/>değerlendirmesi güncellenmemiş ve PTW hazırlayan personele bu bilgi<br/>aktarılmamıştır. Bu, D1.3 (Kontrol Yeterliliği - Hazard Yönetimi)<br/>altında bir sistem kontrolü eksikliğidir. **İkincisi:** PTW sistemi ve<br/>kontrol kriterlerine 'tekrarlayan hazard' bilgisi entegre edilmemiştir.<br/>Önceki olaydan türetilen risk kontrol kriterlerinin PTW checklist'ine<br/>eklenmesi ve işletme prosedürüne dönüştürülmesi için formal bir<br/>mekanizma yoktur. Bu, D9.1 (Prosedür/Checklist Yeterliliği) ve D3.2<br/>(Operasyonal Kılavuzlar) başarısızlığıdır. **Sonuç:** Platform, 'bilinen<br/>tekrarlayan hazard' için sistematik kontrol mekanizması kurmamıştır. Bu,<br/>kurumsal bellek ve çapraz fonksiyonal bilgi paylaşımı eksikliğinin bir<br/>göstergesidir."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Platform operasyon yönetimi ve şirket grup standardında, tekrarlayan<br/>hazardlardan (D1.3 Kontrol Yeterliliği başarısızlığı) elde edilen<br/>derslerin sistematik olarak PTW ve operasyonal kılavuzlara entegre<br/>edilmesi için kurumsal sorumluluk ve yönetim mekanizması neden<br/>tanımlanmamıştır?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Platform operasyon yönetiminde, tekrarlayan hazardlardan (grating<br/>aperture vasıtasıyla cisim düşmesi) alınan derslerin sistematik<br/>entegrasyonu için kurumsal sorumluluk ve yönetim mekanizması<br/>tanımlanmamıştır. Bunun nedenleri: 1. **Risk Değerlendirmesi Döngüsü<br/>Kopuk**: Eylül 2024 düşen cisim olayından sonra, grating aperture riski<br/>için spesifik kontrol önlemleri tanımlanmadı. Mart 2026 PTW'si, bu riski<br/>tekrar tanımadığı için, ilk olaydan alınan dersler uygulanmadı. 2. **PTW<br/>Sistem Tasarımında Eksiklik**: PTW şablonu, pedestal bakım görevlerinde<br/>grating aperture riskini otomatik olarak tanıyacak şekilde<br/>tasarlanmamıştır. Bu, D4.4 (PTW Sistem Başarısızlığı) kapsamında, sistem<br/>düzeyinde bir tasarım boşluğudur. 3. **Sistematik Uyum İzleme Yoktur**:<br/>Grating riskine karşı kontrollerin uygulanıp uygulanmadığını doğrulayan<br/>bir audit veya uyum takip sistemi bulunmamaktadır (D9.5 -<br/>Monitoring/Audit Yetersiz). 4. **Öğrenme Kültürü Kurumsal Seviyede<br/>Zayıf**: İlk olaydan sonra, operasyonal kılavuzlara sistematik<br/>entegrasyon için sorumlu bir yönetim rolü veya mekanizması atanmamıştır<br/>(D1.7 - Zayıf Öğrenme Kültürü). 5. **Tekrarlayan Arıza Analizi Eksik**:<br/>Aynı arıza 18 ay sonra tekrarlandığında, ilk olayın kök neden analizi<br/>sonuçlarını uygulamama sorumluluğu belirlenmemiştir ."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Platform operasyon yönetiminde, tekrarlayan hazardlardan (grating<br/>aperture vasıtasıyla cisim düşmesi) alınan derslerin sistematik<br/>entegrasyonu için kurumsal sorumluluk ve yönetim mekanizması<br/>tanımlanmamıştır. Bunun nedenleri: 1. **Risk Değerlendirmesi Döngüsü<br/>Kopuk**: Eylül 2024 düşen cisim olayından sonra, grating aperture riski<br/>için spesifik kontrol önlemleri tanımlanmadı. Mart 2026 PTW'si, bu riski<br/>tekrar tanımadığı için, ilk olaydan alınan dersler uygulanmadı. 2. **PTW<br/>Sistem Tasarımında Eksiklik**: PTW şablonu, pedestal bakım görevlerinde<br/>grating aperture riskini otomatik olarak tanıyacak şekilde<br/>tasarlanmamıştır. Bu, D4.4 (PTW Sistem Başarısızlığı) kapsamında, sistem<br/>düzeyinde bir tasarım boşluğudur. 3. **Sistematik Uyum İzleme Yoktur**:<br/>Grating riskine karşı kontrollerin uygulanıp uygulanmadığını doğrulayan<br/>bir audit veya uyum takip sistemi bulunmamaktadır (D9.5 -<br/>Monitoring/Audit Yetersiz). 4. **Öğrenme Kültürü Kurumsal Seviyede<br/>Zayıf**: İlk olaydan sonra, operasyonal kılavuzlara sistematik<br/>entegrasyon için sorumlu bir yönetim rolü veya mekanizması atanmamıştır<br/>(D1.7 - Zayıf Öğrenme Kültürü). 5. **Tekrarlayan Arıza Analizi Eksik**:<br/>Aynı arıza 18 ay sonra tekrarlandığında, ilk olayın kök neden analizi<br/>sonuçlarını uygulamama sorumluluğu belirlenmemiştir ."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
+                htmlLabels: true,
+                diagramPadding: 16
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
+                primaryColor: '#fff',
+                primaryTextColor: '#222',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>

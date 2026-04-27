@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }
+        header .top-title { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        header h1 { font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }
+        header .subtitle { font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+        #diagram-wrap {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }
+        #diagram-wrap .mermaid {
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }
+        #diagram-wrap svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden Sevkiyat Alanı Raf Koridoru B'nin forklift manevrası için<br/>fiziksel tasarımı yetersiz duruma getirilmiş ve/veya koridorun güvenli<br/>genişliği sağlanamamıştır?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Sevkiyat Alanı Raf Koridoru B'nin forklift manevrası için fiziksel<br/>tasarımı yetersiz hale getirilmiştir çünkü koridorun genişliği,<br/>forkliftlerin güvenli şekilde manevra yapması için yeterli alan<br/>sağlamamaktadır. Yoğun sevkiyat dönemlerinde artan trafik nedeniyle, dar<br/>koridor içerisinde gerçekleştirilen geri manevra sırasında operatör,<br/>sınırlı alan nedeniyle kolon koruma bariyerine çarpmıştır. İş sahası<br/>tasarımında forklift operasyonları için gerekli olan güvenli çalışma<br/>genişliği göz önüne alınmamıştır."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Sevkiyat Alanı Raf Koridoru B'nin forklift manevrası için yeterli<br/>genişlikte tasarlanmamasının temel nedeni nedir - tasarım aşamasında<br/>forklift operasyon gereksinimlerinin değerlendirilmemiş olması mı, yoksa<br/>mevcut raf sisteminin genişlik sınırlandırması mı?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Temel neden, tasarım aşamasında forklift operasyon gereksinimlerinin<br/>yeterli şekilde değerlendirilmemiş olmasıdır. Sevkiyat Alanı Raf<br/>Koridoru B, forklift manevra çapı, geri görüş alanı ve emniyet mesafesi<br/>gibi operasyonel parametreler dikkate alınmadan tasarlanmıştır. Mevcut<br/>raf sisteminin genişliği ikincil bir faktördür; asıl sorun, tasarım<br/>sürecinde bu operasyonel gereksinimler ile mevcut fiziksel kısıtlamalar<br/>arasında uyum sağlanmamış olmasıdır. Raporda belirtilen 'koridor<br/>genişliği yetersiz' bulgusu, tasarım kontrol mekanizmasının<br/>çalışmadığını göstermektedir."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Tasarım aşamasında forklift operasyonel gereksinimlerinin (manevra<br/>çapı, geri görüş alanı, emniyet mesafesi vb.) değerlendirilmemesine<br/>neden olan tasarım kontrol ve doğrulama prosesinin eksikliği nedir ?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Tasarım aşamasında forklift operasyonel gereksinimlerinin<br/>değerlendirilmemesine neden olan eksiklik, yapılı ortam tasarımında<br/>operasyonel risk değerlendirmesi yapılmaması ve tasarım kontrol<br/>prosesinin tanımlı olmayışıdır. Olay raporunda belirlenen 'koridor<br/>genişliği yetersiz' bulgusu, forklift manevra çapı, dönüş radyüsü ve<br/>geri görüş alanı gibi kritik parametrelerin tasarım faz girdi olarak<br/>kullanılmadığını göstermektedir. Sevkiyat alanı tasarımı gerçek<br/>operasyonel koşullar (forklift boyutları, hız, manevra gereksinimleri,<br/>acil durum mesafeleri) dikkate alınmadan yapılmış; tasarım doğrulama ve<br/>validasyon prosesi uygulanmamıştır."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Tasarım kontrol prosesi ve operasyonel risk değerlendirmesinin tasarım<br/>faz girdilerine dahil edilmemesine yol açan yönetimsel veya<br/>organizasyonel neden nedir?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Tasarım kontrol prosesi ve operasyonel risk değerlendirmesinin tasarım<br/>faz girdilerine dahil edilmemesinin yönetimsel nedeni, tasarım<br/>aşamasında operasyonel gerçekçiliklerin (yoğun sevkiyat trafiği,<br/>forklift manevra kapasitesi, görüş kısıtlamaları) sistematik olarak<br/>değerlendirilmemesidir. Sevkiyat alanının tasarımında, koridor genişliği<br/>ve trafik yönetimi kapasitesi risk değerlendirmesi yapılmaksızın<br/>belirlendikten sonra, operasyonel süreçler bu sınırlı tasarım<br/>parametrelerine uyarlanmıştır. Bu, tasarım kontrolü ve risk<br/>değerlendirmesinin kurumsal prosedürlerinin eksik olması veya<br/>uygulanmamasından kaynaklanmaktadır."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden tasarım kontrol ve operasyonel risk değerlendirmesi prosedürleri<br/>işletmenin kurumsal yönetim sistemine dahil edilmemiş veya<br/>uygulanmamıştır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Tasarım kontrol ve operasyonel risk değerlendirmesi prosedürleri<br/>işletmenin kurumsal yönetim sistemine dahil edilmemiş ve uygulanmamıştır<br/>çünkü: 1. **Sistemik Yapısal Eksiklik**: İşletme seviyesinde, yeni<br/>alanlar tasarlanırken veya operasyonel değişiklikler yapılırken risk<br/>değerlendirmesini zorunlu kılan, resmi bir politika ve prosedür<br/>tanımlanmamıştır. 2. **Entegrasyon Eksikliği**: Risk yönetimi süreci iş<br/>akışının (sevkiyat planlama, alan tasarımı) ayrılmaz bir parçası haline<br/>getirilmemiş, aksine ad-hoc ve reaktif kalmıştır. 3. **Sorumluluk<br/>Belirlenmemesi**: Sevkiyat alanının tasarımı ve trafik yönetim<br/>risklerinin kimin tarafından ve hangi prosedüre uygun olarak<br/>değerlendirilmesi gerektiği açıkça tanımlanmamıştır. 4. **Kontrol<br/>Mekanizması Eksikliği**: D4.1'de tanımlanan risk kontrollerinin (koridor<br/>genişliği, hız limiti, görüş alanı) uygulanması için izleme ve denetim<br/>mekanizması kurulmamıştır. **Sonuç**: Olay, tasarım aşamasında (koridor<br/>genişliği, trafik hacmi) ve operasyonel aşamada (hız kontrolü, arka<br/>kamera kalitesi) yapılması gereken risk değerlendirmelerinin<br/>eksikliğinin doğrudan sonucudur."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Tasarım kontrol ve operasyonel risk değerlendirmesi prosedürleri<br/>işletmenin kurumsal yönetim sistemine dahil edilmemiş ve uygulanmamıştır<br/>çünkü: 1. **Sistemik Yapısal Eksiklik**: İşletme seviyesinde, yeni<br/>alanlar tasarlanırken veya operasyonel değişiklikler yapılırken risk<br/>değerlendirmesini zorunlu kılan, resmi bir politika ve prosedür<br/>tanımlanmamıştır. 2. **Entegrasyon Eksikliği**: Risk yönetimi süreci iş<br/>akışının (sevkiyat planlama, alan tasarımı) ayrılmaz bir parçası haline<br/>getirilmemiş, aksine ad-hoc ve reaktif kalmıştır. 3. **Sorumluluk<br/>Belirlenmemesi**: Sevkiyat alanının tasarımı ve trafik yönetim<br/>risklerinin kimin tarafından ve hangi prosedüre uygun olarak<br/>değerlendirilmesi gerektiği açıkça tanımlanmamıştır. 4. **Kontrol<br/>Mekanizması Eksikliği**: D4.1'de tanımlanan risk kontrollerinin (koridor<br/>genişliği, hız limiti, görüş alanı) uygulanması için izleme ve denetim<br/>mekanizması kurulmamıştır. **Sonuç**: Olay, tasarım aşamasında (koridor<br/>genişliği, trafik hacmi) ve operasyonel aşamada (hız kontrolü, arka<br/>kamera kalitesi) yapılması gereken risk değerlendirmelerinin<br/>eksikliğinin doğrudan sonucudur."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden forklift operatörü geri manevra sırasında bariyerin konumunu<br/>algılayamadı?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Forklift operatörü geri manevra sırasında bariyerin konumunu<br/>algılayamadığı için olayı yaşandı. Bunun nedeni; arka kamera görüş<br/>sisteminin kalitesinin düşük olması ve buna ek olarak, sevkiyat alanında<br/>trafik yoğunluğunun artmasıyla koridor içindeki görüş alanının<br/>kısıtlanmış olmasıdır. Koridor genişliğinin yetersizliği, forklift<br/>operatörünün güvenli manevra yapma ve engelleri önceden algılama<br/>yeteneğini azaltmıştır. Sistemde trafik yönlendirme planı zayıf olduğu<br/>için, operatöre bariyerin yerini bildiren yeterli uyarı mekanizması<br/>mevcut değildir."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden sevkiyat alanında trafik yönlendirme planı yeterli düzeyde<br/>uygulanamamış ve forklift operatörüne bariyerin konumu hakkında uyarı<br/>mekanizması sağlanmamıştır?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Sevkiyat alanında trafik yönlendirme planı yeterli düzeyde<br/>uygulanamamıştır çünkü: (1) Koridor genişliğinin yetersizliği nedeniyle<br/>etkili bir trafik akış sistemi tasarlanmamıştır, (2) Yoğun sevkiyat<br/>dönemlerinde trafiği yönetecek işletme prosedürleri eksiktir, (3)<br/>Forklift operatörlerine bariyerin konumu ve tehlikeli bölgeler konusunda<br/>görsel uyarı mekanizmaları (reflektif işaretler, uyarı levhaları, zemin<br/>işaretlemeleri) sağlanmamıştır, (4) Geri manevra yapan forkliftler için<br/>güvenli avadanlık (kamera, uyarı cihazları) ve rehberlik sistemi<br/>işletilememiştir. Bu eksiklikler, operatörün bariyerin konumunun<br/>farkında olmaması veya fark etmesinin geç olması sonucunu doğurmuştur."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Geri manevra yapan forkliftler için kamera, uyarı cihazları ve<br/>rehberlik sistemi işletilememiş; bu güvenlik sistemleri neden sevkiyat<br/>alanına kurulmamıştır veya neden işlevsel değildir?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Geri manevra güvenlik sistemleri (kamera, uyarı cihazları, rehberlik<br/>sistemi) sevkiyat alanına kurulmamış veya işlevsel olmamıştır çünkü: (1)<br/>Forklift ekipmanlarının düzenli bakım ve kontrol protokolü tanımlı veya<br/>uygulanmamıştır - arka kamera görüş kalitesi düşük bulunmuştur; (2)<br/>Yoğun sevkiyat operasyonları nedeniyle güvenlik sistemlerine yeterli<br/>önem verilmemiştir ve iş yükü altında bakım göz ardı edilmiştir; (3)<br/>Sevkiyat alanı için uygun risk değerlendirmesi yapılmamış, geri manevra<br/>güvenliği için yeterli sistem tasarımı ve işletim planı eksiktir; (4)<br/>Yönetim seviyesinde güvenlik yatırımlarına (uygun kamera teknolojisi,<br/>uyarı sistemleri, operatör rehberlik) düzenli kaynak ayrılmamıştır; (5)<br/>Koridor genişliğinin yetersizliği ve trafik yönlendirme planının<br/>zayıflığı, teknolojik çözümlerin kuruluş aşamasında göz önüne<br/>alınmadığını göstermektedir."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Yönetim seviyesinde güvenlik yatırımlarına (uygun kamera teknolojisi,<br/>uyarı sistemleri, operatör rehberlik) düzenli kaynak ayrılmamış<br/>olmasının altında yatan nedenler nelerdir - güvenlik yatırımlarının<br/>kurumsal bütçe ve önceliklendirme sürecinde nasıl değerlendirildiğini<br/>(D3.1 - İş planlama ve bütçe) etkileyen faktörler?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Güvenlik yatırımlarına düzenli kaynak ayrılmamasının altında yatan<br/>temel nedenler: (1) Kısa dönem operasyonel maliyetlerin uzun dönem<br/>güvenlik yatırımlarına göre öncelendirilmesi, (2) Maddi hasarın<br/>yaralanmadan daha düşük risk olarak değerlendirilmesi sonucu güvenlik<br/>teknolojilerine bütçe talebinin düşük tutulması, (3) Yönetim seviyesinde<br/>güvenlik yatırımlarının (uygun teknoloji, uyarı sistemleri) operasyonel<br/>verimliliğe doğrudan katkı olarak görülmemesi, (4) Sevkiyat alanında<br/>trafik yönetimi ve alan tasarımının kritik güvenlik altyapısı olarak<br/>bütçe planlamasında yer bulmaması, (5) Arka kamera gibi mevcut<br/>teknolojilerin performans ve bakım standartlarına ilişkin kurumsal<br/>yönetim gözetiminin olmayması. Bu faktörler, D3.1 kapsamında bütçe<br/>tahsisi ve önceliklendirme kararlarında güvenlik yatırımlarının sistemli<br/>bir değerlendirme süreci olmadığını göstermektedir."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Why-5 zinciri bu noktada tamamlanmıştır. Kök nedenler belirlenmiş olup,<br/>weitere analiz gerektirmektedir. Kök neden: Bütçe tahsisi kararlarında<br/>güvenlik yatırımlarının sistematik değerlendirme süreci eksikliği ."]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Bu olayın kök nedeni, liderlik tarafından güvenlik yatırımlarının bütçe<br/>tahsisi kararlarında sistematik olarak değerlendirilmemesidir. Forklift<br/>operatasyonunun güvenlik riskleri (dar koridor, yetersiz görüş<br/>sistemleri, zayıf trafik yönetimi) bilinmesine rağmen, bu riskleri<br/>azaltacak kontrollerin (koridor genişletilmesi, kamera sisteminin<br/>iyileştirilmesi, trafik kontrol sisteminin kurulması) yatırım talepleri<br/>bütçe planlaması sürecine sistematik olarak dahil edilmemektedir. Sonuç<br/>olarak: Sevkiyat alanında maddi hasar ve operasyonel kapasite kaybına<br/>neden olan bu olay, teknik tasarım veya bireysel hata değil,<br/>organizasyonel seviyede güvenlik yatırımlarının bütçe kararlarına dahil<br/>edilmemesinden kaynaklanmaktadır."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Bu olayın kök nedeni, liderlik tarafından güvenlik yatırımlarının bütçe<br/>tahsisi kararlarında sistematik olarak değerlendirilmemesidir. Forklift<br/>operatasyonunun güvenlik riskleri (dar koridor, yetersiz görüş<br/>sistemleri, zayıf trafik yönetimi) bilinmesine rağmen, bu riskleri<br/>azaltacak kontrollerin (koridor genişletilmesi, kamera sisteminin<br/>iyileştirilmesi, trafik kontrol sisteminin kurulması) yatırım talepleri<br/>bütçe planlaması sürecine sistematik olarak dahil edilmemektedir. Sonuç<br/>olarak: Sevkiyat alanında maddi hasar ve operasyonel kapasite kaybına<br/>neden olan bu olay, teknik tasarım veya bireysel hata değil,<br/>organizasyonel seviyede güvenlik yatırımlarının bütçe kararlarına dahil<br/>edilmemesinden kaynaklanmaktadır."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden forklift operatörü geri manevra sırasında kolon koruma bariyerini<br/>göremedi veya çarpmaktan kaçınamadı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Forklift operatörü geri manevra sırasında kolon koruma bariyerini<br/>göremedi veya çarpmaktan kaçınamadı çünkü; (1) Arka kamera görüş<br/>kalitesi düşük olması nedeniyle arka görüş yetersiz kalmış, (2) Yoğun<br/>sevkiyat trafiği döneminde çalışan operatörün dikkat kapasitesi<br/>sınırlanmış, (3) Dar koridor genişliği manevra alanını sınırlamış ve<br/>tepki mesafesini azaltmış, (4) Trafik yönlendirme planının zayıflığı<br/>bariyerin konumunun belirsizliğini artırmıştır. Operatör, bariyeri fark<br/>ettiğinde hızını azaltmaya veya manevrayı durdurmaya yeterli mesafesi<br/>kalmamıştır."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Forklift arka kamera görüş kalitesi neden düşük durumda kalmıştır (D4.1<br/>- İş Ekipmanı Yetersizliği)?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Forklift arka kamera görüş kalitesi düşük durumda kalmıştır çünkü:<br/>Kamera sistemi yeterli bakım ve kontrol prosedürü altında<br/>bulunmamaktadır. Raporda işletme alanında koşul olarak belirtilen<br/>sevkiyat alanının toza, neme ve fiziksel haslara maruz bir ortam olması,<br/>kamera lensinin kirlenmesine ve görüntü kalitesinin bozulmasına yol<br/>açmaktadır. Ayrıca, koridor aydınlatması ve kamera montaj pozisyonunun<br/>optimum düzeyde olmaması da görüş kalitesini olumsuz etkilemektedir.<br/>Bakım ekibinin rutin kamera kontrolü ve temizlik prosedürleri eksik veya<br/>yetersiz uygulanmaktadır."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden forklift arka kamera sisteminin rutin bakım, kontrol ve temizlik<br/>prosedürleri eksik veya yetersiz uygulanmaktadır ?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Forklift arka kamera sisteminin rutin bakım, kontrol ve temizlik<br/>prosedürlerinin eksik veya yetersiz uygulanmasının nedenleri: 1. **Bakım<br/>Sorumluluklarının Belirlenmemesi**: Kameralar dahil forklift ek<br/>donanımlarının günlük/haftalık temizlik ve kontrol sorumluluğu açıkça<br/>tanımlanmamıştır. 2. **Bakım Prosedürlerinin Olmaması**: Kamera lensi<br/>temizliği, konnektör kontrolü, görüntü kalitesi testi gibi standart<br/>bakım adımları resmi prosedürlerde yer almamaktadır. 3. **Bakım Kontrol<br/>Listesinin Eksikliği**: Forklift kullanıcılarının başlangıç kontrolü<br/>sırasında kamera fonksiyonelliğini test etmek için bir kontrol<br/>listesi/CheckList bulunmamaktadır. 4. **Bakım Takip Sisteminin<br/>Olmaması**: Kameraların ne zaman bakıldığı, hangi sorunların tespit<br/>edildiği kayıt altına alınmamaktadır. 5. **Eğitim ve Farkındalık<br/>Eksikliği**: Operatörlere kamera bakımının güvenlik açısından kritik<br/>önemi ve nasıl yapılacağı konusunda eğitim verilmemiştir."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Forklift ve ek donanımlarının (kameralar, sensörler vb.) bakım<br/>sorumluluklarının ve prosedürlerinin resmi olarak tanımlanmadığı ve<br/>kurulmaması, hangi temel yönetim/organizasyonel faktörlerin (risk<br/>değerlendirme süreci, operasyon yönetimi politikası, kaynak/bütçe<br/>kısıtları) sonucudur?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["Forklift ve ek donanımlarının bakım sorumluluklarının ve<br/>prosedürlerinin tanımlanmaması, üç temel yönetim/organizasyonel faktörün<br/>sonucudur: 1. **Risk Değerlendirme Süreci Eksikliği**: Sevkiyat alanının<br/>operasyon riskleri (koridor genişliği, trafik yoğunluğu, ekipman görüş<br/>kısıtlamaları) bütünsel olarak değerlendirilmemiştir. Kamera ve sensör<br/>gibi ek donanımların işlevselliğinin önemli bir risk kontrol önlemi<br/>olması fark edilmemiş veya değerlendirilmemiştir. 2. **Operasyon<br/>Yönetimi Politikasının Eksikliği**: Forklift operasyonuna ilişkin yazılı<br/>prosedürler (hız limiti uygulanmıyor, trafik yönlendirme zayıf) eksik<br/>olduğu gibi, ekipman bakım ve ön-operasyon kontrol prosedürleri de<br/>tanımlanmamıştır. Bakım sorumluluklarının 'kim, ne, ne zaman' yapacağı<br/>belirtilmemiştir. 3. **Kaynak/Bütçe Kısıtlaması veya Operasyonel<br/>Önceliklendirme**: Kamera görüş kalitesi düşük durumda çalışmaya devam<br/>etmesi, bakım faaliyetlerinin bütçe veya personel yetersizliği nedeniyle<br/>planlanmadığını gösterir."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Neden Sevkiyat Alanı operasyonlarında risk değerlendirme, yazılı<br/>operasyon prosedürleri ve ekipman bakım planlaması gibi temel yönetim<br/>kontrol mekanizmaları kuruluşta uygulanmamaktadır (D4.1 - Yönetim<br/>Sistemi Eksikliği)?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Sevkiyat Alanı operasyonlarında temel yönetim kontrol mekanizmalarının<br/>uygulanmaması, planlanması aşamasında sistematik risk değerlendirmesinin<br/>yapılmamış olmasından kaynaklanmaktadır. Olay raporunda 'koridor<br/>genişliği yetersiz', 'trafik yönlendirme planı zayıf' ve 'hız limiti<br/>sahada izlenmiyor' olarak belirtilen sorunlar, operasyon planlanırken<br/>forklift trafiği, alan kapasitesi ve araç kontrol hazardlarının<br/>yeterince tanımlanmadığını göstermektedir. Ayrıca 'forklift arka kamera<br/>görüş kalitesi düşük' bulgusu, ekipman bakım ve kontrol sisteminin de<br/>eksik olduğunu göstermektedir. Sonuç olarak, yazılı prosedürler ve<br/>periyodik denetim mekanizmaları kuruluşta tasarlanmamıştır."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Sevkiyat Alanı operasyonlarında temel yönetim kontrol mekanizmalarının<br/>uygulanmaması, planlanması aşamasında sistematik risk değerlendirmesinin<br/>yapılmamış olmasından kaynaklanmaktadır. Olay raporunda 'koridor<br/>genişliği yetersiz', 'trafik yönlendirme planı zayıf' ve 'hız limiti<br/>sahada izlenmiyor' olarak belirtilen sorunlar, operasyon planlanırken<br/>forklift trafiği, alan kapasitesi ve araç kontrol hazardlarının<br/>yeterince tanımlanmadığını göstermektedir. Ayrıca 'forklift arka kamera<br/>görüş kalitesi düşük' bulgusu, ekipman bakım ve kontrol sisteminin de<br/>eksik olduğunu göstermektedir. Sonuç olarak, yazılı prosedürler ve<br/>periyodik denetim mekanizmaları kuruluşta tasarlanmamıştır."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden forklift operatörü yoğun trafik ortamında uygun bir geri manevra<br/>hızını sağlayamadı?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q31
+    A32["Forklift operatörü yoğun trafik ortamında uygun bir geri manevra hızını<br/>sağlayamadı çünkü: (1) Sahada hız limitinin uygulanması ve denetimi<br/>eksikti, (2) Yoğun sevkiyat trafiğinde operatör hız kontrolünde<br/>zorlanmış, (3) Arka kamera görüş kalitesinin düşük olması operatörün<br/>geri manevrada görüş kabiliyetini sınırlamış ve güvenli hız ayarlamasını<br/>engellemişti. Bunlara ek olarak, trafik yönlendirme planı zayıf olduğu<br/>için operatöre açık talimatlar verilmemişti."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Arka kamera görüş kalitesinin düşük olmasının nedeni nedir (D4.1 -<br/>Bakım ve Donanım)?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A32 --> Q33
+    A34["Forklift arka kamera görüş kalitesinin düşük olmasının nedeni, sistemin<br/>düzenli bakım ve kontrolünün yapılmaması ile ilgilidir. Raporda<br/>belirtilen 'arka kamera görüş kalitesi düşük' bulgusunun temel sebepleri<br/>şunlar olabilir: 1. **Bakım Eksikliği**: Kamera lensinin düzenli<br/>temizlenmemesi, kameranın sis, nemlenme veya toz birikintisine maruz<br/>kalması 2. **Donanım Yetersizliği**: Kameranın düşük çözünürlüklü veya<br/>eski teknoloji olması, gece görüş yetenekinin yeterli olmayması 3.<br/>**Kontrol Protokolü Eksikliği**: Güvenlik donanımlarının periyodik<br/>kontrol ve bakım planının bulunmaması 4. **Kalibre Edilmemiş Sistem**:<br/>Arka kamera sisteminin düzgün şekilde kurulu ve ayarlanmamış olması Bu<br/>eksiklikler, operatörün geri manevra sırasında bariyeri zamanında<br/>görebilmesini engellemiş ve çarpma olayına neden olmuştur."]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Güvenlik donanımları (kamera, ışıklandırma vb.) için düzenli bakım ve<br/>kontrol protokolünün yapılmamasının veya uygulanmamasının nedeni nedir?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A34 --> Q35
+    A36["Güvenlik donanımları için düzenli bakım ve kontrol protokolünün<br/>uygulanmamasının temel nedeni, operasyonel faaliyetlere karşı bakım<br/>faaliyetlerinin yeterli öncelik almaması ve sistemik bir bakım yönetim<br/>protokolünün eksikliğidir. Rapordaki 'Forklift arka kamera görüş<br/>kalitesi düşük' bulgusu, bakım protokolünün eksik uygulanmasının<br/>sonucunu doğrudan göstermektedir. Yoğun sevkiyat operasyonları sırasında<br/>(18:35'te 'yoğun sevkiyat nedeniyle trafik arttı') güvenlik<br/>donanımlarının bakım kontrolleri göz ardı edilmiş, bu da operatörlerin<br/>geri manevra sırasında arka kamerayla güvenli bir şekilde görmesini<br/>engellemiştir. Eksiklik, planlı ve periyodik bakım sisteminin olmaması<br/>ile ilgilidir."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Planlı ve periyodik bakım sisteminin (D4.1 - Koruyucu Bakım Eksikliği)<br/>kurulmaması ve operasyonel faaliyetler karşısında yeterli öncelik<br/>alamamasının temel sebebi nedir?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A36 --> Q37
+    A38["Planlı ve periyodik bakım sisteminin kurulmaması ve yeterli öncelik<br/>alamamasının temel sebebi, operasyonel faaliyetlerin acil talep<br/>baskısının (yoğun sevkiyat nedeniyle trafik artışı, alan kapanış<br/>süreleri) bakım ve mekanik sistem kontrol işlerine karşı rekabetçi bir<br/>ortam yaratmasıdır. Yönetim seviyesinde, üretim sürekliliği ve sevkiyat<br/>hedefleri, varlık koruma ve güvenlik altyapısının periyodik bakımı<br/>konusundan daha yüksek öncelik almaktadır. Bu, raf ayakları, güvenlik<br/>bariyerleri, kamera sistemleri ve trafik yönlendirme altyapısı gibi<br/>kritik sistemlerin bakım takviminin oluşturulmaması ve uygulanmaması<br/>sonucunu doğurmuştur."]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>Neden, şirket yönetimi seviyesinde üretim/sevkiyat hedefleri varlık<br/>koruma ve güvenlik altyapısı bakımından daha yüksek öncelik almakta ve<br/>bu durumu düzeltecek bir kurumsal risk yönetimi ve performans metrik<br/>sistemi (D3.2 - Yönetim Sistemleri, D4.1 - Organizasyonel Yapı)<br/>oluşturulmamaktadır?"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A38 --> Q39
+    A40["Şirket yönetimi seviyesinde üretim/sevkiyat hedefleri, varlık koruma ve<br/>güvenlik altyapısı bakımından daha yüksek öncelik almaktadır çünkü: **1.<br/>Kurumsal Risk Yönetimi Sisteminin Olmaması :** Sevkiyat hedeflerinin<br/>finansal performans metriklerine doğrudan yansıması (gelir, kar, müşteri<br/>hizmet seviyesi) ile güvenlik sonuçlarının ancak olay meydana geldikten<br/>sonra görünürlük kazanması arasında bir asimetri vardır. Olay<br/>raporundaki 'yoğun sevkiyat nedeniyle trafik arttı' ifadesi, üretim<br/>baskısının gerçek zamanlı kararları etkilediğini, ancak bu baskıyı<br/>güvenlik riskleri ile dengeleyecek bir mekanizmanın olmadığını<br/>göstermektedir. **2. Liderlik Taahhütünde Güvenlik Deprioritizasyonu :**<br/>Koridor genişliğinin yetersiz kalması, trafik yönlendirme planının zayıf<br/>olması ve hız limitlerinin izlenmaması durumunda, bu sorunları çözmek<br/>için bütçe tahsisi veya kaynakların yeniden tahsisi yapılmamıştır. Bu,<br/>şirket yönetiminin güvenlik altyapısını geliştirmeyi üretim hedeflerine<br/>kıyasla daha düşük öncelik sırasına koyduğunu gösterir. **3. Risk<br/>Değerlendirmesinin Planlama Aşamasında Yetersiz Olması :** Sevkiyat<br/>operasyonunun tasarımı yapılırken (koridor tasarımı, trafik yönetimi),<br/>bu operasyonun forklift manevraları sırasında oluşturduğu çatışma<br/>riskinin (dar koridor + yoğun trafik + geri manevra) yeterince<br/>tanımlanmadığı ve değerlendirilmediği anlaşılmaktadır. **Sorunun<br/>Çözülmemesi Nedeni:** Organizasyonel yapı ve yönetim sistemlerinde (D3.2<br/>- D4.1) sevkiyat performansı ile güvenlik altyapısı arasındaki<br/>ödünleşimleri yönetecek, her iki tarafın da ölçüldüğü bir performans<br/>metrik sistemi yoktur. Bu nedenle yönetim, görünür finansal hedefleri<br/>destekleyen kararlar almaya devam etmektedir."]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Şirket yönetimi seviyesinde üretim/sevkiyat hedefleri, varlık koruma ve<br/>güvenlik altyapısı bakımından daha yüksek öncelik almaktadır çünkü: **1.<br/>Kurumsal Risk Yönetimi Sisteminin Olmaması :** Sevkiyat hedeflerinin<br/>finansal performans metriklerine doğrudan yansıması (gelir, kar, müşteri<br/>hizmet seviyesi) ile güvenlik sonuçlarının ancak olay meydana geldikten<br/>sonra görünürlük kazanması arasında bir asimetri vardır. Olay<br/>raporundaki 'yoğun sevkiyat nedeniyle trafik arttı' ifadesi, üretim<br/>baskısının gerçek zamanlı kararları etkilediğini, ancak bu baskıyı<br/>güvenlik riskleri ile dengeleyecek bir mekanizmanın olmadığını<br/>göstermektedir. **2. Liderlik Taahhütünde Güvenlik Deprioritizasyonu :**<br/>Koridor genişliğinin yetersiz kalması, trafik yönlendirme planının zayıf<br/>olması ve hız limitlerinin izlenmaması durumunda, bu sorunları çözmek<br/>için bütçe tahsisi veya kaynakların yeniden tahsisi yapılmamıştır. Bu,<br/>şirket yönetiminin güvenlik altyapısını geliştirmeyi üretim hedeflerine<br/>kıyasla daha düşük öncelik sırasına koyduğunu gösterir. **3. Risk<br/>Değerlendirmesinin Planlama Aşamasında Yetersiz Olması :** Sevkiyat<br/>operasyonunun tasarımı yapılırken (koridor tasarımı, trafik yönetimi),<br/>bu operasyonun forklift manevraları sırasında oluşturduğu çatışma<br/>riskinin (dar koridor + yoğun trafik + geri manevra) yeterince<br/>tanımlanmadığı ve değerlendirilmediği anlaşılmaktadır. **Sorunun<br/>Çözülmemesi Nedeni:** Organizasyonel yapı ve yönetim sistemlerinde (D3.2<br/>- D4.1) sevkiyat performansı ile güvenlik altyapısı arasındaki<br/>ödünleşimleri yönetecek, her iki tarafın da ölçüldüğü bir performans<br/>metrik sistemi yoktur. Bu nedenle yönetim, görünür finansal hedefleri<br/>destekleyen kararlar almaya devam etmektedir."]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A40 --> ROOT4
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
+                htmlLabels: true,
+                diagramPadding: 16
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
+                primaryColor: '#fff',
+                primaryTextColor: '#222',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOT CAUSE ANALYSIS REPORT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260421-211655";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">ROOT CAUSE ANALYSIS REPORT</h1>
+            <div class="subtitle" contenteditable="true">Professional Investigation and Analysis Report</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                CONFIDENTIAL - AUTHORIZED PERSONNEL ACCESS ONLY
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260421-211655</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">08 March 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Gunashli Alpha Platform - Main Deck (+18m), Crane Pedestal Maintenance Area, Bay CP-04</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">High Potential Near Miss - Dropped Object</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">A 2.4 kg torque wrench fell approximately 8 meters from crane pedestal maintenance area, struck scaffold tube, and landed about 1 meter from a rigger. No injuries sustained but high potential for serious harm identified.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">On 08 March 2026 at 06:52, during a scheduled bearing inspection on Crane No. 2 at the pedestal area on Main Deck (+18m), a 3/4 inch drive torque wrench (2.4 kg, 450 mm length, 28 mm diameter handle) was placed on pedestal grating with 40 mm apertures between uses. The wrench shifted and passed through the aperture, falling approximately 8 meters, deflecting from scaffold tube GA-SC-2026-018 before landing on Main Deck approximately 1 meter from rigger Cavid Aliyev. The maintenance task was being performed by Maintenance Technician Rovshan Sultanov (7 years experience) and Apprentice Technician Murad Quliyev (4 months offshore) under valid Permit to Work GA-PTW-2026-0312. Despite a previous similar incident in September 2024 involving a bolt falling through the same grating, the PTW did not identify dropped object risk from grating apertures as a specific hazard.</div>
+<div class="paragraph" contenteditable="true">All work parties stopped immediately upon the incident. The Crane No. 2 pedestal area was isolated and cordoned off. Scaffold GA-SC-2026-018 was suspended and PTW GA-PTW-2026-0312 was cancelled. The scene was preserved and photographed for investigation purposes. Platform OIM was notified at 07:05. All concurrent work tasks on Main Deck were reviewed for similar risks. A comprehensive tool inventory check was completed with all tools accounted for, confirming no additional items were missing or at risk.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Torque wrench handle diameter (28 mm) was smaller than grating aperture (40 mm), creating uncontrolled dropped object hazard</li>
+<li contenteditable="true">PTW GA-PTW-2026-0312 failed to identify dropped object risk from grating apertures despite previous similar incident in September 2024</li>
+<li contenteditable="true">Systematic learning mechanism absent - lessons from previous incident not integrated into PTW templates and hazard identification procedures</li>
+<li contenteditable="true">No organizational accountability defined for reviewing recurring hazards and updating operational control systems</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Isolation and cordoning of Crane No. 2 pedestal area; suspension of scaffold GA-SC-2026-018</td>
+                        <td contenteditable="true">Platform OIM</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Cancellation of PTW GA-PTW-2026-0312 and scene preservation with photographic documentation</td>
+                        <td contenteditable="true">HSE Specialist</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Review of all concurrent Main Deck work tasks for similar dropped object risks</td>
+                        <td contenteditable="true">Maintenance Supervisor</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Comprehensive tool inventory check confirming all tools accounted for</td>
+                        <td contenteditable="true">Maintenance Technician</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260421-211655</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">08 March 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">06:52 (first light, pre-day-shift handover)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Gunashli Alpha Platform - Main Deck (+18m), Bay CP-04</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Crane Pedestal Maintenance Area, Crane No. 2 pedestal</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Rovshan Sultanov (Maintenance Technician, 7 years experience), Murad Quliyev (Apprentice Technician, 4 months offshore)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Night shift transitioning to day shift</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">3/4 inch drive torque wrench (450 mm length, 28 mm diameter, 2.4 kg), pedestal grating with 40 mm apertures</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Crane No. 2 bearing inspection maintenance task</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">First light conditions, offshore platform environment</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Dawn lighting, transitioning from artificial to natural light</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Standard offshore PPE worn by maintenance team</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">High Potential Near Miss - Dropped Object</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">No injury sustained; high potential for serious injury or fatality</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 person at risk (Rigger Cavid Aliyev Grade 2)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">No physical harm; wrench landed approximately 1 meter from rigger after deflecting from scaffold tube</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Kamil Ismayilov (Scaffold Supervisor), Elnur Babayev (Crane Operator)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">No - no injuries sustained</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Not applicable - no medical intervention required</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">06:30</div>
+                    <div class="timeline-event" contenteditable="true">Maintenance team (Rovshan Sultanov and Murad Quliyev) commenced scheduled bearing inspection on Crane No. 2 under PTW GA-PTW-2026-0312</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">06:45</div>
+                    <div class="timeline-event" contenteditable="true">Torque wrench in use for bearing inspection task; placed on pedestal grating between uses</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">06:52</div>
+                    <div class="timeline-event" contenteditable="true">Torque wrench shifted on grating, passed through 40 mm aperture, and fell approximately 8 meters</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">06:52</div>
+                    <div class="timeline-event" contenteditable="true">Wrench deflected from scaffold tube GA-SC-2026-018 and landed approximately 1 meter from rigger Cavid Aliyev</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">06:53</div>
+                    <div class="timeline-event" contenteditable="true">All work parties stopped immediately; area isolated and cordoned; PTW cancelled</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">07:05</div>
+                    <div class="timeline-event" contenteditable="true">Platform OIM Farid Jafarov notified; investigation initiated by HSE Specialist Nigar Hasanova</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">The 5-Why technique was applied through two distinct causal branches to ensure comprehensive analysis. Branch 1 examined the dropped object hazard control failure, progressing from the immediate cause (inadequate drop zone protection) through hazard identification failures to the root organizational learning system breakdown. Branch 2 investigated the improper tool placement, tracing from the physical mismatch between tool diameter and grating aperture through PTW preparation failures to the same organizational learning deficit. Each 'Why' question built upon the previous answer, systematically peeling back layers of causation. The technique revealed that both branches converged on a common meta root cause: the absence of a systematic organizational learning mechanism to capture lessons from previous incidents and integrate them into operational control systems. This convergence validates the robustness of the analysis and confirms the fundamental nature of the identified organizational weakness.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Human Factor</td>
+                        <td contenteditable="true">Individual factors including knowledge gaps, skill deficiencies, inattention, fatigue, and human error in task execution</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Organizational Factor</td>
+                        <td contenteditable="true">Procedural deficiencies, communication breakdowns, management decisions, policy inadequacies, and organizational culture issues</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Task/Job Factor</td>
+                        <td contenteditable="true">Equipment failures, design flaws, physical workload, ergonomic issues, and task-specific hazards</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Environmental Factor</td>
+                        <td contenteditable="true">Weather conditions, lighting, noise, temperature, area layout, and physical work environment characteristics</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Farid Jafarov</td>
+                        <td contenteditable="true">Platform OIM - Overall Investigation Owner</td>
+                        <td contenteditable="true">08 March 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Nigar Hasanova</td>
+                        <td contenteditable="true">Platform HSE Specialist - Investigation Lead (RCS-trained)</td>
+                        <td contenteditable="true">08 March 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Maintenance Supervisor</td>
+                        <td contenteditable="true">Technical Subject Matter Expert - Maintenance Operations</td>
+                        <td contenteditable="true">08 March 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Lifting Operations Specialist</td>
+                        <td contenteditable="true">Crane and Lifting Equipment Technical Expert</td>
+                        <td contenteditable="true">09 March 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Scaffolding Technical Expert</td>
+                        <td contenteditable="true">Scaffold Design and Safety Specialist</td>
+                        <td contenteditable="true">09 March 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Permit to Work Coordinator</td>
+                        <td contenteditable="true">PTW System and Hazard Identification Expert</td>
+                        <td contenteditable="true">10 March 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Human Factors Specialist</td>
+                        <td contenteditable="true">Behavioral and Organizational Culture Analyst</td>
+                        <td contenteditable="true">10 March 2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Dropped Objects Prevention Specialist</td>
+                        <td contenteditable="true">Dropped Object Hazard Control Technical Expert</td>
+                        <td contenteditable="true">11 March 2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. CRITICAL FACTOR 1 - DROPPED OBJECT HAZARD CONTROL FAILURE</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">The crane pedestal maintenance area at +18m elevation on Main Deck presented an inherent dropped object hazard due to the presence of grating with 40 mm apertures. This physical configuration, combined with the nature of maintenance work requiring hand tools, created a high-risk environment where small objects could potentially fall through the grating to lower levels where personnel were working. The area below the pedestal included active scaffold work (GA-SC-2026-018) with riggers present, creating a direct line of exposure for personnel to falling objects. Despite a previous similar incident in September 2024 involving a bolt falling through the same grating, no systematic controls had been implemented to prevent recurrence. The work was being conducted under PTW GA-PTW-2026-0312, which did not specifically identify or control the dropped object hazard associated with grating apertures.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Inadequate dropped object hazard control - no controlled drop zone protection or warning systems for objects falling from crane pedestal area</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did the torque wrench pass through the 40 mm grating aperture and fall 8 meters?</div>
+                    <div class="why-answer" contenteditable="true">→ The torque wrench was placed on the crane pedestal grating between uses during the maintenance task. The wrench handle diameter of 28 mm was smaller than the grating aperture width of 40 mm, creating a 12 mm clearance gap. This dimensional mismatch meant the wrench could not be stably supported by the grating surface. Without proper control or a secure resting point, mechanical movement caused the wrench to shift position, pass through the aperture opening, and fall freely 8 meters to the deck below.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why were workers not trained on safe tool storage in high-risk areas with grating apertures?</div>
+                    <div class="why-answer" contenteditable="true">→ Workers lacked adequate training and procedural guidance on safe tool storage in high-risk areas, particularly regarding grating with 40 mm apertures. Maintenance Technician Rovshan Sultanov and Apprentice Murad Quliyev had not been trained to identify appropriate interim storage locations during tool use that would prevent dropped object hazards. PTW GA-PTW-2026-0312 did not identify the risk of objects falling through grating apertures as a specific hazard, so workers were not alerted to this risk during pre-job briefing. Even after a similar incident in September 2024 involving a bolt falling through the same grating, this risk was not systematically addressed in subsequent PTW procedures or training programs. The failure resulted from a combination of human factors, procedural deficiencies, and hazard identification system breakdown.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why was the grating aperture dropped object risk not systematically integrated into PTW hazard identification procedures after the September 2024 incident?</div>
+                    <div class="why-answer" contenteditable="true">→ Following the September 2024 incident, the dropped object risk from grating apertures was not systematically integrated into PTW hazard identification procedures due to multiple system failures. First, the hazard database integration was inadequate - despite the same grating configuration causing problems in both incidents, the specific hazard of small objects falling through 40 mm apertures was not converted into a standard PTW hazard category. Second, the PTW hazard checklist was not updated - as the incident report explicitly states, the PTW for pedestal maintenance did not identify dropped object risk from grating apertures as a specific hazard despite the previous incident. Third, information transfer mechanisms failed - no linkage was established between the September 2024 incident report and the March 2026 PTW procedure, meaning the PTW hazard coordinator or maintenance planner did not reference the previous incident during planning. Fourth, corrective action monitoring failed - the hazard identification procedure lacked periodic review mechanisms to systematically integrate lessons learned from previous incidents into new PTW templates. The result was that 17+ months elapsed between incidents without the same physical condition and risk mechanism being addressed.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why does the PTW hazard identification procedure lack periodic review and feedback mechanisms to systematically integrate specific hazard information from previous similar incidents into new PTW templates?</div>
+                    <div class="why-answer" contenteditable="true">→ The PTW hazard identification procedure lacks periodic review and feedback mechanisms to systematically integrate specific hazard information from previous incidents into new PTW templates, resulting in the grating aperture dropped object risk not being identified in the March 2026 PTW despite the September 2024 incident. This represents a fundamental failure of the risk management system to learn from historical incidents and translate those learnings into procedural controls. The absence of periodic review processes, post-incident feedback loops, and template update mechanisms prevents the identification of recurring hazards in specific work environments. Without these systematic mechanisms, the same hazards repeatedly manifest because there is no organizational process to capture, codify, and embed lessons learned into operational procedures.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Why has the organization not integrated proactive review of recurring hazards and post-incident template update procedures into the PTW hazard identification system at the corporate level?</div>
+                    <div class="why-answer" contenteditable="true">→ At the organizational level, the PTW hazard identification system lacks integration of proactive review mechanisms for recurring hazards and post-incident template update procedures due to fundamental system design failures. First, the learning loop has failed - the September 2024 bolt drop incident was not standardized as a recognized hazard category for small tools falling through 40 mm grating apertures, allowing the same hazard to recur 18 months later without any mechanism to automatically incorporate lessons learned into PTW templates. Second, systemic control is absent - PTW-GA-PTW-2026-0312 did not list dropped objects as a specific hazard despite the same pedestal area and grating configuration, indicating change management or Management of Change procedures failed to transfer information from previous incidents to new permit templates. Third, accountability gaps exist - it is undefined who is responsible for reviewing hazards derived from previous incidents at what intervals and updating PTW templates accordingly, making recurring hazards nobody's responsibility. The organizational result is that the incident analysis to learning extraction to PTW template update to validation cycle has not been designed or implemented at the corporate level, causing similar hazards to systematically recur.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Organizational Learning System Failure - Incident Lessons Not Systematically Integrated into PTW Templates)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Organizational Learning System Failure - Incident Lessons Not Systematically Integrated into PTW Templates</div>
+                <div class="box-content" contenteditable="true">The fundamental root cause is the absence of a systematic organizational learning mechanism at the corporate level to capture lessons from previous incidents and integrate them into operational control systems, specifically PTW templates and hazard identification procedures. The September 2024 bolt drop incident through the same 40 mm grating apertures should have triggered a systematic update to PTW templates for pedestal maintenance work, creating a standardized hazard category for small objects falling through grating apertures. However, 18 months later, the March 2026 PTW-GA-PTW-2026-0312 did not identify this specific hazard, demonstrating that no mechanism exists to automatically incorporate incident-derived lessons into permit templates. This organizational learning failure is compounded by undefined accountability - no roles or responsibilities are established for who reviews incident-derived hazards at what intervals and ensures PTW templates are updated accordingly. The result is that recurring hazards become nobody's responsibility, and the organization systematically fails to prevent similar incidents despite having clear historical evidence of the risk. This represents a fundamental breakdown in the incident analysis to learning extraction to PTW template update to validation cycle at the organizational management system level.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Failed Learning Loop - September 2024 bolt drop incident not standardized as recognized hazard category for small tools falling through 40 mm grating apertures, with no mechanism to automatically incorporate lessons learned into PTW templates</li>
+<li contenteditable="true">Systemic Control Absence - PTW-GA-PTW-2026-0312 did not list dropped objects as specific hazard despite same pedestal area and grating configuration, indicating change management or MoC procedure failure to transfer information from previous incidents to new permit templates</li>
+<li contenteditable="true">Accountability Gap - Undefined roles and responsibilities for who reviews incident-derived hazards at what intervals and updates PTW templates accordingly, making recurring hazards nobody's responsibility</li>
+<li contenteditable="true">Organizational Learning Cycle Breakdown - Incident analysis to learning extraction to PTW template update to validation cycle not designed or implemented at corporate level, causing similar hazards to systematically recur across the organization</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. CRITICAL FACTOR 2 - IMPROPER TOOL PLACEMENT AND STORAGE</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">During the crane pedestal bearing inspection maintenance task, the maintenance team required the use of a 3/4 inch drive torque wrench as part of their standard tool kit. The work was being conducted on pedestal grating with 40 mm apertures, a physical configuration that presented an inherent risk for small objects to fall through to lower levels. The torque wrench had a handle diameter of 28 mm, which was 12 mm smaller than the grating aperture width. Between uses during the maintenance task, the technician placed the wrench directly on the grating surface rather than using a secure storage method such as a tool tray, tool bag, or designated storage area. This placement decision was made without recognition of the dimensional mismatch between the tool and the grating aperture, and without awareness of the dropped object hazard this created. The work was being conducted under PTW GA-PTW-2026-0312, which did not provide specific guidance on tool storage or control measures to prevent dropped objects in areas with grating apertures.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Improper tool placement - torque wrench with 28 mm diameter placed on grating with 40 mm apertures, creating uncontrolled dropped object hazard</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did the 28 mm diameter torque wrench become unstable and fall through the 40 mm grating aperture?</div>
+                    <div class="why-answer" contenteditable="true">→ When the torque wrench with its 28 mm diameter body was placed on the grating with 40 mm apertures, the dimensional mismatch prevented stable support. The 12 mm clearance gap between the wrench diameter and the aperture width meant the wrench could not achieve stable positioning on the grating surface and was subject to gravitational forces causing it to shift and fall. The wrench lost its support surface, passed through the void, and fell freely 8 meters to the deck below. The physical impossibility of controlling an object when its dimensions are smaller than the supporting surface apertures made the dropped object incident inevitable once the wrench was placed on the grating.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was the placement of the torque wrench on 40 mm aperture grating not identified and controlled as a dropped object risk in the valid PTW and maintenance procedures?</div>
+                    <div class="why-answer" contenteditable="true">→ The placement of the torque wrench on 40 mm aperture pedestal grating was not identified and controlled as a dropped object risk due to multiple systematic failures. First, hazard identification failed - when preparing PTW GA-PTW-2026-0312, the incompatibility between grating aperture dimensions and torque wrench diameter was not systematically evaluated, and dropped object risk was not listed as a specific hazard in the PTW template. Second, lessons from the previous incident were not learned - despite a bolt falling through the same grating in September 2024, this information was not adequately integrated into the PTW preparation procedure or risk register, and the recurring hazard was not recognized. Third, work control system implementation was deficient - the maintenance procedure should have specified dropped object risk assessment as a valid control point, but this control was either not applied or was bypassed by the PTW preparation team. Fourth, control measures were absent - no mitigation controls were added to the PTW prohibiting direct placement of tools on grating or requiring alternative storage methods. Fifth, management oversight was inadequate - HSE expertise was not sufficiently involved in PTW approval to verify dropped object risk controls before work authorization.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why was a recurring hazard procedure or technical control criteria for grating apertures not integrated into the system after the September 2024 bolt drop incident?</div>
+                    <div class="why-answer" contenteditable="true">→ Following the September 2024 bolt drop incident, a recurring hazard procedure or technical control criteria for grating apertures was not integrated into the system due to multiple organizational failures. First, inter-incident learning was absent - after the September 2024 incident, no updates were made to the platform HSE system for dropped object risk from the same grating, and the consequences of the previous incident were not reflected in PTW checklists or technical procedures. Second, hazard identification was deficient - the 40 mm grating apertures, which are larger than the 28 mm torque wrench handle, were not identified as a potential dropped object source, and no specific control criteria were established for this grating configuration. Third, recurring hazard protocols were missing - no systematic procedure or technical control rule was established for the recurring nature of dropped object risk at the same location. Fourth, PTW preparation standards were inadequate - no written control procedure or criteria exists in the PTW preparation process requiring comparison of grating aperture dimensions with hand tool dimensions. Fifth, management control was weak - after the September 2024 incident, the platform HSE department did not ensure integration of risks categorized as recurring hazards into the system.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why were technical control criteria and PTW checklist updates for similar grating aperture hazards not systematically implemented in the platform HSE system after the September 2024 dropped object incident?</div>
+                    <div class="why-answer" contenteditable="true">→ The systematic implementation of technical control criteria and PTW checklist updates for grating aperture hazards failed after the September 2024 incident due to two fundamental system failures. First, the post-incident learning and corrective control mechanism did not function - during the 18-month period between the September 2024 incident and the March 2026 incident, the hazard assessment related to the same 40 mm grating aperture was not updated and this information was not communicated to PTW preparation personnel, representing a system control deficiency in hazard management. Second, recurring hazard information was not integrated into the PTW system and control criteria - no formal mechanism exists to add risk control criteria derived from previous incidents to PTW checklists and convert them into operational procedures, representing failures in procedural adequacy and operational guidelines. The result is that the platform has not established a systematic control mechanism for known recurring hazards, indicating a deficiency in organizational memory and cross-functional information sharing.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Why has organizational responsibility and management mechanism for systematically integrating lessons from recurring hazards into PTW and operational guidelines not been defined in platform operations management and company group standards?</div>
+                    <div class="why-answer" contenteditable="true">→ In platform operations management, organizational responsibility and management mechanisms for systematic integration of lessons from recurring hazards have not been defined due to multiple fundamental failures. First, the risk assessment cycle is broken - after the September 2024 dropped object incident, specific control measures for grating aperture risk were not defined, and the March 2026 PTW did not recognize this risk again, meaning lessons from the first incident were not applied. Second, PTW system design is deficient - the PTW template is not designed to automatically recognize grating aperture risk in pedestal maintenance tasks, representing a system-level design gap. Third, systematic compliance monitoring is absent - no audit or compliance tracking system exists to verify whether controls against grating risk are being implemented. Fourth, organizational learning culture is weak at the corporate level - after the first incident, no responsible management role or mechanism was assigned for systematic integration into operational guidelines. Fifth, recurring failure analysis is incomplete - when the same failure recurred 18 months later, responsibility for not implementing the root cause analysis results from the first incident was not determined.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Organizational Learning and Compliance Monitoring System Failure - Recurring Hazard Lessons Not Systematically Integrated)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Organizational Learning and Compliance Monitoring System Failure - Recurring Hazard Lessons Not Systematically Integrated</div>
+                <div class="box-content" contenteditable="true">The fundamental root cause is the absence of organizational responsibility and management mechanisms for systematically integrating lessons from recurring hazards into PTW templates and operational guidelines at the platform operations management level. The September 2024 dropped object incident should have triggered specific control measures for grating aperture risk, but the March 2026 PTW did not recognize this risk, demonstrating that lessons from the first incident were not applied. This failure stems from a broken risk assessment cycle where incident-derived hazards are not systematically reviewed and integrated into operational procedures. The PTW system design is fundamentally deficient - templates are not designed to automatically recognize grating aperture risk in pedestal maintenance tasks, representing a system-level design gap. Additionally, no systematic compliance monitoring or audit system exists to verify whether controls against known recurring risks are being implemented. The organizational learning culture is weak at the corporate level, with no defined management role or mechanism responsible for ensuring systematic integration of incident lessons into operational guidelines. When the same failure recurred 18 months later, no accountability was established for the failure to implement root cause analysis results from the first incident. This represents a comprehensive breakdown in the organizational learning and compliance monitoring system at the management system level.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Broken Risk Assessment Cycle - September 2024 dropped object incident did not result in specific control measures for grating aperture risk being defined, and March 2026 PTW did not recognize this risk again, demonstrating lessons from first incident were not applied</li>
+<li contenteditable="true">PTW System Design Deficiency - PTW template not designed to automatically recognize grating aperture risk in pedestal maintenance tasks, representing system-level design gap in hazard identification automation</li>
+<li contenteditable="true">Systematic Compliance Monitoring Absence - No audit or compliance tracking system exists to verify whether controls against grating risk are being implemented, allowing known hazards to persist without verification</li>
+<li contenteditable="true">Weak Organizational Learning Culture - After first incident, no responsible management role or mechanism was assigned for systematic integration into operational guidelines, and when same failure recurred 18 months later, no accountability was established for failure to implement root cause analysis results</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. DİĞER OLASI SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Communication Failure</td>
+                        <td contenteditable="true">Critical safety information from the September 2024 bolt drop incident was not effectively communicated to PTW preparation personnel, maintenance planners, and operational supervisors. The lessons learned from the previous incident did not reach the individuals responsible for planning and executing the March 2026 maintenance task, resulting in the same hazard being overlooked. This communication breakdown extended across organizational boundaries and time periods, indicating systematic deficiencies in how safety-critical information is shared and retained within the organization.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Training Inadequacy</td>
+                        <td contenteditable="true">Maintenance personnel including both the experienced technician and apprentice lacked specific training on dropped object hazard recognition and control in areas with grating apertures. Training programs did not address the specific risk of small tools falling through grating openings or provide guidance on appropriate tool storage and control measures during maintenance tasks at height. The absence of scenario-based training incorporating lessons from previous incidents meant workers were not prepared to recognize and control this specific hazard configuration.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Supervision and Oversight Deficiency</td>
+                        <td contenteditable="true">Work supervision and oversight mechanisms failed to identify the dropped object hazard during pre-job planning, PTW preparation, and task execution. Supervisors and permit issuers did not recognize the dimensional mismatch between tool sizes and grating apertures, and did not verify that appropriate hazard controls were in place before authorizing work. The absence of effective supervision meant that the hazard was not identified and controlled at multiple intervention points where it could have been prevented.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Cultural Factors</td>
+                        <td contenteditable="true">Organizational culture prioritized task completion and operational continuity over systematic hazard identification and control. The tolerance for deviations from best practices in tool storage and the acceptance of working above open grating without specific dropped object controls indicate a culture where production pressures override safety considerations. The failure to systematically address the September 2024 incident lessons suggests a culture that does not prioritize learning from near-misses and implementing preventive measures before serious harm occurs.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Immediate implementation of dropped object prevention controls for all work at height above grating areas - install grating covers, tool lanyards mandatory, and establish exclusion zones below work areas</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">Platform OIM / HSE Specialist</td>
+                        <td contenteditable="true">1 week</td>
+                        <td contenteditable="true">100% compliance with dropped object controls verified through daily inspections</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Emergency revision of PTW template to include specific dropped object hazard identification checklist for all work above grating areas, with mandatory dimensional compatibility verification between tools and grating apertures</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">PTW Coordinator / HSE Manager</td>
+                        <td contenteditable="true">2 weeks</td>
+                        <td contenteditable="true">100% of PTWs for work at height include completed dropped object hazard assessment</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Mandatory dropped object awareness training for all maintenance, scaffolding, and operations personnel, including specific case study of September 2024 and March 2026 incidents</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Training Manager / HSE Department</td>
+                        <td contenteditable="true">1 month</td>
+                        <td contenteditable="true">100% of relevant personnel complete training with competency assessment</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Establish systematic incident learning integration procedure defining roles, responsibilities, and timelines for reviewing incident reports, extracting lessons, updating PTW templates and procedures, and verifying implementation</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">HSE Manager / Operations Manager</td>
+                        <td contenteditable="true">1 month</td>
+                        <td contenteditable="true">Procedure documented, approved, and integrated into management system with defined accountability</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Conduct comprehensive audit of all existing PTW templates and operational procedures to identify and integrate lessons from all incidents in past 3 years, with specific focus on recurring hazard patterns</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">HSE Department / Operations Management</td>
+                        <td contenteditable="true">2 months</td>
+                        <td contenteditable="true">100% of historical incident lessons reviewed and integrated into relevant procedures</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Design and implement PTW system enhancement to automatically flag known recurring hazards based on work location, equipment configuration, and task type, with mandatory control verification before permit issuance</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">IT Department / PTW Coordinator / HSE Manager</td>
+                        <td contenteditable="true">3 months</td>
+                        <td contenteditable="true">Automated hazard flagging system operational with 100% coverage of known recurring hazards</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Establish monthly compliance monitoring and audit program specifically targeting implementation of incident-derived controls, with findings reported to senior management and corrective actions tracked to closure</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">HSE Department / Internal Audit</td>
+                        <td contenteditable="true">3 months</td>
+                        <td contenteditable="true">Monthly audit program established with 100% of planned audits completed and findings closed within defined timelines</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Implement physical engineering controls including permanent grating covers for high-risk areas, tool storage stations at all work-at-height locations, and visual warning systems for dropped object hazard zones</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Maintenance Manager / Engineering Department</td>
+                        <td contenteditable="true">3 months</td>
+                        <td contenteditable="true">Engineering controls installed at 100% of identified high-risk locations</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Develop and implement organizational learning culture improvement program including leadership visible commitment, incident learning sharing forums, and recognition systems for proactive hazard identification and reporting</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Senior Management / HR Department / HSE Department</td>
+                        <td contenteditable="true">6 months</td>
+                        <td contenteditable="true">Culture survey scores show measurable improvement in learning culture indicators</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Establish senior management accountability framework for organizational learning system effectiveness, including quarterly reviews of incident learning integration metrics and management system performance indicators</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">General Manager / Senior Management Team</td>
+                        <td contenteditable="true">6 months</td>
+                        <td contenteditable="true">Quarterly management reviews conducted with documented actions and accountability for learning system performance</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Conduct comprehensive review and update of all dropped object prevention standards, procedures, and technical specifications to reflect industry best practices and lessons learned from internal incidents</td>
+                        <td><span class="priority-low">LOW</span></td>
+                        <td contenteditable="true">Technical Director / HSE Manager</td>
+                        <td contenteditable="true">6 months</td>
+                        <td contenteditable="true">All dropped object prevention standards updated and aligned with industry best practices</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Implement comprehensive safety performance tracking system including leading indicators for organizational learning effectiveness, incident lesson integration rates, and recurring hazard elimination metrics</td>
+                        <td><span class="priority-low">LOW</span></td>
+                        <td contenteditable="true">HSE Manager / IT Department</td>
+                        <td contenteditable="true">12 months</td>
+                        <td contenteditable="true">Performance tracking system operational with monthly reporting of learning effectiveness metrics to senior management</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Always verify dimensional compatibility between tools and work surfaces - before placing any tool or equipment on grating, scaffolding, or other surfaces with apertures, verify that the tool dimensions are larger than the aperture dimensions to prevent dropped object hazards. Implement mandatory dimensional verification as part of pre-job planning and hazard assessment for all work at height.
+• Systematically integrate lessons from previous incidents into operational procedures - establish formal mechanisms to review all incident reports, extract specific lessons learned, and update relevant PTW templates, procedures, and training materials within defined timelines. Assign clear accountability for this integration and verify implementation through audit and compliance monitoring.
+• Implement multiple layers of dropped object prevention controls - use a hierarchy of controls including engineering controls (grating covers, barriers), administrative controls (PTW requirements, exclusion zones), and personal protective equipment (tool lanyards, tethering systems) to prevent dropped objects. Never rely on a single control measure for high-consequence hazards.
+• Establish systematic compliance monitoring for incident-derived controls - after implementing corrective actions from incident investigations, establish ongoing monitoring and audit programs to verify that controls remain effective over time. Include incident-derived control verification as a standard element of routine safety audits and management reviews.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Design and implement comprehensive organizational learning management system - develop corporate-level systems and procedures that systematically capture lessons from incidents, integrate them into operational controls, define clear accountability for implementation, and verify effectiveness through ongoing monitoring. This system should operate as a continuous improvement cycle embedded in the organization's management processes.
+• Enhance PTW system with automated hazard recognition capabilities - invest in PTW system technology that automatically flags known recurring hazards based on work location, equipment configuration, and task type. Build organizational knowledge into the system design so that lessons learned are systematically applied to future work planning without relying solely on individual memory or competence.
+• Develop mature organizational safety culture focused on learning and improvement - implement long-term culture change initiatives that prioritize learning from incidents, encourage proactive hazard identification and reporting, and recognize individuals and teams who contribute to organizational learning. Build a culture where recurring incidents are seen as organizational system failures rather than individual errors.
+• Establish robust management system governance and accountability - implement senior management accountability frameworks that include regular review of organizational learning system effectiveness, incident lesson integration metrics, and recurring hazard elimination progress. Make organizational learning system performance a key element of management performance evaluation and organizational strategic planning.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Immediate platform-wide safety alert - issue comprehensive safety alert to all personnel describing both the September 2024 and March 2026 incidents, highlighting the recurring nature of the hazard, and mandating immediate implementation of dropped object prevention controls for all work at height above grating areas.
+• Cross-platform and corporate-wide lesson sharing - communicate incident details, root cause analysis findings, and corrective actions to all company platforms and facilities to prevent similar incidents across the organization. Include specific technical details about grating aperture dimensions and tool compatibility requirements.
+• Regular organizational learning effectiveness updates - establish routine communication channels to share information about incident lesson integration progress, corrective action implementation status, and organizational learning system performance metrics with all levels of the organization from frontline workers to senior management.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Mandatory dropped object hazard awareness training - develop and deliver comprehensive training program for all personnel working at height or below work-at-height areas, covering hazard recognition, dimensional compatibility verification, tool storage and control requirements, and use of dropped object prevention equipment including tool lanyards and tethering systems.
+• PTW preparer and approver competency enhancement - provide specialized training for all personnel involved in PTW preparation and approval, focusing on systematic hazard identification techniques, integration of lessons learned from previous incidents, and verification of adequate control measures before work authorization. Include practical exercises using real incident case studies.
+• Supervisor and leadership training on organizational learning - develop training program for supervisors and managers on their roles and responsibilities in the organizational learning system, including incident lesson extraction, procedural updating, implementation verification, and ongoing compliance monitoring. Emphasize leadership accountability for learning system effectiveness.
+• Recurring hazard recognition and control training - provide specialized training on identifying patterns of recurring hazards, understanding root causes of recurrence, and implementing systematic controls to prevent repetition. Include training on how to use incident databases and learning management systems to access and apply historical lessons learned.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">This investigation has identified fundamental organizational system failures that extend far beyond the immediate circumstances of the dropped object near-miss incident. While the immediate cause was the placement of a torque wrench on grating with apertures larger than the tool diameter, the root causes reveal systematic weaknesses in how the organization learns from previous incidents and translates those lessons into effective operational controls. The recurrence of essentially the same incident 18 months after a previous similar event demonstrates that the organization lacks the systematic mechanisms necessary to prevent recurring hazards despite having clear historical evidence of specific risks.
+
+The investigation identified two interconnected root causes that converge on a common meta root cause: the absence of a designed and implemented organizational learning system at the corporate level. This meta root cause represents a comprehensive failure in the organization's ability to systematically extract knowledge from incidents, integrate that knowledge into operational control systems, define clear accountability for implementation, and verify through monitoring and audit that integration has been effective. The failure manifests across multiple organizational functions including incident investigation, PTW system design, hazard identification procedures, change management processes, and compliance monitoring systems.
+
+The organizational impact extends beyond this specific incident to affect all operational risk management processes. The weak organizational learning culture, combined with absent systematic compliance monitoring, means that lessons identified from any incident may not be translated into sustained operational improvements. This creates a pattern where the organization repeatedly experiences similar incidents without developing institutional memory or implementing effective preventive measures. The investigation findings indicate that the organization operates at a reactive rather than proactive safety management maturity level, lacking the systematic learning and improvement capabilities fundamental to high-reliability operations.
+
+The corrective action plan addresses both immediate hazard controls and long-term organizational system improvements. Urgent actions focus on implementing dropped object prevention controls and revising PTW templates to prevent recurrence of this specific hazard. High-priority actions establish the systematic incident learning integration procedures and accountability structures necessary to prevent similar organizational learning failures in the future. Medium and long-term actions focus on enhancing PTW system capabilities, implementing compliance monitoring programs, and developing the organizational culture and management system governance necessary for sustained safety performance improvement. Successful implementation of this comprehensive corrective action plan will require sustained senior management commitment, adequate resource allocation, and ongoing verification of effectiveness through systematic monitoring and audit.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Immediate implementation of dropped object prevention controls for all work at height above grating areas including mandatory tool lanyards, grating covers for high-risk locations, and exclusion zones below work areas - to be completed within 1 week with 100% compliance verified through daily inspections</li>
+<li contenteditable="true">Emergency revision of PTW template to include specific dropped object hazard identification checklist with mandatory dimensional compatibility verification between tools and grating apertures - to be completed within 2 weeks with 100% of new PTWs including completed assessment</li>
+<li contenteditable="true">Mandatory dropped object awareness training for all maintenance, scaffolding, and operations personnel including specific case studies of September 2024 and March 2026 incidents - to be completed within 1 month with 100% of relevant personnel completing training with competency assessment</li>
+<li contenteditable="true">Establishment of systematic incident learning integration procedure defining roles, responsibilities, and timelines for reviewing incidents, extracting lessons, updating procedures, and verifying implementation - to be completed within 1 month with procedure documented, approved, and integrated into management system</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Design and implementation of comprehensive organizational learning management system operating as continuous improvement cycle embedded in management processes - to be completed within 3-6 months with systematic mechanisms for lesson capture, integration, accountability definition, and effectiveness verification</li>
+<li contenteditable="true">Enhancement of PTW system with automated hazard recognition capabilities that flag known recurring hazards based on work location, equipment configuration, and task type - to be completed within 3-6 months with automated system operational covering 100% of known recurring hazards</li>
+<li contenteditable="true">Development of mature organizational safety culture focused on learning and improvement through long-term culture change initiatives - to be implemented over 6-12 months with measurable improvements in culture survey indicators for learning culture and proactive hazard identification</li>
+<li contenteditable="true">Establishment of robust management system governance and accountability frameworks including quarterly senior management reviews of organizational learning system effectiveness and incident lesson integration metrics - to be implemented within 6-12 months with documented management accountability for learning system performance</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Organizational Learning System</td>
+                        <td class="current" contenteditable="true">Absent - no systematic mechanism to capture and integrate incident lessons</td>
+                        <td class="target" contenteditable="true">Comprehensive system with defined processes, accountability, and verification</td>
+                    </tr>
+
+                    <tr>
+                        <td>PTW Hazard Identification</td>
+                        <td class="current" contenteditable="true">Manual process without historical incident integration</td>
+                        <td class="target" contenteditable="true">Automated system flagging known recurring hazards with mandatory controls</td>
+                    </tr>
+
+                    <tr>
+                        <td>Incident Lesson Integration Rate</td>
+                        <td class="current" contenteditable="true">0% - September 2024 lessons not integrated into March 2026 PTW</td>
+                        <td class="target" contenteditable="true">100% - all incident lessons integrated within defined timelines</td>
+                    </tr>
+
+                    <tr>
+                        <td>Compliance Monitoring</td>
+                        <td class="current" contenteditable="true">Absent - no systematic verification of control implementation</td>
+                        <td class="target" contenteditable="true">Monthly audit program with 100% planned audits completed</td>
+                    </tr>
+
+                    <tr>
+                        <td>Dropped Object Controls</td>
+                        <td class="current" contenteditable="true">Inadequate - no specific controls for grating aperture hazards</td>
+                        <td class="target" contenteditable="true">Comprehensive - engineering controls, administrative controls, and PPE</td>
+                    </tr>
+
+                    <tr>
+                        <td>Safety Culture Maturity</td>
+                        <td class="current" contenteditable="true">Reactive - recurring incidents without organizational response</td>
+                        <td class="target" contenteditable="true">Proactive - systematic learning and continuous improvement culture</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            <p style="font-size: 13px; color: #555; margin: 8px 0 12px;">
+                Üstten alta: OLAY → soru (kesik çerçeve) → cevap → kök neden. Yazdırırken dikey A4 için uygundur.
+            </p>
+            <div id="decision-tree-diagram" style="background: white; padding: 12px; border: 1px solid #ddd; width: 100%; min-height: min(95vh, 1400px); overflow: auto;">
+                <div class="mermaid" style="width: 100%; min-height: 90vh;">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden torque wrench, pedestal grating'in 40 mm aperitürü içinden<br/>geçerek 8 metre aşağıya düşmüştür?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Torque wrench, kullanımlar arasında crane pedestal grating'ine<br/>yerleştirilmiştir. Wrench'in 28 mm çapı, grating açıklıklarının 40 mm<br/>genişliğinden daha küçük olduğu için, wrench grating üzerine kaymaya ve<br/>yer değiştirmeye müsait hale gelmiştir. Wrench kontrol altında<br/>tutulmamış veya istinat noktası olmaması nedeniyle, mekanik hareket<br/>sonucu açıklıktan geçerek 8 metre aşağı düşmüştür."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Wrench kontrol altında tutulmamış ve grating açıklığından geçerek<br/>düşmüştür; işçilerin alet kullanımı ve depolanması sırasında uygun tutma<br/>prosedürü (D4.1 - İş Pozisyonu/Hata) veya araç güvenliği eğitimi neden<br/>yetersiz kalmıştır?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Wrench'in kontrol altında tutulamamasının nedeni, çalışanların yüksek<br/>risk alanlarında (özellikle 40mm açıklıklı grating) alet güvenli<br/>depolanması konusunda yeterli eğitim ve prosedür almamasıdır.<br/>Maintenance Technician Rovshan Sultanov ve Apprentice Murad Quliyev,<br/>alet kullanımı sırasında ara tutmalar için uygun saklama yerlerini<br/>tanımlamak üzere eğitilmemiştir. PTW GA-PTW-2026-0312'de grating<br/>açıklıklarından düşme riski spesifik hazard olarak tanımlanmadığından,<br/>çalışanlar bu riski göz önünde bulundurmadan wrench'i grating üzerine<br/>basitçe bırakmıştır. Eylül 2024'teki benzer bir olaydan sonra bile bu<br/>risk sistematik olarak ele alınmamış, müteakip PTW'lerde<br/>tekrarlanmamıştır. Sonuç olarak hata insan faktörü, prosedür eksikliği<br/>ve hazard tanımlama başarısızlığının kombinasyonudur."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Eylül 2024'teki benzer düşme olayı sonrası neden, grating<br/>açıklıklarından düşme riski PTW hazard tanımlama prosedürüne (D4.1 -<br/>Hazard Identification) sistematik olarak dahil edilmemiş ve bu bilgi<br/>müteakip bakım görevlerine aktarılmamıştır?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Eylül 2024'deki benzer düşme olayından sonra, grating açıklıklarından<br/>düşme riski PTW hazard tanımlama prosedürüne sistematik olarak dahil<br/>edilmemiştir çünkü: 1. **Tehike Veritabanı Entegrasyonunun Eksikliği**:<br/>Önceki olay (bolt düşmesi) ile Mart 2026 olayında aynı grating (40 mm<br/>aperture) yeniden sorun oluşturmasına rağmen, bu tehike 'grating<br/>aperture'lardan düşen objeler' olarak standart bir PTW hazard<br/>kategorisine dönüştürülmemiştir. 2. **PTW Hazard Checklist'inin<br/>Güncellememe Başarısızlığı**: Raporta göre 'PTW for pedestal maintenance<br/>did not identify dropped object risk from grating apertures as a<br/>specific hazard, despite a previous dropped object incident (September<br/>2024, bolt through same grating).' Bu açık eksiklik, Eylül 2024 olayı<br/>sonrası remedial action olarak PTW şablonlarına/checklist'lerine<br/>eklenmediğini gösterir. 3. **Bilgi Transfer Mekanizmasının Eksikliği**:<br/>Eylül 2024 olayı raporu ile Mart 2026 PTW prosedürü arasında bilgi<br/>bağlantısı kurulmamıştır. PTW hazard coordinator'u veya maintenance<br/>planner'ı, önceki olayı referans alan bir kontrol mekanizması<br/>kullanmamıştır. 4. **Korektif Önlemler İzleme Başarısızlığı**: D4.1<br/>hazard identification prosedürü, önceki olaylardan öğrenilen spesifik<br/>tehikeleri yeni PTW'lere sistematik olarak entegre etmek için devresel<br/>kontrol (periodic review) içermiyor olmalıdır. Sonuç: İki olay arasında<br/>17+ ay geçmesine rağmen, aynı fiziksel koşul (grating aperture) ve aynı<br/>risk mekanizması (küçük araçların düşmesi) tekrar etmiştir."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden PTW hazard identification prosedürü , önceki benzer olaylardan<br/>elde edilen spesifik tehike bilgisini yeni PTW şablonlarına sistematik<br/>olarak entegre etmek için devresel review ve geri beslenme mekanizması<br/>içermiyor?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["PTW hazard identification prosedürü , önceki benzer olaylardan (Eylül<br/>2024 cırtma olayı) elde edilen spesifik tehlike bilgisini yeni PTW<br/>şablonlarına sistematik olarak entegre etmek için devresel review ve<br/>geri beslenme mekanizması içermemektedir. Sonuç olarak, grating<br/>apertures (40 mm delikler) aracılığıyla torque wrench düşme riski, Mart<br/>2026 PTW'sinde tanımlanmamış ve çoğaltılmıştır. Bu, risk yönetimi<br/>sisteminin, tarihsel kazalardan öğrenme ve bu öğrenmeleri prosedürlere<br/>aktarma konusundaki başarısızlığını göstermektedir. Devresel gözden<br/>geçirme (periodic review), olaylar sonrası geri beslenme (post-incident<br/>feedback) ve şablon güncelleme mekanizmalarının olmaması, belirli<br/>çalışma ortamlarında tekrar eden tehlikelerin tanımlanmasını<br/>önlemektedir."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden, PTW hazard identification sisteminin tasarımında tekrarlanan<br/>tehlikeler için proaktif gözden geçirme (D4.1 - Hazard Identification &<br/>Risk Assessment) ve olay-sonrası şablon güncelleme prosedürü (D4.3 -<br/>Procedural Controls) kurumsal düzeyde entegre edilmemiş veya<br/>uygulanmamaktadır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["PTW hazard identification sisteminde tekrarlanan tehlikelerin proaktif<br/>gözden geçirilmesi ve olay-sonrası şablon güncelleme prosedürü kurumsal<br/>düzeyde entegre edilmemiştir çünkü: 1. **Başarısız Öğrenme Döngüsü**:<br/>September 2024'teki cıvata düşme olayı, '40 mm açıklıklı ızgaraların<br/>küçük araçları düşürmesi riski' olarak standart hale getirilmemiştir. Bu<br/>tehlike, önceki olaydan 18 ay sonra tekrar ortaya çıkmıştır. Kurumda,<br/>previous incidents'ten extracted lessons'ları PTW şablonlarına otomatik<br/>olarak dahil eden bir mekanizma yoktur. 2. **Sistemik Kontrol<br/>Eksikliği**: PTW-GA-PTW-2026-0312, aynı pedestal alanında aynı ızgara<br/>açıklıkları olmasına rağmen, dropped object'i özel bir tehlike olarak<br/>listelememiştir. Bu, change management veya MoC prosedürünün başarısız<br/>olduğunu gösterir - önceki olaydan elde edilen bilgiler yeni permit<br/>şablonlarına aktarılmamıştır. 3. **Hesap Verebilirlik Boşluğu**:<br/>Kimlerin, hangi aralıklarla, önceki olaylardan türetilen tehlikeleri<br/>review ettiği ve PTW şablonlarını güncellediği tanımlanmamıştır. Bu<br/>nedenle, tekrarlanan tehlikeler 'hiç kimsenin sorumluluğu' haline<br/>gelmiştir. **Sonuç**: Kurumsal düzeyde, incident analysis → learning<br/>extraction → PTW template update → validation döngüsü tasarlanmamıştır<br/>veya uygulanmamaktadır. Sonuç olarak, benzer tehlikeler sistematik<br/>olarak tekrar ortaya çıkmaktadır."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>PTW hazard identification sisteminde tekrarlanan tehlikelerin proaktif<br/>gözden geçirilmesi ve olay-sonrası şablon güncelleme prosedürü kurumsal<br/>düzeyde entegre edilmemiştir çünkü: 1. **Başarısız Öğrenme Döngüsü**:<br/>September 2024'teki cıvata düşme olayı, '40 mm açıklıklı ızgaraların<br/>küçük araçları düşürmesi riski' olarak standart hale getirilmemiştir. Bu<br/>tehlike, önceki olaydan 18 ay sonra tekrar ortaya çıkmıştır. Kurumda,<br/>previous incidents'ten extracted lessons'ları PTW şablonlarına otomatik<br/>olarak dahil eden bir mekanizma yoktur. 2. **Sistemik Kontrol<br/>Eksikliği**: PTW-GA-PTW-2026-0312, aynı pedestal alanında aynı ızgara<br/>açıklıkları olmasına rağmen, dropped object'i özel bir tehlike olarak<br/>listelememiştir. Bu, change management veya MoC prosedürünün başarısız<br/>olduğunu gösterir - önceki olaydan elde edilen bilgiler yeni permit<br/>şablonlarına aktarılmamıştır. 3. **Hesap Verebilirlik Boşluğu**:<br/>Kimlerin, hangi aralıklarla, önceki olaylardan türetilen tehlikeleri<br/>review ettiği ve PTW şablonlarını güncellediği tanımlanmamıştır. Bu<br/>nedenle, tekrarlanan tehlikeler 'hiç kimsenin sorumluluğu' haline<br/>gelmiştir. **Sonuç**: Kurumsal düzeyde, incident analysis → learning<br/>extraction → PTW template update → validation döngüsü tasarlanmamıştır<br/>veya uygulanmamaktadır. Sonuç olarak, benzer tehlikeler sistematik<br/>olarak tekrar ortaya çıkmaktadır."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden 28 mm çaplı torque wrench, 40 mm açıklıklı grating üzerine<br/>yerleştirildiğinde geçerek düşebilecek bir duruma geldi (D4.1 - Nesne<br/>Kontrol Başarısızlığı)?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Torque wrench, 28 mm çapındaki gövdesiyle 40 mm açıklıklı grating<br/>üzerine yerleştirildiğinde, wrench'in çapı grating deliklerinden daha<br/>küçük olduğu için stabilizasyonu sağlanamaz ve yerçekimi etkisinde<br/>wrench kaymaya ve düşmeye maruz kalır. Wrench'in çapı (28 mm) ile<br/>grating açıklığı (40 mm) arasındaki 12 mm fark, nesnenin kontrol altında<br/>tutulmasını imkânsız hale getirir. Wrench destek yüzeyini kaybederek<br/>boşluğa düşer ve 8 metre aşağıya serbest düşer."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden torque wrench'in 40 mm açıklıklı pedestal grating üzerine<br/>yerleştirilmesi, geçerli Permit to Work (PTW No. GA-PTW-2026-0312) ve<br/>maintenance prosedürlerinde (D4.1 - İş Kontrol Sistemi) dropped object<br/>riski olarak tanımlanmadı ve kontrol edilmedi?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Torque wrench'in 40 mm açıklıklı pedestal grating üzerine<br/>yerleştirilmesi dropped object riski olarak tanımlanmadı ve kontrol<br/>edilmedi çünkü: 1. **Hazard Identification Başarısızlığı**: PTW<br/>GA-PTW-2026-0312 hazırlanırken, grating aperture boyutları (40 mm) ile<br/>torque wrench çapı (28 mm) arasındaki uyumsuzluk ve potansiyel düşme<br/>riski sistematik olarak değerlendirilmedi. PTW şablonunda dropped object<br/>riski belirli bir hazard olarak listelenmedi. 2. **Önceki Olaydan Ders<br/>Alınmadı**: Eylül 2024'te aynı grating üzerinden bir bolt düşmesi olayı<br/>meydana gelmesine rağmen, bu bilgi PTW hazırlama prosedürüne veya risk<br/>register'ına yeterince entegre edilmedi. Tekrarlayan hazard tanınmadı.<br/>3. **D4.1 İş Kontrol Sistemi Uygulama Eksikliği**: Maintenance prosedürü<br/>, dropped object risk assessment'ını geçerli bir kontrol noktası olarak<br/>belirtmiş olmalı, ancak bu kontrol uygulanmadı veya PTW hazırlama ekibi<br/>tarafından bypass edilmiş görünmektedir. 4. **Kontrol Tedbirleri<br/>Eksikliği**: PTW'ye, araçların grating üzerine doğrudan<br/>yerleştirilmesini yasaklayan veya alternatif depolama yöntemi kullanan<br/>mitigasyon kontrolleri eklenmedi. 5. **Yönetimsel Boşluk**: PTW onay<br/>etmeden önce, dropped object risk'i kontrol etmek için HSE<br/>expertise'inin katılımı olmaması veya yetersiz olması."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Neden PTW GA-PTW-2026-0312 hazırlanırken, Eylül 2024'te aynı<br/>grating'den düşen bolt olayının ardından, dropped object riski için bir<br/>tekrarlayan hazard prosedürü veya grating aperture'ları ile ilgili<br/>teknik kontrol kriteri sisteme entegre edilmedi?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["PTW GA-PTW-2026-0312 hazırlanırken dropped object riski için<br/>tekrarlayan hazard prosedürü veya grating aperture'ları ile ilgili<br/>teknik kontrol kriteri sisteme entegre edilmedi çünkü: 1. **Olaylar<br/>Arası Öğrenme Eksikliği**: Eylül 2024'teki bolt düşme olayı sonrası,<br/>aynı grating'den kaynaklanan dropped object riski için platform HSE<br/>sisteminde güncelleme yapılmamış; önceki olayın sonuçları PTW<br/>checklist'ine veya teknik prosedürlere yansıtılmamıştır. 2. **Hazard<br/>İdentifikasyon Eksikliği**: 40 mm grating aperture'ları (28 mm torque<br/>wrench handle'ından büyük) potansiyel dropped object kaynağı olarak<br/>tanımlanmamıştır; bu grating konfigürasyonu için spesifik kontrol<br/>kriteri oluşturulmamıştır. 3. **Tekrarlayan Hazard Protokolü Yokluğu**:<br/>Aynı lokasyonda (Crane Pedestal, grating alan) tekrarlayan doğada olan<br/>dropped object riski için sistematik bir prosedür veya teknik kontrol<br/>kuralı oluşturulmamıştır. 4. **PTW Hazırlama Standartlarının<br/>Yetersizliği**: PTW hazırlama sürecinde grating aperture boyutları ile<br/>el aletleri boyutlarının karşılaştırılmasını gerektiren bir kriteria<br/>veya yazılı kontrol prosedürü mevcut değildir. 5. **Yönetimsel Kontrol<br/>Zayıflığı**: Eylül 2024 olayından sonra, platform HSE bölümü tarafından<br/>'tekrarlayan hazard' olarak kategorize edilen risklerin sisteme<br/>entegrasyonu sağlanmamıştır."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Neden, platform HSE sisteminde eylül 2024 dropped object olayından<br/>sonra, benzer grating aperture hazardı için teknik kontrol kriterlerinin<br/>ve PTW checklist güncellemelerinin sistematik olarak uygulanması<br/>sağlanmadı ve bu tür 'tekrarlayan hazard' bilgisi PTW hazırlayan<br/>teknisyenlere ve kontrol mercilerine aktarılmadı?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Platform HSE sisteminde eylül 2024 dropped object olayından sonra<br/>benzer grating aperture hazardı (D4.1 - Hazard tasarımı/kontrol) için<br/>teknik kontrol kriterlerinin ve PTW checklist güncellemelerinin<br/>sistematik olarak uygulanmaması, iki temel sistem başarısızlığından<br/>kaynaklanmıştır: **Birincisi:** Olay sonrası öğrenme ve düzeltme kontrol<br/>mekanizması çalışmamıştır. Eylül 2024'teki benzer olay (vida grating'ten<br/>düşmesi) ile Mart 2026'daki olay (torque wrench düşmesi) arasında 18<br/>aylık sürede, aynı grating aperture (40mm) ile ilgili yapılan tehlike<br/>değerlendirmesi güncellenmemiş ve PTW hazırlayan personele bu bilgi<br/>aktarılmamıştır. Bu, D1.3 (Kontrol Yeterliliği - Hazard Yönetimi)<br/>altında bir sistem kontrolü eksikliğidir. **İkincisi:** PTW sistemi ve<br/>kontrol kriterlerine 'tekrarlayan hazard' bilgisi entegre edilmemiştir.<br/>Önceki olaydan türetilen risk kontrol kriterlerinin PTW checklist'ine<br/>eklenmesi ve işletme prosedürüne dönüştürülmesi için formal bir<br/>mekanizma yoktur. Bu, D9.1 (Prosedür/Checklist Yeterliliği) ve D3.2<br/>(Operasyonal Kılavuzlar) başarısızlığıdır. **Sonuç:** Platform, 'bilinen<br/>tekrarlayan hazard' için sistematik kontrol mekanizması kurmamıştır. Bu,<br/>kurumsal bellek ve çapraz fonksiyonal bilgi paylaşımı eksikliğinin bir<br/>göstergesidir."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Platform operasyon yönetimi ve şirket grup standardında, tekrarlayan<br/>hazardlardan (D1.3 Kontrol Yeterliliği başarısızlığı) elde edilen<br/>derslerin sistematik olarak PTW ve operasyonal kılavuzlara entegre<br/>edilmesi için kurumsal sorumluluk ve yönetim mekanizması neden<br/>tanımlanmamıştır?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Platform operasyon yönetiminde, tekrarlayan hazardlardan (grating<br/>aperture vasıtasıyla cisim düşmesi) alınan derslerin sistematik<br/>entegrasyonu için kurumsal sorumluluk ve yönetim mekanizması<br/>tanımlanmamıştır. Bunun nedenleri: 1. **Risk Değerlendirmesi Döngüsü<br/>Kopuk**: Eylül 2024 düşen cisim olayından sonra, grating aperture riski<br/>için spesifik kontrol önlemleri tanımlanmadı. Mart 2026 PTW'si, bu riski<br/>tekrar tanımadığı için, ilk olaydan alınan dersler uygulanmadı. 2. **PTW<br/>Sistem Tasarımında Eksiklik**: PTW şablonu, pedestal bakım görevlerinde<br/>grating aperture riskini otomatik olarak tanıyacak şekilde<br/>tasarlanmamıştır. Bu, D4.4 (PTW Sistem Başarısızlığı) kapsamında, sistem<br/>düzeyinde bir tasarım boşluğudur. 3. **Sistematik Uyum İzleme Yoktur**:<br/>Grating riskine karşı kontrollerin uygulanıp uygulanmadığını doğrulayan<br/>bir audit veya uyum takip sistemi bulunmamaktadır (D9.5 -<br/>Monitoring/Audit Yetersiz). 4. **Öğrenme Kültürü Kurumsal Seviyede<br/>Zayıf**: İlk olaydan sonra, operasyonal kılavuzlara sistematik<br/>entegrasyon için sorumlu bir yönetim rolü veya mekanizması atanmamıştır<br/>(D1.7 - Zayıf Öğrenme Kültürü). 5. **Tekrarlayan Arıza Analizi Eksik**:<br/>Aynı arıza 18 ay sonra tekrarlandığında, ilk olayın kök neden analizi<br/>sonuçlarını uygulamama sorumluluğu belirlenmemiştir ."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Platform operasyon yönetiminde, tekrarlayan hazardlardan (grating<br/>aperture vasıtasıyla cisim düşmesi) alınan derslerin sistematik<br/>entegrasyonu için kurumsal sorumluluk ve yönetim mekanizması<br/>tanımlanmamıştır. Bunun nedenleri: 1. **Risk Değerlendirmesi Döngüsü<br/>Kopuk**: Eylül 2024 düşen cisim olayından sonra, grating aperture riski<br/>için spesifik kontrol önlemleri tanımlanmadı. Mart 2026 PTW'si, bu riski<br/>tekrar tanımadığı için, ilk olaydan alınan dersler uygulanmadı. 2. **PTW<br/>Sistem Tasarımında Eksiklik**: PTW şablonu, pedestal bakım görevlerinde<br/>grating aperture riskini otomatik olarak tanıyacak şekilde<br/>tasarlanmamıştır. Bu, D4.4 (PTW Sistem Başarısızlığı) kapsamında, sistem<br/>düzeyinde bir tasarım boşluğudur. 3. **Sistematik Uyum İzleme Yoktur**:<br/>Grating riskine karşı kontrollerin uygulanıp uygulanmadığını doğrulayan<br/>bir audit veya uyum takip sistemi bulunmamaktadır (D9.5 -<br/>Monitoring/Audit Yetersiz). 4. **Öğrenme Kültürü Kurumsal Seviyede<br/>Zayıf**: İlk olaydan sonra, operasyonal kılavuzlara sistematik<br/>entegrasyon için sorumlu bir yönetim rolü veya mekanizması atanmamıştır<br/>(D1.7 - Zayıf Öğrenme Kültürü). 5. **Tekrarlayan Arıza Analizi Eksik**:<br/>Aynı arıza 18 ay sonra tekrarlandığında, ilk olayın kök neden analizi<br/>sonuçlarını uygulamama sorumluluğu belirlenmemiştir ."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: false,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 20,
+                            nodeSpacing: 28,
+                            rankSpacing: 56,
+                            diagramPadding: 16
+                        },
+                        themeVariables: {
+                            fontSize: '14px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#222',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: false,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 20,
+                                    nodeSpacing: 28,
+                                    rankSpacing: 56,
+                                    diagramPadding: 16
+                                },
+                                themeVariables: {
+                                    fontSize: '14px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

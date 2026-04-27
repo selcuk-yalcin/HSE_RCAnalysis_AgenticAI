@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }
+        header .top-title { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        header h1 { font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }
+        header .subtitle { font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+        #diagram-wrap {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }
+        #diagram-wrap .mermaid {
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }
+        #diagram-wrap svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden enleme kirişi kalıp montajı sırasında çalışanın ayağı kayarak<br/>dengesini kaybetmesine neden olan zemin/yüzey koşulu oluştu?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Enleme kirişi kalıp montajı sırasında çalışanın ayağının kayarak<br/>dengesini kaybetmesine neden olan zemin koşulu, çalışma alanındaki dolgu<br/>toprak zeminin düzensiz, kompakte ve potansiyel olarak kaygan durumda<br/>olmasıdır. Raporda 'dolgu toprak zemine düştüğü' belirtilmektedir.<br/>İnşaat sahasında, özellikle trafik ve insan hareketinin yoğun olduğu<br/>alanlarda, toprak zeminin sıkışarak ve nemli koşullarda kayganlaşması<br/>doğal bir sonuçtur. Ayrıca, çalışma alanının düzenli temizlik,<br/>seviyeleme ve zemin hazırlığı bakımından eksiklikler bulunmuş olabilir.<br/>Temel sebep, çalışma ortamında yer seviyelemesi ve zemin güvenliğine<br/>yönelik yeterli kontrol mekanizmasının olmamasıdır."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden çalışma alanında (AK05 orta aks dolgu toprak zemin) düzenli zemin<br/>hazırlığı, seviyeleme ve kayganlaşma kontrolü (D4.1 - İş ortamı ve<br/>çalışma yüzeyi yönetimi) prosedürleri uygulanmadı veya yetersiz kaldı?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["AK05 orta aks dolgu toprak zemin alanında zemin hazırlığı, seviyeleme<br/>ve kayganlaşma kontrolü prosedürleri uygulanmadı veya yetersiz kaldı<br/>çünkü: 1. **Çalışma alanı hazırlığının standart prosedürleştirilmesi<br/>eksik**: Raporda, dolgu toprak zemin alanının ön hazırlığı<br/>(düzleştirilme, stabilizasyon, kayganlaşma giderme) konusunda yazılı<br/>prosedür uygulanmadığı görülmektedir. 2. **Sabit denetim eksikliği**:<br/>'Calisma aninda supervizor/formen/ekip basi sabit varliginin yeterli<br/>olmadigi tespit edildi' - bu durum, zemin koşullarının periyodik<br/>kontrolünü ve iyileştirilmesini engellemektedir. 3. **Çalışma yüzeyinin<br/>dinamik değerlendirilmesi yapılmamış**: Emleme kiriş montajı sırasında<br/>(10:40-14:27 arası 4+ saat), çalışma yüzeyinin (dolgu toprak zemin) ilk<br/>koşulunun değişimini (nem, sıkışabilirlik, kayganlaşma) izleyen bir<br/>sistem bulunmamaktadır. 4. **Koruma önlemleri (ankraj) yetersiz<br/>denetim**: Emniyet kemeri fiziki olarak mevcut olmasına rağmen, çalışan<br/>bağlantı yapmadığında supervizyon bunu engelleyememiş - bu, zemin<br/>düzeyindeki fiziki kontrolün yetersizliğinden kaynaklanmıştır. Zemin<br/>hazırlığı yeterli olsaydı, ek koruma mekanizması tetiklenecekti."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden 10:40-14:27 saatleri arasında enleme kiriş montajı sırasında<br/>supervizor/formen/ekip başının AK05 çalışma alanında sabit ve etkili<br/>denetimi sağlanmadı (D5.2 - İnsan kaynakları ve yönetim<br/>görevlendirmesi)?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["10:40-14:27 saatleri arasında enleme kiriş montajı sırasında<br/>supervizör/formen/ekip başının sabit ve etkili denetimi sağlanmadığının<br/>nedeni, iş organizasyonunda yüksekte çalışma operasyonları için yeterli<br/>insan kaynağının görevlendirilmemesidir. Raporda 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı tespit<br/>edilmiştir.' Bu durum, yönetim tarafından yüksek riskli montaj<br/>faaliyetinde (7-9 metre yükseklikte enleme kiriş kalıp montajı) sürekli<br/>gözetim ve denetim görevinin tanımlanmamış, atanmamış veya etkin şekilde<br/>yürütülmemiş olduğunu gösterir. Sonuç olarak, çalışan emniyet kemeri<br/>bulunmasına rağmen, bunu kullanmadığında bunun tespit ve müdahale<br/>edilmesi mümkün olmamıştır."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden projenin iş planlama ve yönetim organizasyonunda, enleme kiriş<br/>kalıp montajı gibi 7-9 metre yükseklikte gerçekleştirilen riskli<br/>operasyonlar için gerekli denetim ve gözetim kaynakları<br/>(supervizor/formen vb.) önceden tanımlanmış ve tahsis edilmemiştir ?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Enleme kirişi kalıp montajı gibi 7-9 metre yükseklikte gerçekleştirilen<br/>operasyonlar için iş planlama ve organizasyonda, gerekli denetim ve<br/>gözetim kaynakları (supervizor/formen vb.) önceden tanımlanmış ve tahsis<br/>edilmemiştir. Raporda açıkça 'çalışma anında supervizor/formen/ekip başı<br/>sabit varlığının yeterli olmadığı' tespit edilmiştir. Sonuç olarak, 18<br/>yaşındaki panel kalıpçı çalışan, yüksek riskteki bu operasyonda yetersiz<br/>gözetim altında çalışmış ve emniyet kemeri bağlantısının kontrol<br/>edilmemesi nedeniyle 9 metre yükseklikten düşmüştür. Etkili gözetim<br/>eksikliği, davranışsal kontrol mekanizmalarının çökmesine yol açmıştır."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden yüksek risk operasyonları (7-9 metre yükseklikte çalışma vb.)<br/>için iş planlama ve organizasyon sürecinde, risk seviyesine dayalı<br/>olarak gerekli denetim ve gözetim kaynakları (supervizor/formen)<br/>tanımlayan ve bu kaynakları tahsis eden standart bir metodoloji veya<br/>kontrol mekanizması bulunmamaktadır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Yüksek risk operasyonları için iş planlama ve organizasyon sürecinde,<br/>risk seviyesine dayalı olarak gerekli denetim ve gözetim kaynakları<br/>tanımlayan ve tahsis eden standart bir metodoloji eksikliği vardır. Kaza<br/>raporuna göre, 9 metre yükseklikte yapılan enleme kirişi kalıp montaj<br/>çalışması sırasında 'supervizor/formen/ekip başı sabit varlığının<br/>yeterli olmadığı' tespit edilmiştir. Bu, operasyonun risk seviyesini<br/>karşılayacak gözetim yapısının önceden planlanmadığını gösterir. Emniyet<br/>kemeri gibi kişisel koruma ekipmanları mevcutken, çalışanın kemeri<br/>bağlamaması kontrol edilememesinin nedeni, sabit ve sürekli bir gözetim<br/>mekanizmasının tasarım aşamasında tanımlanmamış olmasıdır.<br/>Organizasyonda risk değerlendirmesinden gözetim kaynaklarının tahsisine<br/>kadar ilerleyen bir sistem tasarımı protokolü bulunmamaktadır."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Yüksek risk operasyonları için iş planlama ve organizasyon sürecinde,<br/>risk seviyesine dayalı olarak gerekli denetim ve gözetim kaynakları<br/>tanımlayan ve tahsis eden standart bir metodoloji eksikliği vardır. Kaza<br/>raporuna göre, 9 metre yükseklikte yapılan enleme kirişi kalıp montaj<br/>çalışması sırasında 'supervizor/formen/ekip başı sabit varlığının<br/>yeterli olmadığı' tespit edilmiştir. Bu, operasyonun risk seviyesini<br/>karşılayacak gözetim yapısının önceden planlanmadığını gösterir. Emniyet<br/>kemeri gibi kişisel koruma ekipmanları mevcutken, çalışanın kemeri<br/>bağlamaması kontrol edilememesinin nedeni, sabit ve sürekli bir gözetim<br/>mekanizmasının tasarım aşamasında tanımlanmamış olmasıdır.<br/>Organizasyonda risk değerlendirmesinden gözetim kaynaklarının tahsisine<br/>kadar ilerleyen bir sistem tasarımı protokolü bulunmamaktadır."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden çalışan, mevcut ankraj noktasına emniyet kemeri bağlantısını<br/>yapmadı?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Çalışan, mevcut ankraj noktasına emniyet kemeri bağlantısını yapmadı<br/>çünkü: Çalışma alanında sabit supervizor/formen/ekip başı gözetimi<br/>yeterli olmadığından, bağlantı yapma konusunda etkin denetim<br/>sağlanmamıştır. Ayrıca, ankraj bağlantısını uzaktan tespit etmenin zor<br/>olması nedeniyle, bağlantı yapılmadığının kontrol edilmesi mümkün<br/>olmamıştır. Bu durum, çalışanın kişisel davranış seçimini (emniyet<br/>kemeri bağlantısını ihmal etme) engelleyecek yeterli gözetim, kontrol<br/>mekanizması ve davranışsal eğitim uygulamasının eksikliğinden<br/>kaynaklanmıştır."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden çalışma alanında sabit supervizor/formen/ekip başı gözetimi<br/>yeterli olmadı ve ankraj bağlantısı uygulaması etkin şekilde<br/>denetlenmeledi?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Sabit supervizor/formen/ekip başı gözetimi yeterli olmadığı için: 1.<br/>**Gözetim Kapsamı Yetersizliği**: Çalışma alanında sabit bir gözlemci<br/>olmasına rağmen, ankraj bağlantı noktasının uzaktan görülmesinin zor<br/>olduğu belirtilmiştir. Bu, gözetim tasarımının fiziksel çalışma<br/>koşullarına uyum sağlamadığını gösterir. 2. **Etkin Denetim Prosedürünün<br/>Eksikliği**: Ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerinin<br/>uygulanıp uygulanmadığının sistematik olarak kontrol edilmesi için<br/>tanımlanmış bir prosedür bulunmamaktadır. 3. **Gözetim Yetki ve<br/>Sorumluluğunun Net Olmayışı**: Kiminin ankraj bağlantısını kontrol<br/>etmekle yükümlü olduğu ve bu kontrolün nasıl gerçekleştirileceği açıkça<br/>tanımlanmamış olabilir. 4. **Reaktif Yerine Proaktif Denetlem<br/>Eksikliği**: Kaza meydana gelmeden önce ankraj bağlantısının kontrol<br/>edilmesi için planlı bir denetim sistemi uygulanmamaktadır."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Neden ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerinin uygulanıp<br/>uygulanmadığını sistematik olarak kontrol etmek için tanımlanmış bir<br/>denetim prosedürü ve net yetki-sorumluluk dağılımı oluşturulmamıştır?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerinin uygulanıp<br/>uygulanmadığını sistematik olarak kontrol etmek için tanımlanmış bir<br/>denetim prosedürü ve net yetki-sorumluluk dağılımı oluşturulmamıştır<br/>çünkü: Organizasyonun İSG yönetim sisteminde Tehlike Belirleme, Risk<br/>Değerlendirmesi ve Kontrol Tedbirilerinin Uygulanması aşamasında (D4.2 -<br/>Denetim ve İzleme) eksiklikler bulunmaktadır. Raporun bulgularında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı ve kaza<br/>noktasında ankraj bağlantısının uzaktan kontrolünün zor olduğu<br/>belirtilmiştir. Bu durum, çalışanların yüksekte çalışma sırasında<br/>emniyet kemeri bağlantısı yapıp yapmadığının, kimler tarafından, hangi<br/>sıklıkla kontrol edileceğinin ve bu kontroller sırasında sorumlu<br/>kişilerin kim olacağının net olmadığını göstermektedir. Sonuç olarak,<br/>ankraj bağlantısı tedbirinin uygulanması tamamen çalışanın kişisel<br/>inisiyatifine bırakılmış, sistematik ve düzenli denetim mekanizması<br/>işletilmemiştir."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Yüksekte çalışan panellerde ankraj bağlantısı gibi yaşamsal güvenlik<br/>tedbirlerinin sürekli denetiminden sorumlu supervizor/formen/ekip başı<br/>gibi kişilerin görevleri, yetkileri ve denetim sıklıkları neden açık<br/>şekilde tanımlanmamış ve belirlenmiş personele formal olarak<br/>atanmamıştır?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Supervizor/formen/ekip başı gibi denetim görevlisi kişilerin yüksekte<br/>çalışma sırasında ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerini<br/>denetleme görevleri, yetkileri ve denetim sıklıkları açık şekilde<br/>tanımlanmamış ve formal olarak belirlenmiş personele atanmamıştır.<br/>Raporda; saha genelinde ISG personeli ve çoklu ekipler mevcutken,<br/>'supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu durum, denetim sorumluluğunun net olmadığını, kimin ne<br/>zaman hangi sıklıkta ankraj bağlantısını kontrol edeceğinin<br/>belirlenmediğini göstermektedir. Sonuç olarak, ankraj bağlantısı<br/>yapılmadığı halde bu durum önceden tespit edilememiş ve müdahale<br/>yapılamamıştır. Denetim görevlisi kişilere formal olarak atanan<br/>sorumluluğun, belirli denetim prosedürü ve sıklığının olmaması temel<br/>sistemik sorundur."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Yüksekte çalışmalar sırasında ankraj bağlantısı denetimi için formal<br/>görev atanmadığı sorunu, neden kurumsal iş sağlığı ve güvenliği yönetim<br/>sistemi içinde denetim prosedürleri, sorumluluk atanması ve periyodik<br/>kontrol mekanizmaları tanımlanmamış ve belgelendirilmemiştir?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Kurumsal İSG yönetim sistemi içinde yüksekte çalışmalar sırasında<br/>ankraj bağlantısı denetimi için formal görev atanmadığı sorunu, formal<br/>prosedürlerin, sorumluluk tanımının ve periyodik kontrol<br/>mekanizmalarının tanımlanmaması ve belgelendirilmemesinden<br/>kaynaklanmaktadır. Raporda 'supervizor/formen/ekip basi sabit varliginin<br/>yeterli olmadigi' ve 'ankraj baglantisini uzaktan tespit etmenin zor<br/>oldugu' ifadeleri göstermektedir ki: (1) Kimlerin ankraj kontrolünü<br/>yapacağı belirtilmemiş, (2) Kontrolün nasıl ve ne sıklıkla yapılacağı<br/>prosedürleştirilmemiş, (3) Denetim sonuçlarının kaydedileceği ve takip<br/>edileceği bir sistem kurulmamıştır. Bu nedenle çalışan emniyet kemeri<br/>bağlantısı yapılmadığı halde kimse bunu tespit ve müdahale edememişdir."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Kurumsal İSG yönetim sistemi içinde yüksekte çalışmalar sırasında<br/>ankraj bağlantısı denetimi için formal görev atanmadığı sorunu, formal<br/>prosedürlerin, sorumluluk tanımının ve periyodik kontrol<br/>mekanizmalarının tanımlanmaması ve belgelendirilmemesinden<br/>kaynaklanmaktadır. Raporda 'supervizor/formen/ekip basi sabit varliginin<br/>yeterli olmadigi' ve 'ankraj baglantisini uzaktan tespit etmenin zor<br/>oldugu' ifadeleri göstermektedir ki: (1) Kimlerin ankraj kontrolünü<br/>yapacağı belirtilmemiş, (2) Kontrolün nasıl ve ne sıklıkla yapılacağı<br/>prosedürleştirilmemiş, (3) Denetim sonuçlarının kaydedileceği ve takip<br/>edileceği bir sistem kurulmamıştır. Bu nedenle çalışan emniyet kemeri<br/>bağlantısı yapılmadığı halde kimse bunu tespit ve müdahale edememişdir."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden emniyet kemeri bağlantısı yapılmadı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Emniyet kemeri bağlantısı yapılmadığı için yüksekten düşme kazası<br/>gerçekleşmiştir. Rapordan elde edilen bulgular göstermektedir ki: (1)<br/>Çalışma alanında uygun ankraj noktası mevcut olmasına rağmen çalışan bu<br/>bağlantıyı yapmamıştır. (2) Saha genelinde ISG personeli bulunmasına<br/>rağmen, çalışma anında supervizor/formen/ekip başı sabit varlığının<br/>yeterli olmadığı tespit edilmiştir. (3) Kaza noktasında çalışanın ankraj<br/>bağlantısını uzaktan tespit etmenin zor olması nedeniyle etkili denetim<br/>sağlanamamıştır. (4) Bu nedenle çalışan, EN 361/EN 353/EN 362<br/>standardını karşılayan emniyet kemerini kullanmamış ve 9 metre<br/>yükseklikten düşerek ciddi yaralanmaya (açık kırık, cerrahi müdahale)<br/>uğramıştır."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden saha genelinde ISG personeli bulunmasına rağmen, yüksekte çalışan<br/>panel kalıpçının ankraj bağlantısını ve emniyet kemeri kullanımını<br/>müdahale ile denetleyecek supervizor/formen/ekip başı sabit varlığı ve<br/>denetim mekanizması yeterli olmadı (D1.3 - İş organizasyonu ve denetim)?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Saha genelinde ISG personeli bulunmasına rağmen denetim mekanizması<br/>yeterli olmadığı için, panel kalıpçının ankraj bağlantısı ve emniyet<br/>kemeri kullanımı denetlenmemiştir. Rapor bulgularında açıkça 'çalışma<br/>anında supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' ve<br/>'kaza noktasında çalışanın ankraj bağlantısını uzaktan tespit etmenin<br/>zor olduğu' belirtilmiştir. Bu, yüksekte çalışma gibi yüksek riskli<br/>işlerde operasyonel seviyede müdahaleci, sabit ve yakından denetim<br/>mekanizmasının eksik olduğunu göstermektedir. İş organizasyonu<br/>açısından, ISG personelinin varlığı yeterli değildir; çalışma sahasında<br/>doğrudan gözetim yapacak, kişisel emniyet donanımlarının kullanımını<br/>anında kontrol edecek formen/ekip başı seviyesinde sabit denetim<br/>mekanizması kurgulanmamıştır."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden saha organizasyonunda, yüksekte çalışma gibi yüksek riskli<br/>işlerde formen/ekip başı seviyesinde sabit ve yakından denetim<br/>mekanizması kurgulanmamış veya uygulanmamıştır?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Saha organizasyonunda, yüksekten çalışma gibi yüksek riskli işlerde<br/>formen/ekip başı seviyesinde sabit ve yakından denetim mekanizması<br/>kurgulanmadığı veya yeterince uygulanmadığı için, çalışan emniyet kemeri<br/>bağlantısını yapmamış ve bu ihmal 9 metre yükseklikten düşmeye neden<br/>olmuştur. Rapor, 'çalışma anında supervizor/formen/ekip başı sabit<br/>varlığının yeterli olmadığı' ve 'kaza noktasında çalışanın ankraj<br/>bağlantısını uzaktan tespit etmenin zor olduğu' belirtmektedir.<br/>Yakından, sabit denetim olması halinde, çalışanın emniyet kemeri<br/>bağlanması konusundaki uyumunu kontrol etmek ve gerektiğinde müdahale<br/>etmek mümkün olabilirdi. Bu, özellikle 18 yaşında ve 7 aylık iş<br/>tecrübesi olan genç bir işçi için kritik bir kontrol mekanizmasıydı."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Neden AK05 alan yüksekten çalışma operasyonlarında, formen/ekip başı<br/>pozisyonlarının iş tanımı ve sorumluluk çerçevesi, sabit yakın denetim<br/>görevini açık ve ölçülebilir bir hedef olarak kapsamayacak şekilde<br/>tasarlanmış veya güncelleştirilmemiştir?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["AK05 alan yüksekten çalışma operasyonlarında, formen/ekip başı<br/>pozisyonlarının iş tanımı ve sorumluluk çerçevesi, 'sabit yakın denetim'<br/>görevini açık ve ölçülebilir bir hedef olarak kapsamayacak şekilde<br/>tasarlanmıştır çünkü: Raporda tespit edilen bulgulardan: 'Calisma aninda<br/>supervizor/formen/ekip basi sabit varliginin yeterli olmadigi tespit<br/>edildi.' Bu, denetim görevinin tanımlanmadığını veya operasyonel olarak<br/>uygulanmadığını gösterir. Formen/ekip başı pozisyonlarının sorumluluk<br/>çerçevesinde, özellikle 7 aylık genç işçilerin emniyet kemeri<br/>bağlantısını kontrol etme, ankraj noktası kullanımını doğrulama gibi<br/>spesifik ve ölçülebilir denetim görevleri bulunmamaktadır. Sonuç olarak,<br/>sabit yakın denetimin gerçekleşmediği ve çalışanın ankraj bağlantısını<br/>yapmadığı durum önlenememektedir. İş tanımı bu görevleri açık hedefler<br/>olarak içermediği için, denetim sorumluluğu muğlak ve ölçülmez<br/>kalmaktadır."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Neden Proje Yönetimi ve İnsan Kaynakları departmanları, yüksekten<br/>çalışma operasyonları için formen/ekip başı pozisyonlarının iş<br/>tanımlarında 'sabit yakın denetim' ve 'emniyet kemeri/ankraj bağlantısı<br/>doğrulama' görevlerini açık, ölçülebilir ve sorumlu kılacak şekilde<br/>formalize ve entegre etmeme kararını veya süreci belirlemişlerdir?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Proje Yönetimi ve İnsan Kaynakları departmanları, yüksekten çalışma<br/>operasyonları için formen/ekip başı pozisyonlarının iş tanımlarında<br/>'sabit yakın denetim' ve 'emniyet kemeri/ankraj bağlantısı doğrulama'<br/>görevlerini formalize ve ölçülebilir kılmama kararı almışlardır. Raporda<br/>tespit edilen sonuç, 'çalışma anında supervizor/formen/ekip başı sabit<br/>varlığının yeterli olmadığı'dır. Bu durum, formen/ekip başının<br/>sorumluluk sahasının: - İş tanımında açıkça tanımlanmadığını -<br/>Performans ölçütleri belirtilmediğini (örn: 'Her 30 dakikada bir ankraj<br/>bağlantısı doğrulaması', 'Çalışanı 5 metre çapında izlem alanında<br/>görmek') - Hesap verebilirliğin netleştirilmediğini - Ceza ve ödül<br/>mekanizmalarının bu sorumluluklarla bağlantılandırılmadığını<br/>göstermektedir. Sonuç olarak, formen/ekip başı pozisyonunun sahibi,<br/>kritik güvenlik görevlerinin (ankraj bağlantısı doğrulaması, sabit yakın<br/>denetim) kendi sorumluluğu olduğunun bilincinde olmayabilir veya bu<br/>görevlerin aciliyet seviyesi anlaşılmamış olabilir."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Proje Yönetimi ve İnsan Kaynakları departmanları, yüksekten çalışma<br/>operasyonları için formen/ekip başı pozisyonlarının iş tanımlarında<br/>'sabit yakın denetim' ve 'emniyet kemeri/ankraj bağlantısı doğrulama'<br/>görevlerini formalize ve ölçülebilir kılmama kararı almışlardır. Raporda<br/>tespit edilen sonuç, 'çalışma anında supervizor/formen/ekip başı sabit<br/>varlığının yeterli olmadığı'dır. Bu durum, formen/ekip başının<br/>sorumluluk sahasının: - İş tanımında açıkça tanımlanmadığını -<br/>Performans ölçütleri belirtilmediğini (örn: 'Her 30 dakikada bir ankraj<br/>bağlantısı doğrulaması', 'Çalışanı 5 metre çapında izlem alanında<br/>görmek') - Hesap verebilirliğin netleştirilmediğini - Ceza ve ödül<br/>mekanizmalarının bu sorumluluklarla bağlantılandırılmadığını<br/>göstermektedir. Sonuç olarak, formen/ekip başı pozisyonunun sahibi,<br/>kritik güvenlik görevlerinin (ankraj bağlantısı doğrulaması, sabit yakın<br/>denetim) kendi sorumluluğu olduğunun bilincinde olmayabilir veya bu<br/>görevlerin aciliyet seviyesi anlaşılmamış olabilir."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden çalışan, dusme riski taşıyan yüksekten çalışma alanında (9m)<br/>uygun ankraj noktası olmasına rağmen emniyet kemeri (EN 361/EN 353/EN<br/>362) bağlantısını yapmadı?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q31
+    A32["Çalışanın emniyet kemeri bağlantısını yapmadığının birincil nedeni, iş<br/>alanında yeterli seviyede doğrudan gözetim ve anlık denetimin<br/>bulunmamasıdır. Raporda belirtildiği üzere 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu yaşta (18 yaşında) ve deneyimde (7 ay) olan çalışan,<br/>yüksekte çalışma sırasında ankraj bağlantısı yapılması gerektiği<br/>konusunda eğitilmiş olsa da, o anda sahadaki aktif gözetim eksikliği<br/>nedeniyle bu kritik koruma önlemini uygulamayı ihmal etmiştir. Uygun<br/>ankraj noktası mevcut olmakla birlikte, çalışanı kullanmaya 'zorlayacak'<br/>etkili bir yönetişim kontrol mekanizması (canlı gözetim/kontrol)<br/>işletilmemiştir."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden yüksekte çalışma alanında sabit supervizor/formen/ekip başı<br/>gözetimiyle ilgili planlama ve görevlendirme yetersiz kalmıştır?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A32 --> Q33
+    A34["Yüksekte çalışma alanında sabit supervizor/formen/ekip başı gözetimiyle<br/>ilgili planlama ve görevlendirme yetersiz kalmıştır çünkü: (1) Kaza<br/>anında saha genelinde ISG personeli ve çoklu ekipler olmasına rağmen,<br/>çalışma noktasında sabit bir gözeticinin bulunmadığı tespit edilmiştir;<br/>(2) Çalışanın emniyet kemeri ankraj bağlantısını yapmamasının, 'ankraj<br/>noktasının uzaktan tespit edilmesinin zor olması' nedeniyle denetim<br/>sisteminin yetersiz olduğu görülmüştür; (3) 18 yaşındaki genç çalışan, 7<br/>aylık tecrübesine rağmen yüksekte çalışma sırasında zorunlu güvenlik<br/>prosedürlerini uygulamadığında müdahale edecek sabit bir denetim<br/>mekanizması işletilmemiştir."]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Neden enleme kirisi kalip montaj alanında emniyet kemeri ankraj<br/>bağlantısının uzaktan denetim/kontrolü için alternatif kontrol<br/>sistematiği ve prosedürü oluşturulmamıştır?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A34 --> Q35
+    A36["Enleme kirişi kalıp montaj alanında emniyet kemeri ankraj bağlantısının<br/>uzaktan denetim/kontrolü için alternatif kontrol sistematiği ve<br/>prosedürü oluşturulmamıştır çünkü: 1. **Denetim Mekanizmasının Tasarım<br/>Eksikliği**: Kaza noktasında çalışanın ankraj bağlantısını uzaktan<br/>tespit etmenin zor olduğu belirtilmiştir. Bu, sistemin başından itibaren<br/>görsel kontrol ve denetim için uygun olmayan bir yapıya sahip olduğunu<br/>göstermektedir. 2. **Sabit Supervizyon Sisteminin Yetersizliği**:<br/>Çalışma alanında supervizor/formen/ekip başı sabit varlığının yeterli<br/>olmadığı tespit edilmiştir. Bu, dinamik kontrol ve anında müdahale<br/>yapabilecek bir kontrol prosedürünün geliştirilmediğini gösterir. 3.<br/>**Alternatif Kontrol Protokollerinin Yokluğu**: Emniyet kemeri<br/>bağlantısını garantilemek için (örneğin: ankraj noktasına yaklaşımdan<br/>önce görsel kontrol, çıkış/giriş prosedürü, belge kontrolü vb.)<br/>sistematik alternatif denetim yöntemleri tasarlanmamıştır. 4. **Yönetim<br/>Sisteminin Kontrolsüzlüğü**: Yüksekte çalışma yapan personelin, bağlantı<br/>yapma zorunluluğunu ve denetimini güvence altına alan prosedür ve<br/>sorumluluk tanımlaması yapılmamıştır."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Neden yüksekte çalışma ve emniyet kemeri bağlantı zorunluluğunu<br/>garantilemek için yönetim tarafından riske dayalı sistematik denetim ve<br/>sorumluluk tanımlaması yapılmamış/yetersiz kalmıştır?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A36 --> Q37
+    A38["Yüksekte çalışma sırasında emniyet kemeri bağlantısını garantilemek<br/>için yönetim tarafından riske dayalı sistematik denetim yapılmamıştır<br/>çünkü: 1. **Sabit Supervizyon Eksikliği**: Raporda 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı'<br/>belirtilmektedir. Yüksek risk faaliyetlerinde gerçek zamanlı denetim<br/>sağlanmamıştır. 2. **Kontrol Mekanizmasının Yetersizliği**: Ankraj<br/>bağlantısı uzaktan tespit edilemediği için, bağlantının yapılıp<br/>yapılmadığını doğrulamak üzere iş başında bulunan sorumlu bir<br/>nişan/gözleticinin atanmadığı anlaşılmaktadır. 3. **Sorumluluk Tanımının<br/>Açıklığı**: Kimin emniyet kemeri bağlantısını kontrol edeceğinin,<br/>çalışanın kendi kontrolü vs. denetmen kontrolü olacağının net tanımı<br/>olmadığı görülmektedir. 4. **18 Yaşındaki Yeni Çalışanın Koçluğu**: 7 ay<br/>tecrübeli, 18 yaşındaki panel kalipci için alan koçluğu (field coaching)<br/>ve sürekli gözletiş prosedürü uygulanmamıştır. Sonuç olarak, teknik<br/>araçlar (emniyet kemeri, ankraj noktası) mevcut olmasına rağmen,<br/>yönetimsel uygulama kontrol mekanizması (denetim prosedürü, sorumluluk<br/>ataması, yeni işçi koçluğu) sistemik olarak zayıf veya eksik kalmıştır."]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>Neden yüksek-riskli enleme kirişi kalıp montaj alanında (AK05) çalışma<br/>anında supervizor/formen/ekip başı tarafından sabit ve gerçek zamanlı<br/>gözletiş ve denetim uygulanmamıştır ?"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A38 --> Q39
+    A40["Olay raporunda açıkça belirtildiği üzere 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu yetersizlik, yüksek riskli enleme kirişi kalıp montaj<br/>işinde kritik bir gözletiş boşluğu yaratmıştır. Kaza anında çalışanın<br/>emniyet kemeri ankraj bağlantısı yapılmamış olmasına rağmen, bunun sabit<br/>bir denetçi tarafından müdahalesiyle önlenmesi mümkün olabilirdi.<br/>Raporda belirtilen 'kaza noktasında çalışanın ankraj bağlantısını<br/>uzaktan tespit etmenin zor olduğu' ifadesi, bu işin doğrudan alan<br/>gözletiş ve denetimini gerektirdiğini göstermektedir. Saha genelinde ISG<br/>personeli ve çoklu ekipler mevcut olmasına rağmen, merkezi, sabit ve<br/>gerçek zamanlı bir gözletiş mekanizması eksik kalmıştır. Sonuç olarak, 9<br/>metre yükseklikten düşme kazasında ciddi yaralanma (açık kırık ve<br/>cerrahî müdahale) gerçekleşmiştir."]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Olay raporunda açıkça belirtildiği üzere 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu yetersizlik, yüksek riskli enleme kirişi kalıp montaj<br/>işinde kritik bir gözletiş boşluğu yaratmıştır. Kaza anında çalışanın<br/>emniyet kemeri ankraj bağlantısı yapılmamış olmasına rağmen, bunun sabit<br/>bir denetçi tarafından müdahalesiyle önlenmesi mümkün olabilirdi.<br/>Raporda belirtilen 'kaza noktasında çalışanın ankraj bağlantısını<br/>uzaktan tespit etmenin zor olduğu' ifadesi, bu işin doğrudan alan<br/>gözletiş ve denetimini gerektirdiğini göstermektedir. Saha genelinde ISG<br/>personeli ve çoklu ekipler mevcut olmasına rağmen, merkezi, sabit ve<br/>gerçek zamanlı bir gözletiş mekanizması eksik kalmıştır. Sonuç olarak, 9<br/>metre yükseklikten düşme kazasında ciddi yaralanma (açık kırık ve<br/>cerrahî müdahale) gerçekleşmiştir."]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden çalışanın ayağı yüksekte çalışırken montaj sırasında kaymıştır<br/>(zemin-ayakkabı uyumsuzluğu veya zemin koşulları)?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q41
+    A42["Çalışanın ayağı kaymıştır çünkü: (1) Çalışma alanı dolgu toprak<br/>zemindir ve bu tür zeminler özellikle yüksekte çalışırken kaygan<br/>olabilir; (2) Raporda ayakkabı-zemin uyumsuzluğu veya zemin yüzeyinin<br/>özelliklerine karşı uygun taban tasarımının bulunup bulunmadığı<br/>belirtilmemiştir; (3) Kaza anında zemin koşulları (nem, düzensiz yüzey,<br/>kırıntılar vb.) kayma riskini artırmış olabilir. Temel risk faktörü ise,<br/>emniyet kemeri bağlantısının yapılmamış olması nedeniyle, ayağın kaymasi<br/>durumunda dengenin kaybedilmesi ve 9 metre yüksekten düşme ile<br/>sonuçlanmasıdır."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Neden çalışan, uygun ankraj noktası mevcut olmasına rağmen emniyet<br/>kemeri bağlantısını (D4.1 - Koruyucu Donanım Kullanımı) yapmamıştır?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A42 --> Q43
+    A44["Çalışan emniyet kemeri bağlantısını yapmamıştır çünkü: (1) Çalışma<br/>alanında sabit supervizyon/denetim eksikliği nedeniyle bağlantı yapılıp<br/>yapılmadığı doğrulanamamıştır; (2) Ankraj bağlantısı uzaktan görsel<br/>olarak tespit edilmesi zor olduğundan, çalışanın bu kritik adımı<br/>atlaması fark edilmemiştir; (3) Genç çalışanın (18 yaş, 7 aylık deneyim)<br/>yüksekte çalışma riskleri konusunda tam davranış alışkanlığı<br/>oluşturulmamış olabilir. Eğitim alınmış ve KKD zimmet kaydı var olsa da,<br/>pratik uygulamada gerçek zamanlı denetim ve gözetim yetersiz kalmıştır."]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Neden, yüksekte çalışma alanında enleme kiriş kalıp montajı sırasında<br/>sabit supervizyon (D3.1 - Denetim ve Gözetim Yönetimi) sistemi<br/>uygulanmamış veya etkin olmamıştır?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A44 --> Q45
+    A46["Yüksekte çalışma alanında enleme kiriş kalıp montajı sırasında sabit<br/>supervizyon sistemi uygulanmamış veya etkin olmamıştır çünkü; çalışma<br/>sırasında supervizor, formen veya ekip başının sabit bir fiziksel<br/>varlığı ve doğrudan gözlem görevleri yeterli düzeyde yerine<br/>getirilmemiştir. Raporda bu bulgular açıkça kaydedilmiştir. Sonuç<br/>olarak, çalışan tarafından emniyet kemeri ankrajı yapılmadığı tespit<br/>edilmiş olup, bu kritik hata (KKD ihlali) sabit bir denetim mekanizması<br/>olmadan engellenmemiştir. Genç yaş ve sınırlı tecrübeye sahip<br/>kazazedenin, yüksek riskli işlerde yapması gereken güvenlik<br/>prosedürlerini (emniyet kemeri bağlantısı) tam olarak uygulamadığı,<br/>etkili bir denetim sistemi tarafından zamanında müdahale edilmemiştir.<br/>Bu da 9 metre yükseklikten düşme kazasına neden olmuştur."]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Neden, enleme kiriş kalıp montajı gibi yüksek riskli operasyonlarda<br/>sabit supervizyon görevini yerine getiren personelin<br/>(supervizor/formen/ekip başı) doğrudan ve sürekli fiziksel varlığını<br/>sağlayan kurumsal prosedür ve rol tanımlaması oluşturulmamış veya<br/>uygulanmamıştır?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A46 --> Q47
+    A48["Yüksek riskli operasyonlarda (enleme kirişi kalıp montajı gibi) sabit<br/>supervizyon görevini yerine getiren personelin (supervizor/formen/ekip<br/>başı) doğrudan ve sürekli fiziksel varlığını sağlayan kurumsal prosedür<br/>ve rol tanımlaması oluşturulmamıştır, çünkü: **Kök Nedenler:** 1.<br/>**Sistem Tasarımı Eksikliği**: 9 metre yükseklikte çalışma ve emniyet<br/>kemeri ankraj noktasının uzaktan kontrolünün zor olduğu çalışma<br/>alanında, sabit supervizyon ihtiyacı risk analizi sonucu kurumsal<br/>prosedür haline getirilmemiştir. 2. **Rol ve Sorumluluk Tanımlaması<br/>Boşluğu**: Enleme kirişi kalıp montajı gibi yüksek riskli görevlerde,<br/>supervizor/formen/ekip başının fiziksel varlığı, bulunması gereken<br/>alanlar, kontrol noktaları ve sorumluluk sınırları açıkça<br/>tanımlanmamıştır. 3. **Davranış Kontrolü Mekanizmasının Olmaması**:<br/>Kazazedenin emniyet kemeri takmadığı tespit edilmiş ancak, bunun gerçek<br/>zamanda tespit ve düzeltilmesi için sabit fiziksel supervizyon prosedürü<br/>kurumsal düzeyde zorunlu kılınmamıştır. Ankraj noktası uzaktan tespit<br/>edilemediğinden, doğrudan gözlem gereklidir. 4. **Operasyonel Risk<br/>Kontrol Zayıflığı**: Raporda 'calisma aninda supervizor/formen/ekip basi<br/>sabit varliginin yeterli olmadigi tespit edildi' - bu, mevcut<br/>uygulamanın prosedür ve rol tanımlaması desteğinden yoksun olduğunu<br/>göstermektedir."]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Why-5: Neden, 9 metre yükseklikte enleme kirişi kalıp montajı<br/>operasyonunda emniyet kemeri ankraj noktasının uzaktan kontrolünün<br/>imkânsız olduğu tespit edilen çalışma alanında, sabit supervizyon<br/>gereksiniminin risk analizi sonrası kurumsal prosedür ve zorunlu yönetim<br/>standardı olarak kodifikasyonu gerçekleştirilmemiş, bunun yerine mevcut<br/>uygulamalar işçi davranışı ve bilinç düzeyine bırakılmıştır?"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A48 --> Q49
+    A50["9 metre yükseklikte enleme kirişi kalıp montajı operasyonunda, emniyet<br/>kemeri ankraj noktasının uzaktan kontrolünün imkânsız olduğu tespit<br/>edilen çalışma alanında, sabit supervizyon gereksiniminin kurumsal<br/>prosedür ve zorunlu yönetim standardı olarak kodifikasyonu<br/>gerçekleştirilmemiş olmasının kök nedeni, **sistem seviyesinde uyum<br/>izleme ve denetleme mekanizmasının tasarlanmamış olması ile birlikte,<br/>tanımlanan risklere karşı operasyonel kontrollerin yazılı, zorunlu ve<br/>gözlemlenebilir prosedürler şeklinde uygulanmamış olmasıdır**. Risk<br/>analizi sonrası (D4.1'de tanımlama yapıldıktan sonra) bunun yerine<br/>çalışanın kişisel bilinci ve davranışına güvenilmesi, D4.2 (Risk<br/>kontrollerinin uygulanmaması) ve D9.5 (Sistem seviyesi denetim<br/>mekanizmasının eksikliği) ile D1.2 (Sabit supervizyon personelinin<br/>alanında yeterli varlığının olmaması) komb eksikliklerin sonucudur.<br/>Yazılı prosedür, zorunlu check-list ve gözlemlenebilir (auditlenebilir)<br/>supervizyon sistemi olmaması, çalışanın emniyet kemeri ankrajını<br/>bağlantı yapmama seçeneğini ortadan kaldırmamıştır."]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN</b><br/>Kök Neden<br/>9 metre yükseklikte enleme kirişi kalıp montajı operasyonunda, emniyet<br/>kemeri ankraj noktasının uzaktan kontrolünün imkânsız olduğu tespit<br/>edilen çalışma alanında, sabit supervizyon gereksiniminin kurumsal<br/>prosedür ve zorunlu yönetim standardı olarak kodifikasyonu<br/>gerçekleştirilmemiş olmasının kök nedeni, **sistem seviyesinde uyum<br/>izleme ve denetleme mekanizmasının tasarlanmamış olması ile birlikte,<br/>tanımlanan risklere karşı operasyonel kontrollerin yazılı, zorunlu ve<br/>gözlemlenebilir prosedürler şeklinde uygulanmamış olmasıdır**. Risk<br/>analizi sonrası (D4.1'de tanımlama yapıldıktan sonra) bunun yerine<br/>çalışanın kişisel bilinci ve davranışına güvenilmesi, D4.2 (Risk<br/>kontrollerinin uygulanmaması) ve D9.5 (Sistem seviyesi denetim<br/>mekanizmasının eksikliği) ile D1.2 (Sabit supervizyon personelinin<br/>alanında yeterli varlığının olmaması) komb eksikliklerin sonucudur.<br/>Yazılı prosedür, zorunlu check-list ve gözlemlenebilir (auditlenebilir)<br/>supervizyon sistemi olmaması, çalışanın emniyet kemeri ankrajını<br/>bağlantı yapmama seçeneğini ortadan kaldırmamıştır."]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A50 --> ROOT5
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
+                htmlLabels: true,
+                diagramPadding: 16
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
+                primaryColor: '#fff',
+                primaryTextColor: '#222',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>

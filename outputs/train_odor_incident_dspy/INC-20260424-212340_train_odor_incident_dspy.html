@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOT CAUSE ANALYSIS REPORT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260424-212340";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">ROOT CAUSE ANALYSIS REPORT</h1>
+            <div class="subtitle" contenteditable="true">Professional Investigation and Analysis Report</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                CONFIDENTIAL - ACCESSIBLE ONLY TO AUTHORIZED PERSONNEL
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260424-212340</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">2026-04-26</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">Intercity Train (Hannover to destination), Carriage B, Seat Zone 12-18</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Ill health</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">A passenger fainted on an intercity train due to strong foot odor, causing discomfort to other passengers and a temporary disruption in service. The incident highlighted deficiencies in environmental discomfort protocols and staff response.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">On April 23, 2026, at approximately 16:35, on an Intercity Train traveling from Hannover, specifically in Carriage B, Seat Zone 12-18, a passenger, Mrs. Marina Chai, fainted. This incident occurred after she reported nausea and dizziness due to a strong foot odor emanating from another passenger, Mr. Selcuk Yalcin. The strong odor had already caused other passengers to move away from the area, indicating a significant environmental discomfort. The on-board service team responded to the situation.</div>
+<div class="paragraph" contenteditable="true">Upon Mrs. Chai's fainting, the on-board service team immediately initiated first response protocols. She was moved to a fresh-air zone within the carriage, provided with hydration, and continuously monitored until she fully regained consciousness. The incident was formally documented and escalated to operations management for further action.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Lack of clear protocol for non-chemical odor complaints.</li>
+<li contenteditable="true">Delayed staff intervention despite early signs of passenger discomfort.</li>
+<li contenteditable="true">Inadequate proactive measures for environmental discomforts.</li>
+<li contenteditable="true">Insufficient training for staff on handling specific environmental health risks.</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Affected passenger moved to fresh-air zone</td>
+                        <td contenteditable="true">On-board Service Team</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hydration and monitoring provided to affected passenger</td>
+                        <td contenteditable="true">On-board Service Team</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Incident formally documented</td>
+                        <td contenteditable="true">On-board Service Supervisor</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Incident escalated to operations</td>
+                        <td contenteditable="true">On-board Service Supervisor</td>
+                        <td contenteditable="true">Completed</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260424-212340</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">23 April 2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">16:35</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">Intercity Train (Hannover to destination), Carriage B, Seat Zone 12-18</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Carriage B</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">On-board service team</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Day Shift</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Intercity Train</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Strong foot odor (non-chemical)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Not specified (indoor environment)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Normal (indoor environment)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Not applicable</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Ill health</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Minor (brief fainting, recovered)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 (Mrs. Marina Chai)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Minor</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">On-board Service Supervisor</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">No</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Not applicable (recovered on-site)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:20</div>
+                    <div class="timeline-event" contenteditable="true">Carriage occupancy high, no formal complaints logged, but passengers started to informally change seats away from affected area.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:30</div>
+                    <div class="timeline-event" contenteditable="true">Passengers begin informal seat changes away from affected area, indicating growing discomfort.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:33</div>
+                    <div class="timeline-event" contenteditable="true">First verbal complaint about strong odor received by staff.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:35</div>
+                    <div class="timeline-event" contenteditable="true">Mrs. Marina Chai reports dizziness and faints briefly.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:36</div>
+                    <div class="timeline-event" contenteditable="true">Staff apply first response protocol; passenger moved to fresh-air zone.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:40</div>
+                    <div class="timeline-event" contenteditable="true">Passenger regains full consciousness; hydration and monitoring provided.</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">16:55</div>
+                    <div class="timeline-event" contenteditable="true">Incident formally documented and escalated to operations.</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">The 5-Why technique was applied to each identified immediate cause, forming distinct branches of inquiry. For each immediate cause, a series of 'Why?' questions were posed, with each answer forming the basis for the subsequent question. This iterative questioning continued until a root cause, typically an organizational or systemic failure, was identified that could no longer be attributed to a preceding failure within the operational context. This structured questioning helped to uncover the deeper systemic issues that allowed the incident to occur, moving beyond individual actions or direct environmental factors.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">Human Factor</td>
+                        <td contenteditable="true">Individual factors such as lack of knowledge, skill deficiency, inattention, fatigue</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">Organizational Factor</td>
+                        <td contenteditable="true">Lack of procedures, communication breakdown, management decisions, policy inadequacies</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Job/Task Factor</td>
+                        <td contenteditable="true">Equipment malfunction, design error, physical load, ergonomic issues</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Environmental Factor</td>
+                        <td contenteditable="true">Weather conditions, lighting, noise, temperature, area layout</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">On-board Service Supervisor</td>
+                        <td contenteditable="true">Lead Investigator</td>
+                        <td contenteditable="true">2026-04-26</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Health and Safety Representative</td>
+                        <td contenteditable="true">HSE Expert</td>
+                        <td contenteditable="true">2026-04-26</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. CRITICAL FACTOR 1 - CONDITIONAL CAUSE: INADEQUATE VENTILATION</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">The train carriage experienced a concentration of strong, unpleasant odors due to insufficient ventilation, leading to passenger discomfort and ultimately a passenger fainting. This condition was exacerbated by the enclosed nature of the train environment, which allowed the odor to intensify and spread, affecting multiple passengers.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Inadequate ventilation in the train carriage concentrated strong odors, leading to passenger discomfort and fainting.</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why was there inadequate ventilation in the train carriage?</div>
+                    <div class="why-answer" contenteditable="true">→ Ventilation was inadequate because there was a lack of clear procedures for early detection of in-carriage environmental discomforts and related situations, which led to delayed operational controls, including ventilation adjustments.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why were clear procedures for early detection of in-carriage environmental discomforts lacking?</div>
+                    <div class="why-answer" contenteditable="true">→ Clear procedures were lacking due to the absence of a specific protocol for non-chemical but severe odor complaints in enclosed spaces, and inadequate processes for early detection and escalation of passenger environmental discomfort. This resulted in delays in handling complaints and a reactive rather than proactive approach.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why were non-chemical but severe odor-related environmental discomforts not adequately recognized as an operational risk?</div>
+                    <div class="why-answer" contenteditable="true">→ These discomforts were not adequately recognized as an operational risk due to the absence of a clear protocol for such situations, a lack of a specific Standard Operating Procedure (SOP) for odor-related health risk situations, and insufficient early detection and escalation of passenger environmental discomforts.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why was there no clear protocol or specific SOP for odor-related health risk situations?</div>
+                    <div class="why-answer" contenteditable="true">→ The railway company likely did not provide opportunities for staff to adequately practice skills in handling such incidents due to the absence of a specific SOP or clear protocol for odor-related health risk situations. This stems from a lack of training for staff on how to proactively and structuredly respond to such events, leading to delayed interventions and reactive actions during the incident.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Why did management not proactively identify severe odor complaints as an operational risk or include them in protocols?</div>
+                    <div class="why-answer" contenteditable="true">→ Management failed to proactively identify severe odor complaints as an operational risk or include them in protocols because there was no clear protocol for non-chemical but severe odor complaints in enclosed spaces, and a specific Standard Operating Procedure (SOP) for odor-related health risk situations was missing. This resulted in inadequate early detection and escalation systems for passenger environmental discomforts, leading to delayed and reactive operational controls (ventilation/seat relocation/zone isolation).</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Management Failed to Proactively Identify and Protocolize Severe Odor Complaints)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Management Failed to Proactively Identify and Protocolize Severe Odor Complaints</div>
+                <div class="box-content" contenteditable="true">Management did not proactively identify severe odor complaints as an operational risk or incorporate them into existing protocols. This oversight stemmed from a lack of clear procedures for non-chemical but severe odor complaints in enclosed spaces and the absence of a specific Standard Operating Procedure (SOP) for odor-related health risk situations. Consequently, early detection and escalation systems for passenger environmental discomfort were inadequate, leading to reactive and delayed operational controls.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Absence of specific protocols for non-chemical odor complaints in enclosed spaces.</li>
+<li contenteditable="true">Lack of a dedicated Standard Operating Procedure (SOP) for odor-related health risk situations.</li>
+<li contenteditable="true">Insufficient early detection and escalation mechanisms for passenger environmental discomfort.</li>
+<li contenteditable="true">Reactive rather than proactive approach to managing environmental discomforts.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. CRITICAL FACTOR 2 - CONDITIONAL CAUSE: ENVIRONMENTAL HAZARDS UNNOTICED</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Train personnel failed to timely notice environmental discomfort signals, such as strong odors and passengers moving away, leading to a delayed response to the situation. This lack of early detection allowed the situation to escalate to the point of a passenger fainting.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Train personnel failed to timely notice environmental discomfort signals (e.g., bad odor and passengers moving away), leading to delayed intervention.</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did train personnel fail to timely notice environmental discomfort signals?</div>
+                    <div class="why-answer" contenteditable="true">→ Personnel's inability to proactively observe and understand early signs of discomfort likely stemmed from a lack of effective on-site supervision mechanisms.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why were effective on-site supervision mechanisms lacking?</div>
+                    <div class="why-answer" contenteditable="true">→ Due to the absence of sufficient and regular on-site inspections or the physical presence of managers to check operations, which would enable personnel to proactively observe environmental discomfort signals and respond appropriately.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why were sufficient and regular on-site inspections not conducted or managers' physical presence lacking?</div>
+                    <div class="why-answer" contenteditable="true">→ Due to the absence of a system for systematically verifying and monitoring general procedural compliance and implementation in train operations.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why was there no system for systematically verifying and monitoring procedural compliance in train operations?</div>
+                    <div class="why-answer" contenteditable="true">→ Because the organization had not designed or implemented a mechanism, such as an audit program or compliance tracking system, to control and verify the extent to which standard operating procedures and safety rules were applied on-site.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Why had the organization not designed or implemented such an audit program or compliance tracking system?</div>
+                    <div class="why-answer" contenteditable="true">→ Due to the absence of an organizational system for systematically monitoring and auditing compliance with procedures.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Lack of System for Monitoring and Auditing Procedural Compliance)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Lack of System for Monitoring and Auditing Procedural Compliance</div>
+                <div class="box-content" contenteditable="true">The incident stemmed from train personnel's failure to timely detect environmental discomfort signals and their delayed intervention. The root cause is the company's failure to design and implement a system for systematically monitoring and auditing train personnel's compliance with operational procedures and safety protocols. If regular and effective audits were in place, personnel could have detected such situations earlier and intervened more quickly. This highlights the importance of a monitoring mechanism that not only has written procedures but also actively tracks and verifies their implementation on-site.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Absence of systematic verification and monitoring of procedural compliance.</li>
+<li contenteditable="true">Lack of regular and effective on-site inspections by management.</li>
+<li contenteditable="true">No audit program or compliance tracking system for operational procedures.</li>
+<li contenteditable="true">Insufficient oversight to ensure adherence to safety rules and protocols.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. CRITICAL FACTOR 3 - CONDITIONAL CAUSE: INDIVIDUAL RULE VIOLATION</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Mr. Selcuk Yalcin's failure to adhere to personal hygiene rules created an environmental discomfort, specifically a severe foot odor, which directly contributed to the adverse conditions in the train carriage. This individual action initiated a chain of events leading to passenger distress.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Mr. Selcuk Yalcin's failure to comply with personal hygiene rules caused environmental discomfort.</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did passenger Marina Chai faint?</div>
+                    <div class="why-answer" contenteditable="true">→ Passenger Marina Chai fainted after experiencing nausea and dizziness due to exposure to a severe foot odor, an environmental trigger caused by Mr. Selcuk Yalcin's non-compliance with personal hygiene rules.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was the initial response delayed and ineffective when severe odor was detected?</div>
+                    <div class="why-answer" contenteditable="true">→ Due to train personnel lacking sufficient training and awareness to proactively recognize, assess, and initiate appropriate interventions for environmental discomfort situations arising from such passenger behavior.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why were personnel not adequately trained to proactively recognize and intervene in such situations?</div>
+                    <div class="why-answer" contenteditable="true">→ Due to the absence of a task-oriented training program within the organization that covers specific risk scenarios, including non-chemical but irritating environmental factors (like severe odors) and their potential effects on passenger health, along with sufficient practical application (including drills).</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why did the organization not design or provide a task-oriented training program covering such risk scenarios?</div>
+                    <div class="why-answer" contenteditable="true">→ Because management failed to adequately assess or prioritize the importance and necessity of a comprehensive training strategy to develop proactive intervention and emergency management skills for such environmental discomfort incidents.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Why did management fail to adequately assess or prioritize the importance of a comprehensive training strategy?</div>
+                    <div class="why-answer" contenteditable="true">→ Due to the absence of a systematic evaluation mechanism in incident reports and root cause analyses for determining training requirements for new or existing risk scenarios, and for updating or designing new training programs, that focuses on the effects of potential environmental discomforts on passenger comfort and health.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden (Ineffective Training Design: Scope Did Not Cover Real Work Risks)</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Ineffective Training Design: Scope Did Not Cover Real Work Risks</div>
+                <div class="box-content" contenteditable="true">There is no task-oriented training program that covers the skills for train personnel to proactively recognize, assess, and effectively intervene in environmental discomforts (non-chemical) arising from passenger behavior. Existing training does not adequately address such specific risk scenarios and their potential effects on passenger health, leading to personnel's inability to effectively and timely intervene in the incident. The training design remained ineffective because it did not consider real operational needs and emerging risks.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Lack of task-oriented training for non-chemical environmental discomforts.</li>
+<li contenteditable="true">Training programs do not cover specific risk scenarios related to passenger health.</li>
+<li contenteditable="true">Management failed to prioritize comprehensive training strategies for environmental incidents.</li>
+<li contenteditable="true">Absence of systematic evaluation for training needs based on incident reports and risk scenarios.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">7. CRITICAL FACTOR 4 - CONDITIONAL CAUSE: INEFFECTIVE WARNING/ALARM SYSTEMS</div>
+            
+            <div class="subsection-header">7.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">The absence of warning systems related to air quality or living conditions within the cabin meant that the hazard could not be detected and alarmed at an early stage. This lack of proactive environmental monitoring contributed to the escalation of the odor issue.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Absence of warning systems for cabin air quality or living conditions, preventing early detection and alarm.</div>
+            
+            <div class="subsection-header">7.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did the passenger exposed to the bad odor faint?</div>
+                    <div class="why-answer" contenteditable="true">→ The passenger exposed to the bad odor fainted after experiencing nausea and dizziness due to the strong foot odor.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why does strong foot odor cause nausea and dizziness?</div>
+                    <div class="why-answer" contenteditable="true">→ Strong foot odor, especially when highly concentrated in an enclosed and unventilated environment, can cause symptoms like nausea and dizziness in some individuals. The olfactory system in the human brain is closely linked to the limbic system, which regulates emotional responses and autonomic nervous system functions. Unpleasant or excessively intense odors can trigger a stress response through this connection. This response can trigger nausea via the vagus nerve and lead to a general feeling of discomfort or even dizziness. In some cases, if this physiological response becomes too strong, it can cause temporary loss of consciousness (fainting), especially if the person is sensitive or ventilation is inadequate.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why does an intense odor trigger such a severe vagal response in some individuals via the limbic system?</div>
+                    <div class="why-answer" contenteditable="true">→ An intense odor, when perceived by the olfactory system, can overstimulate the limbic system. Since the limbic system processes strong emotional responses, particularly fear or disgust, this odor can trigger a sudden and severe autonomic nervous system response, known as a vagal response, in some sensitive individuals. This response can lead to a drop in heart rate and dilation of blood vessels, reducing blood flow to the brain and causing symptoms like fainting.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why are some individuals more susceptible to such odor-induced vagal responses than others?</div>
+                    <div class="why-answer" contenteditable="true">→ Some individuals may have increased physiological or psychological sensitivity to environmental triggers like odor exposure. This sensitivity can cause them to experience a more severe vagal response to odor due to known or unknown medical conditions, their current emotional state, or cognitive reactions stemming from previous negative experiences associated with similar odors. In this case, Mrs. Chai's nausea, dizziness, and brief fainting are examples of a physiologically triggered response to the odor.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Why do these medical conditions or previous experiences trigger this increased vagal response to odor?</div>
+                    <div class="why-answer" contenteditable="true">→ The incident report does not contain any information indicating that Mrs. Marina Chai's specific medical conditions or previous experiences could have caused an increased vagal response to the strong odor. The report only states that she experienced nausea, dizziness, and briefly lost consciousness.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">7.3 Kök Neden (Lack of Information on Individual Susceptibility to Odor-Induced Vagal Responses)</div>
+            <div class="colored-box box-blue">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 4: Lack of Information on Individual Susceptibility to Odor-Induced Vagal Responses</div>
+                <div class="box-content" contenteditable="true">The incident report lacks specific information regarding Mrs. Marina Chai's medical conditions or previous experiences that might have contributed to an increased vagal response to the strong odor. The report only details her symptoms of nausea, dizziness, and brief loss of consciousness, indicating a gap in understanding individual physiological sensitivities in such environmental incidents.</div>
+            </div>
+
+            <div class="subsection-header">7.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">No system for identifying passengers with heightened sensitivities to environmental factors.</li>
+<li contenteditable="true">Lack of pre-screening or information gathering on passenger health conditions that might affect their response to environmental stressors.</li>
+<li contenteditable="true">Absence of protocols for managing passengers with known sensitivities to odors or other environmental triggers.</li>
+<li contenteditable="true">Insufficient data collection on individual health factors during incident reporting.</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">8. CRITICAL FACTOR 5 - CONDITIONAL CAUSE: TIME PRESSURE LEADING TO COGNITIVE SHORTCUTS</div>
+            
+            <div class="subsection-header">8.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">The high service intensity and time pressure on train personnel led to the oversight of early detection and preventive measures for environmental complaints. This operational stress diverted attention from subtle cues of discomfort, contributing to the delayed response.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">High service intensity and time pressure on train personnel led to overlooking early detection and prevention of environmental complaints.</div>
+            
+            <div class="subsection-header">8.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Why did service intensity and time pressure lead to overlooking early detection and prevention of environmental complaints?</div>
+                    <div class="why-answer" contenteditable="true">→ Personnel's ability to understand the potential risks of environmental complaints and take proactive measures at an early stage was insufficient.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Why was personnel's ability to understand potential risks and take proactive measures insufficient?</div>
+                    <div class="why-answer" contenteditable="true">→ They lacked the knowledge and skills to distinguish between environmental discomfort signals (e.g., severe odor) that pose a health risk and those that do not.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Why did their training not sufficiently cover when odor-related situations pose a health risk and how to proactively intervene?</div>
+                    <div class="why-answer" contenteditable="true">→ The design of the training program was inadequate for such specific environmental health risk scenarios that they might encounter in the real work environment.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Why was the training program design inadequate for specific environmental health risk scenarios?</div>
+                    <div class="why-answer" contenteditable="true">→ The scope of the training was not aligned with the environmental risk factors that could affect passenger comfort and safety, especially severe odor complaints in enclosed spaces.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Why was the scope of the training not aligned with environmental risk factors affecting passenger comfort and safety?</div>
+                    <div class="why-answer" contenteditable="true">→ The training program design was ineffective because it did not adequately address the real operational needs and emerging risks related to environmental discomforts and their potential health impacts on passengers.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">8.3 Kök Neden (Ineffective Training Design)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 5: Ineffective Training Design</div>
+                <div class="box-content" contenteditable="true">The training received by personnel was not designed to develop their skills in early detection, understanding risks, and proactive intervention for environmental factors (such as discomfort due to severe odor) that could endanger passenger comfort and safety in enclosed and busy environments like trains. The scope of the training did not align with real work risks (the potential health effects of such environmental complaints), leading to personnel's inadequacy in taking early action and seriously addressing the situation.</div>
+            </div>
+
+            <div class="subsection-header">8.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Training scope not aligned with real operational risks, especially environmental health risks.</li>
+<li contenteditable="true">Lack of specific training on distinguishing health-critical environmental discomforts.</li>
+<li contenteditable="true">Inadequate focus on proactive intervention for odor-related health risks in training.</li>
+<li contenteditable="true">Training program design failed to incorporate specific environmental health risk scenarios.</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. DİĞER OLASI SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Communication Gap</td>
+                        <td contenteditable="true">The importance and mandatory nature of safety procedures, particularly regarding environmental discomforts, were not effectively communicated to employees.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Training Deficiency</td>
+                        <td contenteditable="true">Training on recognizing and responding to non-chemical environmental health risks, such as severe odors, was insufficient or ineffective.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Supervision Deficiency</td>
+                        <td contenteditable="true">On-site supervision and monitoring mechanisms were undefined or ineffective in ensuring proactive detection of environmental discomforts.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Cultural Factors</td>
+                        <td contenteditable="true">A culture prioritizing operational efficiency over proactive safety measures, leading to tolerance of safety deviations related to passenger comfort.</td>
+                        <td class="impact-high" contenteditable="true">High</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Develop and implement a clear protocol for managing non-chemical but severe odor complaints in enclosed spaces.</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">HSE Manager</td>
+                        <td contenteditable="true">1 month</td>
+                        <td contenteditable="true">Protocol implementation rate 100%</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Establish a specific Standard Operating Procedure (SOP) for odor-related health risk situations, including early detection and escalation.</td>
+                        <td><span class="priority-low">URGENT</span></td>
+                        <td contenteditable="true">Operations Manager</td>
+                        <td contenteditable="true">1 month</td>
+                        <td contenteditable="true">SOP development and dissemination 100%</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Implement a systematic audit program to monitor and verify compliance with all operational procedures and safety rules.</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Quality Assurance Manager</td>
+                        <td contenteditable="true">2 months</td>
+                        <td contenteditable="true">Audit frequency monthly, compliance score >90%</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Revise and enhance staff training programs to include specific environmental health risk scenarios, focusing on proactive recognition and intervention for non-chemical discomforts.</td>
+                        <td><span class="priority-low">HIGH</span></td>
+                        <td contenteditable="true">Training Manager</td>
+                        <td contenteditable="true">2 months</td>
+                        <td contenteditable="true">Training completion rate 100%, post-training assessment score >85%</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Develop a mechanism for collecting and utilizing passenger feedback and incident data to identify individual sensitivities and inform risk assessments.</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Customer Service Manager</td>
+                        <td contenteditable="true">3 months</td>
+                        <td contenteditable="true">Feedback integration into risk assessment process</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Conduct a comprehensive review of existing risk assessment methodologies to incorporate non-traditional environmental and passenger comfort risks.</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">HSE Manager</td>
+                        <td contenteditable="true">3 months</td>
+                        <td contenteditable="true">Risk assessment methodology updated</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Implement a proactive supervision system to ensure on-site managers actively monitor environmental conditions and staff adherence to procedures.</td>
+                        <td><span class="priority-low">MEDIUM</span></td>
+                        <td contenteditable="true">Operations Manager</td>
+                        <td contenteditable="true">3 months</td>
+                        <td contenteditable="true">Supervision frequency daily, proactive intervention rate</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Foster a safety culture that balances operational efficiency with proactive safety measures, emphasizing passenger well-being.</td>
+                        <td><span class="priority-low">LOW</span></td>
+                        <td contenteditable="true">General Manager</td>
+                        <td contenteditable="true">6 months</td>
+                        <td contenteditable="true">Safety culture survey score improvement</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Proactively identify and protocolize non-chemical environmental discomforts as operational risks to prevent escalation and ensure passenger safety. This includes developing clear guidelines for staff to follow when such situations arise.
+• Implement robust systems for monitoring and auditing procedural compliance to ensure that all operational and safety protocols are consistently followed on-site. This will help in early detection of deviations and prompt corrective actions.
+• Design and deliver task-oriented training programs that specifically address environmental health risk scenarios, equipping staff with the knowledge and skills for proactive recognition, assessment, and effective intervention.
+• Establish mechanisms for gathering and utilizing passenger-specific information, including potential sensitivities, to inform risk assessments and tailor responses, thereby enhancing individual passenger safety and comfort.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Develop a comprehensive corporate governance framework that integrates health, safety, and environmental considerations into all operational planning and decision-making processes, ensuring a holistic approach to risk management.
+• Invest in advanced environmental monitoring technologies for train carriages to provide real-time data on air quality and other comfort parameters, enabling automated alerts and proactive adjustments.
+• Cultivate a strong safety culture that empowers all employees to identify and report potential hazards, regardless of their perceived severity, and encourages proactive problem-solving at all levels.
+• Regularly review and update risk assessment methodologies to include emerging and non-traditional risks, ensuring that the organization remains agile and responsive to evolving challenges in passenger transportation.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Establish clear communication channels for reporting environmental discomforts, ensuring that staff can quickly escalate issues and receive timely support and guidance.
+• Implement a system for transparently communicating safety protocols and incident responses to passengers, fostering trust and confidence in the railway service.
+• Conduct regular briefings and awareness campaigns for staff on the importance of environmental comfort and its impact on passenger well-being, reinforcing the organizational commitment to safety.
+• Develop a crisis communication plan for incidents involving passenger health and safety, ensuring accurate and timely information dissemination to all relevant stakeholders.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Introduce mandatory training modules on environmental health risks, focusing on the physiological and psychological impacts of factors like severe odors on passengers, particularly sensitive individuals.
+• Incorporate practical drills and simulation exercises into training programs to enhance staff's ability to proactively recognize, assess, and respond to various environmental discomfort scenarios.
+• Provide specialized training for supervisory staff on effective on-site monitoring and auditing techniques to ensure consistent procedural compliance and early detection of potential hazards.
+• Implement a continuous professional development program for all operational staff, ensuring they stay updated on best practices in passenger safety, environmental management, and emergency response.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">This incident, though resulting in minor harm, underscores significant systemic weaknesses within the railway company's operational and safety management systems. The root cause analysis revealed a critical failure in corporate governance, specifically in the proactive identification and protocolization of non-chemical environmental risks, the absence of robust procedural compliance monitoring, and deficiencies in staff training design. The lack of clear protocols for managing severe odor complaints, coupled with inadequate staff training on recognizing and responding to such environmental health risks, directly contributed to the delayed intervention and subsequent passenger fainting. Furthermore, the absence of systematic oversight mechanisms allowed these deficiencies to persist unchecked. Addressing these fundamental issues is crucial not only for preventing similar incidents but also for enhancing overall passenger safety, comfort, and the company's reputation. The incident serves as a stark reminder that even seemingly minor environmental discomforts can have significant health and operational consequences if not managed proactively and effectively.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Develop and immediately implement a specific protocol for handling non-chemical severe odor complaints, including clear steps for staff to follow for early detection, assessment, and intervention (1 month).</li>
+<li contenteditable="true">Conduct urgent refresher training for all on-board staff on recognizing and responding to environmental discomforts, emphasizing the potential health impacts of severe odors (1 month).</li>
+<li contenteditable="true">Initiate daily proactive on-site supervision by shift managers to ensure immediate detection and response to any environmental discomforts or procedural deviations (1 month).</li>
+<li contenteditable="true">Establish a rapid feedback mechanism for passenger complaints regarding environmental conditions, ensuring prompt investigation and resolution (2 months).</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Overhaul the corporate governance framework to integrate comprehensive risk assessment for all operational and environmental factors, including non-traditional risks, with clear accountability (6 months).</li>
+<li contenteditable="true">Implement a robust, technology-driven system for continuous monitoring and auditing of procedural compliance across all train operations, ensuring real-time tracking and reporting (9 months).</li>
+<li contenteditable="true">Redesign the entire staff training curriculum to be task-oriented and scenario-based, covering a wide range of environmental health risks and emergency response protocols with practical drills (12 months).</li>
+<li contenteditable="true">Develop and implement a passenger information system that allows for the collection of health-related sensitivities (on a voluntary basis) to inform staff and tailor responses in emergency situations (12 months).</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Risk Level (Environmental Discomforts)</td>
+                        <td class="current" contenteditable="true">High</td>
+                        <td class="target" contenteditable="true">Low</td>
+                    </tr>
+
+                    <tr>
+                        <td>Protocol Compliance Rate</td>
+                        <td class="current" contenteditable="true">Undefined</td>
+                        <td class="target" contenteditable="true">%95</td>
+                    </tr>
+
+                    <tr>
+                        <td>Training Coverage (Environmental Health Risks)</td>
+                        <td class="current" contenteditable="true">Limited</td>
+                        <td class="target" contenteditable="true">Comprehensive</td>
+                    </tr>
+
+                    <tr>
+                        <td>Supervision Frequency</td>
+                        <td class="current" contenteditable="true">Informal</td>
+                        <td class="target" contenteditable="true">Daily</td>
+                    </tr>
+
+                    <tr>
+                        <td>Incident Response Time (Environmental)</td>
+                        <td class="current" contenteditable="true">Delayed</td>
+                        <td class="target" contenteditable="true">Immediate</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            <p style="font-size: 13px; color: #555; margin: 8px 0 12px;">
+                Üstten alta: OLAY → soru (kesik çerçeve) → cevap → kök neden. Yazdırırken dikey A4 için uygundur.
+            </p>
+            <div id="decision-tree-diagram" style="background: white; padding: 12px; border: 1px solid #ddd; width: 100%; min-height: min(95vh, 1400px); overflow: auto;">
+                <div class="mermaid" style="width: 100%; min-height: 90vh;">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden tren vagonunda yetersiz havalandırma vardı?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Havalandırma yetersizdi çünkü vagon içi çevresel rahatsızlıkların erken<br/>tespiti ve ilgili durumlar için net prosedürler eksikti, bu da<br/>operasyonel kontrollerin (havalandırma ayarlamaları dahil) gecikmesine<br/>yol açtı."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden vagon içi çevresel rahatsızlıkların erken tespiti ve ilgili<br/>durumlar için net prosedürler eksikti?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Vagon içi çevresel rahatsızlıkların erken tespiti ve ilgili durumlar<br/>için net prosedürler, kapalı alanlarda kimyasal olmayan ancak ciddi koku<br/>şikayetlerine yönelik spesifik bir protokolün bulunmaması nedeniyle<br/>eksikti ve yolcu çevresel rahatsızlığı için erken tespit ve yükseltme<br/>süreçleri yetersizdi. Bu durum, şikayetlerin işlenmesinde gecikmelere ve<br/>proaktif müdahale yerine reaktif bir yaklaşıma yol açtı."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden (HSG.1) kapalı alanlarda kimyasal olmayan ancak ciddi koku<br/>kaynaklı çevresel rahatsızlıklar operasyonel bir risk olarak yeterince<br/>tanınmıyordu?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Kapalı alanlarda oluşan kimyasal olmayan ancak ciddi koku kaynaklı<br/>çevresel rahatsızlıklar, bu tür durumlar için açık bir protokolün<br/>olmaması, koku kaynaklı sağlık riski durumlarına yönelik özel bir<br/>standart operasyon prosedürünün (SOP) bulunmaması ve yolcu çevresel<br/>rahatsızlıklarının erken tespiti ve tırmanmasında yetersizlik nedeniyle<br/>operasyonel bir risk olarak yeterince tanınmıyordu."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden bu tür durumlar için açık bir protokol veya koku kaynaklı sağlık<br/>riski durumlarına yönelik özel bir Standart Operasyon Prosedürü (SOP)<br/>bulunmuyordu?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Demiryolu şirketinin, koku kaynaklı sağlık riski durumlarına yönelik<br/>özel bir Standart Operasyon Prosedürü (SOP) veya açık bir protokole<br/>sahip olmaması nedeniyle, personelin bu tür olaylarla nasıl başa<br/>çıkacağı konusunda yeterli düzeyde beceri pratiği yapma fırsatı<br/>bulamaması olasıdır. Bu durum, personele bu tür olaylara karşı nasıl<br/>proaktif ve yapılandırılmış bir yanıt verileceği konusunda eğitim<br/>eksikliğinden kaynaklanmaktadır. Bu eksiklik, olay sırasındaki gecikmiş<br/>müdahaleler ve reaktif eylemlerle kendini göstermiştir."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Yönetim, yolcu konforunu ve güvenliğini tehlikeye atabilecek şiddetli<br/>koku şikayetlerini (HSG: Sağlık ve Güvenlik Yönetimi) operasyonel bir<br/>risk olarak veya protokollere dâhil edilmesi gereken bir husus olarak<br/>neden proaktif bir şekilde tanımlamadı?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Yönetim, yolcu konforunu ve güvenliğini tehlikeye atabilecek şiddetli<br/>koku şikayetlerini proaktif olarak bir operasyonel risk olarak<br/>tanımlayamadı veya protokollere dahil edemedi, çünkü kapalı alanlardaki<br/>kimyasal olmayan ancak şiddetli koku şikayetleri için açık bir protokol<br/>bulunmamaktaydı ve kokuyla ilişkili sağlık riski durumları için belirli<br/>bir Standart Operasyon Prosedürü (SOP) eksikti . Bu durum, erken tespit<br/>ve yolcu çevresel rahatsızlıkları için yükseltme sistemlerinin<br/>yetersizliğini ve operasyonel kontrollerin (havalandırma/koltuk<br/>yerleşimi/bölge izolasyonu) gecikmeli ve reaktif olmasını beraberinde<br/>getirmiştir."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Yönetim, yolcu konforunu ve güvenliğini tehlikeye atabilecek şiddetli<br/>koku şikayetlerini proaktif olarak bir operasyonel risk olarak<br/>tanımlayamadı veya protokollere dahil edemedi, çünkü kapalı alanlardaki<br/>kimyasal olmayan ancak şiddetli koku şikayetleri için açık bir protokol<br/>bulunmamaktaydı ve kokuyla ilişkili sağlık riski durumları için belirli<br/>bir Standart Operasyon Prosedürü (SOP) eksikti . Bu durum, erken tespit<br/>ve yolcu çevresel rahatsızlıkları için yükseltme sistemlerinin<br/>yetersizliğini ve operasyonel kontrollerin (havalandırma/koltuk<br/>yerleşimi/bölge izolasyonu) gecikmeli ve reaktif olmasını beraberinde<br/>getirmiştir."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Tren personeli çevresel rahatsızlık sinyallerini (kötü koku ve<br/>yolcuların yer değiştirmesi gibi) neden zamanında fark edemedi?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Personelin mevcut rahatsızlık belirtileri konusunda proaktif gözlem<br/>yapma ve erken sinyalleri anlama konusunda yetersiz kalması, muhtemelen<br/>saha düzeyinde etkin denetim mekanizmalarının eksikliğinden<br/>kaynaklanmaktadır."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Saha düzeyinde etkin denetim mekanizmaları neden eksikti?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Personelin çevresel rahatsızlık sinyallerini proaktif olarak<br/>gözlemlemesini ve doğru şekilde yanıt vermesini sağlayacak yeterli ve<br/>düzenli saha denetimlerinin veya yöneticilerin işleyişi yerinde kontrol<br/>eden fiziksel varlığının olmaması nedeniyle."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Neden yeterli ve düzenli saha denetimleri yapılmadı veya yöneticilerin<br/>fiziksel varlığı eksikti?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Tren operasyonlarında genel prosedür uyumunun ve uygulamasının<br/>sistematik olarak doğrulanması ve izlenmesi için bir sistemin<br/>bulunmaması nedeniyle."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Tren operasyonlarında prosedür uyumunu sistematik olarak doğrulayan ve<br/>izleyen bir sistem neden bulunmuyordu?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Kuruluşun, standart işletim prosedürlerinin ve güvenlik kurallarının<br/>sahada ne ölçüde uygulandığını kontrol etmek ve doğrulamak için bir<br/>denetim programı veya uyum takip sistemi gibi bir mekanizma tasarlamamış<br/>veya uygulamamış olması nedeniyle."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Kuruluş neden böyle bir denetim programı veya uyum takip sistemi<br/>tasarlamamış veya uygulamamıştı?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Prosedürlere uyumun sistematik olarak izlenmesi ve denetlenmesi için<br/>bir organizasyonel sistemin eksikliği nedeniyle."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>İşletim prosedürlerine ve güvenlik kurallarına uyumun sistematik olarak<br/>izlenmesi ve denetlenmesi için bir organizasyonel sistemin eksikliği.<br/>Bu, personelin çevresel rahatsızlık belirtilerini proaktif olarak<br/>gözlemlemesini ve erken sinyalleri zamanında fark etmesini sağlayacak<br/>bir denetim mekanizmasının bulunmamasından kaynaklanmaktadır."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Yolcu Marina Chai neden bayıldı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Bay Selçuk Yalçın'ın kişisel hijyen kurallarına uymaması ve çevresel<br/>rahatsızlık oluşturan şiddetli ayak kokusu nedeniyle çevresel<br/>tetikleyiciye maruz kalması sonucu."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Şiddetli koku algılandığında ilk müdahale neden gecikti ve etkili<br/>olmadı?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Tren personelinin, bu tür yolcu davranışlarından kaynaklanan çevresel<br/>rahatsızlık durumlarını proaktif olarak tanıma, değerlendirme ve uygun<br/>müdahaleleri başlatma konusunda yeterli eğitime ve farkındalığa sahip<br/>olmaması nedeniyle."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Personel neden bu tür durumları proaktif olarak tanıma ve müdahale etme<br/>konusunda yeterli eğitime sahip değildi?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Organizasyonda, kimyasal olmayan ancak rahatsız edici çevresel<br/>faktörler (şiddetli kokular gibi) ve bunların yolcu sağlığı üzerindeki<br/>potansiyel etkileri hakkında belirli risk senaryolarını kapsayan, görev<br/>odaklı ve yeterli pratik uygulama (tatbikatlar dahil) içeren bir eğitim<br/>programı bulunmaması nedeniyle."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Organizasyon neden bu tür risk senaryolarını kapsayan görev odaklı bir<br/>eğitim programı tasarlamadı veya sağlamadı?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["Çünkü yönetim, bu tür çevresel rahatsızlık olaylarına yönelik proaktif<br/>müdahale ve acil durum yönetimi becerilerini geliştirecek kapsamlı bir<br/>eğitim stratejisinin önemini ve gerekliliğini yeterince değerlendiremedi<br/>veya önceliklendiremedi."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Yönetim neden kapsamlı bir eğitim stratejisinin önemini yeterince<br/>değerlendiremedi veya önceliklendiremedi?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Olay raporunda ve kök neden analizlerinde, yeni veya mevcut risk<br/>senaryoları için eğitim gereksinimlerinin belirlenmesi ve eğitim<br/>programlarının güncellenmesi veya yeni programların tasarlanması<br/>süreçlerinde, potansiyel çevresel rahatsızlıkların yolcu konfor ve<br/>sağlığı üzerindeki etkilerine odaklanan sistematik bir değerlendirme<br/>mekanizmasının olmaması nedeniyle."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Eğitim Tasarımı Etkisiz: Eğitim kapsamı gerçek iş riskleriyle<br/>örtüşmedi."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden kötü kokuya maruz kalan yolcu bayıldı?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q31
+    A32["Kötü kokuya maruz kalan yolcu, güçlü ayak kokusu nedeniyle bulantı ve<br/>baş dönmesi yaşadıktan sonra bayılmıştır ."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden güçlü ayak kokusu bulantı ve baş dönmesi yaşatır?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A32 --> Q33
+    A34["Güçlü ayak kokusu, özellikle kapalı ve havalandırılmayan bir ortamda<br/>yüksek konsantrasyonda olduğunda, bazı kişilerde bulantı ve baş dönmesi<br/>gibi semptomlara neden olabilir. İnsan beynindeki koku alma sistemi,<br/>duygusal tepkileri ve otonom sinir sistemi fonksiyonlarını düzenleyen<br/>limbik sistemle yakın bir şekilde bağlantılıdır. Hoş olmayan veya aşırı<br/>derecede yoğun kokular, bu bağlantı üzerinden bir stres tepkisini<br/>tetikleyebilir. Bu tepki, vagus siniri aracılığıyla mide bulantısını<br/>tetikleyebilir ve genel bir rahatsızlık hissi veya hatta baş dönmesine<br/>yol açabilir. Bazı durumlarda, bu fizyolojik tepki çok güçlü hale<br/>gelirse, geçici bilinç kaybına (bayılma) neden olabilir, özellikle de<br/>kişi hassas ise veya havalandırma yetersizse."]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Neden yoğun bir koku, limbik sistem aracılığıyla bazı kişilerde bu<br/>kadar şiddetli bir vagal tepkiyi tetikler?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A34 --> Q35
+    A36["Yoğun bir koku, koku alma sistemi tarafından algılandığında limbik<br/>sistemi aşırı uyarabilir. Limbik sistem, özellikle korku veya iğrenme<br/>gibi güçlü duygusal tepkileri işlediği için, bu koku bazı duyarlı<br/>kişilerde ani ve şiddetli bir otonom sinir sistemi tepkisi olan vagal<br/>yanıtı tetikleyebilir. Bu tepki, kalp atış hızında düşüşe ve kan<br/>damarlarının genişlemesine yol açarak beyne kan akışını azaltabilir ve<br/>bayılma gibi semptomlara neden olabilir."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Neden bazı kişiler bu tür koku kaynaklı vagal tepkilere diğerlerinden<br/>daha duyarlıdır ?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A36 --> Q37
+    A38["Bazı kişiler, kokuya maruz kalma gibi çevresel tetikleyicilere karşı<br/>artan fizyolojik veya psikolojik hassasiyete sahip olabilirler. Bu<br/>hassasiyet, bilinen veya bilinmeyen tıbbi durumlar , o anki duygusal<br/>durumları veya daha önce benzer kokularla ilişkilendirilmiş olumsuz<br/>deneyimlerden kaynaklanan bilişsel tepkiler nedeniyle kokuya karşı daha<br/>şiddetli bir vagal tepki yaşamalarına neden olabilir. Bu vakada Bayan<br/>Chai'nin yaşadığı mide bulantısı, baş dönmesi ve kısa süreli bayılma,<br/>kokunun tetiklediği bir fizyolojik tepkinin bir örneğidir."]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>Bu tıbbi durumlar veya daha önceki deneyimler kokuya karşı artan bu<br/>vagal tepkiyi neden tetiklemektedir?"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A38 --> Q39
+    A40["Olay raporunda, Bayan Marina Chai'nin güçlü kol kokusuna karşı artan<br/>bir vagal tepkiye neden olan bu belirli tıbbi koşullarının veya önceki<br/>deneyimlerinin neden olabileceğine dair herhangi bir bilgi<br/>bulunmamaktadır. Raporda sadece mide bulantısı, baş dönmesi yaşadığı ve<br/>kısa bir süre bilincini kaybettiği belirtilmektedir."]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Olay raporunda, Bayan Marina Chai'nin güçlü kol kokusuna karşı artan<br/>bir vagal tepkiye neden olan bu belirli tıbbi koşullarının veya önceki<br/>deneyimlerinin neden olabileceğine dair herhangi bir bilgi<br/>bulunmamaktadır. Raporda sadece mide bulantısı, baş dönmesi yaşadığı ve<br/>kısa bir süre bilincini kaybettiği belirtilmektedir."]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden trendeki servis yoğunluğu ve personelin zaman baskısı, çevresel<br/>şikayetlerin erken tespit ve önlemlerinin gözden kaçmasına neden oldu?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q41
+    A42["Personelin çevresel şikayetlerin potansiyel risklerini anlama ve erken<br/>aşamada proaktif önlemler alma becerisi yetersizdi."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Neden personelin çevresel şikayetlerin potansiyel risklerini anlama ve<br/>erken aşamada proaktif önlemler alma becerisi yetersizdi?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A42 --> Q43
+    A44["Çevresel rahatsızlık sinyallerini (örneğin şiddetli koku) sağlık riski<br/>taşımayan ve taşıyan durumlar olarak ayırt etmelerini sağlayacak bilgi<br/>ve becerilere sahip değillerdi."]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Neden çevresel rahatsızlık sinyallerini sağlık riski taşıyan ve<br/>taşımayan durumlar olarak ayırt etmelerini sağlayacak bilgi ve<br/>becerilere sahip değillerdi?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A44 --> Q45
+    A46["Aldıkları eğitim, koku ile ilgili durumların ne zaman sağlık riski<br/>oluşturabileceği ve bu tür durumlarda nasıl proaktif olarak müdahale<br/>edileceği konularını yeterince kapsamıyordu."]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Neden aldıkları eğitim, koku ile ilgili durumların ne zaman sağlık<br/>riski oluşturabileceği ve bu tür durumlarda nasıl proaktif olarak<br/>müdahale edileceği konularını yeterince kapsamıyordu?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A46 --> Q47
+    A48["Eğitim programı tasarımı, gerçek iş ortamında karşılaşabilecekleri bu<br/>tür spesifik çevresel sağlık riski senaryolarına yönelik yetersizdi."]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Neden eğitim programı tasarımı, gerçek iş ortamında<br/>karşılaşabilecekleri bu tür spesifik çevresel sağlık riski senaryolarına<br/>yönelik yetersizdi?"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A48 --> Q49
+    A50["Eğitimin kapsamı, yolcu konforunu ve güvenliğini etkileyebilecek<br/>çevresel etken riskleriyle, özellikle de kapalı alanlardaki ciddiyet arz<br/>eden koku şikayetleriyle uyumlu değildi."]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Eğitim Tasarımı Etkisiz"]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A50 --> ROOT5
+
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: false,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 20,
+                            nodeSpacing: 28,
+                            rankSpacing: 56,
+                            diagramPadding: 16
+                        },
+                        themeVariables: {
+                            fontSize: '14px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#222',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: false,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 20,
+                                    nodeSpacing: 28,
+                                    rankSpacing: 56,
+                                    diagramPadding: 16
+                                },
+                                themeVariables: {
+                                    fontSize: '14px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

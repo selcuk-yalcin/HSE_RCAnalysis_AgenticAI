@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }
+        header .top-title { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        header h1 { font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }
+        header .subtitle { font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+        #diagram-wrap {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }
+        #diagram-wrap .mermaid {
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }
+        #diagram-wrap svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden tren vagonunda yetersiz havalandırma vardı?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Havalandırma yetersizdi çünkü vagon içi çevresel rahatsızlıkların erken<br/>tespiti ve ilgili durumlar için net prosedürler eksikti, bu da<br/>operasyonel kontrollerin (havalandırma ayarlamaları dahil) gecikmesine<br/>yol açtı."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden vagon içi çevresel rahatsızlıkların erken tespiti ve ilgili<br/>durumlar için net prosedürler eksikti?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Vagon içi çevresel rahatsızlıkların erken tespiti ve ilgili durumlar<br/>için net prosedürler, kapalı alanlarda kimyasal olmayan ancak ciddi koku<br/>şikayetlerine yönelik spesifik bir protokolün bulunmaması nedeniyle<br/>eksikti ve yolcu çevresel rahatsızlığı için erken tespit ve yükseltme<br/>süreçleri yetersizdi. Bu durum, şikayetlerin işlenmesinde gecikmelere ve<br/>proaktif müdahale yerine reaktif bir yaklaşıma yol açtı."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden (HSG.1) kapalı alanlarda kimyasal olmayan ancak ciddi koku<br/>kaynaklı çevresel rahatsızlıklar operasyonel bir risk olarak yeterince<br/>tanınmıyordu?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Kapalı alanlarda oluşan kimyasal olmayan ancak ciddi koku kaynaklı<br/>çevresel rahatsızlıklar, bu tür durumlar için açık bir protokolün<br/>olmaması, koku kaynaklı sağlık riski durumlarına yönelik özel bir<br/>standart operasyon prosedürünün (SOP) bulunmaması ve yolcu çevresel<br/>rahatsızlıklarının erken tespiti ve tırmanmasında yetersizlik nedeniyle<br/>operasyonel bir risk olarak yeterince tanınmıyordu."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden bu tür durumlar için açık bir protokol veya koku kaynaklı sağlık<br/>riski durumlarına yönelik özel bir Standart Operasyon Prosedürü (SOP)<br/>bulunmuyordu?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Demiryolu şirketinin, koku kaynaklı sağlık riski durumlarına yönelik<br/>özel bir Standart Operasyon Prosedürü (SOP) veya açık bir protokole<br/>sahip olmaması nedeniyle, personelin bu tür olaylarla nasıl başa<br/>çıkacağı konusunda yeterli düzeyde beceri pratiği yapma fırsatı<br/>bulamaması olasıdır. Bu durum, personele bu tür olaylara karşı nasıl<br/>proaktif ve yapılandırılmış bir yanıt verileceği konusunda eğitim<br/>eksikliğinden kaynaklanmaktadır. Bu eksiklik, olay sırasındaki gecikmiş<br/>müdahaleler ve reaktif eylemlerle kendini göstermiştir."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Yönetim, yolcu konforunu ve güvenliğini tehlikeye atabilecek şiddetli<br/>koku şikayetlerini (HSG: Sağlık ve Güvenlik Yönetimi) operasyonel bir<br/>risk olarak veya protokollere dâhil edilmesi gereken bir husus olarak<br/>neden proaktif bir şekilde tanımlamadı?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Yönetim, yolcu konforunu ve güvenliğini tehlikeye atabilecek şiddetli<br/>koku şikayetlerini proaktif olarak bir operasyonel risk olarak<br/>tanımlayamadı veya protokollere dahil edemedi, çünkü kapalı alanlardaki<br/>kimyasal olmayan ancak şiddetli koku şikayetleri için açık bir protokol<br/>bulunmamaktaydı ve kokuyla ilişkili sağlık riski durumları için belirli<br/>bir Standart Operasyon Prosedürü (SOP) eksikti . Bu durum, erken tespit<br/>ve yolcu çevresel rahatsızlıkları için yükseltme sistemlerinin<br/>yetersizliğini ve operasyonel kontrollerin (havalandırma/koltuk<br/>yerleşimi/bölge izolasyonu) gecikmeli ve reaktif olmasını beraberinde<br/>getirmiştir."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Yönetim, yolcu konforunu ve güvenliğini tehlikeye atabilecek şiddetli<br/>koku şikayetlerini proaktif olarak bir operasyonel risk olarak<br/>tanımlayamadı veya protokollere dahil edemedi, çünkü kapalı alanlardaki<br/>kimyasal olmayan ancak şiddetli koku şikayetleri için açık bir protokol<br/>bulunmamaktaydı ve kokuyla ilişkili sağlık riski durumları için belirli<br/>bir Standart Operasyon Prosedürü (SOP) eksikti . Bu durum, erken tespit<br/>ve yolcu çevresel rahatsızlıkları için yükseltme sistemlerinin<br/>yetersizliğini ve operasyonel kontrollerin (havalandırma/koltuk<br/>yerleşimi/bölge izolasyonu) gecikmeli ve reaktif olmasını beraberinde<br/>getirmiştir."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Tren personeli çevresel rahatsızlık sinyallerini (kötü koku ve<br/>yolcuların yer değiştirmesi gibi) neden zamanında fark edemedi?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Personelin mevcut rahatsızlık belirtileri konusunda proaktif gözlem<br/>yapma ve erken sinyalleri anlama konusunda yetersiz kalması, muhtemelen<br/>saha düzeyinde etkin denetim mekanizmalarının eksikliğinden<br/>kaynaklanmaktadır."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Saha düzeyinde etkin denetim mekanizmaları neden eksikti?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Personelin çevresel rahatsızlık sinyallerini proaktif olarak<br/>gözlemlemesini ve doğru şekilde yanıt vermesini sağlayacak yeterli ve<br/>düzenli saha denetimlerinin veya yöneticilerin işleyişi yerinde kontrol<br/>eden fiziksel varlığının olmaması nedeniyle."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Neden yeterli ve düzenli saha denetimleri yapılmadı veya yöneticilerin<br/>fiziksel varlığı eksikti?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Tren operasyonlarında genel prosedür uyumunun ve uygulamasının<br/>sistematik olarak doğrulanması ve izlenmesi için bir sistemin<br/>bulunmaması nedeniyle."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Tren operasyonlarında prosedür uyumunu sistematik olarak doğrulayan ve<br/>izleyen bir sistem neden bulunmuyordu?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Kuruluşun, standart işletim prosedürlerinin ve güvenlik kurallarının<br/>sahada ne ölçüde uygulandığını kontrol etmek ve doğrulamak için bir<br/>denetim programı veya uyum takip sistemi gibi bir mekanizma tasarlamamış<br/>veya uygulamamış olması nedeniyle."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Kuruluş neden böyle bir denetim programı veya uyum takip sistemi<br/>tasarlamamış veya uygulamamıştı?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Prosedürlere uyumun sistematik olarak izlenmesi ve denetlenmesi için<br/>bir organizasyonel sistemin eksikliği nedeniyle."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>İşletim prosedürlerine ve güvenlik kurallarına uyumun sistematik olarak<br/>izlenmesi ve denetlenmesi için bir organizasyonel sistemin eksikliği.<br/>Bu, personelin çevresel rahatsızlık belirtilerini proaktif olarak<br/>gözlemlemesini ve erken sinyalleri zamanında fark etmesini sağlayacak<br/>bir denetim mekanizmasının bulunmamasından kaynaklanmaktadır."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Yolcu Marina Chai neden bayıldı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Bay Selçuk Yalçın'ın kişisel hijyen kurallarına uymaması ve çevresel<br/>rahatsızlık oluşturan şiddetli ayak kokusu nedeniyle çevresel<br/>tetikleyiciye maruz kalması sonucu."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Şiddetli koku algılandığında ilk müdahale neden gecikti ve etkili<br/>olmadı?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Tren personelinin, bu tür yolcu davranışlarından kaynaklanan çevresel<br/>rahatsızlık durumlarını proaktif olarak tanıma, değerlendirme ve uygun<br/>müdahaleleri başlatma konusunda yeterli eğitime ve farkındalığa sahip<br/>olmaması nedeniyle."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Personel neden bu tür durumları proaktif olarak tanıma ve müdahale etme<br/>konusunda yeterli eğitime sahip değildi?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Organizasyonda, kimyasal olmayan ancak rahatsız edici çevresel<br/>faktörler (şiddetli kokular gibi) ve bunların yolcu sağlığı üzerindeki<br/>potansiyel etkileri hakkında belirli risk senaryolarını kapsayan, görev<br/>odaklı ve yeterli pratik uygulama (tatbikatlar dahil) içeren bir eğitim<br/>programı bulunmaması nedeniyle."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Organizasyon neden bu tür risk senaryolarını kapsayan görev odaklı bir<br/>eğitim programı tasarlamadı veya sağlamadı?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["Çünkü yönetim, bu tür çevresel rahatsızlık olaylarına yönelik proaktif<br/>müdahale ve acil durum yönetimi becerilerini geliştirecek kapsamlı bir<br/>eğitim stratejisinin önemini ve gerekliliğini yeterince değerlendiremedi<br/>veya önceliklendiremedi."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Yönetim neden kapsamlı bir eğitim stratejisinin önemini yeterince<br/>değerlendiremedi veya önceliklendiremedi?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Olay raporunda ve kök neden analizlerinde, yeni veya mevcut risk<br/>senaryoları için eğitim gereksinimlerinin belirlenmesi ve eğitim<br/>programlarının güncellenmesi veya yeni programların tasarlanması<br/>süreçlerinde, potansiyel çevresel rahatsızlıkların yolcu konfor ve<br/>sağlığı üzerindeki etkilerine odaklanan sistematik bir değerlendirme<br/>mekanizmasının olmaması nedeniyle."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Eğitim Tasarımı Etkisiz: Eğitim kapsamı gerçek iş riskleriyle<br/>örtüşmedi."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden kötü kokuya maruz kalan yolcu bayıldı?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q31
+    A32["Kötü kokuya maruz kalan yolcu, güçlü ayak kokusu nedeniyle bulantı ve<br/>baş dönmesi yaşadıktan sonra bayılmıştır ."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden güçlü ayak kokusu bulantı ve baş dönmesi yaşatır?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A32 --> Q33
+    A34["Güçlü ayak kokusu, özellikle kapalı ve havalandırılmayan bir ortamda<br/>yüksek konsantrasyonda olduğunda, bazı kişilerde bulantı ve baş dönmesi<br/>gibi semptomlara neden olabilir. İnsan beynindeki koku alma sistemi,<br/>duygusal tepkileri ve otonom sinir sistemi fonksiyonlarını düzenleyen<br/>limbik sistemle yakın bir şekilde bağlantılıdır. Hoş olmayan veya aşırı<br/>derecede yoğun kokular, bu bağlantı üzerinden bir stres tepkisini<br/>tetikleyebilir. Bu tepki, vagus siniri aracılığıyla mide bulantısını<br/>tetikleyebilir ve genel bir rahatsızlık hissi veya hatta baş dönmesine<br/>yol açabilir. Bazı durumlarda, bu fizyolojik tepki çok güçlü hale<br/>gelirse, geçici bilinç kaybına (bayılma) neden olabilir, özellikle de<br/>kişi hassas ise veya havalandırma yetersizse."]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Neden yoğun bir koku, limbik sistem aracılığıyla bazı kişilerde bu<br/>kadar şiddetli bir vagal tepkiyi tetikler?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A34 --> Q35
+    A36["Yoğun bir koku, koku alma sistemi tarafından algılandığında limbik<br/>sistemi aşırı uyarabilir. Limbik sistem, özellikle korku veya iğrenme<br/>gibi güçlü duygusal tepkileri işlediği için, bu koku bazı duyarlı<br/>kişilerde ani ve şiddetli bir otonom sinir sistemi tepkisi olan vagal<br/>yanıtı tetikleyebilir. Bu tepki, kalp atış hızında düşüşe ve kan<br/>damarlarının genişlemesine yol açarak beyne kan akışını azaltabilir ve<br/>bayılma gibi semptomlara neden olabilir."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Neden bazı kişiler bu tür koku kaynaklı vagal tepkilere diğerlerinden<br/>daha duyarlıdır ?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A36 --> Q37
+    A38["Bazı kişiler, kokuya maruz kalma gibi çevresel tetikleyicilere karşı<br/>artan fizyolojik veya psikolojik hassasiyete sahip olabilirler. Bu<br/>hassasiyet, bilinen veya bilinmeyen tıbbi durumlar , o anki duygusal<br/>durumları veya daha önce benzer kokularla ilişkilendirilmiş olumsuz<br/>deneyimlerden kaynaklanan bilişsel tepkiler nedeniyle kokuya karşı daha<br/>şiddetli bir vagal tepki yaşamalarına neden olabilir. Bu vakada Bayan<br/>Chai'nin yaşadığı mide bulantısı, baş dönmesi ve kısa süreli bayılma,<br/>kokunun tetiklediği bir fizyolojik tepkinin bir örneğidir."]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>Bu tıbbi durumlar veya daha önceki deneyimler kokuya karşı artan bu<br/>vagal tepkiyi neden tetiklemektedir?"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A38 --> Q39
+    A40["Olay raporunda, Bayan Marina Chai'nin güçlü kol kokusuna karşı artan<br/>bir vagal tepkiye neden olan bu belirli tıbbi koşullarının veya önceki<br/>deneyimlerinin neden olabileceğine dair herhangi bir bilgi<br/>bulunmamaktadır. Raporda sadece mide bulantısı, baş dönmesi yaşadığı ve<br/>kısa bir süre bilincini kaybettiği belirtilmektedir."]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Olay raporunda, Bayan Marina Chai'nin güçlü kol kokusuna karşı artan<br/>bir vagal tepkiye neden olan bu belirli tıbbi koşullarının veya önceki<br/>deneyimlerinin neden olabileceğine dair herhangi bir bilgi<br/>bulunmamaktadır. Raporda sadece mide bulantısı, baş dönmesi yaşadığı ve<br/>kısa bir süre bilincini kaybettiği belirtilmektedir."]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden trendeki servis yoğunluğu ve personelin zaman baskısı, çevresel<br/>şikayetlerin erken tespit ve önlemlerinin gözden kaçmasına neden oldu?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q41
+    A42["Personelin çevresel şikayetlerin potansiyel risklerini anlama ve erken<br/>aşamada proaktif önlemler alma becerisi yetersizdi."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Neden personelin çevresel şikayetlerin potansiyel risklerini anlama ve<br/>erken aşamada proaktif önlemler alma becerisi yetersizdi?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A42 --> Q43
+    A44["Çevresel rahatsızlık sinyallerini (örneğin şiddetli koku) sağlık riski<br/>taşımayan ve taşıyan durumlar olarak ayırt etmelerini sağlayacak bilgi<br/>ve becerilere sahip değillerdi."]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Neden çevresel rahatsızlık sinyallerini sağlık riski taşıyan ve<br/>taşımayan durumlar olarak ayırt etmelerini sağlayacak bilgi ve<br/>becerilere sahip değillerdi?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A44 --> Q45
+    A46["Aldıkları eğitim, koku ile ilgili durumların ne zaman sağlık riski<br/>oluşturabileceği ve bu tür durumlarda nasıl proaktif olarak müdahale<br/>edileceği konularını yeterince kapsamıyordu."]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Neden aldıkları eğitim, koku ile ilgili durumların ne zaman sağlık<br/>riski oluşturabileceği ve bu tür durumlarda nasıl proaktif olarak<br/>müdahale edileceği konularını yeterince kapsamıyordu?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A46 --> Q47
+    A48["Eğitim programı tasarımı, gerçek iş ortamında karşılaşabilecekleri bu<br/>tür spesifik çevresel sağlık riski senaryolarına yönelik yetersizdi."]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Neden eğitim programı tasarımı, gerçek iş ortamında<br/>karşılaşabilecekleri bu tür spesifik çevresel sağlık riski senaryolarına<br/>yönelik yetersizdi?"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A48 --> Q49
+    A50["Eğitimin kapsamı, yolcu konforunu ve güvenliğini etkileyebilecek<br/>çevresel etken riskleriyle, özellikle de kapalı alanlardaki ciddiyet arz<br/>eden koku şikayetleriyle uyumlu değildi."]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Eğitim Tasarımı Etkisiz"]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A50 --> ROOT5
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
+                htmlLabels: true,
+                diagramPadding: 16
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
+                primaryColor: '#fff',
+                primaryTextColor: '#222',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>

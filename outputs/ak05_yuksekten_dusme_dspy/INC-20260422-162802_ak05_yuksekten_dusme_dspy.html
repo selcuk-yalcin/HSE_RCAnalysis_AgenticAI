@@ -1,0 +1,2615 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÖK NEDEN ANALİZİ RAPORU</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #444;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1B3A5C 0%, #2E6DA4 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .cover h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .cover .subtitle {
+            font-size: 1.2em;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        
+        .confidential-banner {
+            background: #C0392B;
+            color: white;
+            padding: 15px;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .info-item {
+            background: #D6E4F0;
+            padding: 15px;
+            border-left: 4px solid #1B3A5C;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #1B3A5C;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            margin-top: 5px;
+            color: #444;
+        }
+        
+        .incident-summary {
+            background: #1B3A5C;
+            color: white;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin: 40px 0;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: #1B3A5C;
+            color: white;
+            padding: 15px 20px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .subsection-header {
+            color: #2E6DA4;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #2E6DA4;
+        }
+        
+        .paragraph {
+            margin: 15px 0;
+            text-align: justify;
+            line-height: 1.8;
+        }
+        
+        .colored-box {
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .box-header {
+            padding: 15px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .box-content {
+            background: #F5F5F5;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        
+        .box-red .box-header { background: #C0392B; }
+        .box-orange .box-header { background: #E67E22; }
+        .box-green .box-header { background: #27AE60; }
+        .box-blue .box-header { background: #2E6DA4; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1B3A5C;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background: #F5F5F5;
+        }
+        
+        tr:hover {
+            background: #E8F4F8;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #2E6DA4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: #2E6DA4;
+            min-width: 80px;
+            font-size: 1.1em;
+        }
+        
+        .timeline-event {
+            flex: 1;
+            margin-left: 20px;
+        }
+        
+        .why-chain {
+            margin: 20px 0;
+        }
+        
+        .why-item {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #E67E22;
+            background: #FFF8F0;
+        }
+        
+        .why-number {
+            font-weight: bold;
+            color: #E67E22;
+            font-size: 1.1em;
+        }
+        
+        .why-question {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #444;
+        }
+        
+        .why-answer {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        
+        .why-code {
+            display: inline-block;
+            background: #E67E22;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .root-cause-box {
+            margin: 30px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .root-cause-header {
+            padding: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .root-cause-content {
+            background: white;
+            padding: 25px;
+        }
+        
+        .root-cause-1 .root-cause-header { background: #C0392B; }
+        .root-cause-2 .root-cause-header { background: #E67E22; }
+        .root-cause-3 .root-cause-header { background: #27AE60; }
+        .root-cause-4 .root-cause-header { background: #2E6DA4; }
+        
+        ul.bullet-list {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        ul.bullet-list li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .priority-urgent {
+            background: #C0392B;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-high {
+            background: #E67E22;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-medium {
+            background: #27AE60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .priority-low {
+            background: #2E6DA4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        
+        .impact-high { color: #C0392B; font-weight: bold; }
+        .impact-medium { color: #E67E22; font-weight: bold; }
+        .impact-low { color: #27AE60; font-weight: bold; }
+        
+        .signature-section {
+            margin: 40px 0;
+        }
+        
+        .signature-table td {
+            padding: 30px 15px;
+        }
+        
+        .signature-line {
+            border-top: 2px solid #444;
+            margin-top: 60px;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        /*  OLAY FOTOĞRAFLARI  */
+        .photo-section {
+            margin: 40px 0;
+            page-break-before: always;
+        }
+        .photo-page {
+            page-break-after: always;
+        }
+        .photo-page:last-child {
+            page-break-after: auto;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .photo-slot {
+            border: 2px dashed #2E6DA4;
+            border-radius: 10px;
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F8FBFF;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .photo-slot:hover {
+            border-color: #1B3A5C;
+            background: #EBF3FB;
+        }
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: #1B3A5C;
+            background: #fff;
+        }
+        .photo-slot img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            display: block;
+        }
+        .photo-slot .upload-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2E6DA4;
+            pointer-events: none;
+        }
+        .photo-slot .upload-hint .icon {
+            font-size: 3em;
+        }
+        .photo-slot .upload-hint .label {
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .photo-slot .upload-hint .sub {
+            font-size: 0.78em;
+            color: #888;
+        }
+        .photo-caption {
+            width: 100%;
+            padding: 8px 10px;
+            border: none;
+            border-top: 1px solid #ddd;
+            font-size: 0.85em;
+            background: #fff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .photo-caption::placeholder {
+            color: #aaa;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: rgba(192,57,43,0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .photo-slot.has-photo .photo-remove {
+            display: flex;
+        }
+        .photo-page-title {
+            font-size: 1em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        @media print {
+            .photo-slot .upload-hint { display: none; }
+            .photo-remove { display: none !important; }
+            .photo-caption { border-top: 1px solid #ccc; }
+        }
+        
+        .comparison-table td:first-child {
+            background: #D6E4F0 !important;
+            color: #1B3A5C;
+            font-weight: bold;
+        }
+        
+        .comparison-table .current {
+            background: #FFE6E6 !important;
+            color: #C0392B;
+        }
+        
+        .comparison-table .target {
+            background: #E8F8F0 !important;
+            color: #27AE60;
+            font-weight: bold;
+        }
+        
+        /* Navigasyon Menüsü */
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+        }
+        
+        .nav-menu h3 {
+            margin: 0 0 10px 0;
+            font-size: 1em;
+            color: #1B3A5C;
+            border-bottom: 2px solid #1B3A5C;
+            padding-bottom: 5px;
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu li {
+            margin: 8px 0;
+        }
+        
+        .nav-menu a {
+            color: #2E6DA4;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .nav-menu a:hover {
+            background: #D6E4F0;
+            padding-left: 10px;
+        }
+        
+        .nav-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-toggle:hover {
+            background: #2E6DA4;
+        }
+        
+        /* Düzenleme Toolbar */
+        .edit-toolbar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .edit-toolbar.active {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .btn-save {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn-print {
+            background: #2E6DA4;
+            color: white;
+        }
+        
+        .btn-export {
+            background: #E67E22;
+            color: white;
+        }
+        
+        .btn-reset {
+            background: #C0392B;
+            color: white;
+        }
+        
+        .btn-edit-mode {
+            background: #9B59B6;
+            color: white;
+        }
+        
+        /* Sayfa Numaraları (Yazdırma için) */
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Sayfa " counter(page) " / " counter(pages);
+                font-size: 10pt;
+                color: #666;
+            }
+            @bottom-left {
+                content: "HSE Kök Neden Analizi - INC-20260422-162802";
+                font-size: 10pt;
+                color: #666;
+            }
+        }
+        
+        /* Yazdırma Ayarları */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-header {
+                page-break-after: avoid;
+            }
+            
+            .root-cause-box {
+                page-break-inside: avoid;
+            }
+            
+            .nav-menu, .nav-toggle, .edit-toolbar {
+                display: none !important;
+            }
+            
+            /* Sayfa numaraları için footer */
+            .page-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 10pt;
+                color: #666;
+                padding: 10px;
+                border-top: 1px solid #ddd;
+            }
+            
+            /* Bölüm başlarında sayfa ayırıcı */
+            .section-header {
+                page-break-before: always;
+            }
+            
+            .cover {
+                page-break-after: always;
+            }
+        }
+        
+        /* Düzenlenebilir alanlar için */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+        
+        [contenteditable="true"]:hover {
+            background: #FFFACD;
+        }
+        
+        [contenteditable="true"]:focus {
+            background: #FFFFE0;
+            border: 1px dashed #E67E22;
+            padding: 5px;
+        }
+        
+        [contenteditable="true"]:hover::after {
+            content: " Düzenlemek için tıklayın";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #E67E22;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .edit-hint {
+            color: #999;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        /* Scroll-to-top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #1B3A5C;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 998;
+        }
+        
+        .scroll-top:hover {
+            background: #2E6DA4;
+        }
+        
+        .scroll-top.visible {
+            display: block;
+        }
+        
+        /* Highlight effect for navigation */
+        .section.highlighted {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: #FFFACD; }
+            100% { background: transparent; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigasyon Toggle Butonu -->
+    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    
+    <!-- Navigasyon Menüsü -->
+    <div class="nav-menu" id="navMenu" style="display: none;">
+        <h3>İÇİNDEKİLER</h3>
+        <ul>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
+            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
+            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+        </ul>
+    </div>
+    
+    <!-- Düzenleme Toolbar -->
+    <div class="edit-toolbar" id="editToolbar">
+        <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
+            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+        </button>
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
+             Kaydet
+        </button>
+        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
+             Yazdır
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
+             PDF İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
+             Word İndir
+        </button>
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
+             HTML İndir
+        </button>
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
+             Sıfırla
+        </button>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+    
+    <div class="container">
+        <!-- KAPAK SAYFASI -->
+        <div class="cover" id="cover">
+            <h1 contenteditable="true">KÖK NEDEN ANALİZİ RAPORU</h1>
+            <div class="subtitle" contenteditable="true">Profesyonel Araştırma ve Analiz Raporu</div>
+            
+            <div class="confidential-banner" contenteditable="true">
+                GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Referans No</div>
+                    <div class="info-value" contenteditable="true">INC-20260422-162802</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Tarih</div>
+                    <div class="info-value" contenteditable="true">22.04.2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Lokasyon</div>
+                    <div class="info-value" contenteditable="true">KMO Kesim-8 Projesi, AK05 Bölge, Güney Eksen Orta Aks</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-value" contenteditable="true">Yüksekten Düşme - Ciddi Yaralanma</div>
+                </div>
+            </div>
+            
+            <div class="incident-summary">
+                <h3>OLAY ÖZETİ</h3>
+                <p contenteditable="true">18 yaşındaki panel kalıpçı, 9 metre yükseklikte enleme kirişi kalıp montajı sırasında emniyet kemeri bağlantısı yapmadan çalışırken ayağı kayarak düştü ve ciddi yaralandı.</p>
+            </div>
+        </div>
+        
+        <!-- İÇERİK -->
+        <div class="content">
+
+        <div class="section" id="executive-summary">
+            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            
+            <div class="subsection-header">1.1 Olay Özeti</div>
+<div class="paragraph" contenteditable="true">16 Nisan 2026 tarihinde saat 14:27'de, KMO Kesim-8 projesi AK05 bölgesinde enleme kirişi kalıp montajı çalışması sırasında 18 yaşındaki panel kalıpçı Muhammet Ali Demir, yaklaşık 9 metre yükseklikten dolgu toprak zemine düşmüştür. Çalışma alanında uygun ankraj noktası mevcut olmasına rağmen, çalışan emniyet kemeri bağlantısını yapmamıştır. Ayağının kayması sonucu dengesini kaybeden çalışan, zemine düşerek kolunda açık kırık, kalça ve bel/sırt bölgesinde şiddetli ağrı ile sonuçlanan ciddi yaralanma geçirmiştir. Çalışan 7 aydır projede görev yapmakta olup, iş girişi ve yüksekte çalışma eğitimlerini tamamlamış, KKD zimmet kayıtları mevcuttur.</div>
+<div class="paragraph" contenteditable="true">Kaza anında ekip tarafından acil bildirim yapılmış, 112 ve acil durum prosedürü devreye alınmıştır. Saat 14:26'da ambulans çağrısı yapılmış, 14:50'de ambulans olay yerine ulaşmıştır. Yaralı çalışan hastaneye sevk edilmiş, triyaj ve radyolojik inceleme yapılmıştır. 17 Nisan 2026 tarihinde kol kırığı nedeniyle ameliyat gerçekleştirilmiş, yoğun bakım izlemi başlatılmıştır. Kalça bölgesi için ikinci cerrahi müdahale planlaması devam etmektedir.</div>
+
+            <div class="subsection-header">1.2 Temel Bulgular</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Çalışma alanında supervizor/formen/ekip başı sabit varlığının yeterli olmadığı tespit edilmiştir</li>
+<li contenteditable="true">Ankraj bağlantısının uzaktan tespit edilmesinin zor olması nedeniyle etkili denetim sağlanamamıştır</li>
+<li contenteditable="true">Yüksek risk operasyonları için gözetim kaynakları tahsis eden standart metodoloji eksikliği bulunmaktadır</li>
+<li contenteditable="true">Formen/ekip başı iş tanımlarında sabit denetim görevleri formalize edilmemiştir</li>
+
+            </ul>
+            
+            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acil Eylem</th>
+                        <th>Sorumlu</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Tüm yüksekte çalışma alanlarında acil güvenlik denetimi yapılması ve emniyet kemeri kullanımının kontrol edilmesi</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">AK05 bölgesinde çalışmaların geçici olarak durdurulması ve güvenlik önlemlerinin gözden geçirilmesi</td>
+                        <td contenteditable="true">Proje Müdürü</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tüm çalışanlara acil güvenlik brifingi verilmesi ve emniyet kemeri kullanım zorunluluğunun hatırlatılması</td>
+                        <td contenteditable="true">Vardiya Amiri</td>
+                        <td contenteditable="true">Tamamlandı</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Yüksekte çalışma alanlarına sabit gözetim personeli atanması ve denetim sisteminin güçlendirilmesi</td>
+                        <td contenteditable="true">Operasyon Müdürü</td>
+                        <td contenteditable="true">Devam ediyor</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="incident-details">
+            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            
+            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Referans No</td>
+                    <td contenteditable="true">INC-20260422-162802</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Tarih</td>
+                    <td contenteditable="true">16.04.2026</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Saat</td>
+                    <td contenteditable="true">14:27</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Lokasyon</td>
+                    <td contenteditable="true">KMO Kesim-8 Projesi, AK05 Bölge</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Bölüm/Hat</td>
+                    <td contenteditable="true">Güney Eksen Orta Aks, Enleme Kirişi Kalıp Montaj Alanı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Operatör/Çalışan</td>
+                    <td contenteditable="true">Muhammet Ali Demir (18 yaş, Panel Kalıpçı)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Vardiya</td>
+                    <td contenteditable="true">Gündüz Vardiyası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Ekipman</td>
+                    <td contenteditable="true">Enleme Kirişi Kalıp Montaj Ekipmanları, Emniyet Kemeri (EN 361/EN 353/EN 362)</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Malzeme/Madde</td>
+                    <td contenteditable="true">Enleme Kirişi Kalıp Elemanları</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hava Koşulları</td>
+                    <td contenteditable="true">Normal</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Aydınlatma</td>
+                    <td contenteditable="true">Gündüz - Yeterli Doğal Aydınlatma</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Kişisel Koruyucu Ekipman</td>
+                    <td contenteditable="true">Baret, Çelik Burunlu Ayakkabı, Emniyet Kemeri (Zimmet Kaydı Mevcut)</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.2 Olay Detayları</div>
+            <table>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Olay Tipi</td>
+                    <td contenteditable="true">Yüksekten Düşme Kazası</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yaralanma/Hasar Durumu</td>
+                    <td contenteditable="true">Ciddi Yaralanma - Açık Kırık ve Şiddetli Ağrı</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Etkilenen Kişi Sayısı</td>
+                    <td contenteditable="true">1 Kişi</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Hasar Seviyesi</td>
+                    <td contenteditable="true">Fatal or Major</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">İlk Tanık</td>
+                    <td contenteditable="true">Çalışma Ekibi Üyeleri</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Acil Servis Çağrıldı mı</td>
+                    <td contenteditable="true">Evet - 112 Ambulans</td>
+                </tr>
+
+                <tr>
+                    <td style="background: #D6E4F0; font-weight: bold; color: #1B3A5C;">Yatış/Taburculuk</td>
+                    <td contenteditable="true">Yatış - Cerrahi Müdahale ve Yoğun Bakım İzlemi</td>
+                </tr>
+
+            </table>
+            
+            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="timeline">
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">08:00</div>
+                    <div class="timeline-event" contenteditable="true">İş izni alındı ve işbaşı toplantısı gerçekleştirildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">10:40</div>
+                    <div class="timeline-event" contenteditable="true">Enleme kirişi malzeme taşıma ve kalıp montajı başlatıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">12:00</div>
+                    <div class="timeline-event" contenteditable="true">Öğle molası verildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">13:00</div>
+                    <div class="timeline-event" contenteditable="true">Öğle sonrası işe dönüş yapıldı, montaj çalışmasına devam edildi</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:25</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan 9 metre yükseklikte montaj çalışması yaparken ayağı kaydı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:27</div>
+                    <div class="timeline-event" contenteditable="true">Çalışan dengesini kaybederek dolgu toprak zemine düştü</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:26</div>
+                    <div class="timeline-event" contenteditable="true">Ekip tarafından 112 ambulans ve acil ekip çağrısı yapıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">14:50</div>
+                    <div class="timeline-event" contenteditable="true">Ambulans olay yerine ulaştı, ilk müdahale başlatıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">15:30</div>
+                    <div class="timeline-event" contenteditable="true">Yaralı hastaneye sevk edildi, triyaj ve radyolojik inceleme yapıldı</div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-time" contenteditable="true">17.04.2026</div>
+                    <div class="timeline-event" contenteditable="true">Kol kırığı nedeniyle ameliyat gerçekleştirildi, yoğun bakım izlemi başlatıldı</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section" id="analysis-method">
+            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            
+            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="paragraph" contenteditable="true">5-Why tekniği, her bir doğrudan nedenden başlayarak, art arda beş kez 'Neden?' sorusu sorularak kök nedenlere ulaşılmasını sağlayan sistematik bir analiz yöntemidir. Bu olayda, teknik beş farklı dal üzerinden uygulanmıştır: zemin koşulları ve gözetim eksikliği, KKD kullanılmaması ve denetim prosedürü yetersizliği, gözetim ve denetim eksikliği, insan hatası ve gözetim mekanizması yetersizliği, kaygan zemin ve sistem seviyesi kontrol eksikliği. Her dalda, ilk seviye doğrudan nedeni tanımlamış, ikinci ve üçüncü seviyeler operasyonel eksiklikleri ortaya çıkarmış, dördüncü ve beşinci seviyeler ise organizasyonel ve sistem seviyesindeki kök nedenlere ulaşmıştır. Tüm dalların ortak paydası, meta kök neden olarak sentezlenmiştir.</div>
+            
+            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kod</th>
+                        <th>Kategori</th>
+                        <th>Açıklama</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">A</td>
+                        <td contenteditable="true">İnsan Faktörü</td>
+                        <td contenteditable="true">Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk, KKD kullanılmaması gibi bireysel faktörler</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">B</td>
+                        <td contenteditable="true">İş/Görev Faktörü</td>
+                        <td contenteditable="true">Ekipman arızası, tasarım hatası, fiziksel yük, ergonomi sorunları, yüksekte çalışma koşulları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">C</td>
+                        <td contenteditable="true">Çevresel Faktör</td>
+                        <td contenteditable="true">Hava koşulları, aydınlatma, gürültü, sıcaklık, alan düzeni, zemin koşulları</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">D</td>
+                        <td contenteditable="true">Organizasyonel Faktör</td>
+                        <td contenteditable="true">Prosedür eksikliği, iletişim bozukluğu, yönetim kararları, politika yetersizlikleri, gözetim ve denetim eksikliği, eğitim yetersizliği, iş tanımı eksikliği, yönetim sistemi zayıflıkları</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>İsim</th>
+                        <th>Rol</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td contenteditable="true">Kıdemli HSE Yöneticisi</td>
+                        <td contenteditable="true">Baş Araştırmacı</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Proje Müdürü</td>
+                        <td contenteditable="true">Departman Temsilcisi</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Yüksekte Çalışma Teknik Uzmanı</td>
+                        <td contenteditable="true">Teknik Uzman</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Kalıp/İskele Uzmanı</td>
+                        <td contenteditable="true">Operasyonel Uzman</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">İnsan Kaynakları Temsilcisi</td>
+                        <td contenteditable="true">İK Temsilcisi</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Tıbbi/İş Sağlığı Danışmanı</td>
+                        <td contenteditable="true">Sağlık Uzmanı</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Vardiya Amiri</td>
+                        <td contenteditable="true">Operasyonel Tanık</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">HSE Görevlisi</td>
+                        <td contenteditable="true">Saha Gözlemcisi</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                    <tr>
+                        <td contenteditable="true">Hukuk/Uyum Görevlisi</td>
+                        <td contenteditable="true">Yasal Uyum Temsilcisi</td>
+                        <td contenteditable="true">22.04.2026</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="branches">
+
+            <div class="subsection">
+            <div class="section-header">4. KRİTİK FAKTÖR 1 - ZEMİN KOŞULLARI VE GÖZETİM EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">4.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Enleme kirişi kalıp montajı çalışması sırasında, 9 metre yükseklikte bulunan çalışma alanında dolgu toprak zemin koşulları mevcuttu. Çalışma alanında uygun ankraj noktası bulunmasına rağmen, çalışan emniyet kemeri bağlantısını yapmamıştı. Zemin yüzeyinin düzensiz ve potansiyel olarak kaygan olması, çalışanın ayağının kaymasına ve dengesini kaybetmesine neden oldu. Bu koşullar altında, emniyet kemeri bağlantısının yapılmamış olması, düşme kazasının gerçekleşmesine yol açtı.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Emniyet kemeri ankraj noktası mevcut olmasına rağmen çalışan bağlantı yapmadı ve 9 metre yükseklikten dolgu toprak zemine düştü</div>
+            
+            <div class="subsection-header">4.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden çalışanın ayağı kayarak dengesini kaybetmesine neden olan zemin koşulu oluştu?</div>
+                    <div class="why-answer" contenteditable="true">→ Dolgu toprak zeminin düzensiz, kompakte ve kaygan durumda olması, çalışma alanının düzenli temizlik ve seviyeleme bakımından eksiklikler içermesi nedeniyle zemin güvenliğine yönelik yeterli kontrol mekanizması bulunmamaktadır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden zemin hazırlığı, seviyeleme ve kayganlaşma kontrolü prosedürleri uygulanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışma alanı hazırlığının standart prosedürleştirilmesi eksik, sabit denetim yetersiz, çalışma yüzeyinin dinamik değerlendirilmesi yapılmamış ve koruma önlemleri için yeterli denetim sağlanamamıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden supervizör/formen/ekip başının sabit ve etkili denetimi sağlanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ İş organizasyonunda yüksekte çalışma operasyonları için yeterli insan kaynağı görevlendirilmemiş, sürekli gözetim ve denetim görevi tanımlanmamış veya etkin şekilde yürütülmemiştir.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden gerekli denetim ve gözetim kaynakları önceden tanımlanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Yüksek riskli montaj faaliyetinde gözetim yapısı önceden planlanmamış, emniyet kemeri bağlantısının kontrol edilmemesi nedeniyle davranışsal kontrol mekanizmaları çökmüştür.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden risk seviyesine dayalı gözetim kaynakları tahsis eden standart metodoloji eksik?</div>
+                    <div class="why-answer" contenteditable="true">→ Organizasyonda risk değerlendirmesinden gözetim kaynaklarının tahsisine kadar ilerleyen bir sistem tasarımı protokolü bulunmamakta, sabit ve sürekli gözetim mekanizması tasarım aşamasında tanımlanmamıştır.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">4.3 Kök Neden (Risk Bazlı Gözetim Kaynakları Tahsis Metodolojisi Eksikliği)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 1: Risk Bazlı Gözetim Kaynakları Tahsis Metodolojisi Eksikliği</div>
+                <div class="box-content" contenteditable="true">Yüksek risk operasyonları için iş planlama ve organizasyon sürecinde, risk seviyesine dayalı olarak gerekli denetim ve gözetim kaynakları tanımlayan ve tahsis eden standart bir metodoloji eksikliği bulunmaktadır. 9 metre yükseklikte yapılan enleme kirişi kalıp montaj çalışması sırasında supervizor/formen/ekip başı sabit varlığının yeterli olmadığı tespit edilmiştir. Bu durum, operasyonun risk seviyesini karşılayacak gözetim yapısının önceden planlanmadığını göstermektedir. Emniyet kemeri gibi kişisel koruma ekipmanları mevcutken, çalışanın kemeri bağlamaması kontrol edilememesinin nedeni, sabit ve sürekli bir gözetim mekanizmasının tasarım aşamasında tanımlanmamış olmasıdır. Organizasyonda risk değerlendirmesinden gözetim kaynaklarının tahsisine kadar ilerleyen bir sistem tasarımı protokolü bulunmamaktadır.</div>
+            </div>
+
+            <div class="subsection-header">4.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">İş planlama sürecinde yüksek riskli operasyonlar için gözetim ihtiyacının sistematik olarak değerlendirilmemesi ve kaynak tahsisinin yapılmaması</li>
+<li contenteditable="true">Risk seviyesi ile gözetim yoğunluğu arasında doğrudan bağlantı kuran metodolojinin olmaması, bu nedenle yüksek riskli alanlarda yetersiz gözetim sağlanması</li>
+<li contenteditable="true">Operasyonel planlama aşamasında supervizor/formen/ekip başı görevlendirmelerinin risk bazlı değil, genel iş yükü bazlı yapılması</li>
+<li contenteditable="true">Gözetim kaynaklarının tahsisi ve etkinliğinin ölçülmesi için performans göstergelerinin tanımlanmamış olması, bu nedenle gözetim eksikliklerinin tespit edilememesi</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">5. KRİTİK FAKTÖR 2 - KKD KULLANIMI VE DENETİM PROSEDÜRÜ YETERSİZLİĞİ</div>
+            
+            <div class="subsection-header">5.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Çalışan, iş girişi ve yüksekte çalışma eğitimlerini tamamlamış, KKD zimmet kayıtları mevcuttu ve EN standartlarına uygun emniyet kemeri sağlanmıştı. Çalışma alanında uygun ankraj noktası bulunmasına rağmen, çalışan emniyet kemeri bağlantısını yapmamıştı. Saha genelinde İSG personeli ve çoklu ekipler mevcuttu, ancak çalışma anında sabit supervizor/formen/ekip başı varlığı yeterli değildi. Ankraj bağlantısının uzaktan tespit edilmesinin zor olması nedeniyle, bağlantının yapılıp yapılmadığı kontrol edilememişti.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Emniyet kemeri sağlanmış ve eğitim verilmiş olmasına rağmen çalışan gerekli KKD bağlantısını yapmadı</div>
+            
+            <div class="subsection-header">5.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden çalışan ankraj noktasına emniyet kemeri bağlantısını yapmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışma alanında sabit gözetim yeterli olmadığından etkin denetim sağlanmamış, ankraj bağlantısını uzaktan tespit etmek zor olduğundan kontrol edilememiş, yeterli gözetim ve kontrol mekanizması eksikliği bulunmuştur.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden sabit gözetim yeterli olmadı ve ankraj bağlantısı denetlenmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Gözetim kapsamı yetersiz, ankraj bağlantı noktasının uzaktan görülmesi zor, etkin denetim prosedürü eksik, gözetim yetki ve sorumluluğu net değil, reaktif yerine proaktif denetim eksikliği bulunmaktadır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden sistematik denetim prosedürü ve net yetki-sorumluluk dağılımı oluşturulmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ İSG yönetim sisteminde denetim ve izleme aşamasında eksiklikler bulunmakta, çalışanların emniyet kemeri bağlantısı yapıp yapmadığının kimler tarafından hangi sıklıkla kontrol edileceği net değildir, sistematik denetim mekanizması işletilmemiştir.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden denetim görevleri ve sorumlulukları formal olarak atanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Saha genelinde İSG personeli mevcutken supervizor/formen/ekip başı sabit varlığı yeterli olmamış, denetim sorumluluğu net olmamış, ankraj bağlantısı yapılmadığı halde tespit ve müdahale yapılamamıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden formal prosedürler, sorumluluk tanımı ve kontrol mekanizmaları belgelendirilmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Kimlerin ankraj kontrolünü yapacağı belirtilmemiş, kontrolün nasıl ve ne sıklıkla yapılacağı prosedürleştirilmemiş, denetim sonuçlarının kaydedileceği ve takip edileceği sistem kurulmamıştır.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">5.3 Kök Neden (Kurumsal İSG Yönetim Sisteminde Denetim Prosedürü ve Sorumluluk Tanımı Eksikliği)</div>
+            <div class="colored-box box-orange">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 2: Kurumsal İSG Yönetim Sisteminde Denetim Prosedürü ve Sorumluluk Tanımı Eksikliği</div>
+                <div class="box-content" contenteditable="true">Kurumsal İSG yönetim sistemi içinde yüksekte çalışmalar sırasında ankraj bağlantısı denetimi için formal görev atanmadığı sorunu, formal prosedürlerin, sorumluluk tanımının ve periyodik kontrol mekanizmalarının tanımlanmaması ve belgelendirilmemesinden kaynaklanmaktadır. Supervizor/formen/ekip başı sabit varlığının yeterli olmadığı ve ankraj bağlantısını uzaktan tespit etmenin zor olduğu tespit edilmiştir. Kimlerin ankraj kontrolünü yapacağı belirtilmemiş, kontrolün nasıl ve ne sıklıkla yapılacağı prosedürleştirilmemiş, denetim sonuçlarının kaydedileceği ve takip edileceği bir sistem kurulmamıştır. Bu nedenle çalışan emniyet kemeri bağlantısı yapılmadığı halde kimse bunu tespit ve müdahale edememişdir. Sistemde denetim sorumluluklarının net olmayışı, kritik güvenlik tedbirlerinin uygulanmasının çalışanın kişisel inisiyatifine bırakılmasına yol açmıştır.</div>
+            </div>
+
+            <div class="subsection-header">5.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">İSG yönetim sisteminde yüksekte çalışma operasyonları için denetim prosedürlerinin yazılı, detaylı ve uygulanabilir şekilde tanımlanmamış olması</li>
+<li contenteditable="true">Ankraj bağlantısı gibi kritik güvenlik tedbirlerinin kontrolü için sorumluluk matrisinin oluşturulmamış ve ilgili personele formal olarak atanmamış olması</li>
+<li contenteditable="true">Denetim sıklığı, kontrol noktaları ve kayıt sisteminin belgelenmemiş olması, bu nedenle denetim faaliyetlerinin takip edilememesi ve iyileştirilememesi</li>
+<li contenteditable="true">Denetim eksikliklerinin tespit edilmesi ve düzeltici faaliyetlerin başlatılması için geri bildirim mekanizmasının kurulmamış olması</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">6. KRİTİK FAKTÖR 3 - GÖZETİM VE DENETİM YÖNETİMİ EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">6.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Saha genelinde İSG personeli ve çoklu ekipler mevcuttu, ancak çalışma alanında sabit supervizor/formen varlığının yeterli olmadığı belirtilmiştir. Kaza anında, 9 metre yükseklikte enleme kirişi kalıp montajı yapan 18 yaşındaki çalışanın emniyet kemeri bağlantısını yapıp yapmadığını kontrol edecek sabit bir gözetim mekanizması bulunmamaktaydı. Ankraj bağlantısının uzaktan tespit edilmesinin zor olması, etkili denetim sağlanmasını engellemişti. Bu durum, çalışanın kritik güvenlik prosedürünü uygulamamasının fark edilmemesine ve kazanın gerçekleşmesine yol açmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Saha genelinde İSG personeli mevcut olmasına rağmen çalışma alanında sabit supervizor/formen varlığı yeterli değildi</div>
+            
+            <div class="subsection-header">6.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden emniyet kemeri bağlantısı yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Çalışma alanında uygun ankraj noktası mevcut olmasına rağmen çalışan bağlantı yapmamış, saha genelinde İSG personeli bulunmasına rağmen sabit gözetim yeterli olmamış, ankraj bağlantısını uzaktan tespit etmek zor olduğundan etkili denetim sağlanamamıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden sabit gözetim yeterli olmadı ve denetim mekanizması etkin çalışmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ İSG personeli varlığı yeterli olmamış, operasyonel seviyede müdahaleci ve yakından denetim mekanizması eksik kalmış, formen/ekip başı seviyesinde sabit denetim mekanizması kurgulanmamıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden formen/ekip başı seviyesinde sabit denetim mekanizması kurgulanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Yüksek riskli işlerde sabit ve yakından denetim mekanizması kurgulanmamış veya uygulanmamış, çalışanın emniyet kemeri bağlanması konusundaki uyumu kontrol edilememiş, özellikle genç ve tecrübesiz işçi için kritik kontrol mekanizması eksik kalmıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden formen/ekip başı iş tanımı sabit yakın denetim görevini kapsamıyor?</div>
+                    <div class="why-answer" contenteditable="true">→ Denetim görevi tanımlanmamış veya operasyonel olarak uygulanmamış, formen/ekip başı sorumluluk çerçevesinde spesifik ve ölçülebilir denetim görevleri bulunmamakta, iş tanımı bu görevleri açık hedefler olarak içermediğinden denetim sorumluluğu muğlak kalmaktadır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden iş tanımlarında sabit denetim görevleri formalize edilmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ İş tanımında açıkça tanımlanmamış, performans ölçütleri belirtilmemiş, hesap verebilirlik netleştirilmemiş, ceza ve ödül mekanizmaları bağlantılandırılmamış, formen/ekip başı kritik güvenlik görevlerinin kendi sorumluluğu olduğunun bilincinde olmayabilir.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">6.3 Kök Neden (Formen/Ekip Başı İş Tanımlarında Güvenlik Görevlerinin Formalizasyon Eksikliği)</div>
+            <div class="colored-box box-green">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 3: Formen/Ekip Başı İş Tanımlarında Güvenlik Görevlerinin Formalizasyon Eksikliği</div>
+                <div class="box-content" contenteditable="true">Proje Yönetimi ve İnsan Kaynakları departmanları, yüksekten çalışma operasyonları için formen/ekip başı pozisyonlarının iş tanımlarında sabit yakın denetim ve emniyet kemeri/ankraj bağlantısı doğrulama görevlerini formalize ve ölçülebilir kılmama kararı almışlardır. Çalışma anında supervizor/formen/ekip başı sabit varlığının yeterli olmadığı tespit edilmiştir. Bu durum, formen/ekip başının sorumluluk sahasının iş tanımında açıkça tanımlanmadığını, performans ölçütlerinin belirtilmediğini, hesap verebilirliğin netleştirilmediğini ve ceza-ödül mekanizmalarının bu sorumluluklarla bağlantılandırılmadığını göstermektedir. Sonuç olarak, formen/ekip başı pozisyonunun sahibi, kritik güvenlik görevlerinin kendi sorumluluğu olduğunun bilincinde olmayabilir veya bu görevlerin aciliyet seviyesi anlaşılmamış olabilir. İş tanımlarının güvenlik sorumluluklarını içermemesi, operasyonel seviyede güvenlik denetiminin zayıflamasına ve kazaların önlenememesine yol açmaktadır.</div>
+            </div>
+
+            <div class="subsection-header">6.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">İnsan Kaynakları ve Proje Yönetimi departmanlarının iş tanımı geliştirme sürecinde güvenlik sorumluluklarını sistematik olarak entegre etmemesi</li>
+<li contenteditable="true">Formen/ekip başı pozisyonları için performans değerlendirme kriterlerinin üretim odaklı olması, güvenlik denetimi ve gözetim görevlerinin ölçülmemesi</li>
+<li contenteditable="true">İş tanımlarının güncellenmesi ve gözden geçirilmesi sürecinde İSG departmanının aktif rol almaması, güvenlik gereksinimlerinin iş tanımlarına yansıtılmaması</li>
+<li contenteditable="true">Formen/ekip başı pozisyonlarına atanan personelin güvenlik gözetimi konusunda yetkinlik ve yetki düzeyinin değerlendirilmemesi ve geliştirilmemesi</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">7. KRİTİK FAKTÖR 4 - İNSAN HATASI VE GÖZETİM MEKANİZMASI YETERSİZLİĞİ</div>
+            
+            <div class="subsection-header">7.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Çalışanın ayağının kayması sonucu dengesini kaybetmesi, fiziksel ve zemin koşullarından kaynaklanan istem dışı bir hata olarak değerlendirilmiştir. Ancak, bu fiziksel hatanın fatal sonuçlara yol açmasının temel nedeni, emniyet kemeri bağlantısının yapılmamış olmasıdır. 18 yaşında ve 7 aylık deneyime sahip olan çalışan, yüksekte çalışma eğitimlerini tamamlamış ve KKD zimmet kayıtları mevcuttu. Buna rağmen, çalışma anında uygun ankraj noktasına emniyet kemeri bağlantısını yapmamıştı. İş alanında yeterli seviyede doğrudan gözetim ve anlık denetimin bulunmaması, bu kritik güvenlik ihmalinin fark edilmemesine ve düzeltilmememesine yol açmıştır.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Çalışanın ayağının kayması sonucu dengesini kaybetmesi fiziksel koşullardan kaynaklanan istem dışı hataydı</div>
+            
+            <div class="subsection-header">7.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden çalışan emniyet kemeri bağlantısını yapmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ İş alanında yeterli seviyede doğrudan gözetim ve anlık denetim bulunmamakta, sahadaki aktif gözetim eksikliği nedeniyle kritik koruma önlemi uygulanmamış, etkili yönetişim kontrol mekanizması işletilmemiştir.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden sabit gözetim planlaması ve görevlendirmesi yetersiz kaldı?</div>
+                    <div class="why-answer" contenteditable="true">→ Saha genelinde İSG personeli olmasına rağmen çalışma noktasında sabit gözetici bulunmamış, ankraj noktasının uzaktan tespit edilmesi zor olduğundan denetim sistemi yetersiz kalmış, genç çalışan için müdahale edecek sabit denetim mekanizması işletilmemiştir.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden ankraj bağlantısı için alternatif kontrol sistematiği oluşturulmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Denetim mekanizmasının tasarım eksikliği bulunmakta, sabit supervizyon sistemi yetersiz, alternatif kontrol protokolleri yok, yönetim sisteminde prosedür ve sorumluluk tanımlaması yapılmamıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden riske dayalı sistematik denetim yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sabit supervizyon eksik, kontrol mekanizması yetersiz, sorumluluk tanımı açık değil, yeni çalışan için alan koçluğu ve sürekli gözetiş prosedürü uygulanmamış, yönetimsel uygulama kontrol mekanizması zayıf kalmıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden sabit ve gerçek zamanlı gözetiş uygulanmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Supervizor/formen/ekip başı sabit varlığı yeterli olmamış, ankraj bağlantısını uzaktan tespit etmek zor olduğundan doğrudan alan gözetiş gerekli ancak sağlanmamış, merkezi ve gerçek zamanlı gözetiş mekanizması eksik kalmıştır.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">7.3 Kök Neden (Yüksek Riskli Operasyonlarda Sabit ve Gerçek Zamanlı Gözetiş Mekanizması Eksikliği)</div>
+            <div class="colored-box box-blue">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 4: Yüksek Riskli Operasyonlarda Sabit ve Gerçek Zamanlı Gözetiş Mekanizması Eksikliği</div>
+                <div class="box-content" contenteditable="true">Olay raporunda açıkça belirtildiği üzere çalışma anında supervizor/formen/ekip başı sabit varlığının yeterli olmadığı tespit edilmiştir. Bu yetersizlik, yüksek riskli enleme kirişi kalıp montaj işinde kritik bir gözetiş boşluğu yaratmıştır. Kaza anında çalışanın emniyet kemeri ankraj bağlantısı yapılmamış olmasına rağmen, bunun sabit bir denetçi tarafından müdahalesiyle önlenmesi mümkün olabilirdi. Kaza noktasında çalışanın ankraj bağlantısını uzaktan tespit etmenin zor olduğu ifadesi, bu işin doğrudan alan gözetiş ve denetimini gerektirdiğini göstermektedir. Saha genelinde İSG personeli ve çoklu ekipler mevcut olmasına rağmen, merkezi, sabit ve gerçek zamanlı bir gözetiş mekanizması eksik kalmıştır. Sonuç olarak, 9 metre yükseklikten düşme kazasında ciddi yaralanma gerçekleşmiştir. Özellikle genç ve tecrübesiz çalışanlar için, kritik güvenlik prosedürlerinin uygulanmasını garanti altına alacak sabit gözetiş mekanizması hayati önem taşımaktadır.</div>
+            </div>
+
+            <div class="subsection-header">7.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yüksek riskli operasyonlar için sabit gözetiş gereksiniminin risk değerlendirmesi sürecinde tanımlanmamış ve operasyonel planlama aşamasına aktarılmamış olması</li>
+<li contenteditable="true">Gözetiş kaynaklarının tahsisinde maliyet odaklı yaklaşımın güvenlik gereksinimlerinin önüne geçmesi, bu nedenle yeterli sayıda gözetim personeli atanmaması</li>
+<li contenteditable="true">Gerçek zamanlı gözetiş ve müdahale mekanizmalarının teknolojik ve operasyonel olarak tasarlanmamış olması, uzaktan izleme ve erken uyarı sistemlerinin kurulmamış olması</li>
+<li contenteditable="true">Genç ve tecrübesiz çalışanlar için özel gözetiş protokollerinin oluşturulmamış olması, bu çalışanların yüksek riskli işlerde daha yakın gözetim altında tutulmaması</li>
+
+            </ul>
+
+            </div>
+
+            <div class="subsection">
+            <div class="section-header">8. KRİTİK FAKTÖR 5 - KAYGAN ZEMİN VE SİSTEM SEVİYESİ KONTROL EKSİKLİĞİ</div>
+            
+            <div class="subsection-header">8.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="paragraph" contenteditable="true">Çalışma yapılan enleme kiriş kalıp montaj alanında zemin koşullarının nemli veya kaygan yüzey özelliği göstermesi, çalışanın ayağının kaymasına neden olmuş olabilir. Dolgu toprak zemin, özellikle yüksekte çalışma sırasında kaygan olabilmektedir. Kaza öğleden sonra, öğle molasından sonra gerçekleşmiştir ve zemin koşullarının bu süreçte değişmiş olması muhtemeldir. Ancak, zemin kayması durumunda bile, emniyet kemeri bağlantısı yapılmış olsaydı, düşme kazası önlenebilirdi. Temel sorun, emniyet kemeri bağlantısının yapılmamış olması ve bu durumun kontrol edilmemesidir. Risk analizi sonrası tanımlanan kontrollerin operasyonel prosedürlere dönüştürülmemesi ve uygulanmasının denetlenmemesi, sistemik bir zayıflığı işaret etmektedir.</div>
+            <div class="paragraph" contenteditable="true" style="font-weight: bold;">Çalışma alanında zemin koşullarının kaygan olması çalışanın ayağının kaymasına neden oldu</div>
+            
+            <div class="subsection-header">8.2 5-Why Analiz Zinciri</div>
+            <div class="why-chain">
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 1</div>
+                    <div class="why-question" contenteditable="true">Neden çalışanın ayağı kaydı?</div>
+                    <div class="why-answer" contenteditable="true">→ Dolgu toprak zemin kaygan olabilmekte, ayakkabı-zemin uyumsuzluğu veya uygun taban tasarımı belirtilmemiş, zemin koşulları kayma riskini artırmış, temel risk faktörü emniyet kemeri bağlantısının yapılmamış olmasıdır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 2</div>
+                    <div class="why-question" contenteditable="true">Neden emniyet kemeri bağlantısı yapılmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sabit supervizyon/denetim eksikliği nedeniyle bağlantı doğrulanmamış, ankraj bağlantısı uzaktan tespit edilememiş, genç çalışanın davranış alışkanlığı oluşturulmamış, gerçek zamanlı denetim ve gözetim yetersiz kalmıştır.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 3</div>
+                    <div class="why-question" contenteditable="true">Neden sabit supervizyon sistemi etkin olmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Supervizor/formen/ekip başının sabit fiziksel varlığı ve doğrudan gözlem görevleri yeterli düzeyde yerine getirilmemiş, kritik KKD ihlali sabit denetim mekanizması olmadan engellenmemiş, genç ve tecrübesiz çalışan için etkili denetim sistemi zamanında müdahale edememiştir.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 4</div>
+                    <div class="why-question" contenteditable="true">Neden sabit supervizyon görevini sağlayan kurumsal prosedür oluşturulmadı?</div>
+                    <div class="why-answer" contenteditable="true">→ Sistem tasarımı eksik, sabit supervizyon ihtiyacı risk analizi sonucu prosedür haline getirilmemiş, rol ve sorumluluk tanımlaması boşluğu bulunmakta, davranış kontrolü mekanizması olmamakta, operasyonel risk kontrol zayıflığı mevcuttur.</div>
+                </div>
+
+                <div class="why-item">
+                    <div class="why-number">NEDEN 5</div>
+                    <div class="why-question" contenteditable="true">Neden sabit supervizyon gereksinimi kurumsal prosedür olarak kodifiye edilmedi?</div>
+                    <div class="why-answer" contenteditable="true">→ Sistem seviyesinde uyum izleme ve denetleme mekanizması tasarlanmamış, tanımlanan risklere karşı operasyonel kontroller yazılı ve zorunlu prosedürler şeklinde uygulanmamış, risk analizi sonrası çalışanın kişisel bilincine güvenilmiş, yazılı prosedür ve gözlemlenebilir supervizyon sistemi olmamıştır.</div>
+                </div>
+
+            </div>
+            
+            <div class="subsection-header">8.3 Kök Neden (Sistem Seviyesinde Uyum İzleme ve Risk Kontrol Uygulama Mekanizması Eksikliği)</div>
+            <div class="colored-box box-red">
+                <div class="box-header" contenteditable="true">KÖK NEDEN 5: Sistem Seviyesinde Uyum İzleme ve Risk Kontrol Uygulama Mekanizması Eksikliği</div>
+                <div class="box-content" contenteditable="true">9 metre yükseklikte enleme kirişi kalıp montajı operasyonunda, emniyet kemeri ankraj noktasının uzaktan kontrolünün imkânsız olduğu tespit edilen çalışma alanında, sabit supervizyon gereksiniminin kurumsal prosedür ve zorunlu yönetim standardı olarak kodifikasyonu gerçekleştirilmemiş olmasının kök nedeni, sistem seviyesinde uyum izleme ve denetleme mekanizmasının tasarlanmamış olması ile birlikte, tanımlanan risklere karşı operasyonel kontrollerin yazılı, zorunlu ve gözlemlenebilir prosedürler şeklinde uygulanmamış olmasıdır. Risk analizi sonrası tanımlanan kontroller, operasyonel prosedürlere dönüştürülmemiş ve bunun yerine çalışanın kişisel bilinci ve davranışına güvenilmiştir. Risk kontrollerinin uygulanmaması, sistem seviyesi denetim mekanizmasının eksikliği ve sabit supervizyon personelinin alanında yeterli varlığının olmaması kombinasyonu, kazanın gerçekleşmesine yol açmıştır. Yazılı prosedür, zorunlu kontrol listesi ve gözlemlenebilir supervizyon sistemi olmaması, çalışanın emniyet kemeri ankrajını bağlantı yapmama seçeneğini ortadan kaldırmamıştır.</div>
+            </div>
+
+            <div class="subsection-header">8.4 Organizasyonel Faktörler</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Risk değerlendirmesi sürecinde tanımlanan kontrollerin operasyonel prosedürlere, iş talimatlarına ve kontrol listelerine dönüştürülmesi sürecinin sistematik olmaması</li>
+<li contenteditable="true">Tanımlanan risk kontrollerinin uygulanıp uygulanmadığını doğrulamak için sistem seviyesinde denetim ve izleme mekanizmasının kurulmamış olması</li>
+<li contenteditable="true">Kritik güvenlik kontrollerinin zorunlu hale getirilmesi ve uygulanmasının garanti altına alınması için yönetim sisteminin tasarlanmamış olması</li>
+<li contenteditable="true">Risk kontrol uygulamalarının etkinliğinin ölçülmesi, raporlanması ve sürekli iyileştirilmesi için performans yönetimi sisteminin olmaması</li>
+
+            </ul>
+
+            </div>
+
+        </div>
+
+        <div class="section" id="contributing-factors">
+            <div class="section-header">6. DİĞER OLASI SİSTEMSEL FAKTÖRLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Faktör Türü</th>
+                        <th>Açıklama</th>
+                        <th>Etki Seviyesi</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Gözetim ve Denetim Eksikliği</td>
+                        <td contenteditable="true">Yüksek riskli operasyonlarda sabit supervizor/formen/ekip başı varlığının yeterli olmaması, ankraj bağlantısının uzaktan tespit edilmesinin zor olması nedeniyle etkili denetim sağlanamaması</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Prosedür ve Sorumluluk Tanımı Eksikliği</td>
+                        <td contenteditable="true">Kritik güvenlik kontrollerinin uygulanması için formal prosedürlerin, sorumluluk tanımının ve periyodik kontrol mekanizmalarının tanımlanmamış ve belgelendirilmemiş olması</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">İş Tanımı Formalizasyon Eksikliği</td>
+                        <td contenteditable="true">Formen/ekip başı pozisyonlarının iş tanımlarında sabit yakın denetim ve emniyet kemeri/ankraj bağlantısı doğrulama görevlerinin formalize ve ölçülebilir kılınmamış olması</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Risk Bazlı Kaynak Tahsisi Metodolojisi Eksikliği</td>
+                        <td contenteditable="true">Yüksek risk operasyonları için risk seviyesine dayalı olarak gerekli denetim ve gözetim kaynakları tanımlayan ve tahsis eden standart bir metodolojinin bulunmaması</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Sistem Seviyesi Uyum İzleme Eksikliği</td>
+                        <td contenteditable="true">Risk değerlendirmesi sonrası tanımlanan kontrollerin operasyonel prosedürlere dönüştürülmesi ve uygulanmasının denetlenmesi için sistem seviyesinde mekanizmaların kurulmamış olması</td>
+                        <td class="impact-yüksek" contenteditable="true">Yüksek</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Genç ve Tecrübesiz Çalışan Yönetimi</td>
+                        <td contenteditable="true">18 yaşında ve 7 aylık deneyime sahip çalışan için özel gözetim protokollerinin oluşturulmamış olması, yüksek riskli işlerde daha yakın gözetim altında tutulmaması</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Zemin Koşulları ve Çalışma Ortamı Yönetimi</td>
+                        <td contenteditable="true">Dolgu toprak zeminin düzensiz ve kaygan olması, çalışma alanının düzenli temizlik ve seviyeleme bakımından eksiklikler içermesi, zemin güvenliğine yönelik yeterli kontrol mekanizmasının bulunmaması</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                    <tr>
+                        <td style="font-weight: bold;" contenteditable="true">Teknolojik Destek Eksikliği</td>
+                        <td contenteditable="true">Uzaktan izleme ve erken uyarı sistemlerinin kurulmamış olması, ankraj bağlantısının uzaktan tespit edilmesinin zor olması nedeniyle teknolojik çözümlerin geliştirilmemiş olması</td>
+                        <td class="impact-medium" contenteditable="true">Orta</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="corrective-actions">
+            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th style="width: 35%;">Faaliyet</th>
+                        <th style="width: 10%;">Öncelik</th>
+                        <th style="width: 15%;">Sorumlu</th>
+                        <th style="width: 10%;">Süre</th>
+                        <th style="width: 25%;">KPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td contenteditable="true">Yüksek riskli operasyonlar için risk bazlı gözetim kaynakları tahsis metodolojisi geliştirilmesi ve uygulanması, risk seviyesi ile gözetim yoğunluğu arasında doğrudan bağlantı kuran protokolün oluşturulması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Operasyon Müdürü / İSG Yöneticisi</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Metodoloji dokümanı tamamlanma ve tüm yüksek riskli operasyonlarda uygulama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>2</td>
+                        <td contenteditable="true">Tüm yüksekte çalışma alanlarına sabit supervizor/formen/ekip başı atanması ve gözetim varlığının sürekli olarak sağlanması, gözetim personelinin fiziksel varlığının kontrol edilmesi sistemi kurulması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">Proje Müdürü / Vardiya Amiri</td>
+                        <td contenteditable="true">1 hafta</td>
+                        <td contenteditable="true">Tüm yüksekte çalışma alanlarında sabit gözetim varlığı %100, günlük kontrol kayıtları</td>
+                    </tr>
+
+                    <tr>
+                        <td>3</td>
+                        <td contenteditable="true">Ankraj bağlantısı denetimi için formal prosedür, sorumluluk matrisi ve kontrol listesi oluşturulması, denetim sıklığı ve kayıt sisteminin belgelenmesi, denetim sonuçlarının takip edilmesi sistemi kurulması</td>
+                        <td><span class="priority-urgent">ACİL</span></td>
+                        <td contenteditable="true">İSG Yöneticisi / Kalite Müdürü</td>
+                        <td contenteditable="true">2 hafta</td>
+                        <td contenteditable="true">Prosedür dokümanı tamamlanma, sorumluluk matrisi onaylanma, günlük denetim kayıtları %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td contenteditable="true">Formen/ekip başı iş tanımlarının güncellenmesi, sabit yakın denetim ve emniyet kemeri/ankraj bağlantısı doğrulama görevlerinin formalize edilmesi, performans ölçütlerinin belirlenmesi ve performans değerlendirme sistemine entegre edilmesi</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İnsan Kaynakları Müdürü / Proje Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">İş tanımları güncelleme oranı %100, performans değerlendirme sistemine entegrasyon</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td contenteditable="true">Genç ve tecrübesiz çalışanlar için özel gözetim protokolü oluşturulması, yüksek riskli işlerde daha yakın gözetim ve mentorluk sistemi kurulması, 18-25 yaş arası çalışanlar için zorunlu eşlik sistemi uygulanması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İSG Yöneticisi / İnsan Kaynakları Müdürü</td>
+                        <td contenteditable="true">3 hafta</td>
+                        <td contenteditable="true">Protokol dokümanı tamamlanma, genç çalışanlar için eşlik sistemi uygulama oranı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td contenteditable="true">Risk değerlendirmesi sonrası tanımlanan kontrollerin operasyonel prosedürlere, iş talimatlarına ve kontrol listelerine dönüştürülmesi sürecinin sistematik hale getirilmesi, risk kontrol uygulama takip sistemi kurulması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İSG Yöneticisi / Kalite Müdürü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Tüm risk kontrolleri için operasyonel prosedür oluşturma oranı %100, takip sistemi kurulumu</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td contenteditable="true">Sistem seviyesinde uyum izleme ve denetim mekanizması kurulması, kritik güvenlik kontrollerinin uygulanıp uygulanmadığını doğrulamak için düzenli denetim programı oluşturulması, denetim sonuçlarının raporlanması ve iyileştirme sistemi kurulması</td>
+                        <td><span class="priority-high">YÜKSEK</span></td>
+                        <td contenteditable="true">İSG Yöneticisi / Kalite Müdürü</td>
+                        <td contenteditable="true">6 hafta</td>
+                        <td contenteditable="true">Denetim programı oluşturma, aylık denetim gerçekleştirme oranı %100, düzeltici faaliyet tamamlanma oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td contenteditable="true">Yüksekte çalışma alanlarında ankraj bağlantısı kontrolü için teknolojik çözümler geliştirilmesi, uzaktan izleme ve erken uyarı sistemlerinin kurulması, akıllı emniyet kemeri ve sensör teknolojilerinin pilot uygulaması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Teknoloji Müdürü / İSG Yöneticisi</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Teknoloji araştırma raporu tamamlanma, pilot uygulama başlatılma</td>
+                    </tr>
+
+                    <tr>
+                        <td>9</td>
+                        <td contenteditable="true">Çalışma alanlarında zemin koşulları yönetimi prosedürü oluşturulması, düzenli zemin hazırlığı, seviyeleme ve kayganlaşma kontrolü standartlarının belirlenmesi, günlük zemin kontrol sistemi kurulması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">Operasyon Müdürü / İSG Yöneticisi</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Prosedür dokümanı tamamlanma, günlük zemin kontrol kayıtları %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>10</td>
+                        <td contenteditable="true">Tüm çalışanlara yüksekte çalışma ve emniyet kemeri kullanımı konusunda tazeleme eğitimi verilmesi, özellikle genç ve tecrübesiz çalışanlar için uygulamalı eğitim programı düzenlenmesi</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">İSG Yöneticisi / Eğitim Koordinatörü</td>
+                        <td contenteditable="true">1 ay</td>
+                        <td contenteditable="true">Eğitim tamamlama oranı %100, uygulamalı eğitim katılım oranı</td>
+                    </tr>
+
+                    <tr>
+                        <td>11</td>
+                        <td contenteditable="true">Formen/ekip başı ve supervizor pozisyonları için güvenlik liderliği ve denetim becerileri eğitim programı geliştirilmesi ve uygulanması, yetkinlik değerlendirme sistemi kurulması</td>
+                        <td><span class="priority-medium">ORTA</span></td>
+                        <td contenteditable="true">İnsan Kaynakları Müdürü / İSG Yöneticisi</td>
+                        <td contenteditable="true">2 ay</td>
+                        <td contenteditable="true">Eğitim programı tamamlanma, formen/ekip başı eğitim katılım oranı %100, yetkinlik değerlendirme</td>
+                    </tr>
+
+                    <tr>
+                        <td>12</td>
+                        <td contenteditable="true">Güvenlik performans yönetimi sistemi kurulması, güvenlik göstergelerinin tanımlanması ve izlenmesi, güvenlik performansının ödüllendirilmesi mekanizması oluşturulması</td>
+                        <td><span class="priority-low">DÜŞÜK</span></td>
+                        <td contenteditable="true">İSG Yöneticisi / İnsan Kaynakları Müdürü</td>
+                        <td contenteditable="true">3 ay</td>
+                        <td contenteditable="true">Performans yönetimi sistemi kurulumu, aylık güvenlik performans raporları</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="lessons-learned">
+            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+
+            <div class="colored-box box-green">
+                <div class="box-header">NE YAPILMALI</div>
+                <div class="box-content" contenteditable="true">• Yüksek riskli operasyonlarda risk seviyesine dayalı gözetim kaynakları tahsis metodolojisi uygulanmalı, risk seviyesi arttıkça gözetim yoğunluğu artırılmalıdır. Özellikle 7 metre ve üzeri yüksekte çalışmalarda sabit supervizor/formen/ekip başı varlığı zorunlu hale getirilmelidir.
+• Kritik güvenlik kontrollerinin uygulanması için formal prosedürler, sorumluluk matrisleri ve kontrol listeleri oluşturulmalı, denetim sıklığı ve kayıt sistemleri belgelenmelidir. Ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerinin kontrolü sistematik hale getirilmelidir.
+• Formen/ekip başı iş tanımlarına sabit yakın denetim ve kritik güvenlik kontrollerinin doğrulanması görevleri formalize edilmeli, performans ölçütleri belirlenmeli ve performans değerlendirme sistemine entegre edilmelidir. Güvenlik sorumluluklarının operasyonel seviyede net olması sağlanmalıdır.
+• Genç ve tecrübesiz çalışanlar için özel gözetim protokolleri oluşturulmalı, yüksek riskli işlerde daha yakın gözetim ve mentorluk sistemi kurulmalıdır. 18-25 yaş arası çalışanlar için zorunlu eşlik sistemi uygulanmalı, kritik güvenlik prosedürlerinin uygulanması yakından takip edilmelidir.</div>
+            </div>
+
+            <div class="colored-box box-blue">
+                <div class="box-header">UZUN VADELİ ÇÖZÜMLER</div>
+                <div class="box-content" contenteditable="true">• Risk yönetimi sürecinin tamamlanması ve tanımlanan kontrollerin operasyonel prosedürlere dönüştürülmesi sürecinin sistematik hale getirilmesi gerekmektedir. Risk değerlendirmesinden operasyonel uygulamaya kadar uzanan süreç tümleşik bir yönetim sistemi olarak tasarlanmalı ve kurumsal zorunlu standart olarak kodifiye edilmelidir.
+• Sistem seviyesinde uyum izleme ve denetim mekanizması kurulmalı, kritik güvenlik kontrollerinin uygulanıp uygulanmadığını doğrulamak için düzenli denetim programı oluşturulmalıdır. Denetim sonuçları raporlanmalı, düzeltici faaliyetler başlatılmalı ve sürekli iyileştirme sağlanmalıdır.
+• Yüksekte çalışma alanlarında ankraj bağlantısı kontrolü için teknolojik çözümler geliştirilmeli, uzaktan izleme ve erken uyarı sistemleri kurulmalıdır. Akıllı emniyet kemeri ve sensör teknolojileri gibi yenilikçi çözümler pilot uygulamalarla test edilmeli ve yaygınlaştırılmalıdır.
+• Güvenlik performans yönetimi sistemi kurulmalı, güvenlik göstergeleri tanımlanmalı ve izlenmelidir. Güvenlik performansının ödüllendirilmesi mekanizması oluşturulmalı, güvenlik kültürünün geliştirilmesi için sistematik yaklaşım benimsenmelidir. Operasyonel seviyeden üst yönetime kadar tüm seviyelerde güvenlik sorumluluklarının net olması ve hesap verebilirliğin sağlanması gerekmektedir.</div>
+            </div>
+
+            <div class="colored-box box-orange">
+                <div class="box-header">İLETİŞİM VE PAYLAŞIM</div>
+                <div class="box-content" contenteditable="true">• Kaza detayları, kök nedenleri ve alınan düzeltici faaliyetler tüm çalışanlara, özellikle yüksekte çalışma yapan ekiplere ve formen/ekip başlarına aktarılmalıdır. Güvenlik brifingleri ve toolbox toplantılarında kaza senaryosu paylaşılmalı, benzer kazaların önlenmesi için alınması gereken önlemler vurgulanmalıdır.
+• Proje yönetimi, operasyon yönetimi, İSG departmanı, insan kaynakları ve tüm ilgili departmanlar arasında düzenli koordinasyon toplantıları düzenlenmeli, güvenlik performansı ve düzeltici faaliyetlerin ilerlemesi paylaşılmalıdır. Departmanlar arası işbirliği güçlendirilmeli, güvenlik sorumluluklarının paylaşımı sağlanmalıdır.
+• Üst yönetime düzenli güvenlik performans raporları sunulmalı, kök neden analizi sonuçları ve stratejik iyileştirme önerileri paylaşılmalıdır. Üst yönetimin güvenlik liderliği ve taahhüdü görünür hale getirilmeli, güvenlik yatırımları ve kaynak tahsisi konularında destek sağlanmalıdır.</div>
+            </div>
+
+            <div class="colored-box box-red">
+                <div class="box-header">EĞİTİM VE FARKINDALIK</div>
+                <div class="box-content" contenteditable="true">• Tüm çalışanlara yüksekte çalışma ve emniyet kemeri kullanımı konusunda tazeleme eğitimi verilmeli, özellikle genç ve tecrübesiz çalışanlar için uygulamalı eğitim programı düzenlenmelidir. Eğitimler teorik bilginin yanı sıra pratik uygulamaları da içermeli, gerçek çalışma koşullarında simülasyonlar yapılmalıdır.
+• Formen/ekip başı ve supervizor pozisyonları için güvenlik liderliği ve denetim becerileri eğitim programı geliştirilmeli ve uygulanmalıdır. Eğitimler, kritik güvenlik kontrollerinin nasıl denetleneceği, güvenlik ihlallerine nasıl müdahale edileceği, etkili iletişim ve koçluk becerileri konularını içermelidir. Yetkinlik değerlendirme sistemi kurulmalı, formen/ekip başlarının güvenlik denetimi konusunda yetkinlikleri düzenli olarak değerlendirilmelidir.
+• Risk değerlendirmesi ve risk kontrol uygulama süreçleri konusunda İSG departmanı, proje yönetimi ve operasyon yönetimi personeline eğitim verilmelidir. Eğitimler, risk değerlendirmesi sonrası tanımlanan kontrollerin operasyonel prosedürlere nasıl dönüştürüleceği, uygulamanın nasıl denetleneceği ve sürekli iyileştirmenin nasıl sağlanacağı konularını içermelidir.
+• Genç ve tecrübesiz çalışanlar için özel oryantasyon ve mentorluk programı geliştirilmelidir. Program, yüksek riskli işlerde çalışma öncesi kapsamlı eğitim, deneyimli çalışanlarla eşleştirme, düzenli performans değerlendirmesi ve geri bildirim mekanizmalarını içermelidir. Genç çalışanların güvenlik bilinci ve davranış alışkanlıklarının geliştirilmesi için sistematik yaklaşım benimsenmelidir.</div>
+            </div>
+
+        </div>
+
+        <div class="section" id="conclusion">
+            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            
+            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="paragraph" contenteditable="true">16 Nisan 2026 tarihinde KMO Kesim-8 projesi AK05 bölgesinde meydana gelen yüksekten düşme kazası, 18 yaşındaki panel kalıpçı çalışanın 9 metre yükseklikten düşerek ciddi yaralanmasıyla sonuçlanmıştır. Kök neden analizi, kazanın temel nedeninin organizasyonel ve sistemik zayıflıklar olduğunu ortaya koymuştur. Çalışma alanında uygun ankraj noktası ve emniyet kemeri mevcut olmasına rağmen, çalışanın bu ekipmanları kullanmaması ve bu durumun kontrol edilmemesi, kazanın gerçekleşmesine yol açmıştır. Analiz, beş farklı kritik faktör dalı üzerinden gerçekleştirilmiş ve her dal için beş seviyeli neden-sonuç zinciri oluşturulmuştur. Tüm dalların ortak paydası, yüksek risk operasyonlarında risk değerlendirmesinden sahadaki operasyonel uygulamaya kadar uzanan sürecin tümleşik bir yönetim sistemi olarak tasarlanmamış ve kurumsal zorunlu standart olarak kodifikasyonu gerçekleştirilmemiş olmasıdır. Risk bazlı gözetim kaynakları tahsis metodolojisi eksikliği, kurumsal İSG yönetim sisteminde denetim prosedürü ve sorumluluk tanımı eksikliği, formen/ekip başı iş tanımlarında güvenlik görevlerinin formalizasyon eksikliği, yüksek riskli operasyonlarda sabit ve gerçek zamanlı gözetiş mekanizması eksikliği ve sistem seviyesinde uyum izleme ve risk kontrol uygulama mekanizması eksikliği, beş temel kök neden olarak tespit edilmiştir. Bu kök nedenler, organizasyonun güvenlik yönetimi yaklaşımında temel değişiklikler yapılması gerektiğini göstermektedir. Kısa vadede acil düzeltici faaliyetler uygulanmalı, uzun vadede ise sistemik iyileştirmeler gerçekleştirilmelidir.</div>
+            
+            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Tüm yüksekte çalışma alanlarına acil olarak sabit supervizor/formen/ekip başı atanması ve gözetim varlığının sürekli olarak sağlanması. Gözetim personelinin fiziksel varlığının günlük olarak kontrol edilmesi ve kayıt altına alınması. Özellikle 7 metre ve üzeri yüksekte çalışmalarda sabit gözetim zorunlu hale getirilmesi ve bu zorunluluğun tüm çalışanlara duyurulması.</li>
+<li contenteditable="true">Ankraj bağlantısı denetimi için acil prosedür, sorumluluk matrisi ve kontrol listesi oluşturulması. Denetim sıklığının günlük olarak belirlenmesi ve her vardiya başında ankraj bağlantısı kontrolünün zorunlu hale getirilmesi. Denetim sonuçlarının kayıt altına alınması ve takip edilmesi sistemi kurulması. Ankraj bağlantısı yapılmadan yüksekte çalışmaya başlanmaması kuralının uygulanması.</li>
+<li contenteditable="true">Tüm çalışanlara, özellikle yüksekte çalışma yapan ekiplere ve genç/tecrübesiz çalışanlara acil güvenlik brifingi verilmesi. Emniyet kemeri kullanım zorunluluğunun ve ankraj bağlantısı yapılmasının hayati önem taşıdığının vurgulanması. Kaza senaryosunun paylaşılması ve benzer kazaların önlenmesi için alınması gereken önlemlerin anlatılması.</li>
+<li contenteditable="true">Genç ve tecrübesiz çalışanlar için acil gözetim protokolü oluşturulması ve uygulanması. 18-25 yaş arası çalışanların yüksek riskli işlerde deneyimli çalışanlarla eşleştirilmesi ve zorunlu eşlik sistemi başlatılması. Genç çalışanların kritik güvenlik prosedürlerini uygulaması konusunda yakın gözetim ve koçluk sağlanması.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <ul class="bullet-list">
+<li contenteditable="true">Yüksek riskli operasyonlar için risk bazlı gözetim kaynakları tahsis metodolojisi geliştirilmesi ve kurumsal standart olarak uygulanması. Risk seviyesi ile gözetim yoğunluğu arasında doğrudan bağlantı kuran protokolün oluşturulması ve tüm projelerde uygulanması. Gözetim kaynaklarının tahsisinin risk değerlendirmesi sürecine entegre edilmesi ve operasyonel planlama aşamasında dikkate alınması.</li>
+<li contenteditable="true">Kurumsal İSG yönetim sisteminin güçlendirilmesi, kritik güvenlik kontrollerinin uygulanması için formal prosedürlerin, sorumluluk tanımlarının ve periyodik kontrol mekanizmalarının tanımlanması ve belgelendirilmesi. Sistem seviyesinde uyum izleme ve denetim mekanizması kurulması, düzenli denetim programı oluşturulması ve denetim sonuçlarının raporlanması sistemi kurulması. Risk değerlendirmesi sonrası tanımlanan kontrollerin operasyonel prosedürlere dönüştürülmesi sürecinin sistematik hale getirilmesi.</li>
+<li contenteditable="true">Formen/ekip başı iş tanımlarının güncellenmesi, sabit yakın denetim ve kritik güvenlik kontrollerinin doğrulanması görevlerinin formalize edilmesi ve performans değerlendirme sistemine entegre edilmesi. Güvenlik liderliği ve denetim becerileri eğitim programı geliştirilmesi ve uygulanması. Yetkinlik değerlendirme sistemi kurulması ve formen/ekip başlarının güvenlik denetimi konusunda yetkinliklerinin düzenli olarak değerlendirilmesi.</li>
+<li contenteditable="true">Yüksekte çalışma alanlarında ankraj bağlantısı kontrolü için teknolojik çözümler geliştirilmesi, uzaktan izleme ve erken uyarı sistemlerinin kurulması. Akıllı emniyet kemeri ve sensör teknolojileri gibi yenilikçi çözümlerin pilot uygulamalarla test edilmesi ve yaygınlaştırılması. Güvenlik performans yönetimi sistemi kurulması, güvenlik göstergelerinin tanımlanması ve izlenmesi, güvenlik performansının ödüllendirilmesi mekanizması oluşturulması.</li>
+
+            </ul>
+            
+            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Kriter</th>
+                        <th>Mevcut Durum</th>
+                        <th>Hedeflenen</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td>Yüksek Riskli Operasyonlarda Sabit Gözetim Varlığı</td>
+                        <td class="current" contenteditable="true">Yetersiz - Saha genelinde İSG personeli mevcut ancak sabit gözetim yok</td>
+                        <td class="target" contenteditable="true">Yeterli - Tüm yüksek riskli alanlarda sabit supervizor/formen varlığı %100</td>
+                    </tr>
+
+                    <tr>
+                        <td>Ankraj Bağlantısı Denetim Prosedürü</td>
+                        <td class="current" contenteditable="true">Yok - Formal prosedür, sorumluluk tanımı ve kontrol listesi bulunmuyor</td>
+                        <td class="target" contenteditable="true">Var - Yazılı prosedür, sorumluluk matrisi ve günlük kontrol listesi uygulanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Formen/Ekip Başı İş Tanımlarında Güvenlik Görevleri</td>
+                        <td class="current" contenteditable="true">Tanımsız - Sabit denetim ve güvenlik kontrolü görevleri formalize edilmemiş</td>
+                        <td class="target" contenteditable="true">Tanımlı - Güvenlik görevleri iş tanımında açık, ölçülebilir ve performans değerlendirmesine entegre</td>
+                    </tr>
+
+                    <tr>
+                        <td>Risk Bazlı Gözetim Kaynakları Tahsis Metodolojisi</td>
+                        <td class="current" contenteditable="true">Yok - Risk seviyesine dayalı gözetim tahsisi yapılmıyor</td>
+                        <td class="target" contenteditable="true">Var - Risk seviyesi ile gözetim yoğunluğu arasında doğrudan bağlantı kuran metodoloji uygulanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Sistem Seviyesinde Uyum İzleme ve Denetim Mekanizması</td>
+                        <td class="current" contenteditable="true">Yetersiz - Risk kontrolleri operasyonel prosedürlere dönüştürülmemiş, denetim sistemi yok</td>
+                        <td class="target" contenteditable="true">Yeterli - Risk kontrolleri operasyonel prosedürlere dönüştürülmüş, düzenli denetim programı uygulanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Genç ve Tecrübesiz Çalışanlar İçin Özel Gözetim Protokolü</td>
+                        <td class="current" contenteditable="true">Yok - Genç çalışanlar için özel gözetim ve mentorluk sistemi bulunmuyor</td>
+                        <td class="target" contenteditable="true">Var - 18-25 yaş arası çalışanlar için zorunlu eşlik sistemi ve yakın gözetim protokolü uygulanıyor</td>
+                    </tr>
+
+                    <tr>
+                        <td>Teknolojik Destek ve Uzaktan İzleme Sistemleri</td>
+                        <td class="current" contenteditable="true">Yok - Ankraj bağlantısı kontrolü için teknolojik çözümler geliştirilmemiş</td>
+                        <td class="target" contenteditable="true">Var - Uzaktan izleme, erken uyarı ve akıllı emniyet kemeri sistemleri pilot uygulamada</td>
+                    </tr>
+
+                    <tr>
+                        <td>Güvenlik Performans Yönetimi Sistemi</td>
+                        <td class="current" contenteditable="true">Yok - Güvenlik göstergeleri tanımlı değil, performans ölçülmüyor ve ödüllendirilmiyor</td>
+                        <td class="target" contenteditable="true">Var - Güvenlik göstergeleri tanımlı, düzenli izleniyor ve performans ödüllendiriliyor</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section signature-section" id="signatures">
+            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+            
+            <table class="signature-table">
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>İsim</th>
+                        <th>Ünvan</th>
+                        <th>İmza / Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td contenteditable="true">HSE Uzmanı</td>
+                        <td contenteditable="true">HSE Kök Neden Analisti</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td contenteditable="true">HSE Yöneticisi</td>
+                        <td contenteditable="true">HSE Departman Yöneticisi</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td contenteditable="true">Tesis Müdürü</td>
+                        <td contenteditable="true">Genel Operasyon Müdürü</td>
+                        <td contenteditable="true">
+                            <div class="signature-line">
+                                _____________________<br>
+                                _____ / _____ / _____
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
+                <p style="margin: 0; color: #666;">
+                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
+                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
+                    ve "PDF olarak kaydet" seçeneğini seçin.
+                </p>
+            </div>
+        </div>
+
+        <div class="section" id="decision-tree" style="page-break-before: always;">
+            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            <p style="font-size: 13px; color: #555; margin: 8px 0 12px;">
+                Üstten alta: OLAY → soru (kesik çerçeve) → cevap → kök neden. Yazdırırken dikey A4 için uygundur.
+            </p>
+            <div id="decision-tree-diagram" style="background: white; padding: 12px; border: 1px solid #ddd; width: 100%; min-height: min(95vh, 1400px); overflow: auto;">
+                <div class="mermaid" style="width: 100%; min-height: 90vh;">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden enleme kirişi kalıp montajı sırasında çalışanın ayağı kayarak<br/>dengesini kaybetmesine neden olan zemin/yüzey koşulu oluştu?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Enleme kirişi kalıp montajı sırasında çalışanın ayağının kayarak<br/>dengesini kaybetmesine neden olan zemin koşulu, çalışma alanındaki dolgu<br/>toprak zeminin düzensiz, kompakte ve potansiyel olarak kaygan durumda<br/>olmasıdır. Raporda 'dolgu toprak zemine düştüğü' belirtilmektedir.<br/>İnşaat sahasında, özellikle trafik ve insan hareketinin yoğun olduğu<br/>alanlarda, toprak zeminin sıkışarak ve nemli koşullarda kayganlaşması<br/>doğal bir sonuçtur. Ayrıca, çalışma alanının düzenli temizlik,<br/>seviyeleme ve zemin hazırlığı bakımından eksiklikler bulunmuş olabilir.<br/>Temel sebep, çalışma ortamında yer seviyelemesi ve zemin güvenliğine<br/>yönelik yeterli kontrol mekanizmasının olmamasıdır."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Neden çalışma alanında (AK05 orta aks dolgu toprak zemin) düzenli zemin<br/>hazırlığı, seviyeleme ve kayganlaşma kontrolü (D4.1 - İş ortamı ve<br/>çalışma yüzeyi yönetimi) prosedürleri uygulanmadı veya yetersiz kaldı?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["AK05 orta aks dolgu toprak zemin alanında zemin hazırlığı, seviyeleme<br/>ve kayganlaşma kontrolü prosedürleri uygulanmadı veya yetersiz kaldı<br/>çünkü: 1. **Çalışma alanı hazırlığının standart prosedürleştirilmesi<br/>eksik**: Raporda, dolgu toprak zemin alanının ön hazırlığı<br/>(düzleştirilme, stabilizasyon, kayganlaşma giderme) konusunda yazılı<br/>prosedür uygulanmadığı görülmektedir. 2. **Sabit denetim eksikliği**:<br/>'Calisma aninda supervizor/formen/ekip basi sabit varliginin yeterli<br/>olmadigi tespit edildi' - bu durum, zemin koşullarının periyodik<br/>kontrolünü ve iyileştirilmesini engellemektedir. 3. **Çalışma yüzeyinin<br/>dinamik değerlendirilmesi yapılmamış**: Emleme kiriş montajı sırasında<br/>(10:40-14:27 arası 4+ saat), çalışma yüzeyinin (dolgu toprak zemin) ilk<br/>koşulunun değişimini (nem, sıkışabilirlik, kayganlaşma) izleyen bir<br/>sistem bulunmamaktadır. 4. **Koruma önlemleri (ankraj) yetersiz<br/>denetim**: Emniyet kemeri fiziki olarak mevcut olmasına rağmen, çalışan<br/>bağlantı yapmadığında supervizyon bunu engelleyememiş - bu, zemin<br/>düzeyindeki fiziki kontrolün yetersizliğinden kaynaklanmıştır. Zemin<br/>hazırlığı yeterli olsaydı, ek koruma mekanizması tetiklenecekti."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Neden 10:40-14:27 saatleri arasında enleme kiriş montajı sırasında<br/>supervizor/formen/ekip başının AK05 çalışma alanında sabit ve etkili<br/>denetimi sağlanmadı (D5.2 - İnsan kaynakları ve yönetim<br/>görevlendirmesi)?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["10:40-14:27 saatleri arasında enleme kiriş montajı sırasında<br/>supervizör/formen/ekip başının sabit ve etkili denetimi sağlanmadığının<br/>nedeni, iş organizasyonunda yüksekte çalışma operasyonları için yeterli<br/>insan kaynağının görevlendirilmemesidir. Raporda 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı tespit<br/>edilmiştir.' Bu durum, yönetim tarafından yüksek riskli montaj<br/>faaliyetinde (7-9 metre yükseklikte enleme kiriş kalıp montajı) sürekli<br/>gözetim ve denetim görevinin tanımlanmamış, atanmamış veya etkin şekilde<br/>yürütülmemiş olduğunu gösterir. Sonuç olarak, çalışan emniyet kemeri<br/>bulunmasına rağmen, bunu kullanmadığında bunun tespit ve müdahale<br/>edilmesi mümkün olmamıştır."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Neden projenin iş planlama ve yönetim organizasyonunda, enleme kiriş<br/>kalıp montajı gibi 7-9 metre yükseklikte gerçekleştirilen riskli<br/>operasyonlar için gerekli denetim ve gözetim kaynakları<br/>(supervizor/formen vb.) önceden tanımlanmış ve tahsis edilmemiştir ?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Enleme kirişi kalıp montajı gibi 7-9 metre yükseklikte gerçekleştirilen<br/>operasyonlar için iş planlama ve organizasyonda, gerekli denetim ve<br/>gözetim kaynakları (supervizor/formen vb.) önceden tanımlanmış ve tahsis<br/>edilmemiştir. Raporda açıkça 'çalışma anında supervizor/formen/ekip başı<br/>sabit varlığının yeterli olmadığı' tespit edilmiştir. Sonuç olarak, 18<br/>yaşındaki panel kalıpçı çalışan, yüksek riskteki bu operasyonda yetersiz<br/>gözetim altında çalışmış ve emniyet kemeri bağlantısının kontrol<br/>edilmemesi nedeniyle 9 metre yükseklikten düşmüştür. Etkili gözetim<br/>eksikliği, davranışsal kontrol mekanizmalarının çökmesine yol açmıştır."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Neden yüksek risk operasyonları (7-9 metre yükseklikte çalışma vb.)<br/>için iş planlama ve organizasyon sürecinde, risk seviyesine dayalı<br/>olarak gerekli denetim ve gözetim kaynakları (supervizor/formen)<br/>tanımlayan ve bu kaynakları tahsis eden standart bir metodoloji veya<br/>kontrol mekanizması bulunmamaktadır?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Yüksek risk operasyonları için iş planlama ve organizasyon sürecinde,<br/>risk seviyesine dayalı olarak gerekli denetim ve gözetim kaynakları<br/>tanımlayan ve tahsis eden standart bir metodoloji eksikliği vardır. Kaza<br/>raporuna göre, 9 metre yükseklikte yapılan enleme kirişi kalıp montaj<br/>çalışması sırasında 'supervizor/formen/ekip başı sabit varlığının<br/>yeterli olmadığı' tespit edilmiştir. Bu, operasyonun risk seviyesini<br/>karşılayacak gözetim yapısının önceden planlanmadığını gösterir. Emniyet<br/>kemeri gibi kişisel koruma ekipmanları mevcutken, çalışanın kemeri<br/>bağlamaması kontrol edilememesinin nedeni, sabit ve sürekli bir gözetim<br/>mekanizmasının tasarım aşamasında tanımlanmamış olmasıdır.<br/>Organizasyonda risk değerlendirmesinden gözetim kaynaklarının tahsisine<br/>kadar ilerleyen bir sistem tasarımı protokolü bulunmamaktadır."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Yüksek risk operasyonları için iş planlama ve organizasyon sürecinde,<br/>risk seviyesine dayalı olarak gerekli denetim ve gözetim kaynakları<br/>tanımlayan ve tahsis eden standart bir metodoloji eksikliği vardır. Kaza<br/>raporuna göre, 9 metre yükseklikte yapılan enleme kirişi kalıp montaj<br/>çalışması sırasında 'supervizor/formen/ekip başı sabit varlığının<br/>yeterli olmadığı' tespit edilmiştir. Bu, operasyonun risk seviyesini<br/>karşılayacak gözetim yapısının önceden planlanmadığını gösterir. Emniyet<br/>kemeri gibi kişisel koruma ekipmanları mevcutken, çalışanın kemeri<br/>bağlamaması kontrol edilememesinin nedeni, sabit ve sürekli bir gözetim<br/>mekanizmasının tasarım aşamasında tanımlanmamış olmasıdır.<br/>Organizasyonda risk değerlendirmesinden gözetim kaynaklarının tahsisine<br/>kadar ilerleyen bir sistem tasarımı protokolü bulunmamaktadır."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden çalışan, mevcut ankraj noktasına emniyet kemeri bağlantısını<br/>yapmadı?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Çalışan, mevcut ankraj noktasına emniyet kemeri bağlantısını yapmadı<br/>çünkü: Çalışma alanında sabit supervizor/formen/ekip başı gözetimi<br/>yeterli olmadığından, bağlantı yapma konusunda etkin denetim<br/>sağlanmamıştır. Ayrıca, ankraj bağlantısını uzaktan tespit etmenin zor<br/>olması nedeniyle, bağlantı yapılmadığının kontrol edilmesi mümkün<br/>olmamıştır. Bu durum, çalışanın kişisel davranış seçimini (emniyet<br/>kemeri bağlantısını ihmal etme) engelleyecek yeterli gözetim, kontrol<br/>mekanizması ve davranışsal eğitim uygulamasının eksikliğinden<br/>kaynaklanmıştır."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden çalışma alanında sabit supervizor/formen/ekip başı gözetimi<br/>yeterli olmadı ve ankraj bağlantısı uygulaması etkin şekilde<br/>denetlenmeledi?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Sabit supervizor/formen/ekip başı gözetimi yeterli olmadığı için: 1.<br/>**Gözetim Kapsamı Yetersizliği**: Çalışma alanında sabit bir gözlemci<br/>olmasına rağmen, ankraj bağlantı noktasının uzaktan görülmesinin zor<br/>olduğu belirtilmiştir. Bu, gözetim tasarımının fiziksel çalışma<br/>koşullarına uyum sağlamadığını gösterir. 2. **Etkin Denetim Prosedürünün<br/>Eksikliği**: Ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerinin<br/>uygulanıp uygulanmadığının sistematik olarak kontrol edilmesi için<br/>tanımlanmış bir prosedür bulunmamaktadır. 3. **Gözetim Yetki ve<br/>Sorumluluğunun Net Olmayışı**: Kiminin ankraj bağlantısını kontrol<br/>etmekle yükümlü olduğu ve bu kontrolün nasıl gerçekleştirileceği açıkça<br/>tanımlanmamış olabilir. 4. **Reaktif Yerine Proaktif Denetlem<br/>Eksikliği**: Kaza meydana gelmeden önce ankraj bağlantısının kontrol<br/>edilmesi için planlı bir denetim sistemi uygulanmamaktadır."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Neden ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerinin uygulanıp<br/>uygulanmadığını sistematik olarak kontrol etmek için tanımlanmış bir<br/>denetim prosedürü ve net yetki-sorumluluk dağılımı oluşturulmamıştır?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerinin uygulanıp<br/>uygulanmadığını sistematik olarak kontrol etmek için tanımlanmış bir<br/>denetim prosedürü ve net yetki-sorumluluk dağılımı oluşturulmamıştır<br/>çünkü: Organizasyonun İSG yönetim sisteminde Tehlike Belirleme, Risk<br/>Değerlendirmesi ve Kontrol Tedbirilerinin Uygulanması aşamasında (D4.2 -<br/>Denetim ve İzleme) eksiklikler bulunmaktadır. Raporun bulgularında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı ve kaza<br/>noktasında ankraj bağlantısının uzaktan kontrolünün zor olduğu<br/>belirtilmiştir. Bu durum, çalışanların yüksekte çalışma sırasında<br/>emniyet kemeri bağlantısı yapıp yapmadığının, kimler tarafından, hangi<br/>sıklıkla kontrol edileceğinin ve bu kontroller sırasında sorumlu<br/>kişilerin kim olacağının net olmadığını göstermektedir. Sonuç olarak,<br/>ankraj bağlantısı tedbirinin uygulanması tamamen çalışanın kişisel<br/>inisiyatifine bırakılmış, sistematik ve düzenli denetim mekanizması<br/>işletilmemiştir."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Yüksekte çalışan panellerde ankraj bağlantısı gibi yaşamsal güvenlik<br/>tedbirlerinin sürekli denetiminden sorumlu supervizor/formen/ekip başı<br/>gibi kişilerin görevleri, yetkileri ve denetim sıklıkları neden açık<br/>şekilde tanımlanmamış ve belirlenmiş personele formal olarak<br/>atanmamıştır?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Supervizor/formen/ekip başı gibi denetim görevlisi kişilerin yüksekte<br/>çalışma sırasında ankraj bağlantısı gibi yaşamsal güvenlik tedbirlerini<br/>denetleme görevleri, yetkileri ve denetim sıklıkları açık şekilde<br/>tanımlanmamış ve formal olarak belirlenmiş personele atanmamıştır.<br/>Raporda; saha genelinde ISG personeli ve çoklu ekipler mevcutken,<br/>'supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu durum, denetim sorumluluğunun net olmadığını, kimin ne<br/>zaman hangi sıklıkta ankraj bağlantısını kontrol edeceğinin<br/>belirlenmediğini göstermektedir. Sonuç olarak, ankraj bağlantısı<br/>yapılmadığı halde bu durum önceden tespit edilememiş ve müdahale<br/>yapılamamıştır. Denetim görevlisi kişilere formal olarak atanan<br/>sorumluluğun, belirli denetim prosedürü ve sıklığının olmaması temel<br/>sistemik sorundur."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Yüksekte çalışmalar sırasında ankraj bağlantısı denetimi için formal<br/>görev atanmadığı sorunu, neden kurumsal iş sağlığı ve güvenliği yönetim<br/>sistemi içinde denetim prosedürleri, sorumluluk atanması ve periyodik<br/>kontrol mekanizmaları tanımlanmamış ve belgelendirilmemiştir?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Kurumsal İSG yönetim sistemi içinde yüksekte çalışmalar sırasında<br/>ankraj bağlantısı denetimi için formal görev atanmadığı sorunu, formal<br/>prosedürlerin, sorumluluk tanımının ve periyodik kontrol<br/>mekanizmalarının tanımlanmaması ve belgelendirilmemesinden<br/>kaynaklanmaktadır. Raporda 'supervizor/formen/ekip basi sabit varliginin<br/>yeterli olmadigi' ve 'ankraj baglantisini uzaktan tespit etmenin zor<br/>oldugu' ifadeleri göstermektedir ki: (1) Kimlerin ankraj kontrolünü<br/>yapacağı belirtilmemiş, (2) Kontrolün nasıl ve ne sıklıkla yapılacağı<br/>prosedürleştirilmemiş, (3) Denetim sonuçlarının kaydedileceği ve takip<br/>edileceği bir sistem kurulmamıştır. Bu nedenle çalışan emniyet kemeri<br/>bağlantısı yapılmadığı halde kimse bunu tespit ve müdahale edememişdir."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Kurumsal İSG yönetim sistemi içinde yüksekte çalışmalar sırasında<br/>ankraj bağlantısı denetimi için formal görev atanmadığı sorunu, formal<br/>prosedürlerin, sorumluluk tanımının ve periyodik kontrol<br/>mekanizmalarının tanımlanmaması ve belgelendirilmemesinden<br/>kaynaklanmaktadır. Raporda 'supervizor/formen/ekip basi sabit varliginin<br/>yeterli olmadigi' ve 'ankraj baglantisini uzaktan tespit etmenin zor<br/>oldugu' ifadeleri göstermektedir ki: (1) Kimlerin ankraj kontrolünü<br/>yapacağı belirtilmemiş, (2) Kontrolün nasıl ve ne sıklıkla yapılacağı<br/>prosedürleştirilmemiş, (3) Denetim sonuçlarının kaydedileceği ve takip<br/>edileceği bir sistem kurulmamıştır. Bu nedenle çalışan emniyet kemeri<br/>bağlantısı yapılmadığı halde kimse bunu tespit ve müdahale edememişdir."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Neden emniyet kemeri bağlantısı yapılmadı?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Emniyet kemeri bağlantısı yapılmadığı için yüksekten düşme kazası<br/>gerçekleşmiştir. Rapordan elde edilen bulgular göstermektedir ki: (1)<br/>Çalışma alanında uygun ankraj noktası mevcut olmasına rağmen çalışan bu<br/>bağlantıyı yapmamıştır. (2) Saha genelinde ISG personeli bulunmasına<br/>rağmen, çalışma anında supervizor/formen/ekip başı sabit varlığının<br/>yeterli olmadığı tespit edilmiştir. (3) Kaza noktasında çalışanın ankraj<br/>bağlantısını uzaktan tespit etmenin zor olması nedeniyle etkili denetim<br/>sağlanamamıştır. (4) Bu nedenle çalışan, EN 361/EN 353/EN 362<br/>standardını karşılayan emniyet kemerini kullanmamış ve 9 metre<br/>yükseklikten düşerek ciddi yaralanmaya (açık kırık, cerrahi müdahale)<br/>uğramıştır."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Neden saha genelinde ISG personeli bulunmasına rağmen, yüksekte çalışan<br/>panel kalıpçının ankraj bağlantısını ve emniyet kemeri kullanımını<br/>müdahale ile denetleyecek supervizor/formen/ekip başı sabit varlığı ve<br/>denetim mekanizması yeterli olmadı (D1.3 - İş organizasyonu ve denetim)?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["Saha genelinde ISG personeli bulunmasına rağmen denetim mekanizması<br/>yeterli olmadığı için, panel kalıpçının ankraj bağlantısı ve emniyet<br/>kemeri kullanımı denetlenmemiştir. Rapor bulgularında açıkça 'çalışma<br/>anında supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' ve<br/>'kaza noktasında çalışanın ankraj bağlantısını uzaktan tespit etmenin<br/>zor olduğu' belirtilmiştir. Bu, yüksekte çalışma gibi yüksek riskli<br/>işlerde operasyonel seviyede müdahaleci, sabit ve yakından denetim<br/>mekanizmasının eksik olduğunu göstermektedir. İş organizasyonu<br/>açısından, ISG personelinin varlığı yeterli değildir; çalışma sahasında<br/>doğrudan gözetim yapacak, kişisel emniyet donanımlarının kullanımını<br/>anında kontrol edecek formen/ekip başı seviyesinde sabit denetim<br/>mekanizması kurgulanmamıştır."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Neden saha organizasyonunda, yüksekte çalışma gibi yüksek riskli<br/>işlerde formen/ekip başı seviyesinde sabit ve yakından denetim<br/>mekanizması kurgulanmamış veya uygulanmamıştır?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Saha organizasyonunda, yüksekten çalışma gibi yüksek riskli işlerde<br/>formen/ekip başı seviyesinde sabit ve yakından denetim mekanizması<br/>kurgulanmadığı veya yeterince uygulanmadığı için, çalışan emniyet kemeri<br/>bağlantısını yapmamış ve bu ihmal 9 metre yükseklikten düşmeye neden<br/>olmuştur. Rapor, 'çalışma anında supervizor/formen/ekip başı sabit<br/>varlığının yeterli olmadığı' ve 'kaza noktasında çalışanın ankraj<br/>bağlantısını uzaktan tespit etmenin zor olduğu' belirtmektedir.<br/>Yakından, sabit denetim olması halinde, çalışanın emniyet kemeri<br/>bağlanması konusundaki uyumunu kontrol etmek ve gerektiğinde müdahale<br/>etmek mümkün olabilirdi. Bu, özellikle 18 yaşında ve 7 aylık iş<br/>tecrübesi olan genç bir işçi için kritik bir kontrol mekanizmasıydı."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Neden AK05 alan yüksekten çalışma operasyonlarında, formen/ekip başı<br/>pozisyonlarının iş tanımı ve sorumluluk çerçevesi, sabit yakın denetim<br/>görevini açık ve ölçülebilir bir hedef olarak kapsamayacak şekilde<br/>tasarlanmış veya güncelleştirilmemiştir?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["AK05 alan yüksekten çalışma operasyonlarında, formen/ekip başı<br/>pozisyonlarının iş tanımı ve sorumluluk çerçevesi, 'sabit yakın denetim'<br/>görevini açık ve ölçülebilir bir hedef olarak kapsamayacak şekilde<br/>tasarlanmıştır çünkü: Raporda tespit edilen bulgulardan: 'Calisma aninda<br/>supervizor/formen/ekip basi sabit varliginin yeterli olmadigi tespit<br/>edildi.' Bu, denetim görevinin tanımlanmadığını veya operasyonel olarak<br/>uygulanmadığını gösterir. Formen/ekip başı pozisyonlarının sorumluluk<br/>çerçevesinde, özellikle 7 aylık genç işçilerin emniyet kemeri<br/>bağlantısını kontrol etme, ankraj noktası kullanımını doğrulama gibi<br/>spesifik ve ölçülebilir denetim görevleri bulunmamaktadır. Sonuç olarak,<br/>sabit yakın denetimin gerçekleşmediği ve çalışanın ankraj bağlantısını<br/>yapmadığı durum önlenememektedir. İş tanımı bu görevleri açık hedefler<br/>olarak içermediği için, denetim sorumluluğu muğlak ve ölçülmez<br/>kalmaktadır."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Neden Proje Yönetimi ve İnsan Kaynakları departmanları, yüksekten<br/>çalışma operasyonları için formen/ekip başı pozisyonlarının iş<br/>tanımlarında 'sabit yakın denetim' ve 'emniyet kemeri/ankraj bağlantısı<br/>doğrulama' görevlerini açık, ölçülebilir ve sorumlu kılacak şekilde<br/>formalize ve entegre etmeme kararını veya süreci belirlemişlerdir?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Proje Yönetimi ve İnsan Kaynakları departmanları, yüksekten çalışma<br/>operasyonları için formen/ekip başı pozisyonlarının iş tanımlarında<br/>'sabit yakın denetim' ve 'emniyet kemeri/ankraj bağlantısı doğrulama'<br/>görevlerini formalize ve ölçülebilir kılmama kararı almışlardır. Raporda<br/>tespit edilen sonuç, 'çalışma anında supervizor/formen/ekip başı sabit<br/>varlığının yeterli olmadığı'dır. Bu durum, formen/ekip başının<br/>sorumluluk sahasının: - İş tanımında açıkça tanımlanmadığını -<br/>Performans ölçütleri belirtilmediğini (örn: 'Her 30 dakikada bir ankraj<br/>bağlantısı doğrulaması', 'Çalışanı 5 metre çapında izlem alanında<br/>görmek') - Hesap verebilirliğin netleştirilmediğini - Ceza ve ödül<br/>mekanizmalarının bu sorumluluklarla bağlantılandırılmadığını<br/>göstermektedir. Sonuç olarak, formen/ekip başı pozisyonunun sahibi,<br/>kritik güvenlik görevlerinin (ankraj bağlantısı doğrulaması, sabit yakın<br/>denetim) kendi sorumluluğu olduğunun bilincinde olmayabilir veya bu<br/>görevlerin aciliyet seviyesi anlaşılmamış olabilir."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Proje Yönetimi ve İnsan Kaynakları departmanları, yüksekten çalışma<br/>operasyonları için formen/ekip başı pozisyonlarının iş tanımlarında<br/>'sabit yakın denetim' ve 'emniyet kemeri/ankraj bağlantısı doğrulama'<br/>görevlerini formalize ve ölçülebilir kılmama kararı almışlardır. Raporda<br/>tespit edilen sonuç, 'çalışma anında supervizor/formen/ekip başı sabit<br/>varlığının yeterli olmadığı'dır. Bu durum, formen/ekip başının<br/>sorumluluk sahasının: - İş tanımında açıkça tanımlanmadığını -<br/>Performans ölçütleri belirtilmediğini (örn: 'Her 30 dakikada bir ankraj<br/>bağlantısı doğrulaması', 'Çalışanı 5 metre çapında izlem alanında<br/>görmek') - Hesap verebilirliğin netleştirilmediğini - Ceza ve ödül<br/>mekanizmalarının bu sorumluluklarla bağlantılandırılmadığını<br/>göstermektedir. Sonuç olarak, formen/ekip başı pozisyonunun sahibi,<br/>kritik güvenlik görevlerinin (ankraj bağlantısı doğrulaması, sabit yakın<br/>denetim) kendi sorumluluğu olduğunun bilincinde olmayabilir veya bu<br/>görevlerin aciliyet seviyesi anlaşılmamış olabilir."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Neden çalışan, dusme riski taşıyan yüksekten çalışma alanında (9m)<br/>uygun ankraj noktası olmasına rağmen emniyet kemeri (EN 361/EN 353/EN<br/>362) bağlantısını yapmadı?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q31
+    A32["Çalışanın emniyet kemeri bağlantısını yapmadığının birincil nedeni, iş<br/>alanında yeterli seviyede doğrudan gözetim ve anlık denetimin<br/>bulunmamasıdır. Raporda belirtildiği üzere 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu yaşta (18 yaşında) ve deneyimde (7 ay) olan çalışan,<br/>yüksekte çalışma sırasında ankraj bağlantısı yapılması gerektiği<br/>konusunda eğitilmiş olsa da, o anda sahadaki aktif gözetim eksikliği<br/>nedeniyle bu kritik koruma önlemini uygulamayı ihmal etmiştir. Uygun<br/>ankraj noktası mevcut olmakla birlikte, çalışanı kullanmaya 'zorlayacak'<br/>etkili bir yönetişim kontrol mekanizması (canlı gözetim/kontrol)<br/>işletilmemiştir."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Neden yüksekte çalışma alanında sabit supervizor/formen/ekip başı<br/>gözetimiyle ilgili planlama ve görevlendirme yetersiz kalmıştır?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A32 --> Q33
+    A34["Yüksekte çalışma alanında sabit supervizor/formen/ekip başı gözetimiyle<br/>ilgili planlama ve görevlendirme yetersiz kalmıştır çünkü: (1) Kaza<br/>anında saha genelinde ISG personeli ve çoklu ekipler olmasına rağmen,<br/>çalışma noktasında sabit bir gözeticinin bulunmadığı tespit edilmiştir;<br/>(2) Çalışanın emniyet kemeri ankraj bağlantısını yapmamasının, 'ankraj<br/>noktasının uzaktan tespit edilmesinin zor olması' nedeniyle denetim<br/>sisteminin yetersiz olduğu görülmüştür; (3) 18 yaşındaki genç çalışan, 7<br/>aylık tecrübesine rağmen yüksekte çalışma sırasında zorunlu güvenlik<br/>prosedürlerini uygulamadığında müdahale edecek sabit bir denetim<br/>mekanizması işletilmemiştir."]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Neden enleme kirisi kalip montaj alanında emniyet kemeri ankraj<br/>bağlantısının uzaktan denetim/kontrolü için alternatif kontrol<br/>sistematiği ve prosedürü oluşturulmamıştır?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A34 --> Q35
+    A36["Enleme kirişi kalıp montaj alanında emniyet kemeri ankraj bağlantısının<br/>uzaktan denetim/kontrolü için alternatif kontrol sistematiği ve<br/>prosedürü oluşturulmamıştır çünkü: 1. **Denetim Mekanizmasının Tasarım<br/>Eksikliği**: Kaza noktasında çalışanın ankraj bağlantısını uzaktan<br/>tespit etmenin zor olduğu belirtilmiştir. Bu, sistemin başından itibaren<br/>görsel kontrol ve denetim için uygun olmayan bir yapıya sahip olduğunu<br/>göstermektedir. 2. **Sabit Supervizyon Sisteminin Yetersizliği**:<br/>Çalışma alanında supervizor/formen/ekip başı sabit varlığının yeterli<br/>olmadığı tespit edilmiştir. Bu, dinamik kontrol ve anında müdahale<br/>yapabilecek bir kontrol prosedürünün geliştirilmediğini gösterir. 3.<br/>**Alternatif Kontrol Protokollerinin Yokluğu**: Emniyet kemeri<br/>bağlantısını garantilemek için (örneğin: ankraj noktasına yaklaşımdan<br/>önce görsel kontrol, çıkış/giriş prosedürü, belge kontrolü vb.)<br/>sistematik alternatif denetim yöntemleri tasarlanmamıştır. 4. **Yönetim<br/>Sisteminin Kontrolsüzlüğü**: Yüksekte çalışma yapan personelin, bağlantı<br/>yapma zorunluluğunu ve denetimini güvence altına alan prosedür ve<br/>sorumluluk tanımlaması yapılmamıştır."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Neden yüksekte çalışma ve emniyet kemeri bağlantı zorunluluğunu<br/>garantilemek için yönetim tarafından riske dayalı sistematik denetim ve<br/>sorumluluk tanımlaması yapılmamış/yetersiz kalmıştır?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A36 --> Q37
+    A38["Yüksekte çalışma sırasında emniyet kemeri bağlantısını garantilemek<br/>için yönetim tarafından riske dayalı sistematik denetim yapılmamıştır<br/>çünkü: 1. **Sabit Supervizyon Eksikliği**: Raporda 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı'<br/>belirtilmektedir. Yüksek risk faaliyetlerinde gerçek zamanlı denetim<br/>sağlanmamıştır. 2. **Kontrol Mekanizmasının Yetersizliği**: Ankraj<br/>bağlantısı uzaktan tespit edilemediği için, bağlantının yapılıp<br/>yapılmadığını doğrulamak üzere iş başında bulunan sorumlu bir<br/>nişan/gözleticinin atanmadığı anlaşılmaktadır. 3. **Sorumluluk Tanımının<br/>Açıklığı**: Kimin emniyet kemeri bağlantısını kontrol edeceğinin,<br/>çalışanın kendi kontrolü vs. denetmen kontrolü olacağının net tanımı<br/>olmadığı görülmektedir. 4. **18 Yaşındaki Yeni Çalışanın Koçluğu**: 7 ay<br/>tecrübeli, 18 yaşındaki panel kalipci için alan koçluğu (field coaching)<br/>ve sürekli gözletiş prosedürü uygulanmamıştır. Sonuç olarak, teknik<br/>araçlar (emniyet kemeri, ankraj noktası) mevcut olmasına rağmen,<br/>yönetimsel uygulama kontrol mekanizması (denetim prosedürü, sorumluluk<br/>ataması, yeni işçi koçluğu) sistemik olarak zayıf veya eksik kalmıştır."]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>Neden yüksek-riskli enleme kirişi kalıp montaj alanında (AK05) çalışma<br/>anında supervizor/formen/ekip başı tarafından sabit ve gerçek zamanlı<br/>gözletiş ve denetim uygulanmamıştır ?"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A38 --> Q39
+    A40["Olay raporunda açıkça belirtildiği üzere 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu yetersizlik, yüksek riskli enleme kirişi kalıp montaj<br/>işinde kritik bir gözletiş boşluğu yaratmıştır. Kaza anında çalışanın<br/>emniyet kemeri ankraj bağlantısı yapılmamış olmasına rağmen, bunun sabit<br/>bir denetçi tarafından müdahalesiyle önlenmesi mümkün olabilirdi.<br/>Raporda belirtilen 'kaza noktasında çalışanın ankraj bağlantısını<br/>uzaktan tespit etmenin zor olduğu' ifadesi, bu işin doğrudan alan<br/>gözletiş ve denetimini gerektirdiğini göstermektedir. Saha genelinde ISG<br/>personeli ve çoklu ekipler mevcut olmasına rağmen, merkezi, sabit ve<br/>gerçek zamanlı bir gözletiş mekanizması eksik kalmıştır. Sonuç olarak, 9<br/>metre yükseklikten düşme kazasında ciddi yaralanma (açık kırık ve<br/>cerrahî müdahale) gerçekleşmiştir."]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Olay raporunda açıkça belirtildiği üzere 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu yetersizlik, yüksek riskli enleme kirişi kalıp montaj<br/>işinde kritik bir gözletiş boşluğu yaratmıştır. Kaza anında çalışanın<br/>emniyet kemeri ankraj bağlantısı yapılmamış olmasına rağmen, bunun sabit<br/>bir denetçi tarafından müdahalesiyle önlenmesi mümkün olabilirdi.<br/>Raporda belirtilen 'kaza noktasında çalışanın ankraj bağlantısını<br/>uzaktan tespit etmenin zor olduğu' ifadesi, bu işin doğrudan alan<br/>gözletiş ve denetimini gerektirdiğini göstermektedir. Saha genelinde ISG<br/>personeli ve çoklu ekipler mevcut olmasına rağmen, merkezi, sabit ve<br/>gerçek zamanlı bir gözletiş mekanizması eksik kalmıştır. Sonuç olarak, 9<br/>metre yükseklikten düşme kazasında ciddi yaralanma (açık kırık ve<br/>cerrahî müdahale) gerçekleşmiştir."]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden çalışanın ayağı yüksekte çalışırken montaj sırasında kaymıştır<br/>(zemin-ayakkabı uyumsuzluğu veya zemin koşulları)?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q41
+    A42["Çalışanın ayağı kaymıştır çünkü: (1) Çalışma alanı dolgu toprak<br/>zemindir ve bu tür zeminler özellikle yüksekte çalışırken kaygan<br/>olabilir; (2) Raporda ayakkabı-zemin uyumsuzluğu veya zemin yüzeyinin<br/>özelliklerine karşı uygun taban tasarımının bulunup bulunmadığı<br/>belirtilmemiştir; (3) Kaza anında zemin koşulları (nem, düzensiz yüzey,<br/>kırıntılar vb.) kayma riskini artırmış olabilir. Temel risk faktörü ise,<br/>emniyet kemeri bağlantısının yapılmamış olması nedeniyle, ayağın kaymasi<br/>durumunda dengenin kaybedilmesi ve 9 metre yüksekten düşme ile<br/>sonuçlanmasıdır."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Neden çalışan, uygun ankraj noktası mevcut olmasına rağmen emniyet<br/>kemeri bağlantısını (D4.1 - Koruyucu Donanım Kullanımı) yapmamıştır?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A42 --> Q43
+    A44["Çalışan emniyet kemeri bağlantısını yapmamıştır çünkü: (1) Çalışma<br/>alanında sabit supervizyon/denetim eksikliği nedeniyle bağlantı yapılıp<br/>yapılmadığı doğrulanamamıştır; (2) Ankraj bağlantısı uzaktan görsel<br/>olarak tespit edilmesi zor olduğundan, çalışanın bu kritik adımı<br/>atlaması fark edilmemiştir; (3) Genç çalışanın (18 yaş, 7 aylık deneyim)<br/>yüksekte çalışma riskleri konusunda tam davranış alışkanlığı<br/>oluşturulmamış olabilir. Eğitim alınmış ve KKD zimmet kaydı var olsa da,<br/>pratik uygulamada gerçek zamanlı denetim ve gözetim yetersiz kalmıştır."]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Neden, yüksekte çalışma alanında enleme kiriş kalıp montajı sırasında<br/>sabit supervizyon (D3.1 - Denetim ve Gözetim Yönetimi) sistemi<br/>uygulanmamış veya etkin olmamıştır?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A44 --> Q45
+    A46["Yüksekte çalışma alanında enleme kiriş kalıp montajı sırasında sabit<br/>supervizyon sistemi uygulanmamış veya etkin olmamıştır çünkü; çalışma<br/>sırasında supervizor, formen veya ekip başının sabit bir fiziksel<br/>varlığı ve doğrudan gözlem görevleri yeterli düzeyde yerine<br/>getirilmemiştir. Raporda bu bulgular açıkça kaydedilmiştir. Sonuç<br/>olarak, çalışan tarafından emniyet kemeri ankrajı yapılmadığı tespit<br/>edilmiş olup, bu kritik hata (KKD ihlali) sabit bir denetim mekanizması<br/>olmadan engellenmemiştir. Genç yaş ve sınırlı tecrübeye sahip<br/>kazazedenin, yüksek riskli işlerde yapması gereken güvenlik<br/>prosedürlerini (emniyet kemeri bağlantısı) tam olarak uygulamadığı,<br/>etkili bir denetim sistemi tarafından zamanında müdahale edilmemiştir.<br/>Bu da 9 metre yükseklikten düşme kazasına neden olmuştur."]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Neden, enleme kiriş kalıp montajı gibi yüksek riskli operasyonlarda<br/>sabit supervizyon görevini yerine getiren personelin<br/>(supervizor/formen/ekip başı) doğrudan ve sürekli fiziksel varlığını<br/>sağlayan kurumsal prosedür ve rol tanımlaması oluşturulmamış veya<br/>uygulanmamıştır?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A46 --> Q47
+    A48["Yüksek riskli operasyonlarda (enleme kirişi kalıp montajı gibi) sabit<br/>supervizyon görevini yerine getiren personelin (supervizor/formen/ekip<br/>başı) doğrudan ve sürekli fiziksel varlığını sağlayan kurumsal prosedür<br/>ve rol tanımlaması oluşturulmamıştır, çünkü: **Kök Nedenler:** 1.<br/>**Sistem Tasarımı Eksikliği**: 9 metre yükseklikte çalışma ve emniyet<br/>kemeri ankraj noktasının uzaktan kontrolünün zor olduğu çalışma<br/>alanında, sabit supervizyon ihtiyacı risk analizi sonucu kurumsal<br/>prosedür haline getirilmemiştir. 2. **Rol ve Sorumluluk Tanımlaması<br/>Boşluğu**: Enleme kirişi kalıp montajı gibi yüksek riskli görevlerde,<br/>supervizor/formen/ekip başının fiziksel varlığı, bulunması gereken<br/>alanlar, kontrol noktaları ve sorumluluk sınırları açıkça<br/>tanımlanmamıştır. 3. **Davranış Kontrolü Mekanizmasının Olmaması**:<br/>Kazazedenin emniyet kemeri takmadığı tespit edilmiş ancak, bunun gerçek<br/>zamanda tespit ve düzeltilmesi için sabit fiziksel supervizyon prosedürü<br/>kurumsal düzeyde zorunlu kılınmamıştır. Ankraj noktası uzaktan tespit<br/>edilemediğinden, doğrudan gözlem gereklidir. 4. **Operasyonel Risk<br/>Kontrol Zayıflığı**: Raporda 'calisma aninda supervizor/formen/ekip basi<br/>sabit varliginin yeterli olmadigi tespit edildi' - bu, mevcut<br/>uygulamanın prosedür ve rol tanımlaması desteğinden yoksun olduğunu<br/>göstermektedir."]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Why-5: Neden, 9 metre yükseklikte enleme kirişi kalıp montajı<br/>operasyonunda emniyet kemeri ankraj noktasının uzaktan kontrolünün<br/>imkânsız olduğu tespit edilen çalışma alanında, sabit supervizyon<br/>gereksiniminin risk analizi sonrası kurumsal prosedür ve zorunlu yönetim<br/>standardı olarak kodifikasyonu gerçekleştirilmemiş, bunun yerine mevcut<br/>uygulamalar işçi davranışı ve bilinç düzeyine bırakılmıştır?"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A48 --> Q49
+    A50["9 metre yükseklikte enleme kirişi kalıp montajı operasyonunda, emniyet<br/>kemeri ankraj noktasının uzaktan kontrolünün imkânsız olduğu tespit<br/>edilen çalışma alanında, sabit supervizyon gereksiniminin kurumsal<br/>prosedür ve zorunlu yönetim standardı olarak kodifikasyonu<br/>gerçekleştirilmemiş olmasının kök nedeni, **sistem seviyesinde uyum<br/>izleme ve denetleme mekanizmasının tasarlanmamış olması ile birlikte,<br/>tanımlanan risklere karşı operasyonel kontrollerin yazılı, zorunlu ve<br/>gözlemlenebilir prosedürler şeklinde uygulanmamış olmasıdır**. Risk<br/>analizi sonrası (D4.1'de tanımlama yapıldıktan sonra) bunun yerine<br/>çalışanın kişisel bilinci ve davranışına güvenilmesi, D4.2 (Risk<br/>kontrollerinin uygulanmaması) ve D9.5 (Sistem seviyesi denetim<br/>mekanizmasının eksikliği) ile D1.2 (Sabit supervizyon personelinin<br/>alanında yeterli varlığının olmaması) komb eksikliklerin sonucudur.<br/>Yazılı prosedür, zorunlu check-list ve gözlemlenebilir (auditlenebilir)<br/>supervizyon sistemi olmaması, çalışanın emniyet kemeri ankrajını<br/>bağlantı yapmama seçeneğini ortadan kaldırmamıştır."]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN</b><br/>Kök Neden<br/>9 metre yükseklikte enleme kirişi kalıp montajı operasyonunda, emniyet<br/>kemeri ankraj noktasının uzaktan kontrolünün imkânsız olduğu tespit<br/>edilen çalışma alanında, sabit supervizyon gereksiniminin kurumsal<br/>prosedür ve zorunlu yönetim standardı olarak kodifikasyonu<br/>gerçekleştirilmemiş olmasının kök nedeni, **sistem seviyesinde uyum<br/>izleme ve denetleme mekanizmasının tasarlanmamış olması ile birlikte,<br/>tanımlanan risklere karşı operasyonel kontrollerin yazılı, zorunlu ve<br/>gözlemlenebilir prosedürler şeklinde uygulanmamış olmasıdır**. Risk<br/>analizi sonrası (D4.1'de tanımlama yapıldıktan sonra) bunun yerine<br/>çalışanın kişisel bilinci ve davranışına güvenilmesi, D4.2 (Risk<br/>kontrollerinin uygulanmaması) ve D9.5 (Sistem seviyesi denetim<br/>mekanizmasının eksikliği) ile D1.2 (Sabit supervizyon personelinin<br/>alanında yeterli varlığının olmaması) komb eksikliklerin sonucudur.<br/>Yazılı prosedür, zorunlu check-list ve gözlemlenebilir (auditlenebilir)<br/>supervizyon sistemi olmaması, çalışanın emniyet kemeri ankrajını<br/>bağlantı yapmama seçeneğini ortadan kaldırmamıştır."]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A50 --> ROOT5
+
+                </div>
+            </div>
+            
+            <!-- Mermaid.js library -->
+            <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+            <script>
+                if (typeof mermaid !== 'undefined') {
+                    mermaid.initialize({
+                        startOnLoad: true,
+                        theme: 'default',
+                        flowchart: {
+                            useMaxWidth: false,
+                            htmlLabels: true,
+                            curve: 'basis',
+                            padding: 20,
+                            nodeSpacing: 28,
+                            rankSpacing: 56,
+                            diagramPadding: 16
+                        },
+                        themeVariables: {
+                            fontSize: '14px',
+                            fontFamily: 'Segoe UI, Arial, sans-serif',
+                            primaryColor: '#fff',
+                            primaryTextColor: '#222',
+                            primaryBorderColor: '#333',
+                            lineColor: '#333',
+                            secondaryColor: '#f5f5f5',
+                            tertiaryColor: '#fff'
+                        }
+                    });
+                } else {
+                    setTimeout(function() {
+                        if (typeof mermaid !== 'undefined') {
+                            mermaid.initialize({
+                                startOnLoad: true,
+                                theme: 'default',
+                                flowchart: {
+                                    useMaxWidth: false,
+                                    htmlLabels: true,
+                                    curve: 'basis',
+                                    padding: 20,
+                                    nodeSpacing: 28,
+                                    rankSpacing: 56,
+                                    diagramPadding: 16
+                                },
+                                themeVariables: {
+                                    fontSize: '14px',
+                                    fontFamily: 'Segoe UI, Arial, sans-serif'
+                                }
+                            });
+                            mermaid.contentLoaded();
+                        }
+                    }, 1000);
+                }
+            </script>
+        </div>
+
+        <div class="section photo-section" id="incident-photos">
+            <div class="section-header"> OLAY FOTOĞRAFLARI</div>
+            <p style="color:#555; margin-bottom:20px;">
+                Her kareye tıklayarak olay fotoğrafı yükleyin. Yüklenen fotoğraflar yalnızca 
+                bu rapor oturumunda saklanır; raporu <strong>HTML olarak indirerek</strong> 
+                kalıcı hale getirebilirsiniz.
+            </p>
+            
+            <div class="photo-page" id="photo-page-1">
+                <div class="photo-page-title">Sayfa 1 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p1_s1_slot" onclick="triggerUpload('photo_p1_s1')">
+                    <input type="file" id="photo_p1_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s1')"></button>
+                    <div class="upload-hint" id="photo_p1_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s2_slot" onclick="triggerUpload('photo_p1_s2')">
+                    <input type="file" id="photo_p1_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s2')"></button>
+                    <div class="upload-hint" id="photo_p1_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s3_slot" onclick="triggerUpload('photo_p1_s3')">
+                    <input type="file" id="photo_p1_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s3')"></button>
+                    <div class="upload-hint" id="photo_p1_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p1_s4_slot" onclick="triggerUpload('photo_p1_s4')">
+                    <input type="file" id="photo_p1_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p1_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p1_s4')"></button>
+                    <div class="upload-hint" id="photo_p1_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p1_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p1_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+            <div class="photo-page" id="photo-page-2">
+                <div class="photo-page-title">Sayfa 2 / 2</div>
+                <div class="photo-grid">
+                    
+                <div class="photo-slot" id="photo_p2_s1_slot" onclick="triggerUpload('photo_p2_s1')">
+                    <input type="file" id="photo_p2_s1_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s1')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s1')"></button>
+                    <div class="upload-hint" id="photo_p2_s1_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 1</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s1_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s1_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s2_slot" onclick="triggerUpload('photo_p2_s2')">
+                    <input type="file" id="photo_p2_s2_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s2')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s2')"></button>
+                    <div class="upload-hint" id="photo_p2_s2_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 2</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s2_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s2_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s3_slot" onclick="triggerUpload('photo_p2_s3')">
+                    <input type="file" id="photo_p2_s3_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s3')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s3')"></button>
+                    <div class="upload-hint" id="photo_p2_s3_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 3</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s3_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s3_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                <div class="photo-slot" id="photo_p2_s4_slot" onclick="triggerUpload('photo_p2_s4')">
+                    <input type="file" id="photo_p2_s4_input" accept="image/*"
+                           style="display:none"
+                           onchange="loadPhoto(event, 'photo_p2_s4')">
+                    <button class="photo-remove" title="Fotoğrafı Kaldır"
+                            onclick="event.stopPropagation(); removePhoto('photo_p2_s4')"></button>
+                    <div class="upload-hint" id="photo_p2_s4_hint">
+                        <span class="icon"></span>
+                        <span class="label">Fotoğraf 4</span>
+                        <span class="sub">Tıklayın veya sürükleyin</span>
+                    </div>
+                    <img id="photo_p2_s4_img" src="" alt="" style="display:none">
+                    <input class="photo-caption"
+                           id="photo_p2_s4_caption"
+                           type="text"
+                           placeholder="Fotoğraf açıklaması giriniz..."
+                           onclick="event.stopPropagation()"
+                           style="display:none">
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        /*  OLAY FOTOĞRAFLARI JS  */
+        function triggerUpload(uid) {
+            document.getElementById(uid + '_input').click();
+        }
+
+        function loadPhoto(event, uid) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const slot  = document.getElementById(uid + '_slot');
+                const img   = document.getElementById(uid + '_img');
+                const hint  = document.getElementById(uid + '_hint');
+                const cap   = document.getElementById(uid + '_caption');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                hint.style.display = 'none';
+                cap.style.display  = 'block';
+                slot.classList.add('has-photo');
+                // Auto-fill caption with filename (without extension)
+                if (!cap.value) {
+                    cap.value = file.name.replace(/\.[^/.]+$/, '');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(uid) {
+            const slot  = document.getElementById(uid + '_slot');
+            const img   = document.getElementById(uid + '_img');
+            const hint  = document.getElementById(uid + '_hint');
+            const cap   = document.getElementById(uid + '_caption');
+            const input = document.getElementById(uid + '_input');
+            img.src = '';
+            img.style.display = 'none';
+            hint.style.display = 'flex';
+            cap.style.display  = 'none';
+            cap.value = '';
+            input.value = '';
+            slot.classList.remove('has-photo');
+        }
+
+        // Sürükle-bırak desteği
+        document.querySelectorAll('.photo-slot').forEach(function(slot) {
+            slot.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '#1B3A5C';
+                slot.style.background  = '#D6E4F0';
+            });
+            slot.addEventListener('dragleave', function() {
+                if (!slot.classList.contains('has-photo')) {
+                    slot.style.borderColor = '#2E6DA4';
+                    slot.style.background  = '#F8FBFF';
+                }
+            });
+            slot.addEventListener('drop', function(e) {
+                e.preventDefault();
+                slot.style.borderColor = '';
+                slot.style.background  = '';
+                const uid   = slot.id.replace('_slot', '');
+                const input = document.getElementById(uid + '_input');
+                const file  = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Simulate file input change
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    input.files = dt.files;
+                    loadPhoto({target: input}, uid);
+                }
+            });
+        });
+        </script>
+
+        </div>
+    </div>
+    
+    <script>
+        // Navigasyon toggle
+        function toggleNav() {
+            const menu = document.getElementById('navMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Bölüme kaydır ve highlight
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                element.classList.add('highlighted');
+                setTimeout(() => element.classList.remove('highlighted'), 1000);
+            }
+            // Mobilde menüyü kapat
+            if (window.innerWidth < 768) {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        }
+        
+        // Scroll to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Scroll position tracking
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.pageYOffset > 300) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+        
+        // Düzenleme modu toggle
+        let editMode = false;
+        function toggleEditMode() {
+            editMode = !editMode;
+            const editableElements = document.querySelectorAll('[contenteditable]');
+            const editModeText = document.getElementById('editModeText');
+            const toolbar = document.getElementById('editToolbar');
+            
+            if (editMode) {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
+                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                toolbar.classList.add('active');
+                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+            } else {
+                editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
+                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                toolbar.classList.remove('active');
+                showNotification(' Düzenleme modu KAPALI', 'info');
+            }
+        }
+        
+        // Raporu kaydet (localStorage)
+        function saveReport() {
+            const html = document.documentElement.outerHTML;
+            const timestamp = new Date().toISOString();
+            localStorage.setItem('hse_report_saved', html);
+            localStorage.setItem('hse_report_saved_time', timestamp);
+            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            console.log('Rapor kaydedildi:', timestamp);
+        }
+        
+        // Yazdır / PDF kaydet
+        function printReport() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Yazdırma ekranı açılıyor...', 'info');
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // HTML olarak indir
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hse_report_' + new Date().getTime() + '.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification(' HTML dosyası indiriliyor...', 'success');
+        }
+        
+        // PDF olarak indir (düzenlenebilir)
+        function exportPDF() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            // html2pdf kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = function() {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin: 10,
+                    filename: 'hse_report_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                html2pdf().set(opt).from(element).save();
+                showNotification(' PDF dosyası indiriliyor...', 'success');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Word olarak indir (DOCX)
+        function exportWord() {
+            // Düzenleme modunu kapat
+            if (editMode) {
+                toggleEditMode();
+            }
+            
+            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            
+            // docx kütüphanesi yükle
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js';
+            script.onload = function() {
+                try {
+                    const html = document.querySelector('.container').innerHTML;
+                    
+                    // HTML'i temizle
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const text = temp.innerText;
+                    
+                    // Basit DOCX oluştur
+                    const docx = new docx.Document({
+                        sections: [{
+                            properties: {},
+                            children: [
+                                new docx.Paragraph({
+                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    heading: docx.HeadingLevel.HEADING_1,
+                                    alignment: docx.AlignmentType.CENTER,
+                                    spacing: { after: 400 }
+                                }),
+                                new docx.Paragraph({
+                                    text: text,
+                                    spacing: { line: 360 }
+                                })
+                            ]
+                        }]
+                    });
+                    
+                    docx.Packer.toBlob(docx).then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'hse_report_' + new Date().getTime() + '.docx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showNotification(' Word dosyası indiriliyor...', 'success');
+                    });
+                } catch (error) {
+                    showNotification(' Word export başarısız: ' + error.message, 'error');
+                }
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Orijinal haline döndür
+        function resetReport() {
+            if (confirm(' Tüm değişiklikler kaybolacak. Orijinal rapora dönmek istediğinizden emin misiniz?')) {
+                location.reload();
+                showNotification(' Rapor sıfırlandı', 'info');
+            }
+        }
+        
+        // Bildirim göster
+        function showNotification(message, type = 'info') {
+            // Mevcut bildirimi kaldır
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Yeni bildirim oluştur
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: ${type === 'success' ? '#27AE60' : type === 'error' ? '#C0392B' : '#2E6DA4'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+                font-weight: bold;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3 saniye sonra kaldır
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Animasyonlar
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Otomatik kaydetme
+        let autoSaveTimeout;
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('contenteditable')) {
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(() => {
+                    const html = document.documentElement.outerHTML;
+                    localStorage.setItem('hse_report_autosave', html);
+                    localStorage.setItem('hse_report_autosave_time', new Date().toISOString());
+                    console.log(' Otomatik kaydedildi:', new Date().toLocaleTimeString());
+                }, 2000); // 2 saniye sonra otomatik kaydet
+            }
+        });
+        
+        // Sayfa yüklendiğinde toolbar'ı göster
+        window.addEventListener('load', function() {
+            document.getElementById('editToolbar').classList.add('active');
+            
+            // Kaydedilmiş rapor var mı kontrol et
+            const savedTime = localStorage.getItem('hse_report_saved_time');
+            if (savedTime) {
+                console.log(' Son kayıt:', new Date(savedTime).toLocaleString('tr-TR'));
+            }
+            
+            showNotification(' Rapor yüklendi - Düzenlemek için  butonuna tıklayın', 'info');
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P: Print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                printReport();
+            }
+            // Ctrl+S: Save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveReport();
+            }
+            // Ctrl+E: Toggle edit mode
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                toggleEditMode();
+            }
+            // Escape: Close nav
+            if (e.key === 'Escape') {
+                document.getElementById('navMenu').style.display = 'none';
+            }
+        });
+        
+        // PDF hint
+        console.log(' KULLANIM İPUÇLARI:');
+        console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
+        console.log(' Ctrl+S: Kaydet');
+        console.log(' Ctrl+P: Yazdır / PDF kaydet');
+        console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
+        console.log(' Sıfırla: Tüm değişiklikleri geri al');
+    </script>
+</body>
+</html>

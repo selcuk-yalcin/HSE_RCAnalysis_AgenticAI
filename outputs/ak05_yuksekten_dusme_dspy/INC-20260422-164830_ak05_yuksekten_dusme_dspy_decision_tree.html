@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-WHY Decision Tree</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: white;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 12px;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            flex-shrink: 0;
+            padding: 8px 0 12px;
+        }
+        header .top-title { font-size: 13px; font-weight: bold; color: #333; margin-bottom: 4px; }
+        header h1 { font-size: 18px; font-weight: bold; color: #111; margin-bottom: 4px; }
+        header .subtitle { font-size: 13px; color: #444; max-width: 900px; margin: 0 auto; line-height: 1.4; }
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 8px 10px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+        #diagram-wrap {
+            flex: 1;
+            overflow: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+            padding: 8px 4px 24px;
+        }
+        #diagram-wrap .mermaid {
+            width: 100%;
+            min-width: min(100%, 900px);
+            margin: 0 auto;
+        }
+        #diagram-wrap svg {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
+        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="subtitle">Kaza Analizi</div>
+    </header>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div id="diagram-wrap">
+        <div class="mermaid">
+graph TD
+    OLAY["<b>OLAY</b><br/>Kaza Analizi"]
+    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold
+
+    Q1["<b>Neden 1:</b><br/>Neden emniyet kemeri ankraj bağlantısı yapılmadan yüksekte çalışma<br/>gerçekleşti?"]
+    style Q1 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q1
+    A2["Çalışma alanında uygun ankraj noktası mevcut olmasına rağmen, çalışanın<br/>emniyet kemeri bağlantısını yapıp yapmadığının kontrolü ve gözetimi<br/>yetersizdi. Raporda açıkça belirtildiği üzere, kaza noktasında çalışanın<br/>ankraj bağlantısını uzaktan tespit etmenin zor olması ve<br/>supervizör/formen/ekip başı sabit varlığının yeterli olmaması nedeniyle,<br/>çalışanın güvenli çalışma prosedürüne uyup uymadığı anlık olarak<br/>denetlenemedi. Çalışan 18 yaşında ve yüksekte çalışma eğitimini almış<br/>olsa da, sahada davranış bazlı aktif gözetim eksikliği, emniyet kemeri<br/>ankraj bağlantısının yapılmamasına yol açtı."]
+    style A2 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q1 --> A2
+    Q3["<b>Neden 2:</b><br/>Yüksekte çalışma gibi kritik operasyonlarda sürekli ve yakın gözetim<br/>sağlanması neden organizasyonel olarak planlanmadı veya uygulanamadı?"]
+    style Q3 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A2 --> Q3
+    A4["Kritik operasyonlarda sürekli ve yakın gözetim sağlanması<br/>organizasyonel olarak planlanmadı veya uygulanamadı çünkü yönetim<br/>sistemleri ve organizasyonel yapıda yapısal eksiklikler mevcuttu. Rapor,<br/>sahada ISG personeli bulunmasına rağmen, supervizör, formen veya ekip<br/>başının sabit ve yakın varlığının yeterli olmadığını açıkça tespit<br/>etmiştir. Ayrıca, yüksekte çalışma gibi yüksek riskli faaliyetlerde<br/>çalışanların emniyet kemeri bağlantılarının uzaktan tespit edilmesinin<br/>zor olduğu belirtilmiştir. Bu durum, kritik kontrol noktalarında<br/>doğrudan gözetim sisteminin organizasyonel düzeyde planlanmadığını veya<br/>kaynak tahsisinin yetersiz kaldığını göstermektedir. Yönetim, yüksek<br/>riskli işler için özel gözetim protokolleri ve denetim sıklığı belirleme<br/>konusunda organizasyonel bir başarısızlık sergilemiştir."]
+    style A4 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q3 --> A4
+    Q5["<b>Neden 3:</b><br/>Yönetim, yüksek riskli operasyonlar için özel gözetim protokolleri ve<br/>yeterli kaynak tahsisinin gerekliliğini neden tespit edemedi veya<br/>önceliklendirmedi?"]
+    style Q5 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A4 --> Q5
+    A6["Yönetim, yüksek riskli operasyonlar için özel gözetim protokolleri ve<br/>yeterli kaynak tahsisini önceliklendirmemesinin temel nedeni, risk<br/>değerlendirme ve kontrol sistemlerinin yetersizliğidir. Raporda genel<br/>ISG personeli varlığına rağmen, 9 metre yükseklikteki enleme kirişi<br/>kalip montajı gibi kritik işler için sürekli ve özel gözetim<br/>sağlanmadığı açıkça belirtilmiştir. Yönetim, yüksekten düşme gibi yüksek<br/>riskli operasyonları diğer rutin işlerden ayırt edecek ve bu işler için<br/>zorunlu sürekli gözetim gerektiren özel protokoller oluşturmamıştır.<br/>Kaza noktasında ankraj bağlantısının uzaktan tespitinin zor olması ve<br/>sürekli gözetim eksikliği, yönetimin kaynak planlaması ve organizasyonel<br/>kontrol sistemlerinde ciddi bir zayıflık olduğunu göstermektedir. Bu<br/>durum, kritik operasyonlar için gerekli insan kaynağı, gözetim<br/>prosedürleri ve organizasyonel yapılanmanın yeterince<br/>önceliklendirilmediğinin somut kanıtıdır."]
+    style A6 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q5 --> A6
+    Q7["<b>Neden 4:</b><br/>Yönetim, risk değerlendirme ve kontrol sistemlerinin operasyonel<br/>gerçeklikle uyumlu olup olmadığını düzenli olarak gözden geçiren ve<br/>güncelleyen bir mekanizma neden oluşturmadı?"]
+    style Q7 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A6 --> Q7
+    A8["Bu soru, verilen HSG245 Personal Factors (C kategorisi) kodları<br/>kapsamında doğrudan yanıtlanamaz. Soru, yönetim sistemlerinin düzenli<br/>gözden geçirilmesi ve güncellenmesi ile ilgili bir Management System<br/>zafiyetini (D kategorisi) işaret etmektedir. Rapordaki kanıtlar, kağıt<br/>üzerindeki kontrol sistemlerinin (eğitimler verilmiş, KKD zimmetlenmiş,<br/>prosedürler mevcut) sahada etkin çalışmadığını göstermektedir: 'Kaza<br/>noktasında çalışanın ankraj bağlantısını uzaktan tespit etmenin zor<br/>olduğu belirtildi' ve 'Çalışma anında süpervizör/formen/ekip başı sabit<br/>varlığının yeterli olmadığı tespit edildi.' Sistem, operasyonel<br/>zorlukları (yüksekte çalışma noktalarında görsel kontrol zorluğu,<br/>yetersiz süpervizyon kaynağı) yansıtacak şekilde gözden geçirilmemiş ve<br/>bu gerçekliğe uygun kontrol mekanizmaları (örn: sürekli gözlemci, buddy<br/>sistem, teknolojik izleme) geliştirilmemiştir."]
+    style A8 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q7 --> A8
+    Q9["<b>Neden 5:</b><br/>Organizasyon, saha operasyonlarından gelen gerçek performans verilerini<br/>(denetim bulguları, yakın kaçışlar, kontrol uygulanabilirliği<br/>gözlemleri) sistemik öğrenme ve sürekli iyileştirme döngüsüne dönüştüren<br/>bir örgütsel öğrenme kültürünü ve yapısını neden kurmadı?"]
+    style Q9 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A8 --> Q9
+    A10["Organizasyon, saha operasyonlarından gelen performans verilerini<br/>sistemik öğrenmeye dönüştüren bir yapı kurmadı çünkü zayıf raporlama ve<br/>öğrenme kültürüne sahipti. Raporda 'ankraj bağlantısını uzaktan tespit<br/>etmenin zor olduğu' tespiti, organizasyonun daha önceki çalışmalarda bu<br/>gözlemi yapıp analiz etmediğini gösteriyor. Yakın kaçışlar, denetim<br/>bulguları ve kontrol uygulanabilirliği gözlemleri toplanıp analiz<br/>edilmediği için, benzer risklerin tekrarlanmasını önleyecek sistematik<br/>iyileştirmeler yapılmamıştır. Kazazede tüm eğitimleri almış, KKD'si<br/>zimmetli ve standartlara uygun olmasına rağmen, saha pratiğinde ankraj<br/>kullanımının zor izlenebilir olması sorunu önceden tespit edilip<br/>çözülmemiştir. Bu, organizasyonun saha gerçeklerinden öğrenmeyen,<br/>reaktif bir yaklaşıma sahip olduğunu ortaya koymaktadır."]
+    style A10 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q9 --> A10
+    ROOT1["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Organizasyon, saha operasyonlarından gelen performans verilerini<br/>sistemik öğrenmeye dönüştüren bir yapı kurmadı çünkü zayıf raporlama ve<br/>öğrenme kültürüne sahipti. Raporda 'ankraj bağlantısını uzaktan tespit<br/>etmenin zor olduğu' tespiti, organizasyonun daha önceki çalışmalarda bu<br/>gözlemi yapıp analiz etmediğini gösteriyor. Yakın kaçışlar, denetim<br/>bulguları ve kontrol uygulanabilirliği gözlemleri toplanıp analiz<br/>edilmediği için, benzer risklerin tekrarlanmasını önleyecek sistematik<br/>iyileştirmeler yapılmamıştır. Kazazede tüm eğitimleri almış, KKD'si<br/>zimmetli ve standartlara uygun olmasına rağmen, saha pratiğinde ankraj<br/>kullanımının zor izlenebilir olması sorunu önceden tespit edilip<br/>çözülmemiştir. Bu, organizasyonun saha gerçeklerinden öğrenmeyen,<br/>reaktif bir yaklaşıma sahip olduğunu ortaya koymaktadır."]
+    style ROOT1 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A10 --> ROOT1
+
+    Q11["<b>Neden 1:</b><br/>Neden emniyet kemeri ankraj bağlantısı yapılmadan 9 metre yükseklikte<br/>çalışma gerçekleşti?"]
+    style Q11 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q11
+    A12["Emniyet kemeri ankraj bağlantısı yapılmamasının temel nedeni, çalışma<br/>alanında ankraj noktası mevcut olmasına rağmen çalışanın bu bağlantıyı<br/>yapmamış olmasıdır. Raporda, kaza noktasında çalışanın ankraj<br/>bağlantısını uzaktan tespit etmenin zor olduğu ve supervizör/formen/ekip<br/>başı sabit varlığının yeterli olmadığı tespit edilmiştir. Bu durum,<br/>güvenli çalışma prosedürlerinin uygulanmasında hem bireysel uyum<br/>eksikliği hem de sürekli denetim yetersizliğini göstermektedir. Çalışan<br/>18 yaşında ve 7 aylık deneyime sahip olup, yüksekte çalışma eğitimlerini<br/>almış ve KKD zimmet kayıtları mevcuttur, ancak kritik an güvenlik<br/>prosedürü uygulanmamıştır."]
+    style A12 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q11 --> A12
+    Q13["<b>Neden 2:</b><br/>Neden supervizör/formen/ekip başı tarafından ankraj bağlantısının<br/>yapılıp yapılmadığının sürekli ve etkin denetimi sağlanamadı?"]
+    style Q13 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A12 --> Q13
+    A14["Supervizör/formen/ekip başı tarafından ankraj bağlantısının sürekli ve<br/>etkin denetimi sağlanamadı çünkü çalışma anında supervizör/formen/ekip<br/>başının sabit varlığı yeterli değildi. Raporda açıkça belirtildiği<br/>üzere, kaza noktasında çalışanın ankraj bağlantısını uzaktan tespit<br/>etmenin zor olduğu tespit edilmiştir. Saha genelinde ISG personeli ve<br/>çoklu ekipler mevcut olmasına rağmen, yüksekte çalışma yapan işçinin<br/>emniyet kemeri bağlantısının düzenli kontrolünü yapacak bir gözetim<br/>sistemi etkin şekilde işlememiştir. Bu durum, denetim prosedürlerinin ve<br/>sahada fiziksel gözetim organizasyonunun yetersiz olduğunu<br/>göstermektedir."]
+    style A14 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q13 --> A14
+    Q15["<b>Neden 3:</b><br/>Neden yüksekte çalışma noktalarında yeterli sayıda ve sürekli gözetim<br/>sağlayacak denetim kaynağı tahsis edilmedi veya organize edilmedi?"]
+    style Q15 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A14 --> Q15
+    A16["Yüksekte çalışma noktalarında yeterli ve sürekli gözetim sağlayacak<br/>denetim kaynağı tahsis edilmemesinin temel nedeni, risk bazlı gözetim<br/>planlamasının yapılmamış olmasıdır. Raporda, saha genelinde İSG<br/>personeli bulunmasına rağmen, kaza noktasında çalışanın emniyet kemeri<br/>ankraj bağlantısını uzaktan tespit etmenin zor olduğu ve<br/>supervizör/formen/ekip başı sabit varlığının yeterli olmadığı açıkça<br/>belirtilmiştir. Yüksekte çalışma gibi yüksek riskli aktiviteler için,<br/>sürekli ve yakın gözetim yapacak özel kaynak tahsisi ve organizasyon<br/>sistemi oluşturulmamıştır. Bu durum, yönetimin gözetim kaynaklarını<br/>riske göre planlamadığını ve tahsis etmediğini göstermektedir."]
+    style A16 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q15 --> A16
+    Q17["<b>Neden 4:</b><br/>Yüksek riskli aktiviteler için gözetim ihtiyacını belirleme ve kaynak<br/>tahsis etme süreçleri neden mevcut sistemde tanımlı değildi?"]
+    style Q17 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A16 --> Q17
+    A18["Yüksek riskli aktiviteler için gözetim ihtiyacının belirlenmesi ve<br/>kaynak tahsis edilmesi, bireysel yetkinlik değil, kurumsal iş planlama<br/>ve risk yönetimi süreçlerine ait bir konudur. Raporda 'kaza noktasında<br/>çalışanın ankraj bağlantısını uzaktan tespit etmenin zor olduğu' ve<br/>'supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' açıkça<br/>ifade edilmiştir. ISG personeli saha genelinde mevcut olsa da, 9 metre<br/>yükseklikte çalışma gibi kritik riskli aktivitelerde özel gözetim<br/>planlaması yapılmamıştır. Bu eksiklik, kurumsal seviyede gözetim ihtiyaç<br/>analizi ve kaynak tahsis süreçlerinin tanımlı olmamasından<br/>kaynaklanmaktadır. Ancak bu durum, verilen HSG245 C serisi (Kişisel<br/>Faktörler) taksonomi kodları kapsamında değildir; D serisi (Sistem ve<br/>Süreç Faktörleri) altında ele alınması gereken bir yönetim sistemi<br/>eksikliğidir."]
+    style A18 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q17 --> A18
+    Q19["<b>Neden 5:</b><br/>Risk tabanlı gözetim ve kaynak planlama süreçleri neden kurumsal<br/>yönetim sistemine entegre edilmemişti?"]
+    style Q19 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A18 --> Q19
+    A20["Risk tabanlı gözetim ve kaynak planlama süreçleri kurumsal yönetim<br/>sistemine entegre edilmemişti çünkü organizasyonda prosedür uyumluluğunu<br/>sistematik olarak doğrulayan bir izleme ve denetim sistemi<br/>tasarlanmamıştı. Raporda 'kaza noktasında çalışanın ankraj bağlantısını<br/>uzaktan tespit etmenin zor olduğu' ve 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu bulgular, yüksek riskli işler için kritik öneme sahip<br/>emniyet kemeri kullanımının sahada sistematik olarak kontrol<br/>edilmediğini göstermektedir. Sahada ISG personeli ve çoklu ekipler<br/>mevcut olmasına rağmen, bu kaynakların risk seviyesine göre etkin<br/>dağıtılması ve gözetim yapılması için kurumsal bir sistem<br/>oluşturulmamıştı. Sonuç olarak, 18 yaşındaki deneyimsiz bir çalışan 9<br/>metre yükseklikte emniyet kemeri takmadan çalışabilmiş ve bu durum<br/>hiçbir sistemik kontrol mekanizması tarafından tespit edilememiştir."]
+    style A20 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q19 --> A20
+    ROOT2["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Risk tabanlı gözetim ve kaynak planlama süreçleri kurumsal yönetim<br/>sistemine entegre edilmemişti çünkü organizasyonda prosedür uyumluluğunu<br/>sistematik olarak doğrulayan bir izleme ve denetim sistemi<br/>tasarlanmamıştı. Raporda 'kaza noktasında çalışanın ankraj bağlantısını<br/>uzaktan tespit etmenin zor olduğu' ve 'çalışma anında<br/>supervizor/formen/ekip başı sabit varlığının yeterli olmadığı' tespit<br/>edilmiştir. Bu bulgular, yüksek riskli işler için kritik öneme sahip<br/>emniyet kemeri kullanımının sahada sistematik olarak kontrol<br/>edilmediğini göstermektedir. Sahada ISG personeli ve çoklu ekipler<br/>mevcut olmasına rağmen, bu kaynakların risk seviyesine göre etkin<br/>dağıtılması ve gözetim yapılması için kurumsal bir sistem<br/>oluşturulmamıştı. Sonuç olarak, 18 yaşındaki deneyimsiz bir çalışan 9<br/>metre yükseklikte emniyet kemeri takmadan çalışabilmiş ve bu durum<br/>hiçbir sistemik kontrol mekanizması tarafından tespit edilememiştir."]
+    style ROOT2 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A20 --> ROOT2
+
+    Q21["<b>Neden 1:</b><br/>Çalışan neden emniyet kemerini ankraj noktasına bağlamadan yüksekte<br/>çalışmaya devam etti?"]
+    style Q21 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q21
+    A22["Emniyet kemerinin ankraj noktasına bağlanmadığı kimse tarafından fark<br/>edilmedi ve müdahale edilmedi."]
+    style A22 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q21 --> A22
+    Q23["<b>Neden 2:</b><br/>Çalışanın emniyet kemerini bağlamadığı neden fark edilmedi?"]
+    style Q23 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A22 --> Q23
+    A24["9 metre yükseklikte çalışan 18 yaşındaki deneyimsiz personelin kritik<br/>güvenlik uygulamasını gerçekleştirip gerçekleştirmediği gözetim altına<br/>alınmadı."]
+    style A24 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q23 --> A24
+    Q25["<b>Neden 3:</b><br/>Yüksek riskli işte gözetim neden yetersiz kaldı?"]
+    style Q25 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A24 --> Q25
+    A26["Yüksekte çalışma gibi kritik risk seviyesine sahip operasyonlar için<br/>özel gözetim yöntemleri ve protokolleri tasarlanmamıştı; saha genelinde<br/>İSG personeli mevcut olmasına rağmen gözetim stratejik olarak yüksek<br/>riskli işlere odaklanmamıştı."]
+    style A26 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q25 --> A26
+    Q27["<b>Neden 4:</b><br/>Risk seviyesine göre farklılaştırılmış gözetim stratejisi neden<br/>oluşturulmamıştı?"]
+    style Q27 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A26 --> Q27
+    A28["Organizasyon, kritik güvenlik kontrollerinin (emniyet kemeri bağlantısı<br/>gibi) yüksek riskli operasyonlarda nasıl gözetileceğine dair risk<br/>tabanlı bir gözetim ve kaynak tahsis sistemi geliştirmemişti."]
+    style A28 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q27 --> A28
+    Q29["<b>Neden 5:</b><br/>Risk tabanlı gözetim sistemi ve kaynak tahsisi neden kurgulanmamıştı?"]
+    style Q29 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A28 --> Q29
+    A30["Üst yönetim, yüksek riskli operasyonlar için farklılaştırılmış gözetim<br/>stratejileri tasarlamayı, gerekli kaynakları (dedicated supervizör,<br/>gözlem teknolojileri, gözetim protokolleri) tahsis etmeyi ve bu sistemin<br/>performansını ölçmeyi stratejik güvenlik önceliği olarak belirlemedi."]
+    style A30 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q29 --> A30
+    ROOT3["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Üst yönetim, yüksek riskli operasyonlar (yüksekte çalışma, enerji<br/>izolasyonu vb.) için risk seviyesine göre farklılaştırılmış gözetim<br/>stratejileri geliştirmeyi, bu stratejiler için özel kaynaklar (dedicated<br/>supervizör, yakın gözetim, teknoloji destekli izleme) tahsis etmeyi ve<br/>gözetim etkinliğini ölçmeyi stratejik güvenlik önceliği olarak<br/>belirlemedi."]
+    style ROOT3 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A30 --> ROOT3
+
+    Q31["<b>Neden 1:</b><br/>Yüksekte çalışan kişinin emniyet kemeri ankrajını bağlamaması neden<br/>tespit edilemedi?"]
+    style Q31 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q31
+    A32["Çalışma anında supervizör/formen/ekip başının sabit varlığı yeterli<br/>olmadığı için, çalışanın ankraj bağlantısını uzaktan tespit etmek zor<br/>oldu ve emniyet kemeri kullanımı kontrol edilemedi."]
+    style A32 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q31 --> A32
+    Q33["<b>Neden 2:</b><br/>Supervizör/formen/ekip başının sabit varlığı neden yeterli olmadı?"]
+    style Q33 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A32 --> Q33
+    A34["Yüksek riskli çalışma bölgelerine göre supervizör ataması yapılmamış,<br/>saha rotasyon planı oluşturulmamış ve hangi supervizörün hangi alanda<br/>sürekli gözetim yapacağı netleştirilmemiştir."]
+    style A34 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q33 --> A34
+    Q35["<b>Neden 3:</b><br/>Saha bölgelerine göre supervizör ataması ve rotasyon planı neden<br/>oluşturulmamıştı?"]
+    style Q35 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A34 --> Q35
+    A36["Supervizör ve formen rollerinin iş tanımlarında 'saha içi sürekli<br/>gözetim sorumluluğu' açıkça belirtilmemiş, hangi alanlarda ne sıklıkla<br/>gözlem yapacakları tanımlanmamıştır."]
+    style A36 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q35 --> A36
+    Q37["<b>Neden 4:</b><br/>Supervizör/formen rollerinin gözetim sorumluluğu neden tanımlanmamıştı?"]
+    style Q37 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A36 --> Q37
+    A38["Yönetim, supervizör/formen performansını ölçen ve saha gözlem<br/>faaliyetlerini takip eden bir sistem kurmadığı için, gözetim<br/>faaliyetleri hesap verebilir bir görev haline gelmemiştir."]
+    style A38 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q37 --> A38
+    Q39["<b>Neden 5:</b><br/>Yönetim neden saha gözetim performansını ölçen bir sistem kurmadı?"]
+    style Q39 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A38 --> Q39
+    A40["Saha seviyesinde sürekli gözetim sağlayacak organizasyonel yapı<br/>(supervizör sayısı, bölge ataması, performans KPI'ları, rotasyon planı)<br/>kurmak, yönetim tarafından stratejik bir güvenlik önceliği olarak<br/>belirlenmedi ve kaynak tahsisi yapılmadı."]
+    style A40 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q39 --> A40
+    ROOT4["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Yönetim, saha seviyesinde sürekli gözetim sağlayacak yeterli kaynak<br/>tahsisini, rol tanımlarını ve performans ölçüm sistemlerini kurmadı."]
+    style ROOT4 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A40 --> ROOT4
+
+    Q41["<b>Neden 1:</b><br/>Neden çalışan emniyet kemerini mevcut ankraj noktasına bağlamadı?"]
+    style Q41 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    OLAY --> Q41
+    A42["Çalışan emniyet kemerini mevcut ankraj noktasına bağlamadı çünkü<br/>çalışma sırasında supervizör, formen veya ekip başı tarafından yeterli<br/>gözetim ve denetim yapılmadı. Kaza noktasında çalışanın ankraj<br/>bağlantısını uzaktan tespit etmenin zor olması ve sabit gözetim<br/>eksikliği, çalışanın güvenli çalışma prosedürlerini uygulamamasına yol<br/>açtı. Eğitimler verilmiş olmasına rağmen, sahada fiili uygulamanın<br/>kontrolü ve sürekli gözetimi sağlanamamıştır."]
+    style A42 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q41 --> A42
+    Q43["<b>Neden 2:</b><br/>Neden çalışma noktasında supervizör, formen veya ekip başı tarafından<br/>sabit ve etkili gözetim sağlanamadı?"]
+    style Q43 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A42 --> Q43
+    A44["Çalışma noktasında etkili gözetim sağlanamama nedeni, yüksekte çalışma<br/>gibi kritik risk içeren operasyonlarda doğrudan ve sürekli denetim<br/>sisteminin kurulmamış olmasıdır. Raporda açıkça 'kaza anında saha<br/>genelinde İSG personeli ve çoklu ekipler mevcuttu' ancak 'kaza<br/>noktasında çalışanın ankraj bağlantısını uzaktan tespit etmenin zor<br/>olduğu' ve 'çalışma anında supervizör/formen/ekip başı sabit varlığının<br/>yeterli olmadığı' belirtilmiştir. Bu durum, yüksek riskli çalışmalarda<br/>gerekli olan yakın mesafeli, sürekli ve etkili gözetim sisteminin<br/>uygulanmadığını göstermektedir. Çalışan emniyet kemerini takmış olmasına<br/>rağmen ankraj bağlantısı yapmamıştır ve bu kritik güvenlik ihlali anlık<br/>olarak tespit edilip düzeltilememiştir."]
+    style A44 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q43 --> A44
+    Q45["<b>Neden 3:</b><br/>Neden yüksek riskli operasyonlar için doğrudan ve sürekli denetim<br/>sistemini kuracak açık prosedür veya yönetim kontrolü oluşturulmamıştı?"]
+    style Q45 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A44 --> Q45
+    A46["Yüksek riskli operasyonlar için doğrudan ve sürekli denetim sistemi<br/>kurulmamasının temel nedeni, yönetim kontrollerinin ve prosedürlerin<br/>yetersiz kalması ve yazılı-uygulanabilir bir yapıya kavuşturulmamasıdır.<br/>Raporda açıkça belirtildiği üzere, kaza noktasında supervizor, formen<br/>veya ekip başının sabit varlığı yeterli düzeyde değildi ve çalışanın<br/>ankraj bağlantısını uzaktan tespit etmek zor olduğu için fiili kontrol<br/>gerçekleştirilemedi. Bu durum, yüksekte çalışma gibi kritik operasyonlar<br/>için özel denetim prosedürlerinin tanımlanmadığını ve sürekli gözetim<br/>gerektiren aktivitelerde yönetim sisteminin etkili olmadığını<br/>göstermektedir."]
+    style A46 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q45 --> A46
+    Q47["<b>Neden 4:</b><br/>Neden yönetim, yüksek riskli operasyonlar için kritik kontrol<br/>prosedürlerini yazılı ve uygulanabilir yapıya dönüştürecek sistematik<br/>bir süreç oluşturmadı?"]
+    style Q47 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A46 --> Q47
+    A48["Yönetim, yüksek riskli operasyonlar için kritik kontrol prosedürlerini<br/>sistematik hale getirmedi çünkü **saha seviyesinde sürekli koçluk ve<br/>gözetim mekanizması kurmadı**. Raporda 'süpervizör/formen/ekip başı<br/>sabit varlığının yeterli olmadığı' açıkça belirtilmiş. ISG personeli<br/>sahada olmasına rağmen, 'ankraj bağlantısını uzaktan tespit etmenin zor<br/>olduğu' ifade edilmiş. Bu durum, kritik güvenlik davranışlarının<br/>(emniyet kemeri bağlama gibi) sürekli gözetim, koçluk ve geri bildirim<br/>ile pekiştirilmesi gereken bir sürecin sistemleştirilmediğini<br/>gösteriyor. Toolbox eğitimleri ve iş izinleri yapılmış ancak uygulamada<br/>davranışın doğrulanması ve koçlanması için sistematik bir yapı<br/>oluşturulmamış."]
+    style A48 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q47 --> A48
+    Q49["<b>Neden 5:</b><br/>Neden yönetim, saha seviyesinde sürekli gözetim ve koçluk sağlayacak<br/>yeterli kaynak, rol tanımı ve performans ölçüm sistemini kurmadı?"]
+    style Q49 fill:#fff,stroke:#999,stroke-width:1px,stroke-dasharray:5 4,font-size:14px
+    A48 --> Q49
+    A50["Yönetim, saha seviyesinde sürekli gözetim sağlayacak yeterli kaynak<br/>tahsisini, rol tanımlarını ve performans ölçüm sistemlerini kurmadı.<br/>Raporda açıkça belirtildiği gibi 'Calisma aninda supervizor/formen/ekip<br/>basi sabit varliginin yeterli olmadigi tespit edildi.' Bu durum, 18<br/>yaşındaki panel kalıpçının yüksekte çalışırken emniyet kemeri ankrajını<br/>bağlamadan çalışmasının fark edilmemesine yol açtı. Kaza anında 'saha<br/>genelinde ISG personeli ve coklu ekipler mevcuttu' ancak 'kaza<br/>noktasinda calisanin ankraj baglantisini uzaktan tespit etmenin zor<br/>oldugu' belirtilmiş - bu da aktif, yakın mesafeli gözetim eksikliğini<br/>göstermektedir. Yönetimin, süpervizör/formen kaynaklarını artırma,<br/>rolleri netleştirme ve saha gözlem performanslarını ölçme konusunda<br/>yeterli sistemi kurmaması, bu tür kritik emniyet ihlallerinin tespit<br/>edilememesine neden olmuştur."]
+    style A50 fill:#fff,stroke:#666,stroke-width:1px,font-size:14px
+    Q49 --> A50
+    ROOT5["<b>KÖK NEDEN</b><br/>Kök Neden<br/>Yönetim, saha seviyesinde sürekli gözetim sağlayacak yeterli kaynak<br/>tahsisini, rol tanımlarını ve performans ölçüm sistemlerini kurmadı.<br/>Raporda açıkça belirtildiği gibi 'Calisma aninda supervizor/formen/ekip<br/>basi sabit varliginin yeterli olmadigi tespit edildi.' Bu durum, 18<br/>yaşındaki panel kalıpçının yüksekte çalışırken emniyet kemeri ankrajını<br/>bağlamadan çalışmasının fark edilmemesine yol açtı. Kaza anında 'saha<br/>genelinde ISG personeli ve coklu ekipler mevcuttu' ancak 'kaza<br/>noktasinda calisanin ankraj baglantisini uzaktan tespit etmenin zor<br/>oldugu' belirtilmiş - bu da aktif, yakın mesafeli gözetim eksikliğini<br/>göstermektedir. Yönetimin, süpervizör/formen kaynaklarını artırma,<br/>rolleri netleştirme ve saha gözlem performanslarını ölçme konusunda<br/>yeterli sistemi kurmaması, bu tür kritik emniyet ihlallerinin tespit<br/>edilememesine neden olmuştur."]
+    style ROOT5 fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold
+    A50 --> ROOT5
+
+        </div>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 28,
+                rankSpacing: 56,
+                useMaxWidth: false,
+                htmlLabels: true,
+                diagramPadding: 16
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Arial, sans-serif',
+                primaryColor: '#fff',
+                primaryTextColor: '#222',
+                primaryBorderColor: '#333',
+                lineColor: '#333',
+                secondaryColor: '#f5f5f5',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>
