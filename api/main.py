@@ -516,6 +516,7 @@ class HitlQuestionsRequest(BaseModel):
     previous_why_answer: str = ""
     mode: str = "global"
     batch_size: int = 1
+    known_fields: list[str] = []
 
 class PDFGenerateRequest(BaseModel):
     incident_id: str
@@ -857,6 +858,7 @@ async def hitl_dynamic_questions(tenant_id: TenantId, incident_id: str, body: Hi
             current_why_question=body.current_why_question or "",
             previous_why_answer=body.previous_why_answer or "",
             batch_size=bs,
+            known_fields=body.known_fields or [],
         )
     else:
         payload = next_hitl_questions(
@@ -865,6 +867,7 @@ async def hitl_dynamic_questions(tenant_id: TenantId, incident_id: str, body: Hi
             body.answered_ids or [],
             body.immediate_causes,
             bs,
+            known_fields=body.known_fields or [],
         )
     hybrid_set(
         tenant_id,

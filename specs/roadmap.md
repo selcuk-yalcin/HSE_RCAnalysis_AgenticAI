@@ -20,6 +20,9 @@ Source: synchronized from root `TODO.md`.
 - Improve Why-chain continuity and answer handling options.
 - Persist HITL logs for training reuse.
 - Keep a single primary large-area frontend analysis flow (remove duplicated secondary Why widgets).
+- ✅ Show initial immediate causes without taxonomy codes in chat intro, then switch directly to deep-dive collaboration prompts. (DONE)
+- ✅ Filter out generic/duplicative HITL questions already covered by manual form fields (timeline/training/PPE/weather/lighting). (DONE)
+- ✅ Generate Why-probe questions from taxonomy code semantics (choose-if/not-this-if) before generic gap questions. (DONE - taxonomy-first probe)
 
 ### P0.3 Frontend Live Streaming
 
@@ -124,6 +127,7 @@ Source: synchronized from root `TODO.md`.
 - Managed embeddings and vector store.
 - Tenant-isolated vector namespaces.
 - Controlled RAG prompt injection strategy.
+- Add normalized HGS taxonomy store in Mongo (`hgs_taxonomy.taxonomy_items`) for taxonomy-aware retrieval/questioning.
 
 ### P1.6 ABS-Guided DSPy Training + Deep HITL
 

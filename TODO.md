@@ -68,6 +68,9 @@ questions and increasing depth at each Why level.
 - [ ] Persist HITL logs per tenant in Mongo for training data.
 - [ ] Remove duplicated/secondary Why chain widgets from frontend; keep a single primary
   large-area live flow panel for analysis progression.
+- [x] Intro card now lists first immediate causes without codes and adds deep-investigation collaboration message.
+- [x] Add form-aware question suppression (do not repeat timeline/training/PPE/weather/lighting prompts already captured in form).
+- [x] Prioritize taxonomy-driven deep Why probes (code choose-if / not-this-if) before generic taxonomy-gap prompts.
 
 **Acceptance criteria**:
 - Across 5 scenario categories (fall, electric, chemical, crush, train odor), HITL
@@ -499,6 +502,7 @@ operational flow.
 - [ ] Use managed vector store (MongoDB Atlas Vector or Pinecone).
 - [ ] Feed RAG context into WhyChain prompts.
 - [ ] Isolate vector namespaces per tenant.
+- [x] Add HGS taxonomy normalization path (`agents/knowledge.json` -> Pydantic -> Mongo `hgs_taxonomy.taxonomy_items`) for taxonomy-aware HITL/RAG.
 
 ---
 

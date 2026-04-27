@@ -98,6 +98,8 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
   - Retrieve ABS/taxonomy context to guide question generation and root-cause coding,
   - Keep tenant-scoped retrieval boundaries,
   - Keep deterministic fallback path when retrieval is unavailable.
+  - Keep normalized HGS taxonomy records in Mongo for code-level retrieval/question generation
+    (target: `hgs_taxonomy.taxonomy_items`).
 
 ## UX and Report Consistency Requirements
 

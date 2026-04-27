@@ -10,8 +10,29 @@ import re
 from typing import Any
 
 from agents.hitl_disambiguation_bank import build_questions_for_causes
+from agents.hgs_taxonomy import parse_hsg_taxonomy_items, infer_codes_from_text
 
 _HS_CODE_RE = re.compile(r"\b([ABCD][0-9]+\.[0-9]+)\b", re.IGNORECASE)
+_GENERIC_PATTERNS = (
+    "olay hangi tarih ve saatte",
+    "risk değerlendirmesi yapılmış mıydı",
+    "risk degerlendirmesi yapilmis miydi",
+)
+
+_KNOWN_FIELD_GUARD_PATTERNS = {
+    "risk_assessment": (r"risk\s+de[ğg]erlendirmesi",),
+    "timeline_known": (r"hangi\s+tarih", r"hangi\s+saat", r"ne\s+zaman"),
+    "training_known": (r"e[ğg]itim", r"sertifika", r"yetki belgesi"),
+    "ppe_known": (r"\bkkd\b", r"\bppe\b"),
+    "permit_known": (r"i[sş]\s+izni", r"\bptw\b", r"permit"),
+    "weather_known": (r"hava\s+ko[şs]ullar", r"ya[ğg]mur|r[üu]zgar|s[ıi]cak"),
+    "lighting_known": (r"ayd[ıi]nlatma",),
+}
+
+try:
+    _TAXONOMY_ITEMS = parse_hsg_taxonomy_items("agents/knowledge.json")
+except Exception:
+    _TAXONOMY_ITEMS = []
 
 
 def extract_hs_codes(text: str) -> list[str]:
@@ -39,7 +60,86 @@ def _immediate_causes_from_payload(
     if immediate_causes:
         return [c for c in immediate_causes if isinstance(c, dict)]
     codes = extract_hs_codes(root_cause_initial or "")
+    if not codes:
+        # fallback: derive candidate codes from first immediate-cause lines
+        lines = [
+            re.sub(r"^\s*\d+[\.)-]?\s*", "", ln).strip()
+            for ln in str(root_cause_initial or "").splitlines()
+            if ln.strip()
+        ][:6]
+        for ln in lines:
+            for c in infer_codes_from_text(ln, _TAXONOMY_ITEMS, top_k=2):
+                if c not in codes:
+                    codes.append(c)
     return [{"code": c, "cause_tr": c} for c in codes[:5]]
+
+
+def _build_deep_questions_from_taxonomy(code: str, why_level: int) -> list[dict]:
+    if not code or not _TAXONOMY_ITEMS:
+        return []
+    item = next((x for x in _TAXONOMY_ITEMS if x.code == code), None)
+    if item is None:
+        return []
+
+    out: list[dict] = []
+    # Prefer "choose_if" lines as targeted disambiguation probes.
+    for idx, choose in enumerate(item.choose_if[:2], start=1):
+        q = f"{item.code} ({item.title}) icin: {choose} Bu olayda sahaya ne kadar uyuyordu?"
+        out.append(
+            {
+                "id": _stable_id("tx-c", code, str(why_level), str(idx), q),
+                "source": "why_probe_taxonomy_code",
+                "code": item.code,
+                "cause_desc": item.title,
+                "hsg245": item.code,
+                "soru": q,
+                "yönler": {},
+                "why_level": why_level,
+            }
+        )
+    # One deepening question from "not this if" to reduce wrong mapping.
+    if item.not_this_if:
+        nt = item.not_this_if[0]
+        q = f"Bu durum `{item.code}` yerine `{nt}` olabilir mi? Ayirmamiza yardim edecek kanit var mi?"
+        out.append(
+            {
+                "id": _stable_id("tx-n", code, str(why_level), q),
+                "source": "why_probe_taxonomy_code",
+                "code": item.code,
+                "cause_desc": item.title,
+                "hsg245": item.code,
+                "soru": q,
+                "yönler": {},
+                "why_level": why_level,
+            }
+        )
+    return out
+
+
+def _filter_questions(
+    questions: list[dict[str, Any]],
+    known_fields: list[str] | None,
+) -> list[dict[str, Any]]:
+    known = {str(k or "").strip().lower() for k in (known_fields or []) if str(k or "").strip()}
+    out: list[dict[str, Any]] = []
+    for q in questions:
+        text = str(q.get("soru") or "").strip()
+        if not text:
+            continue
+        low = text.lower()
+        if any(p in low for p in _GENERIC_PATTERNS):
+            continue
+        skip = False
+        for field in known:
+            for patt in _KNOWN_FIELD_GUARD_PATTERNS.get(field, ()):
+                if re.search(patt, low, flags=re.IGNORECASE):
+                    skip = True
+                    break
+            if skip:
+                break
+        if not skip:
+            out.append(q)
+    return out
 
 
 def _taxonomy_gap_questions(full_text: str, max_categories: int = 4, per_cat: int = 2) -> list[dict]:
@@ -127,12 +227,16 @@ def next_hitl_questions(
     answered_ids: list[str],
     immediate_causes: list[dict] | None = None,
     batch_size: int = 1,
+    known_fields: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Cevaplanmış id'leri düşürür; sıradaki batch_size soruyu döndürür.
     """
     answered = set(answered_ids or [])
-    pool = build_hitl_question_pool(how_happened, root_cause_initial, immediate_causes)
+    pool = _filter_questions(
+        build_hitl_question_pool(how_happened, root_cause_initial, immediate_causes),
+        known_fields=known_fields,
+    )
     pending = [q for q in pool if q.get("id") not in answered]
     batch = pending[: max(1, batch_size)]
 
@@ -163,6 +267,7 @@ def build_why_probe_question_pool(
     why_level: int = 1,
     current_why_question: str = "",
     previous_why_answer: str = "",
+    known_fields: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     """
     Why zinciri içinde ara netleştirme soruları üretir.
@@ -185,7 +290,16 @@ def build_why_probe_question_pool(
     pool: list[dict[str, Any]] = []
     seen_q: set[str] = set()
 
-    # 1) Disambiguation (hedef immediate code)
+    # 1) Code-grounded deep questions directly from taxonomy item.
+    for code in focus_codes:
+        for row in _build_deep_questions_from_taxonomy(code, why_level):
+            soru = row.get("soru") or ""
+            if not soru or soru.lower() in seen_q:
+                continue
+            seen_q.add(soru.lower())
+            pool.append(row)
+
+    # 2) Disambiguation (hedef immediate code)
     if focus_codes:
         causes = [{"code": c, "cause_tr": c} for c in focus_codes]
         for row in build_questions_for_causes(causes)[:4]:
@@ -207,7 +321,7 @@ def build_why_probe_question_pool(
                 }
             )
 
-    # 2) Code-specific questions (knowledge_base bağlı template'ler)
+    # 3) Code-specific questions (knowledge_base bağlı template'ler)
     qe = QuestionEngine()
     for i, row in enumerate(qe.get_code_specific_questions(focus_codes)[:6]):
         soru = row.get("question") or ""
@@ -229,28 +343,7 @@ def build_why_probe_question_pool(
             }
         )
 
-    # 3) Gap questions (kontekst eksikleri)
-    full_text = "\n\n".join(
-        s
-        for s in (
-            how_happened or "",
-            root_cause_initial or "",
-            current_why_question or "",
-            previous_why_answer or "",
-        )
-        if s.strip()
-    )
-    for row in _taxonomy_gap_questions(full_text, max_categories=2, per_cat=1):
-        soru = row.get("soru") or ""
-        if not soru or soru.lower() in seen_q:
-            continue
-        seen_q.add(soru.lower())
-        row["id"] = _stable_id("wp-kb", str(why_level), row["id"], soru)
-        row["source"] = "why_probe_taxonomy_gap"
-        row["why_level"] = why_level
-        pool.append(row)
-
-    return pool[:12]
+    return _filter_questions(pool[:14], known_fields=known_fields)
 
 
 def next_why_probe_questions(
@@ -262,6 +355,7 @@ def next_why_probe_questions(
     current_why_question: str = "",
     previous_why_answer: str = "",
     batch_size: int = 1,
+    known_fields: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Why-level ara sorular: her seviyede daha net sebep ayrımı için döngüsel API.
@@ -274,6 +368,7 @@ def next_why_probe_questions(
         why_level=why_level,
         current_why_question=current_why_question,
         previous_why_answer=previous_why_answer,
+        known_fields=known_fields,
     )
     pending = [q for q in pool if q.get("id") not in answered]
     batch = pending[: max(1, batch_size)]
