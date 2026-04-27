@@ -834,7 +834,8 @@ async def create_incident(tenant_id: TenantId, incident: IncidentCreate):
 @app.post("/api/v1/incidents/{incident_id}/hitl/questions")
 async def hitl_dynamic_questions(tenant_id: TenantId, incident_id: str, body: HitlQuestionsRequest):
     """
-    Sıralı HITL soruları: HSG245 disambiguation bankası + QuestionEngine (taxonomy / kb).
+    Sıralı HITL soruları: HSG245 disambiguation + taxonomy + LLM.
+    Her soru `response_mode`: `yes_no_unknown` | `free_text` (açık uçlu; UI serbest metin toplar).
     """
     _require_incident_record(tenant_id, incident_id)
     bs = body.batch_size if body.batch_size and body.batch_size > 0 else 1

@@ -91,6 +91,45 @@ except Exception:
 
 _HITL_LLM_ENABLED = (os.getenv("HITL_USE_LLM") or "1").strip().lower() in ("1", "true", "yes", "on")
 
+# "free_text" = cevap Evet/Hayır/Bilinmiyor olamaz (sebep, seçenek, açıklama beklenir).
+
+
+def _infer_response_mode(soru: str) -> str:
+    """
+    UI'nin Evet/Hayır/Bilinmiyor mı yoksa serbest metin mi toplayacağını seçer.
+    Açık choice-style sorularda (ör. 'A mı, B mı, C mü?') free_text.
+    """
+    t = (soru or "").strip()
+    if len(t) < 8:
+        return "yes_no_unknown"
+    low = t.lower()
+    # Birden fazla mı/mi sorusu eki = çoklu seçenek; Evet/Hayır yeterli değil
+    tr_q_particles = re.findall(r"(?i)\b(mı|mi|mu|mü)\b", t)
+    if len(tr_q_particles) >= 2:
+        return "free_text"
+    if ("—" in t or " – " in t) and re.search(
+        r"(?i)(mı|mi|mu|mü).*(mı|mi|mu|mü)|,\s*[^,]{2, 80}(mı|mi|mu|mü)", t
+    ):
+        return "free_text"
+    if " veya " in low and "?" in t and len(t) > 40:
+        return "free_text"
+    if re.search(r"\b(or|versus|rather than)\b", low) and "?" in t and len(t) > 35:
+        return "free_text"
+    if re.search(r"\byoksa\b", low) and "?" in t and len(t) > 20:
+        return "free_text"
+    if re.search(
+        r"\b(hangi|açıkla|acikla|detaylandır|açıkça|açıkla:)\b",
+        low,
+        re.IGNORECASE,
+    ) and "?" in t:
+        return "free_text"
+    if re.search(
+        r"neden(ler|i)?\s*(\(|—|:|\s+)(.|\n)*(yoksa| veya )",
+        low,
+    ):
+        return "free_text"
+    return "yes_no_unknown"
+
 
 def extract_hs_codes(text: str) -> list[str]:
     if not text:
@@ -342,7 +381,8 @@ Kurallar:
 - Sorular doğrudan bu olay metnindeki kanıta/eksik kanıta bağlı olsun.
 - Her soru belirli bir kodu ayrıştırmaya hizmet etsin.
 - Türkçe, kısa, net.
-- JSON array döndür: [{{"question_tr":"...","code":"A1.1","reason":"neden bu soru"}}]
+- Soru sadece Evet/Hayır/Unknown ile yanıtlanamıyorsa (açık uçlu, neden, seçenek listesi) "answer_format": "free_text" ver. Basit kapanış sorusu ise "answer_format": "yes_no".
+- JSON array döndür: [{{"question_tr":"...","code":"A1.1","answer_format":"yes_no"|"free_text","reason":"..."}}]
 - En fazla {max_questions} soru.
 """.strip()
 
@@ -362,6 +402,13 @@ Kurallar:
             code = str(it.get("code") or "").strip().upper()
             if not q:
                 continue
+            af = str(it.get("answer_format") or "").strip().lower()
+            if af in ("free_text", "freetext", "text", "açık"):
+                rmode: str = "free_text"
+            elif af in ("yes_no", "yesno", "boolean"):
+                rmode = "yes_no_unknown"
+            else:
+                rmode = _infer_response_mode(q)
             out.append(
                 {
                     "id": _stable_id("llm", str(why_level), code, str(i), q),
@@ -372,6 +419,7 @@ Kurallar:
                     "soru": q,
                     "yönler": {},
                     "why_level": why_level,
+                    "response_mode": rmode,
                 }
             )
         return out
@@ -461,15 +509,20 @@ def next_hitl_questions(
     batch = pending[: max(1, batch_size)]
 
     def _shape(q: dict) -> dict[str, Any]:
+        soru = str(q.get("soru", "") or "")
+        rm = str(q.get("response_mode") or "").strip()
+        if rm not in ("free_text", "yes_no_unknown"):
+            rm = _infer_response_mode(soru)
         return {
             "id": q["id"],
             "source": q.get("source", "disambiguation"),
             "hsg_hint": q.get("hsg245", ""),
             "code": q.get("code", ""),
             "cause_desc": q.get("cause_desc", ""),
-            "question_tr": q.get("soru", ""),
-            "question_en": q.get("soru", ""),
+            "question_tr": soru,
+            "question_en": soru,
             "yönler": q.get("yönler") or {},
+            "response_mode": rm,
         }
 
     return {
@@ -621,16 +674,21 @@ def next_why_probe_questions(
     batch = pending[: max(1, batch_size)]
 
     def _shape(q: dict) -> dict[str, Any]:
+        soru = str(q.get("soru", "") or "")
+        rm = str(q.get("response_mode") or "").strip()
+        if rm not in ("free_text", "yes_no_unknown"):
+            rm = _infer_response_mode(soru)
         return {
             "id": q["id"],
             "source": q.get("source", "why_probe"),
             "hsg_hint": q.get("hsg245", ""),
             "code": q.get("code", ""),
             "cause_desc": q.get("cause_desc", ""),
-            "question_tr": q.get("soru", ""),
-            "question_en": q.get("soru", ""),
+            "question_tr": soru,
+            "question_en": soru,
             "yönler": q.get("yönler") or {},
             "why_level": q.get("why_level", why_level),
+            "response_mode": rm,
         }
 
     return {

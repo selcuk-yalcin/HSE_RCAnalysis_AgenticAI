@@ -915,7 +915,10 @@ class RootCauseAgentV3_1:
                 print(f"⚠️  BranchCritic init başarısız: {e}")
                 self.branch_critic = None
 
-        # RAG (optional)
+        # RAG: use_rag=True iken asıl enjeksiyon analyze_root_causes içinde
+        # _build_rag_context_block() ile MongoDB (abs_guidance_chunks + taxonomy_items) keyword
+        # aramasıdır; MONGODB_URI yoksa blok boş kalır. Aşağıdaki RAGAnalyzer, vektör aramayı
+        # başlatır ancak V3.1 analiz hattında şu an kullanılmamaktadır.
         self.use_rag = use_rag
         self.rag_analyzer = None
         if use_rag and RAG_AVAILABLE:
@@ -968,6 +971,7 @@ class RootCauseAgentV3_1:
         return out
 
     def _build_rag_context_block(self, incident_summary: str) -> str:
+        """Olay metnine Mongo tabanlı ABS + taksonomi bağlamı (ROOTCAUSE_USE_RAG, MONGODB_URI)."""
         if not self.use_rag:
             return ""
         abs_rows = self._mongo_keyword_context(
