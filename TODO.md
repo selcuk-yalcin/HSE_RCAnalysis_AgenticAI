@@ -431,6 +431,7 @@ only when needed, while keeping idle cost low.
 - [ ] Version compiled artifacts under `agents/training/compiled/why_chain_v{N}.json`.
 - [ ] Load latest compiled WhyChain in `RootCauseAgentV3_1` using `WHYCHAIN_COMPILED_PATH`.
 - [ ] Add baseline vs compiled A/B report on dev set.
+- [x] Add baseline vs compiled A/B report on dev set.
 - [ ] Add continuous improvement loop using HITL-approved production samples.
 
 **Acceptance criteria**:
@@ -490,7 +491,7 @@ operational flow.
 
 ## P1.5 — RAG Pipeline Production Rollout
 
-**Goal**: Make optional RAG analyzer in V3.1 production-ready (`ROOTCAUSE_USE_RAG=0` by default).
+**Goal**: Make optional RAG analyzer in V3.1 production-ready (`ROOTCAUSE_USE_RAG=1` by default, configurable).
 
 **Current state**:
 - `agents/v3_vector_search/` and `rag_pipeline/` exist but are currently disabled
@@ -500,7 +501,7 @@ operational flow.
 **Tasks**:
 - [ ] Use managed embedding APIs (OpenRouter/OpenAI) instead of local heavy models.
 - [ ] Use managed vector store (MongoDB Atlas Vector or Pinecone).
-- [ ] Feed RAG context into WhyChain prompts.
+- [x] Feed RAG context into WhyChain prompts.
 - [ ] Isolate vector namespaces per tenant.
 - [x] Add HGS taxonomy normalization path (`agents/knowledge.json` -> Pydantic -> Mongo `hgs_taxonomy.taxonomy_items`) for taxonomy-aware HITL/RAG.
 

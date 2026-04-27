@@ -35,6 +35,10 @@ from pathlib import Path
 import json
 import re
 from pydantic import BaseModel, ValidationError, validator
+try:
+    from pymongo import MongoClient
+except Exception:  # noqa: BLE001
+    MongoClient = None
 
 # ============================================================================
 # IMPORTS - Knowledge Base & Utils
@@ -923,10 +927,71 @@ class RootCauseAgentV3_1:
                 print("   V3.1 static mode devam ediyor")
         else:
             critic_state = "ON" if self.branch_critic else "OFF"
+            rag_state = "Mongo-keyword RAG ON" if use_rag else "RAG OFF"
             print(
                 "✅ Root Cause Agent V3.1 başlatıldı "
-                f"(DSPy powered, RAG disabled, BranchCritic: {critic_state})"
+                f"(DSPy powered, {rag_state}, BranchCritic: {critic_state})"
             )
+
+    def _mongo_keyword_context(
+        self,
+        text: str,
+        collection_name: str,
+        fields: tuple[str, ...],
+        limit: int = 3,
+    ) -> List[str]:
+        if not self.use_rag or MongoClient is None:
+            return []
+        uri = (os.getenv("MONGODB_URI") or "").strip()
+        if not uri:
+            return []
+        tokens = [t for t in re.findall(r"[A-Za-z0-9çğıöşüÇĞİÖŞÜ_-]+", text or "") if len(t) >= 4][:6]
+        regex = "|".join(re.escape(t) for t in tokens)
+        q = {"$regex": regex, "$options": "i"} if regex else {"$regex": ".", "$options": "i"}
+        out: List[str] = []
+        client = None
+        try:
+            client = MongoClient(uri, serverSelectionTimeoutMS=3000)
+            col = client["rca"][collection_name]
+            docs = list(col.find({"text": q}, {"_id": 0, **{f: 1 for f in fields}}).limit(limit))
+            if not docs:
+                docs = list(col.find({}, {"_id": 0, **{f: 1 for f in fields}}).limit(limit))
+            for d in docs:
+                row = " | ".join(str(d.get(f) or "") for f in fields).strip()
+                if row:
+                    out.append(row)
+        except Exception as e:  # noqa: BLE001
+            print(f"⚠️  Mongo RAG context read failed ({collection_name}): {e}")
+        finally:
+            if client is not None:
+                client.close()
+        return out
+
+    def _build_rag_context_block(self, incident_summary: str) -> str:
+        if not self.use_rag:
+            return ""
+        abs_rows = self._mongo_keyword_context(
+            incident_summary,
+            "abs_guidance_chunks",
+            fields=("section_hint", "block_type", "text"),
+            limit=3,
+        )
+        tax_rows = self._mongo_keyword_context(
+            incident_summary,
+            "taxonomy_items",
+            fields=("code", "title", "description"),
+            limit=3,
+        )
+        lines: List[str] = []
+        if abs_rows:
+            lines.append("[RAG ABS CONTEXT]")
+            for r in abs_rows:
+                lines.append(f"- {r[:420]}")
+        if tax_rows:
+            lines.append("[RAG TAXONOMY CONTEXT]")
+            for r in tax_rows:
+                lines.append(f"- {r[:260]}")
+        return "\n".join(lines).strip()
     
     # ─────────────────────────────────────────────────────────────────────────
     # MAIN ENTRY POINT
@@ -1002,6 +1067,10 @@ class RootCauseAgentV3_1:
             part1_data, part2_data, investigation_data
         )
         incident_summary = self._append_hitl_answers(incident_summary, investigation_data)
+        rag_block = self._build_rag_context_block(incident_summary)
+        if rag_block:
+            incident_summary = f"{incident_summary}\n\n{rag_block}"
+            print("🔍 RAG context injected from Mongo (ABS + taxonomy)")
 
         if investigation_data and isinstance(investigation_data, dict):
             oc = (investigation_data.get("oracle_context") or "").strip()

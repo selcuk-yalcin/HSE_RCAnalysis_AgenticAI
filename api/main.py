@@ -170,9 +170,8 @@ async def startup_event():
         assessment_agent = AssessmentAgent()
         print("✅ Assessment Agent initialized")
         
-        # RAG (SentenceTransformer + Mongo) startup'ı çok uzatır; Railway healthcheck zaman aşımına düşer.
-        # Üretimde varsayılan kapalı — ROOTCAUSE_USE_RAG=1 ile açın (MONGODB_URI gerekli).
-        use_rag = _env_bool("ROOTCAUSE_USE_RAG", False)
+        # RAG aktif varsayilan: ROOTCAUSE_USE_RAG=0 ile kapatılabilir.
+        use_rag = _env_bool("ROOTCAUSE_USE_RAG", True)
         rootcause_agent, rootcause_engine_info = _init_root_cause_agent(use_rag)
         print(
             "✅ Root Cause Agent initialized "
@@ -1159,7 +1158,7 @@ async def health_check():
             "hitl_cache_ttl_seconds": _hitl_cache_ttl_seconds(),
             "hybrid": {"redis_ping_ms": redis_ms, "redis_ok": redis_ok, "mongo_ping_ms": mongo_ms, "mongo_ok": mongo_ok},
         },
-        "rag": {"enabled": _env_bool("ROOTCAUSE_USE_RAG", False)},
+        "rag": {"enabled": _env_bool("ROOTCAUSE_USE_RAG", True)},
         "pipeline_executor": "celery" if _use_celery_pipeline() else "inprocess",
         "api_key_configured": bool(api_key),
         "api_key_source": "OPENROUTER_API_KEY" if os.getenv("OPENROUTER_API_KEY") else "OPENAI_API_KEY" if os.getenv("OPENAI_API_KEY") else "none",

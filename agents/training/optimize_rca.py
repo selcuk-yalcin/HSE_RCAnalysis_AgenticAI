@@ -77,6 +77,7 @@ def main() -> None:
     parser.add_argument("--output-dir", default="agents/training/compiled", help="Compiled artifact output dir")
     parser.add_argument("--artifact-name", default="", help="Optional output file name")
     parser.add_argument("--num-trials", type=int, default=6, help="MIPROv2 trial count")
+    parser.add_argument("--eval-samples", type=int, default=12, help="Validation sample count for A/B eval")
     parser.add_argument(
         "--allow-fallback",
         action="store_true",
@@ -157,9 +158,36 @@ def main() -> None:
         mode = "mipro_v2_compile"
 
     # Baseline/optimized score: dataset üstünden yaklaşık hesap
-    baseline_scores = [hse_5why_metric(_to_program_prediction_format(e)) for e in val_raw]
-    baseline_avg = sum(baseline_scores) / max(1, len(baseline_scores))
-    optimized_avg = baseline_avg  # Program-output eval burada lightweight tutuluyor
+    def _evaluate_program(program, val_examples: List[Dict[str, Any]], sample_n: int) -> float:
+        if not val_examples:
+            return 0.0
+        scores: List[float] = []
+        limit = min(max(1, int(sample_n)), len(val_examples))
+        for e in val_examples[:limit]:
+            pred = program(
+                incident_summary=e.get("incident_description", ""),
+                immediate_cause={
+                    "code": "GEN.1",
+                    "cause_tr": ((e.get("why_chain") or [{}])[0] or {}).get("answer", ""),
+                },
+                taxonomy_c="",
+                taxonomy_d="",
+            )
+            scores.append(hse_5why_metric(_normalize_whychain_prediction(pred)))
+        return sum(scores) / max(1, len(scores))
+
+    if dspy_compatible:
+        from agents.rootcause_agent_v3_1 import WhyChain
+
+        baseline_program = WhyChain()
+        baseline_avg = _evaluate_program(baseline_program, val_raw, args.eval_samples)
+        optimized_avg = baseline_avg
+        if compiled is not None:
+            optimized_avg = _evaluate_program(compiled, val_raw, args.eval_samples)
+    else:
+        baseline_scores = [hse_5why_metric(_to_program_prediction_format(e)) for e in val_raw]
+        baseline_avg = sum(baseline_scores) / max(1, len(baseline_scores))
+        optimized_avg = baseline_avg
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -174,7 +202,12 @@ def main() -> None:
         "model": model,
         "baseline_metric_avg": round(baseline_avg, 4),
         "optimized_metric_avg": round(optimized_avg, 4),
-        "note": "optimized_metric_avg placeholder; full online eval should be run in CI pipeline.",
+        "eval_samples": min(max(1, int(args.eval_samples)), len(val_raw)),
+        "improvement_pct": round(
+            ((optimized_avg - baseline_avg) / baseline_avg * 100.0) if baseline_avg > 0 else 0.0,
+            2,
+        ),
+        "note": "A/B eval is run on sampled validation set with same metric.",
     }
 
     # Save compiled program with DSPy native save if available

@@ -5,6 +5,7 @@ Celery tasks for RCA + Action Plan pipeline.
 from __future__ import annotations
 
 from typing import Any, Dict
+import os
 
 from celery_app import celery_app
 
@@ -74,9 +75,11 @@ def run_pipeline_task(
     try:
         from agents.rootcause_agent_v3_1 import RootCauseAgentV3_1
 
-        rootcause_agent = RootCauseAgentV3_1(use_rag=False)
+        use_rag = (os.getenv("ROOTCAUSE_USE_RAG") or "1").strip().lower() in ("1", "true", "yes", "on")
+        rootcause_agent = RootCauseAgentV3_1(use_rag=use_rag)
     except Exception:  # noqa: BLE001
-        rootcause_agent = RootCauseAgentV2(use_rag=False)
+        use_rag = (os.getenv("ROOTCAUSE_USE_RAG") or "1").strip().lower() in ("1", "true", "yes", "on")
+        rootcause_agent = RootCauseAgentV2(use_rag=use_rag)
 
     actionplan_agent = ActionPlanAgent()
 

@@ -108,7 +108,7 @@ Source: synchronized from root `TODO.md`.
 - ✅ Define RCA quality metrics. (DONE - `agents/training/dspy_metrics.py`)
 - ✅ Build optimize/compile pipeline for WhyChain. (DONE - `agents/training/optimize_rca.py`, WhyChain input adaptation + MIPRO run path)
 - ✅ Version compiled artifacts and support runtime loading. (DONE - versioned summary artifacts in `agents/training/compiled/`)
-- Add baseline vs compiled A/B evaluation.
+- ✅ Add baseline vs compiled A/B evaluation. (DONE - sampled dev-set A/B report in `agents/training/compiled/`)
 
 ### P1.3 Operational Training Workflow
 
@@ -126,7 +126,7 @@ Source: synchronized from root `TODO.md`.
 
 - Managed embeddings and vector store.
 - Tenant-isolated vector namespaces.
-- Controlled RAG prompt injection strategy.
+- ✅ Controlled RAG prompt injection strategy. (DONE - Mongo context injection into `RootCauseAgentV3_1` incident summary path)
 - Add normalized HGS taxonomy store in Mongo (`hgs_taxonomy.taxonomy_items`) for taxonomy-aware retrieval/questioning.
 
 ### P1.6 ABS-Guided DSPy Training + Deep HITL
