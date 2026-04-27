@@ -92,6 +92,119 @@ except Exception:
 _HITL_LLM_ENABLED = (os.getenv("HITL_USE_LLM") or "1").strip().lower() in ("1", "true", "yes", "on")
 
 # "free_text" = cevap Evet/Hayır/Bilinmiyor olamaz (sebep, seçenek, açıklama beklenir).
+# "choice" = arayüzde sabit/LLM listesi; çoklu veya tek seçim (PPE, ekipman).
+
+_DEFAULT_PPE_TR_OPTIONS: tuple[str, ...] = (
+    "Baret (baş koruması)",
+    "Gözlük / yüz kalkanı",
+    "İşitme koruyucu (kulak tıkacı/ earmuff)",
+    "Solunum (FFP/ maske / SCBA'ya göre iş riski)",
+    "Eldiven (kimyasal/ kesim/ ısıya uygun türde)",
+    "Koruyucu elbise, ön veya tulum",
+    "Güvenlik ayakkabısı / çizme (çelik burun, kaymaz taban)",
+    "Düşmeye karşı emniyet kemeri / lanyard / can halatı",
+    "Yüksek görünürlüklü yelek (EN ISO 20471 benzeri)",
+    "Kemirgen / biyolojik riske uygun KKD (gerekliyse belirtin)",
+    "Diğer / o olayda kullanılması en kritik 1–2 KKD'yi açık yazın",
+)
+
+_DEFAULT_PPE_EN_OPTIONS: tuple[str, ...] = (
+    "Helmet (head protection)",
+    "Safety glasses / face shield",
+    "Hearing protection (earplugs/ earmuff)",
+    "R respirator / mask (type per risk — FFP, half/full face, SCBA)",
+    "Gloves (chemical/cut/heat-appropriate type)",
+    "Coveralls, apron, or full-body PPE as required",
+    "Safety shoes / boots (steel-toe, slip resistance)",
+    "Fall protection: harness, lanyard, lifeline",
+    "High-visibility vest (e.g. EN ISO 20471 class)",
+    "PPE for biological/rodent risk (specify if relevant)",
+    "Other — name the 1–2 PPE that mattered most in this case",
+)
+
+
+def _normalize_str_list(v: Any, max_n: int = 30) -> list[str]:
+    if v is None:
+        return []
+    if isinstance(v, str):
+        return [s.strip() for s in re.split(r"[,;\n|]", v) if s.strip()][:max_n]
+    if isinstance(v, (list, tuple)):
+        return [str(x).strip() for x in v if str(x).strip()][:max_n]
+    return []
+
+
+def _enrich_hitl_ui(soru: str, q: dict) -> dict[str, Any]:
+    """
+    response_mode: yes_no_unknown | free_text | choice
+    choice_options: Trafik etiketleri (TR); aynı uzunlukta choice_options_en = gösterim dili.
+    """
+    s = (soru or "").strip()
+    low = s.lower()
+    o_tr = _normalize_str_list((q or {}).get("choice_options") or (q or {}).get("options"))
+    o_en = _normalize_str_list(
+        (q or {}).get("choice_options_en") or (q or {}).get("options_en"),
+    )
+
+    # 1) Açık seçenek listesi (LLM / şablon)
+    if len(o_tr) >= 2:
+        if len(o_en) != len(o_tr) or not o_en:
+            o_en = o_tr[:]
+        multi = bool(
+            (q or {}).get("choice_multi", (q or {}).get("multi", False)) or
+            re.search(
+                r"(k?kd[''´` ]?ler|korumal|neler|hangileri|birden|fazla|hepsi|t[üu]m(ünü)?|list|se[çc]|belirt|çeşit|cesit|veya|and)",
+                low,
+            ) or
+            re.search(
+                r"\bve\s+birden|,\s*ve\s+",
+                low,
+            ) or
+            bool((q or {}).get("force_choice_multi", False))
+        )
+        return {
+            "response_mode": "choice",
+            "choice_options": o_tr,
+            "choice_options_en": o_en,
+            "choice_multi": bool(multi),
+        }
+
+    # 2) "Hangi KKD" vb. — varsayılan PPE / koruma listesi
+    if re.search(r"\bhangi\b", low) and re.search(
+        r"(\bkkd\b|kisisel\s+koruyucu|kişisel\s+koruyucu|ppe|baret|eldiven|ayakkab|gözlük|göz|isitme|dusm|düşm|can\s+halat|kemer|emniyet)",
+        low,
+    ):
+        ppe_multi = bool(
+            re.search(
+                r"kkd[''´` ]?ler|korumal|neler|hangileri|gerekli(ydi|ydı|ydu)?|gerek(irdi)?|list|belirt|çeşit|cesit",
+                low,
+            ) or
+            re.search(
+                r"\bve\s+birden|,\s*ve\s+", low,
+            ),
+        )
+        return {
+            "response_mode": "choice",
+            "choice_options": list(_DEFAULT_PPE_TR_OPTIONS),
+            "choice_options_en": list(_DEFAULT_PPE_EN_OPTIONS),
+            "choice_multi": bool(ppe_multi),
+        }
+
+    # 3) Sadece mode + metin türü (free_text vs evet-hayır)
+    ex = str((q or {}).get("response_mode", "") or "").strip().lower()
+    if ex in ("free_text", "freetext", "text"):
+        m3 = "free_text"
+    elif ex in ("yes_no", "yesno", "yes_no", "yes_no_unknown", "bool"):
+        m3 = "yes_no_unknown"
+    else:
+        m3 = _infer_response_mode(s)
+    if m3 not in ("free_text", "yes_no_unknown"):
+        m3 = "yes_no_unknown"
+    return {
+        "response_mode": m3,
+        "choice_options": [],
+        "choice_options_en": [],
+        "choice_multi": False,
+    }
 
 
 def _infer_response_mode(soru: str) -> str:
@@ -377,12 +490,12 @@ Taxonomy odak kodları:
 {taxonomy_ctx}
 
 Kurallar:
-- Generic checklist soru üretme (tarih/saat, son 2 saat, vardiya, fazla mesai, tanık kimdi, formen orada mı, hangi ekipman, hangi KKD gibi çıplak şablonlar yasak).
-- Sorular doğrudan bu olay metnindeki kanıta/eksik kanıta bağlı olsun.
-- Her soru belirli bir kodu ayrıştırmaya hizmet etsin.
+- Olaya özgü sor; yalnız kopya-şablon sorma. Kanıt veya ayrıntı ister.
+- HSG koduna bağla.
 - Türkçe, kısa, net.
-- Soru sadece Evet/Hayır/Unknown ile yanıtlanamıyorsa (açık uçlu, neden, seçenek listesi) "answer_format": "free_text" ver. Basit kapanış sorusu ise "answer_format": "yes_no".
-- JSON array döndür: [{{"question_tr":"...","code":"A1.1","answer_format":"yes_no"|"free_text","reason":"..."}}]
+- Cevap türü: (1) basit "answer_format": "yes_no" (2) açık metin: "free_text" (3) tıklanabilir etiket listesi: "answer_format": "choice", "options": ["3–8 kısa kategori"], "options_en" (aynı sıra, İngilizce), "multi": true bir veya false tek seçim.
+- "hangi KKD" gibi cevabı belli liste olan sorulara "choice" + options koy; Evet/Hayır yeterli değilse "yes_no" kullanma.
+- JSON array: [{{"question_tr":"...","code":"A1.1","answer_format":"yes_no"|"free_text"|"choice","options":[]|null,"options_en":[]|null,"multi":false,"reason":"..."}}]
 - En fazla {max_questions} soru.
 """.strip()
 
@@ -403,25 +516,35 @@ Kurallar:
             if not q:
                 continue
             af = str(it.get("answer_format") or "").strip().lower()
-            if af in ("free_text", "freetext", "text", "açık"):
-                rmode: str = "free_text"
-            elif af in ("yes_no", "yesno", "boolean"):
+            c_opts = _normalize_str_list(it.get("options") or it.get("choice_options"))
+            c_en = _normalize_str_list(it.get("options_en") or it.get("choice_options_en"))
+            c_multi = bool(it.get("multi", it.get("choice_multi", False)))
+            if af in ("choice", "options", "list", "multi_choice") and len(c_opts) >= 2:
+                rmode = "choice"
+            elif af in ("free_text", "freetext", "text", "açık"):
+                rmode = "free_text"
+            elif af in ("yes_no", "yesno", "boolean", "bool"):
                 rmode = "yes_no_unknown"
             else:
                 rmode = _infer_response_mode(q)
-            out.append(
-                {
-                    "id": _stable_id("llm", str(why_level), code, str(i), q),
-                    "source": "why_probe_llm",
-                    "code": code,
-                    "cause_desc": code,
-                    "hsg245": code,
-                    "soru": q,
-                    "yönler": {},
-                    "why_level": why_level,
-                    "response_mode": rmode,
-                }
-            )
+            row: dict[str, Any] = {
+                "id": _stable_id("llm", str(why_level), code, str(i), q),
+                "source": "why_probe_llm",
+                "code": code,
+                "cause_desc": code,
+                "hsg245": code,
+                "soru": q,
+                "yönler": {},
+                "why_level": why_level,
+                "response_mode": rmode,
+            }
+            if c_opts:
+                row["choice_options"] = c_opts
+            if c_en and len(c_en) == len(c_opts):
+                row["choice_options_en"] = c_en
+            if c_multi:
+                row["choice_multi"] = True
+            out.append(row)
         return out
     except Exception:
         return []
@@ -510,9 +633,7 @@ def next_hitl_questions(
 
     def _shape(q: dict) -> dict[str, Any]:
         soru = str(q.get("soru", "") or "")
-        rm = str(q.get("response_mode") or "").strip()
-        if rm not in ("free_text", "yes_no_unknown"):
-            rm = _infer_response_mode(soru)
+        u = _enrich_hitl_ui(soru, q)
         return {
             "id": q["id"],
             "source": q.get("source", "disambiguation"),
@@ -522,7 +643,10 @@ def next_hitl_questions(
             "question_tr": soru,
             "question_en": soru,
             "yönler": q.get("yönler") or {},
-            "response_mode": rm,
+            "response_mode": u.get("response_mode", "yes_no_unknown"),
+            "choice_options": u.get("choice_options") or [],
+            "choice_options_en": u.get("choice_options_en") or [],
+            "choice_multi": bool(u.get("choice_multi", False)),
         }
 
     return {
@@ -675,9 +799,7 @@ def next_why_probe_questions(
 
     def _shape(q: dict) -> dict[str, Any]:
         soru = str(q.get("soru", "") or "")
-        rm = str(q.get("response_mode") or "").strip()
-        if rm not in ("free_text", "yes_no_unknown"):
-            rm = _infer_response_mode(soru)
+        u = _enrich_hitl_ui(soru, q)
         return {
             "id": q["id"],
             "source": q.get("source", "why_probe"),
@@ -688,7 +810,10 @@ def next_why_probe_questions(
             "question_en": soru,
             "yönler": q.get("yönler") or {},
             "why_level": q.get("why_level", why_level),
-            "response_mode": rm,
+            "response_mode": u.get("response_mode", "yes_no_unknown"),
+            "choice_options": u.get("choice_options") or [],
+            "choice_options_en": u.get("choice_options_en") or [],
+            "choice_multi": bool(u.get("choice_multi", False)),
         }
 
     return {

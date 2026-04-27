@@ -835,7 +835,7 @@ async def create_incident(tenant_id: TenantId, incident: IncidentCreate):
 async def hitl_dynamic_questions(tenant_id: TenantId, incident_id: str, body: HitlQuestionsRequest):
     """
     Sıralı HITL soruları: HSG245 disambiguation + taxonomy + LLM.
-    Her soru `response_mode`: `yes_no_unknown` | `free_text` (açık uçlu; UI serbest metin toplar).
+    Her soru `response_mode`: `yes_no_unknown` | `free_text` | `choice` (chip listesi: `choice_options`, `choice_multi`).
     """
     _require_incident_record(tenant_id, incident_id)
     bs = body.batch_size if body.batch_size and body.batch_size > 0 else 1
