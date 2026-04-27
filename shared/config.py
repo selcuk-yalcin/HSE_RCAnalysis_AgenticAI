@@ -12,7 +12,7 @@ load_dotenv()
 
 # Varsayılan üretim modeli (OpenRouter id); OPENAI_MODEL ile doğrudan override edilebilir.
 _DEFAULT_LLM_MODEL = (
-    (os.getenv("OPENROUTER_DEFAULT_MODEL") or "").strip() or "google/gemini-2.5-flash"
+    (os.getenv("OPENROUTER_DEFAULT_MODEL") or "").strip() or "anthropic/claude-sonnet-4.5"
 )
 
 # OpenAI Configuration

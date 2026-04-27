@@ -330,6 +330,51 @@ only when needed, while keeping idle cost low.
 
 ---
 
+## P0.10 — RCA Quality Hardening (SemanticVerifier + BranchCritic + MIPROv2)
+
+**Goal**: Improve 5-Why depth, branch diversity, and scoring reliability by replacing coarse semantic checks and introducing optimized DSPy signatures.
+
+**Current state**:
+- Semantic duplicate checks rely on coarse token-overlap behavior that is sensitive to repeated domain vocabulary.
+- BranchCritic runs mostly after branch generation, so overlap prevention is reactive rather than proactive.
+- `chain_quality` is not a robust measurement of Why-chain deepening quality.
+- Why signatures are not fully optimized with MIPROv2/few-shot strategy.
+
+**Tasks**:
+- [ ] Replace semantic duplicate logic with embedding-based cosine similarity.
+- [ ] Add weighted TF-IDF fallback when embedding path is unavailable.
+- [ ] Calibrate similarity thresholds on incident-family dev sets (not fixed global threshold only).
+- [ ] Move BranchCritic checks to branch generation time (pre-branch constraint injection).
+- [ ] Add post-regeneration consistency validation for updated branches.
+- [ ] Add per-branch diversity constraint injection (`avoid prior branch rationale` guidance).
+- [ ] Replace placeholder chain quality with real metrics:
+  - Why-to-Why causal continuity,
+  - paraphrase-loop penalty,
+  - depth progression quality score.
+- [ ] Introduce MIPROv2 optimization workflow for Why signatures:
+  - optimize `WhyQuestion` / `WhyAnswer` prompts,
+  - include positive/negative few-shot examples,
+  - produce baseline vs optimized evaluation report.
+- [ ] Add instrumentation and dashboards for:
+  - semantic collision rate,
+  - branch regeneration rate,
+  - chain quality distribution by incident type.
+
+**Acceptance criteria**:
+- Duplicate branch/root-cause rate drops on regression scenarios.
+- BranchCritic prevents overlap earlier (before finalizing each branch).
+- `chain_quality` reflects measurable variance across weak/strong chains.
+- MIPROv2-optimized signatures outperform baseline on defined RCA quality metrics.
+
+**Related files**:
+- `agents/rootcause_agent_v3_1.py`
+- `agents/branch_critic.py`
+- `agents/synetic_data_preperation/hse_synthetic_data.py`
+- `agents/training/` (new)
+- `specs/plan.md`
+
+---
+
 ## P1.1 — Synthetic Data Generation Pipeline (Internal)
 
 **Goal**: Generate realistic synthetic data to optimize HSE 5-Why trainsets with DSPy MIPROv2.

@@ -124,6 +124,39 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
   - support configurable watermark/hologram overlay in output artifacts.
   - watermark/hologram should support draft/final modes and tenant-level defaults.
 
+## Critical RCA Quality Gaps (DSPy/V3.1)
+
+- SemanticVerifier is currently too coarse for 5-Why semantic duplicate detection:
+  - token-overlap/Jaccard style checks overcount shared domain terms (`production`, `LOTO`, etc.),
+  - fixed threshold behavior is not domain-calibrated,
+  - this can trigger false diversity alarms or miss real paraphrase duplication.
+- BranchCritic timing is late in the flow:
+  - critic runs after all branches are generated,
+  - branch 3/4 generation does not proactively avoid branch 1/2 reasoning overlap,
+  - regenerated branches are not consistently revalidated for chain-level coherence.
+- `chain_quality` signal is not yet trustworthy:
+  - score path behaves like a near-constant high value,
+  - Why-to-Why deepening quality and paraphrase loops are not measured robustly.
+- MIPROv2 optimization is not yet applied to Why signatures:
+  - prompts/signatures run mostly with manual definitions,
+  - few-shot optimization path is limited,
+  - model tends to generic patterns under ambiguity.
+
+## RCA Improvement Priority (Ordered)
+
+- Immediate:
+  - adopt MIPROv2-based optimization for Why signatures,
+  - replace placeholder chain-quality scoring with measurable chain metrics,
+  - move SemanticVerifier to embedding-based cosine similarity (or weighted TF-IDF fallback).
+- Mid-term:
+  - shift BranchCritic to earlier branch-generation stages,
+  - enforce post-regeneration coherence checks,
+  - inject per-branch diversity constraints before branch generation.
+- Later:
+  - introduce DSPy Assertions for rule-based constraints,
+  - add automatic few-shot retrieval/selection support (RAG-assisted),
+  - add reverse consistency checks (Why-5 back to Why-1 chain logic).
+
 ## Spec Ownership
 
 - Product + flow details: `README.md`

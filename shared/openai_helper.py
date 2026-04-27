@@ -21,7 +21,7 @@ class OpenAIClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "google/gemini-2.5-flash",
+        model: str = "anthropic/claude-sonnet-4.5",
         temperature: float = 0.7,
         max_tokens: int = 4000
     ):
@@ -30,7 +30,7 @@ class OpenAIClient:
         
         Args:
             api_key: OpenAI API key (defaults to env variable)
-            model: Model to use (OpenRouter: google/gemini-2.5-flash, etc.)
+            model: Model to use (OpenRouter: anthropic/claude-sonnet-4.5, etc.)
             temperature: Sampling temperature (0-2)
             max_tokens: Maximum tokens in response
         """
@@ -259,7 +259,7 @@ _client: Optional[OpenAIClient] = None
 
 def get_openai_client(
     api_key: Optional[str] = None,
-    model: str = "google/gemini-2.5-flash",
+    model: str = "anthropic/claude-sonnet-4.5",
     temperature: float = 0.7
 ) -> OpenAIClient:
     """
