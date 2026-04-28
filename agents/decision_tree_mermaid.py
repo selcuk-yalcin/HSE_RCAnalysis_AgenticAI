@@ -61,6 +61,15 @@ class DecisionTreeGenerator:
             immediate_cause_text = strip_hse_codes(
                 str(immediate_cause.get("cause_tr", immediate_cause.get("cause", "")) or "")
             )
+            root_cause = branch.get("root_cause", {}) or {}
+            root_title = strip_hse_codes(str(root_cause.get("title", "") or ""))
+            root_cause_text = strip_hse_codes(
+                str(root_cause.get("cause_tr", root_cause.get("cause", "")) or "")
+            )
+            root_explanation = self._clean_root_explanation(
+                root_cause.get("explanation_tr") or root_cause.get("explanation") or ""
+            )
+            chain_len = len(why_chain)
 
             for why_idx, why_item in enumerate(why_chain, 1):
                 question = strip_hse_codes(
@@ -75,6 +84,14 @@ class DecisionTreeGenerator:
                     # İlk cevap doğrudan nedeni (immediate cause) temsil etsin.
                     if immediate_cause_text:
                         answer = immediate_cause_text
+                elif chain_len and why_idx == chain_len:
+                    # 5. Why cevabı kök neden olsun (ayrı root kutusu üretme).
+                    answer = self._build_root_answer_text(
+                        root_title=root_title,
+                        root_cause_text=root_cause_text,
+                        root_explanation=root_explanation,
+                        fallback=answer,
+                    )
 
                 norm_q = self._question_key(question)
                 norm_qa = self._norm(f"{question}|||{answer}")
@@ -99,36 +116,39 @@ class DecisionTreeGenerator:
                     self.answer_nodes[norm_qa] = a_node
                     a_fmt = self._fmt(answer, 72)
                     lines.append(f'    {a_node}["{a_fmt}"]')
-                    lines.append(f'    style {a_node} fill:#fff,stroke:#666,stroke-width:1px,font-size:14px')
+                    if chain_len and why_idx == chain_len:
+                        lines.append(
+                            f"    style {a_node} fill:#111,stroke:#000,stroke-width:2px,color:#fff,font-size:13px,font-weight:bold"
+                        )
+                    else:
+                        lines.append(f'    style {a_node} fill:#fff,stroke:#666,stroke-width:1px,font-size:14px')
                 else:
                     a_node = self.answer_nodes[norm_qa]
+                    if chain_len and why_idx == chain_len:
+                        lines.append(
+                            f"    style {a_node} fill:#111,stroke:#000,stroke-width:2px,color:#fff,font-size:13px,font-weight:bold"
+                        )
 
                 self._add_conn(lines, q_node, a_node)
                 prev_node = a_node
 
-            root_cause = branch.get("root_cause", {})
-            root_node = f"ROOT{branch_idx}"
-            root_title = strip_hse_codes(str(root_cause.get("title", "") or ""))
-            root_cause_text = strip_hse_codes(
-                str(root_cause.get("cause_tr", root_cause.get("cause", "")) or "")
-            )
-            root_explanation = strip_hse_codes(
-                str(
-                    root_cause.get("explanation_tr")
-                    or root_cause.get("explanation")
-                    or ""
+            # Zincir eksikse fallback root düğümü üret.
+            if not chain_len:
+                root_node = f"ROOT{branch_idx}"
+                content = self._fmt(
+                    self._build_root_answer_text(
+                        root_title=root_title,
+                        root_cause_text=root_cause_text,
+                        root_explanation=root_explanation,
+                        fallback="Kök neden",
+                    ),
+                    72,
                 )
-            )
-
-            # Kök neden kutusunda gereksiz başlık/prefix kalabalığını kaldır.
-            primary_text = root_cause_text or root_title or "Kök neden"
-            content = self._fmt(primary_text, 72)
-            if root_explanation and self._norm(root_explanation) != self._norm(primary_text):
-                content += f"<br/><span style='font-size:12px; font-weight:normal; color:#333'>{self._fmt(root_explanation, 84)}</span>"
-
-            lines.append(f'    {root_node}["{content}"]')
-            lines.append(f'    style {root_node} fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold')
-            self._add_conn(lines, prev_node, root_node)
+                lines.append(f'    {root_node}["{content}"]')
+                lines.append(
+                    f"    style {root_node} fill:#111,stroke:#000,stroke-width:2px,color:#fff,font-size:13px,font-weight:bold"
+                )
+                self._add_conn(lines, prev_node, root_node)
             lines.append('')
 
         return '\n'.join(lines)
@@ -238,6 +258,35 @@ class DecisionTreeGenerator:
     def _build_first_why_question(self, incident_summary: str) -> str:
         subject = self._extract_subject_for_injury_question(incident_summary)
         return f"Neden {subject} yaralandı?"
+
+    def _clean_root_explanation(self, text: Any) -> str:
+        s = strip_hse_codes(str(text or "")).strip()
+        if not s:
+            return ""
+        s = re.sub(r"^\s*5-why\s+zincirinin\s+açıklaması\s*:\s*", "", s, flags=re.IGNORECASE)
+        return s.strip()
+
+    def _build_root_answer_text(
+        self,
+        *,
+        root_title: str,
+        root_cause_text: str,
+        root_explanation: str,
+        fallback: str,
+    ) -> str:
+        title = (root_title or "").strip()
+        cause = (root_cause_text or "").strip()
+        expl = (root_explanation or "").strip()
+        parts: list[str] = []
+        if title:
+            parts.append(title)
+        if cause and self._norm(cause) != self._norm(title):
+            parts.append(cause)
+        if expl and self._norm(expl) not in {self._norm(title), self._norm(cause)}:
+            parts.append(expl)
+        if not parts:
+            parts.append(strip_hse_codes(str(fallback or "")).strip() or "Kök neden")
+        return " - ".join(parts)
 
     def _fmt(self, text: str, max_line_length: int = 72) -> str:
         if not text:
