@@ -3,7 +3,7 @@ OpenRouter model seçimi (agents geneli).
 
 Ayrılmış varsayılanlar:
 - Analiz (DSPy, kök neden, overview, değerlendirme, eylem planı vb.):
-  `qwen/qwen3.6-35b-a3b`
+  `qwen/qwen3.6-flash`
 - Yalnızca rapor yazımı (DOCX/HTML: SkillBasedDocxAgent):
   `google/gemini-2.5-flash`
 
@@ -18,7 +18,7 @@ Ortam önceliği (özet):
 import os
 
 # --- Analiz / genel ajanlar (DSPy ve chat) ---
-_DEFAULT_ANALYSIS_MODEL = "qwen/qwen3.6-35b-a3b"
+_DEFAULT_ANALYSIS_MODEL = "qwen/qwen3.6-flash"
 # --- Rapor üretimi (yalnızca DOCX/HTML) ---
 _DEFAULT_REPORT_MODEL = "google/gemini-2.5-flash"
 
@@ -30,9 +30,9 @@ _MODEL_PRESETS = {
     "claude_sonnet": "anthropic/claude-sonnet-4.5",
     "deepseek": "deepseek/deepseek-v4-pro",
     "v4pro": "deepseek/deepseek-v4-pro",
-    "qwen": "qwen/qwen3.6-35b-a3b",
-    "qwen3": "qwen/qwen3.6-35b-a3b",
-    "qwen-thinking": "qwen/qwen3.6-35b-a3b",
+    "qwen": "qwen/qwen3.6-flash",
+    "qwen3": "qwen/qwen3.6-flash",
+    "qwen-thinking": "qwen/qwen3.6-flash",
 }
 
 
