@@ -54,6 +54,10 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
     - Default `prefork` pool with Celery autoscale.
     - Scale range: min 1, max 5 worker processes per container.
     - Goal: avoid always-on high concurrency while handling burst traffic.
+  - Burst scaling acceptance (P0.5 baseline):
+    - Idle worker must run at min process count.
+    - Under queue pressure worker must scale up to configured max.
+    - Scale-down must occur automatically after queue drains.
   - Reliability hardening requirements:
     - Heartbeat/visibility-timeout tuning for long RCA tasks,
     - Reduced CPU-blocking critical sections,
@@ -113,6 +117,23 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 - Pipeline transparency:
   - while root cause and report stages run, users should see continuously streaming progress
     and Why-chain lines to reduce waiting friction.
+
+## Pricing Page Refresh Requirements
+
+- Pricing page should be refreshed with a 3-tier card layout matching the target design language
+  (dark background, highlighted middle plan, compact feature bullets).
+- Tiers and monthly anchor prices:
+  - Starter: `$29/ay`
+  - Professional: `$99/ay` (badge: "En popüler")
+  - Enterprise: `$299/ay`
+- Each tier must include clear capacity and capability limits (report quota, analysis method scope,
+  output formats, user seats, support/SLA level, API/SSO availability where applicable).
+- Tier footer labels should communicate target segment:
+  - Starter: KOBİ / bireysel HSE
+  - Professional: Orta ölçekli işletme
+  - Enterprise: Büyük sanayi / holding
+- CTA and billing text should remain editable/configurable (future campaign/discount support).
+- Pricing content should be locale-aware (TR now, EN-ready i18n keys for later switch).
 
 ## Report Productization Requirements
 

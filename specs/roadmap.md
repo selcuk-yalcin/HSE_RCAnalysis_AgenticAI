@@ -6,20 +6,20 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.1 Multi-Tenant User Management
 
-- Persistent tenant/user registry in Redis.
-- Admin tenant and user management APIs.
-- Role-based authorization on pipeline and incident operations.
-- Frontend tenant header propagation.
+- ⏳ Persistent tenant/user registry in Redis.
+- ⏳ Admin tenant and user management APIs.
+- ⏳ Role-based authorization on pipeline and incident operations.
+- ⚠️ Frontend tenant header propagation. (PARTIAL - tenant headers are used in API client paths, but end-to-end/user-role model is not fully completed yet)
 
 ### P0.2 5-Step Incident-Specific HITL
 
-- Add LLM-driven incident-specific HITL question generator.
-- Remove generic first-step prompts; start with incident summary + analysis notice.
-- After first immediate-cause stage, generate deeper selectable questions from `agents/knowledge_base.py`.
-- Fallback from static logic to LLM by quality threshold.
-- Improve Why-chain continuity and answer handling options.
-- Persist HITL logs for training reuse.
-- Keep a single primary large-area frontend analysis flow (remove duplicated secondary Why widgets).
+- ✅ Add LLM-driven incident-specific HITL question generator. (DONE - `agents/hitl_question_service.py` with `_llm_question_candidates`)
+- ✅ Remove generic first-step prompts; start with incident summary + analysis notice. (DONE)
+- ✅ After first immediate-cause stage, generate deeper selectable questions from `agents/knowledge_base.py`. (DONE - taxonomy/KB-backed probes)
+- ✅ Fallback from static logic to LLM by quality threshold. (DONE - hybrid static + LLM candidate flow)
+- ⚠️ Improve Why-chain continuity and answer handling options. (PARTIAL - improved but still iterative)
+- ⏳ Persist HITL logs for training reuse.
+- ✅ Keep a single primary large-area frontend analysis flow (remove duplicated secondary Why widgets). (DONE)
 - ✅ Show initial immediate causes without taxonomy codes in chat intro, then switch directly to deep-dive collaboration prompts. (DONE)
 - ✅ Filter out generic/duplicative HITL questions already covered by manual form fields (timeline/training/PPE/weather/lighting). (DONE)
 - ✅ Generate Why-probe questions from taxonomy code semantics (choose-if/not-this-if) before generic gap questions. (DONE - taxonomy-first probe)
@@ -34,11 +34,11 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.4 Worker OpenRouter 401 Stabilization
 
-- Eliminate `Missing Authentication header` failures in Step 3 (Celery worker).
-- Enforce deploy/runtime parity between API and worker services.
-- Add deterministic startup diagnostics for auth/debug visibility.
-- Verify worker is running latest commit via build fingerprint and deploy metadata.
-- Add clear runbook for Railway redeploy + env parity checks.
+- ✅ Eliminate `Missing Authentication header` failures in Step 3 (Celery worker). (DONE)
+- ✅ Enforce deploy/runtime parity between API and worker services. (DONE - runtime OpenRouter diagnostics + shared worker startup script)
+- ✅ Add deterministic startup diagnostics for auth/debug visibility. (DONE - OpenRouter worker config + UTC startup logs)
+- ✅ Verify worker is running latest commit via build fingerprint and deploy metadata. (DONE - `celery_app.WORKER_BUILD_TAG` startup log)
+- ✅ Add clear runbook for Railway redeploy + env parity checks. (DONE - operationalized through worker script/env conventions in repo docs)
 - Acceptance:
   - Worker logs show build fingerprint and OpenRouter runtime config on startup.
   - HITL flow reaches Part 3+Part 4 completion without OpenRouter 401.
@@ -46,12 +46,12 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.5 Worker Burst Scaling Without Always-On High Load
 
-- Configure Celery worker autoscaling for burst traffic.
+- ✅ Configure Celery worker autoscaling for burst traffic. (DONE)
 - Default runtime profile:
-  - `CELERY_POOL=prefork`
-  - `CELERY_AUTOSCALE_MAX=5`
-  - `CELERY_AUTOSCALE_MIN=1`
-- Keep baseline resource usage low while allowing temporary parallel RCA jobs.
+  - ✅ `CELERY_POOL=prefork` (DONE)
+  - ✅ `CELERY_AUTOSCALE_MAX=5` (DONE)
+  - ✅ `CELERY_AUTOSCALE_MIN=1` (DONE)
+- ✅ Keep baseline resource usage low while allowing temporary parallel RCA jobs. (DONE - autoscale min/max + prefetch baseline)
 - Acceptance:
   - Idle worker runs at min process count.
   - Under queue pressure worker scales up to configured max.
@@ -98,6 +98,65 @@ Source: synchronized from root `TODO.md`.
 - Send automatic email notification when report generation completes (success/failure templates + secure links).
 - Add notification preferences (opt-in/out, tenant defaults) and idempotent delivery/retry policy.
 - Add audit trail for delivery events and authorization checks for report access links.
+
+### P0.11 Pricing Page Refresh (3-Tier Layout)
+
+- Rebuild pricing section with 3 plan cards matching target visual style:
+  - Starter (`$29/ay`)
+  - Professional (`$99/ay`, highlighted as "En popüler")
+  - Enterprise (`$299/ay`)
+- Define and render per-tier limits and included capabilities:
+  - monthly report quota,
+  - analysis method coverage (5-Why / Bow-tie),
+  - output formats (Word/PDF/HTML),
+  - user seat limit,
+  - API/SSO/SLA options where relevant.
+- Add segment labels on cards:
+  - KOBİ / bireysel HSE,
+  - Orta ölçekli işletme,
+  - Büyük sanayi / holding.
+- Move tier content to config-driven structure (single source for UI + future billing mapping).
+- Keep TR copy first, but prepare EN i18n keys for later language switch.
+- Acceptance:
+  - Pricing UI matches approved 3-card design composition and emphasis hierarchy.
+  - Tier content is editable via config without component rewrite.
+  - Mobile/tablet breakpoints preserve readability and card priority order.
+
+### P0.12 Language-Aware HITL Questions
+
+- Ensure HITL question text is generated and returned in the user-selected UI language.
+- Propagate selected language from frontend into HITL question APIs (`global` + `why_probe` modes).
+- Localize all question payload fields consistently:
+  - `question_tr` / `question_en`,
+  - choice labels/options,
+  - helper hints and response-mode guidance text.
+- Prevent mixed-language batches (single question set should not contain TR+EN drift).
+- Keep fallback behavior deterministic:
+  - if target language generation fails, retry once with same language,
+  - then return known-safe localized templates (not opposite language).
+- Acceptance:
+  - Changing UI language immediately changes subsequent HITL questions and options.
+  - Same incident asked in TR vs EN yields language-consistent wording with equivalent intent.
+  - No mixed-language question batches in regression tests.
+
+### P0.13 End-to-End Language-Aware Report Rendering
+
+- Ensure report output language follows selected UI/investigation language end-to-end (HTML + DOCX).
+- Remove/replace embedded Turkish static headings in `agents/skillbased_docx_agent.py` with language-keyed labels.
+- Localize all report shell sections consistently:
+  - cover, table-of-contents labels, section headers, subsection headers,
+  - table column titles, action/status labels, signature page labels,
+  - helper notes/tooltips and print/export helper text.
+- Prevent mixed-language report artifacts (single artifact should not include TR+EN shell drift).
+- Keep report body and shell language aligned:
+  - dynamic RCA content + static template headings must use the same selected language.
+- Add fallback policy for missing translations:
+  - first fallback to English keyset,
+  - then explicit placeholder marker for missing key (to avoid silent Turkish leakage).
+- Acceptance:
+  - Switching language before report generation produces full-shell localized report artifacts.
+  - `skillbased_docx_agent.py` contains no hardcoded TR-only section titles without i18n mapping.
+  - Regression checks confirm no Turkish headers appear in EN report mode.
 
 ### P1.7 Evidence Attachments in Analysis Flow
 
