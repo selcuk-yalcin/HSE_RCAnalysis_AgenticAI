@@ -154,12 +154,32 @@ def run_pipeline_task(
             "severity": part2_data.get("investigation_level", ""),
         }
     )
+    actionplan_meta = {
+        "fallback_used": bool((part4_data or {}).get("_fallback")),
+        "action_count": len((part4_data or {}).get("immediate_actions", []) or []),
+    }
+    self.update_state(
+        state="PROGRESS",
+        meta={
+            "incident_id": incident_id,
+            "tenant_id": tenant_id,
+            "stage": "actionplan",
+            "progress": 90,
+            "message": (
+                "Action plan fallback used"
+                if actionplan_meta["fallback_used"]
+                else "Action plan generated"
+            ),
+            "actionplan_meta": actionplan_meta,
+        },
+    )
 
     return {
         "tenant_id": tenant_id,
         "incident_id": incident_id,
         "part3": part3_data,
         "part4": part4_data,
+        "actionplan_meta": actionplan_meta,
         "stage": "completed",
         "progress": 100,
         "message": "Pipeline tamamlandi",

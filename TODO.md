@@ -106,6 +106,7 @@ and which C/D code is being produced.
 - [ ] Add a live timeline component in chat (`PipelineLiveTimeline.jsx`).
 - [ ] Add explicit \"pipeline failed\" UI for terminal errors.
 - [ ] Add WebSocket auto-reconnect with backoff.
+- [x] Increase client-side pipeline timeout defaults from 6m to 20m in frontend polling/WebSocket paths to reduce premature UI timeout errors on long RCA runs.
 
 **Acceptance criteria**:
 - User can follow all 25 analysis steps (5 branches × 5 Why) in order.
@@ -197,6 +198,9 @@ only when needed, while keeping idle cost low.
 - [x] Split/limit CPU-heavy sections or add cooperative checkpoints to avoid single-process blocking.
 - [x] Add queue-depth + worker-heartbeat health surface in ops endpoint.
 - [x] Add load test scenario for 3-5 parallel RCA runs with acceptable queue wait and no task loss.
+- [x] Add worker recycle guard + UTC startup diagnostics for drift triage (`CELERY_MAX_TASKS_PER_CHILD`, startup UTC log in worker script/app).
+- [x] Surface action-plan fallback usage in pipeline task progress/final payload (`actionplan_meta.fallback_used`, `action_count`).
+- [ ] Verify Railway-level clock/NTP parity across worker replicas (platform ops task; code-side diagnostics done).
 
 **Acceptance criteria**:
 - No task loss/duplication in 3-5 parallel RCA runs.
@@ -286,6 +290,62 @@ only when needed, while keeping idle cost low.
 - `api/main.py`
 - `admin_pan/Admin/src/rca-frontend/`
 - `generate_docx_report.py`
+
+---
+
+## P0.11 — User Report Library + Automatic Result Email Delivery
+
+**Goal**: Let each user keep their own report archive in admin panel and automatically receive final analysis/report outputs by email when generation completes.
+
+**Current state**:
+- Reports are generated and downloadable, but there is no first-class per-user report inbox/library page.
+- There is no guaranteed "report completed" email notification flow tied to pipeline/report completion events.
+
+**Tasks**:
+- [ ] Add per-user report library data model and API:
+  - `reports` collection/table fields: `{report_id, tenant_id, owner_user_id, incident_id, status, artifact_urls, created_at, completed_at, meta}`.
+  - List/detail endpoints scoped by user and role (owner/admin visibility rules).
+- [ ] Add admin-panel "My Reports" page with filter/search/sort:
+  - status (`queued/running/completed/failed`),
+  - incident/date/language filters,
+  - quick actions (open/download/regenerate/share policy-bound).
+- [ ] Ensure report ownership binding at job start:
+  - store initiating user identity and tenant in pipeline/report jobs,
+  - preserve ownership across retries/regenerations.
+- [ ] Add email notification workflow on report completion/failure:
+  - send summary + secure link(s) to generated artifacts,
+  - send failure notification with retry guidance,
+  - include language-aware email template rendering.
+- [ ] Add email provider integration and delivery resilience:
+  - provider adapter (SES/SendGrid/etc.),
+  - retry/backoff + dead-letter logging,
+  - idempotency guard to avoid duplicate sends.
+- [ ] Add user notification preferences:
+  - opt-in/out,
+  - per-tenant defaults,
+  - digest vs immediate mode (optional).
+- [ ] Add audit and security controls:
+  - expiring signed URLs for report access,
+  - delivery logs and trace IDs,
+  - tenant/user authorization checks on all report-link endpoints.
+- [ ] Add end-to-end tests:
+  - report completion creates user-visible library entry,
+  - exactly-once (or safely idempotent) email delivery semantics,
+  - unauthorized user cannot access another user's report.
+
+**Acceptance criteria**:
+- Every completed report appears in initiating user's "My Reports" list within defined SLA.
+- Report completion triggers an email to the correct user with valid, authorized access links.
+- Failed reports also notify users with actionable status.
+- Admin can audit delivery state and users can control notification preferences.
+
+**Related files**:
+- `api/main.py`
+- `tasks/pipeline_tasks.py`
+- `agents/skillbased_docx_agent.py`
+- `admin_pan/Admin/src/`
+- `shared/tenant_auth.py`
+- `shared/tenant_store.py`
 
 ---
 

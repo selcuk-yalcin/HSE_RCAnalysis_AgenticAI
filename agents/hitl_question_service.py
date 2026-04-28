@@ -262,6 +262,67 @@ def _stable_id(prefix: str, *parts: str) -> str:
     return f"{prefix}-{h}"
 
 
+_QUESTION_NOISE_RX = re.compile(r"\b([abcd]\d+\.\d+|vs|veya|yoksa|icin|için)\b", re.IGNORECASE)
+
+
+def _question_fingerprint(text: str) -> str:
+    """
+    Aynı niyeti taşıyan soruları normalize et:
+    - HSG kodlarını ve bağlaç gürültüsünü temizle
+    - Noktalama/boşluk farklarını yok say
+    """
+    s = str(text or "").lower().strip()
+    if not s:
+        return ""
+    s = _QUESTION_NOISE_RX.sub(" ", s)
+    s = re.sub(r"[^\wçğıöşü\s]", " ", s, flags=re.IGNORECASE)
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+
+def _tokenize_question(text: str) -> set[str]:
+    s = _question_fingerprint(text)
+    if not s:
+        return set()
+    toks = {t for t in s.split(" ") if len(t) >= 3}
+    stop = {
+        "nedir", "neden", "mi", "mı", "mu", "mü", "icin", "için", "gore", "göre",
+        "oldu", "olabilir", "var", "yok", "bu", "soru", "olay", "durum", "kadar",
+        "sahada", "miydi", "yardim", "yardım", "kanit", "kanıt", "ne", "hangi",
+    }
+    return {t for t in toks if t not in stop}
+
+
+def _is_overlapping_question(text: str, seen_fingerprints: set[str], seen_token_sets: list[set[str]]) -> bool:
+    fp = _question_fingerprint(text)
+    if not fp:
+        return True
+    if fp in seen_fingerprints:
+        return True
+    cur = _tokenize_question(text)
+    if not cur:
+        return False
+    # Yüksek örtüşen soruları ele (ör. "neden KKD yoktu..." varyantları)
+    for prev in seen_token_sets:
+        if not prev:
+            continue
+        inter = len(cur.intersection(prev))
+        union = len(cur.union(prev))
+        if union <= 0:
+            continue
+        jacc = inter / union
+        if jacc >= 0.72:
+            return True
+    return False
+
+
+def _register_question(text: str, seen_fingerprints: set[str], seen_token_sets: list[set[str]]) -> None:
+    fp = _question_fingerprint(text)
+    if fp:
+        seen_fingerprints.add(fp)
+    seen_token_sets.append(_tokenize_question(text))
+
+
 def _immediate_causes_from_payload(
     immediate_causes: list[dict] | None,
     root_cause_initial: str,
@@ -562,13 +623,14 @@ def build_hitl_question_pool(
     focus_codes = [str((c or {}).get("code") or "").strip().upper() for c in causes if (c or {}).get("code")]
     disamb_raw = build_questions_for_causes(causes)
     pool: list[dict[str, Any]] = []
-    seen_q: set[str] = set()
+    seen_q_fp: set[str] = set()
+    seen_q_tokens: list[set[str]] = []
 
     for row in disamb_raw:
-        soru = row.get("soru") or ""
-        if not soru or soru.lower() in seen_q:
+        soru = str(row.get("soru") or "").strip()
+        if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
             continue
-        seen_q.add(soru.lower())
+        _register_question(soru, seen_q_fp, seen_q_tokens)
         code = row.get("code", "")
         qid = _stable_id("d", code, soru)
         pool.append(
@@ -587,10 +649,10 @@ def build_hitl_question_pool(
         s for s in (how_happened or "", root_cause_initial or "") if s.strip()
     )
     for row in _taxonomy_gap_questions(full_text):
-        soru = row.get("soru") or ""
-        if not soru or soru.lower() in seen_q:
+        soru = str(row.get("soru") or "").strip()
+        if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
             continue
-        seen_q.add(soru.lower())
+        _register_question(soru, seen_q_fp, seen_q_tokens)
         pool.append(row)
 
     llm_rows = _llm_question_candidates(
@@ -603,9 +665,9 @@ def build_hitl_question_pool(
     )
     for row in llm_rows:
         soru = str(row.get("soru") or "").strip()
-        if not soru or soru.lower() in seen_q:
+        if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
             continue
-        seen_q.add(soru.lower())
+        _register_question(soru, seen_q_fp, seen_q_tokens)
         pool.insert(0, row)
 
     return pool[:20]
@@ -685,7 +747,8 @@ def build_why_probe_question_pool(
     focus_codes = focus_codes[:3]
 
     pool: list[dict[str, Any]] = []
-    seen_q: set[str] = set()
+    seen_q_fp: set[str] = set()
+    seen_q_tokens: list[set[str]] = []
 
     # 1) Code-grounded deep questions directly from taxonomy item.
     llm_rows = _llm_question_candidates(
@@ -699,29 +762,29 @@ def build_why_probe_question_pool(
         max_questions=6,
     )
     for row in llm_rows:
-        soru = row.get("soru") or ""
-        if not soru or soru.lower() in seen_q:
+        soru = str(row.get("soru") or "").strip()
+        if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
             continue
-        seen_q.add(soru.lower())
+        _register_question(soru, seen_q_fp, seen_q_tokens)
         pool.append(row)
 
     # 2) Code-grounded deep questions directly from taxonomy item.
     for code in focus_codes:
         for row in _build_deep_questions_from_taxonomy(code, why_level):
-            soru = row.get("soru") or ""
-            if not soru or soru.lower() in seen_q:
+            soru = str(row.get("soru") or "").strip()
+            if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
                 continue
-            seen_q.add(soru.lower())
+            _register_question(soru, seen_q_fp, seen_q_tokens)
             pool.append(row)
 
     # 3) Disambiguation (hedef immediate code)
     if focus_codes:
         causes = [{"code": c, "cause_tr": c} for c in focus_codes]
         for row in build_questions_for_causes(causes)[:4]:
-            soru = row.get("soru") or ""
-            if not soru or soru.lower() in seen_q:
+            soru = str(row.get("soru") or "").strip()
+            if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
                 continue
-            seen_q.add(soru.lower())
+            _register_question(soru, seen_q_fp, seen_q_tokens)
             qid = _stable_id("wp-d", str(why_level), row.get("code", ""), soru)
             pool.append(
                 {
@@ -739,11 +802,11 @@ def build_why_probe_question_pool(
     # 4) Code-specific questions (knowledge_base bağlı template'ler)
     qe = QuestionEngine()
     for i, row in enumerate(qe.get_code_specific_questions(focus_codes)[:6]):
-        soru = row.get("question") or ""
+        soru = str(row.get("question") or "").strip()
         code = row.get("hsg245_code", "")
-        if not soru or soru.lower() in seen_q:
+        if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
             continue
-        seen_q.add(soru.lower())
+        _register_question(soru, seen_q_fp, seen_q_tokens)
         qid = _stable_id("wp-c", str(why_level), code, str(i), soru)
         pool.append(
             {

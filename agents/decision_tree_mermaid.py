@@ -97,13 +97,23 @@ class DecisionTreeGenerator:
             root_cause_text = strip_hse_codes(
                 str(root_cause.get("cause_tr", root_cause.get("cause", "")) or "")
             )
+            root_explanation = strip_hse_codes(
+                str(
+                    root_cause.get("explanation_tr")
+                    or root_cause.get("explanation")
+                    or ""
+                )
+            )
 
-            header = "<b>KÖK NEDEN</b>"
+            header = "<b>KÖK NEDEN / ROOT CAUSE</b>"
             title_fmt = self._fmt(root_title, 72)
             content = f"{header}<br/>{title_fmt}"
             if root_cause_text:
                 cause_fmt = self._fmt(root_cause_text, 72)
                 content += f"<br/>{cause_fmt}"
+            if root_explanation:
+                expl_fmt = self._fmt(root_explanation, 84)
+                content += f"<br/><span style='font-size:12px; font-weight:normal; color:#333'><b>Açıklama / Explanation:</b> {expl_fmt}</span>"
 
             lines.append(f'    {root_node}["{content}"]')
             lines.append(f'    style {root_node} fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold')
@@ -216,11 +226,11 @@ class DecisionTreeGenerator:
 </head>
 <body>
     <header>
-        <div class="top-title">5-WHY ANALİZ AĞACI (DECISION TREE)</div>
-        <h1>5-WHY ANALİZ AĞACI</h1>
+        <div class="top-title">5-WHY ANALİZ AĞACI / DECISION TREE</div>
+        <h1>5-WHY ANALİZ AĞACI / DECISION TREE</h1>
         <div class="subtitle">{safe_title}</div>
     </header>
-    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
+    <div class="legend">Üstten alta / Top to bottom: OLAY / EVENT → NEDEN / WHY (kesik çerçeve / dashed) → CEVAP / ANSWER → KÖK NEDEN / ROOT CAUSE (koyu / bold)</div>
     <div id="diagram-wrap">
         <div class="mermaid">
 {mermaid_code}

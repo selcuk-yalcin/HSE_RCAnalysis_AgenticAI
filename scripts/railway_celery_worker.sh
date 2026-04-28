@@ -2,6 +2,7 @@
 # Railway / Nixpacks: use python -m celery so the CLI is always on PYTHONPATH.
 # Autoscale defaults keep low idle cost: min=1, max=5.
 set -eu
+export TZ="${TZ:-UTC}"
 POOL="${CELERY_POOL:-prefork}"
 LOGLEVEL="${CELERY_LOGLEVEL:-info}"
 AUTOSCALE_MAX="${CELERY_AUTOSCALE_MAX:-5}"
@@ -18,6 +19,8 @@ fi
 if [ "${DISABLE_GOSSIP}" = "1" ]; then
   EXTRA_FLAGS="${EXTRA_FLAGS} --without-gossip"
 fi
+
+echo "worker-start tz=${TZ} utc_now=$(date -u +"%Y-%m-%dT%H:%M:%SZ") pool=${POOL} autoscale=${AUTOSCALE_MAX},${AUTOSCALE_MIN} heartbeat=${HEARTBEAT_INTERVAL}"
 
 exec python -m celery -A celery_app:celery_app worker \
   --loglevel="$LOGLEVEL" \

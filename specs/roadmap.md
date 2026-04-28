@@ -30,6 +30,7 @@ Source: synchronized from root `TODO.md`.
 - Enriched job payload fields for UI.
 - Live timeline component in chat UI.
 - WebSocket reconnect and robust failure UX.
+- ✅ Increase frontend pipeline timeout defaults from 6 minutes to 20 minutes for polling/WebSocket job tracking to reduce premature "Pipeline timeout (360s)" errors on long RCA runs. (DONE)
 
 ### P0.4 Worker OpenRouter 401 Stabilization
 
@@ -69,6 +70,9 @@ Source: synchronized from root `TODO.md`.
 - ✅ Tune heartbeat and broker visibility timeout for long RCA tasks. (DONE - env-driven visibility timeout + health interval + prefetch=1)
 - ✅ Reduce single-worker CPU blocking with staged checkpoints. (DONE - cooperative progress checkpoints in `tasks/pipeline_tasks.py`)
 - ✅ Add 3-5 parallel-run reliability/load validation and ops visibility. (DONE - ops summary in `shared/ops_celery.py` + `tests/test_parallel_rca_load_scenario.py`)
+- ✅ Add worker recycle and runtime UTC diagnostics to reduce long-lived process degradation and make clock-drift triage explicit (`CELERY_MAX_TASKS_PER_CHILD`, startup UTC log in `celery_app.py` + worker start script). (DONE)
+- ✅ Expose action-plan fallback telemetry in pipeline progress/result payload (`actionplan_meta.fallback_used`) for easier RCA/report quality triage. (DONE - `tasks/pipeline_tasks.py`)
+- ⚠️ Remaining ops prerequisite: platform-level clock sync/NTP parity across worker instances (code cannot force host clock; monitor for `Substantial drift ... clocks are out of sync`). (OPS NOTE)
 
 ### P0.8 Multilingual Report + Interactive UX Stream
 
@@ -86,6 +90,14 @@ Source: synchronized from root `TODO.md`.
 - Confirm final code-visibility policy with Baris Bey before release.
 - Add optional logo insertion support (tenant-level default + per-report override).
 - Add watermark/hologram support for draft/final report modes.
+
+### P0.10 User Report Library + Completion Email Delivery
+
+- Add per-user "My Reports" library in admin panel (list/filter/status/download/regenerate).
+- Persist report ownership and lifecycle metadata (`owner_user_id`, `incident_id`, `status`, `artifact_urls`, timestamps).
+- Send automatic email notification when report generation completes (success/failure templates + secure links).
+- Add notification preferences (opt-in/out, tenant defaults) and idempotent delivery/retry policy.
+- Add audit trail for delivery events and authorization checks for report access links.
 
 ### P1.7 Evidence Attachments in Analysis Flow
 
@@ -128,6 +140,7 @@ Source: synchronized from root `TODO.md`.
 - Tenant-isolated vector namespaces.
 - ✅ Controlled RAG prompt injection strategy. (DONE - Mongo context injection into `RootCauseAgentV3_1` incident summary path)
 - ✅ Vector RAG lazy import + soft degradation when optional deps missing (V3.1 can run without local torch/sentence-transformers; wired in `rag_pipeline/retrieval` + `RootCauseAgentV3_1`). (DONE)
+- ⚠️ Runtime prerequisite reminder: if `sentence_transformers` (and compatible `torch`) is missing on worker runtime, vector RAG stays disabled and system falls back to keyword/context-only path (`No module named 'sentence_transformers'`). (OPS NOTE)
 - ✅ Canonical root-cause labels: after 5-Why, map final C/D (and D-only meta-synthesis) to official HSG245 titles from `agents/knowledge.json` via `parse_hsg_taxonomy_items` / `infer_codes_from_text` (`_try_snap_to_taxonomy` in `rootcause_agent_v3_1.py`). (DONE)
 - Add normalized HGS taxonomy store in Mongo (`hgs_taxonomy.taxonomy_items`) for taxonomy-aware retrieval/questioning.
 
@@ -161,12 +174,12 @@ Source: synchronized from root `TODO.md`.
 ### P1.9 Model Strategy by Stage
 
 - ✅ **Implemented defaults** (`agents/model_constants.py`):
-  - **Analysis (DSPy, 5-Why, overview, assessment, action plan, chat using `OPENROUTER_DEFAULT_CHAT_MODEL`):** `qwen/qwen3.6-flash`.
+  - **Analysis (DSPy, 5-Why, overview, assessment, action plan, chat using `OPENROUTER_DEFAULT_CHAT_MODEL`):** `anthropic/claude-haiku-4.5`.
   - **Report writing only (DOCX/HTML, `SkillBasedDocxAgent` / `resolve_openrouter_docx_model`):** `google/gemini-2.5-flash`, independent of analysis default.
-  - Overrides: `OPENROUTER_DSPY_MODEL`, `OPENROUTER_DOCX_MODEL`, `OPENROUTER_DEFAULT_MODEL`, `OPENROUTER_MODEL_PRESET` (presets include `flash`, `qwen`, `qwen3`, `deepseek`, `v4pro`, `sonnet`). `OPENROUTER_TEST_MODEL` forces a single model for the whole stack—leave empty for the split. (DONE)
+  - Overrides: `OPENROUTER_DSPY_MODEL`, `OPENROUTER_DOCX_MODEL`, `OPENROUTER_DEFAULT_MODEL`, `OPENROUTER_MODEL_PRESET` (presets include `flash`, `qwen`, `qwen3`, `qwen3-vl`, `haiku`, `maestro`, `gpt-5.4-mini`, `kimi`, `deepseek`, `v4pro`, `sonnet`). `OPENROUTER_TEST_MODEL` forces a single model for the whole stack—leave empty for the split. (DONE)
 - Training/synthetic generation profile (non-production defaults in scripts; align with `agents/synetic_data_preperation`):
   - prefer `google/gemini-2.5-flash` for speed and cost where still used.
-- Historical note: earlier drafts suggested `anthropic/claude-sonnet-4.5` for agentic + report; production split above uses Qwen (analysis) + Flash (report); DeepSeek was the prior code default before Qwen.
+- Historical note: earlier drafts suggested `anthropic/claude-sonnet-4.5` for agentic + report; production split now uses Haiku (analysis) + Flash (report), after prior DeepSeek/Qwen default iterations.
 - Runtime fallback policy (still open):
   - primary model failure should degrade gracefully to a secondary profile.
 

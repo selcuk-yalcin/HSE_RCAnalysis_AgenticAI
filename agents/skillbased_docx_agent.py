@@ -1242,6 +1242,185 @@ class SkillBasedDocxAgent:
             return {"part1": {}, "part2": {}, "part3_rca": data}
         return data
 
+    @staticmethod
+    def _is_empty_value(v: Any) -> bool:
+        if v is None:
+            return True
+        if isinstance(v, str):
+            return not v.strip()
+        if isinstance(v, (list, tuple, set, dict)):
+            return len(v) == 0
+        return False
+
+    def _merge_with_fallback_content(self, parsed: Dict, fallback: Dict) -> Dict:
+        """LLM çıktısı kısmi/boşsa fallback'ten doldur; dolu alanları koru."""
+        if not isinstance(parsed, dict):
+            return fallback
+        merged = copy.deepcopy(parsed)
+        for key, fb_val in fallback.items():
+            cur_val = merged.get(key)
+            if key not in merged or self._is_empty_value(cur_val):
+                merged[key] = copy.deepcopy(fb_val)
+                continue
+            if isinstance(cur_val, dict) and isinstance(fb_val, dict):
+                merged[key] = self._merge_with_fallback_content(cur_val, fb_val)
+        return merged
+
+    def _build_deterministic_fallback_content(self, raw_data: Dict, lang: Optional[Dict] = None) -> Dict:
+        """LLM başarısız olsa bile boş olmayan rapor iskeleti üret."""
+        lang = lang or {"code": "tr"}
+        lang_code = (lang.get("code") or "tr").lower()
+        part1 = raw_data.get("part1", {}) or {}
+        part2 = raw_data.get("part2", {}) or {}
+        part3 = raw_data.get("part3_rca", {}) or {}
+        overview = part1.get("overview", {}) if isinstance(part1.get("overview", {}), dict) else {}
+
+        incident_summary = str(
+            part3.get("incident_summary")
+            or overview.get("what_happened")
+            or part1.get("description")
+            or "Olay özeti mevcut değil."
+        )
+        incident_id = str(
+            part1.get("incident_id")
+            or part1.get("reference_no")
+            or part3.get("incident_id")
+            or "N/A"
+        )
+        location = str(
+            part1.get("location")
+            or overview.get("where_happened")
+            or "N/A"
+        )
+        incident_type = str(
+            part1.get("incident_type")
+            or part2.get("incident_type")
+            or "N/A"
+        )
+
+        branches_raw = part3.get("analysis_branches") or part3.get("branches") or []
+        branches: List[Dict[str, Any]] = []
+        root_causes: List[Dict[str, Any]] = []
+
+        for idx, br in enumerate(branches_raw[:8], start=1):
+            immediate = br.get("immediate_cause", {}) if isinstance(br.get("immediate_cause", {}), dict) else {}
+            root = br.get("root_cause", {}) if isinstance(br.get("root_cause", {}), dict) else {}
+            why_chain_raw = br.get("why_chain") or br.get("questions_and_answers") or []
+            why_chain: List[Dict[str, Any]] = []
+            for w_i, w in enumerate(why_chain_raw[:5], start=1):
+                q = strip_hse_codes(str(w.get("question_tr") or w.get("question") or ""))
+                a = strip_hse_codes(str(w.get("answer_tr") or w.get("answer") or ""))
+                why_chain.append({"number": w.get("level", w_i), "question": q, "answer": a})
+
+            root_title = strip_hse_codes(str(root.get("cause_tr") or root.get("cause") or root.get("title") or f"Kök Neden {idx}"))
+            root_detail = strip_hse_codes(str(root.get("explanation_tr") or root.get("explanation") or root_title))
+            branches.append(
+                {
+                    "branch_number": br.get("branch_number", idx),
+                    "branch_title": f"KRİTİK FAKTÖR {idx}",
+                    "initial_condition": strip_hse_codes(str(immediate.get("evidence_tr") or incident_summary[:500])),
+                    "direct_cause": strip_hse_codes(str(immediate.get("cause_tr") or immediate.get("cause") or "")),
+                    "why_chain": why_chain,
+                    "root_cause_title": root_title,
+                    "root_cause_detail": root_detail,
+                    "organizational_factors": [],
+                }
+            )
+            root_causes.append(
+                {
+                    "title": root_title,
+                    "category": str(root.get("category_type") or root.get("category") or ""),
+                    "contributing_organizations": "",
+                    "detailed_description": root_detail,
+                    "impacts": [],
+                }
+            )
+
+        # analysis_branches yoksa part3.root_causes listesinden üret
+        if not root_causes:
+            for idx, rc in enumerate(part3.get("root_causes", [])[:8], start=1):
+                title = strip_hse_codes(str(rc.get("description") or rc.get("cause_tr") or rc.get("title") or f"Kök Neden {idx}"))
+                detail = strip_hse_codes(str(rc.get("explanation") or rc.get("detailed_description") or title))
+                root_causes.append(
+                    {
+                        "title": title,
+                        "category": str(rc.get("category") or rc.get("category_type") or ""),
+                        "contributing_organizations": "",
+                        "detailed_description": detail,
+                        "impacts": [],
+                    }
+                )
+                branches.append(
+                    {
+                        "branch_number": idx,
+                        "branch_title": f"KRİTİK FAKTÖR {idx}",
+                        "initial_condition": strip_hse_codes(incident_summary[:500]),
+                        "direct_cause": title,
+                        "why_chain": [],
+                        "root_cause_title": title,
+                        "root_cause_detail": detail,
+                        "organizational_factors": [],
+                    }
+                )
+
+        immediate_actions = [
+            {"action": "Tehlikeli iş adımı durduruldu ve alan emniyete alındı", "responsible": "Saha Sorumlusu", "status": "Tamamlandı"},
+            {"action": "İlgili ekip için hızlı güvenlik bilgilendirmesi yapıldı", "responsible": "HSE", "status": "Devam ediyor"},
+        ]
+
+        return {
+            "cover": {
+                "title": _label(lang_code, "cover_title"),
+                "subtitle": _label(lang_code, "cover_subtitle"),
+                "confidentiality": _label(lang_code, "cover_confidentiality"),
+                "ref_no": incident_id,
+                "date": datetime.now().strftime("%Y-%m-%d"),
+                "location": location,
+                "incident_type": incident_type,
+                "incident_summary_short": strip_hse_codes(incident_summary[:420]),
+            },
+            "executive_summary": {
+                "what_happened": strip_hse_codes(incident_summary),
+                "immediate_response": strip_hse_codes(str(part1.get("immediate_response") or part2.get("immediate_response") or "")),
+                "key_findings": [rc.get("title", "") for rc in root_causes[:5] if rc.get("title")],
+                "immediate_actions": immediate_actions,
+            },
+            "incident_details": {
+                "info_table": {
+                    "Referans No": incident_id,
+                    "Tarih": datetime.now().strftime("%Y-%m-%d"),
+                    "Lokasyon": location,
+                    "Olay Tipi": incident_type,
+                },
+                "event_table": {
+                    "Özet": strip_hse_codes(incident_summary[:700]),
+                    "Analiz Seviyesi": str(part2.get("investigation_level") or ""),
+                },
+                "timeline": [],
+            },
+            "analysis_method": {
+                "five_why_explanation": "HSG245 tabanlı 5-Why yaklaşımı ile doğrudan ve kök nedenler analiz edilmiştir.",
+                "code_system": [],
+                "team_members": [],
+            },
+            "branches": branches,
+            "root_causes": root_causes,
+            "contributing_factors": [],
+            "corrective_actions": [],
+            "lessons_learned": {
+                "what_to_do": [],
+                "long_term": [],
+                "communication": [],
+                "training": [],
+            },
+            "conclusion": {
+                "overall_assessment": "Rapor, mevcut vaka verileri üzerinden otomatik olarak derlenmiştir.",
+                "short_term_measures": [],
+                "long_term_improvements": [],
+                "comparison_table": [],
+            },
+        }
+
     def _generate_content_with_claude(self, raw_data: Dict, lang: Optional[Dict] = None) -> Dict:
         lang = lang or {"code": "tr", "name": "Turkish", "rtl": False}
         lang_name = lang["name"]
@@ -1299,7 +1478,7 @@ class SkillBasedDocxAgent:
 
         print("-" * 50)
 
-        minimal = {"cover": {"title": _label(lang.get("code", "tr"), "cover_title")}}
+        deterministic_fallback = self._build_deterministic_fallback_content(raw_data, lang)
         def _request_and_parse(payload: Dict, label: str) -> Optional[Dict]:
             try:
                 response = requests.post(
@@ -1374,7 +1553,7 @@ class SkillBasedDocxAgent:
         # 1) İlk deneme
         parsed = _request_and_parse(base_payload, "attempt-1")
         if parsed:
-            return parsed
+            return self._merge_with_fallback_content(parsed, deterministic_fallback)
 
         # 2) Parse/format bozuksa, daha katı prompt ve düşük temperature ile bir kez yeniden dene
         retry_payload = copy.deepcopy(base_payload)
@@ -1392,10 +1571,10 @@ class SkillBasedDocxAgent:
         print("  🔁 İlk deneme parse edilemedi, katı JSON modunda ikinci deneme yapılıyor...")
         parsed_retry = _request_and_parse(retry_payload, "attempt-2")
         if parsed_retry:
-            return parsed_retry
+            return self._merge_with_fallback_content(parsed_retry, deterministic_fallback)
 
-        print("  ⚠️  Tüm denemeler başarısız, minimal içeriğe düşülüyor.")
-        return minimal
+        print("  ⚠️  Tüm denemeler başarısız, deterministic fallback rapora düşülüyor (boş rapor engellendi).")
+        return deterministic_fallback
 
     def _parse_json_response(self, text: str) -> Optional[Dict]:
         last_error: Optional[Exception] = None

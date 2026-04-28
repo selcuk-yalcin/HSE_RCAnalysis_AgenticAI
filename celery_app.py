@@ -5,6 +5,7 @@ Project-level Celery application.
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 
 from celery import Celery
 
@@ -19,6 +20,15 @@ BROKER_HEARTBEAT = int((os.getenv("CELERY_BROKER_HEARTBEAT") or "30").strip() or
 BROKER_POOL_LIMIT = int((os.getenv("CELERY_BROKER_POOL_LIMIT") or "10").strip() or "10")
 VISIBILITY_TIMEOUT = int((os.getenv("CELERY_VISIBILITY_TIMEOUT") or "7200").strip() or "7200")
 HEALTH_CHECK_INTERVAL = int((os.getenv("CELERY_HEALTH_CHECK_INTERVAL") or "20").strip() or "20")
+WORKER_MAX_TASKS_PER_CHILD = int((os.getenv("CELERY_MAX_TASKS_PER_CHILD") or "25").strip() or "25")
+WORKER_MAX_MEMORY_PER_CHILD = int((os.getenv("CELERY_MAX_MEMORY_PER_CHILD_KB") or "0").strip() or "0")
+
+print(
+    "🕒 Celery runtime clock check: "
+    f"utc_now={datetime.now(timezone.utc).isoformat()}, "
+    f"TZ={os.getenv('TZ', 'unset')}, "
+    f"broker_heartbeat={BROKER_HEARTBEAT}s"
+)
 
 celery_app = Celery(
     "hse_rca_tasks",
@@ -51,5 +61,7 @@ celery_app.conf.update(
         "visibility_timeout": VISIBILITY_TIMEOUT,
     },
     worker_prefetch_multiplier=1,
+    worker_max_tasks_per_child=WORKER_MAX_TASKS_PER_CHILD,
+    worker_max_memory_per_child=WORKER_MAX_MEMORY_PER_CHILD if WORKER_MAX_MEMORY_PER_CHILD > 0 else None,
 )
 
