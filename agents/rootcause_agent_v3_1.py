@@ -138,6 +138,102 @@ except ImportError:
         def strip_hse_codes(t: str) -> str:
             return t if isinstance(t, str) else t
 
+try:
+    from agents.hgs_taxonomy import (
+        HGSTaxonomyItem,
+        infer_codes_from_text,
+        parse_hsg_taxonomy_items,
+    )
+except ImportError:
+    from .hgs_taxonomy import (
+        HGSTaxonomyItem,
+        infer_codes_from_text,
+        parse_hsg_taxonomy_items,
+    )
+
+# Lazy cache: C/D (5-Why kök) ve yalnız D (üst seviye meta) maddeleri
+_CD_TAXONOMY_LIST: List[HGSTaxonomyItem] = []
+_D_TAXONOMY_LIST: List[HGSTaxonomyItem] = []
+_TAXO_INDEX_LOADED: bool = False
+
+
+def _hsg_knowledge_json_path() -> str:
+    return str(Path(__file__).resolve().parent / "knowledge.json")
+
+
+def _load_taxonomy_indexes() -> None:
+    global _CD_TAXONOMY_LIST, _D_TAXONOMY_LIST, _TAXO_INDEX_LOADED
+    if _TAXO_INDEX_LOADED:
+        return
+    _TAXO_INDEX_LOADED = True
+    try:
+        items = parse_hsg_taxonomy_items(_hsg_knowledge_json_path())
+    except Exception:  # noqa: BLE001
+        items = []
+    _D_TAXONOMY_LIST = [x for x in items if (x.code or "").upper().startswith("D")]
+    _CD_TAXONOMY_LIST = [x for x in items if (x.code or "").upper()[:1] in ("C", "D")]
+
+
+_HSG_CODE_RE = re.compile(r"\b([ABCD]\d+\.\d+)\b", re.IGNORECASE)
+
+
+def _extract_hsg_code_line(raw: Optional[str]) -> str:
+    if not raw or not str(raw).strip():
+        return ""
+    s = re.sub(r"\s+", " ", str(raw).strip().upper())
+    s_compact = s.replace(" ", "")
+    m = _HSG_CODE_RE.search(s_compact)
+    if m:
+        return m.group(1).upper()
+    m2 = re.search(r"([ABCD])\s*(\d+)\s*\.\s*(\d+)", s)
+    if m2:
+        return f"{m2.group(1).upper()}{m2.group(2)}.{m2.group(3)}"
+    return s_compact if re.match(r"^[ABCD]\d+\.\d+$", s_compact) else ""
+
+
+def _try_snap_to_taxonomy(
+    code: str,
+    model_answer: str,
+    base_explanation: str,
+    *,
+    family: str = "cd",
+) -> Optional[Dict[str, str]]:
+    """
+    Kök neden metnini LLM cümlesinden almayıp HSG245 taksonomisindeki resmi başlığa hizala.
+    family: 'cd' = C ve D; 'd' = yalnız D (üst seviye meta nedenler için).
+    """
+    _load_taxonomy_indexes()
+    items = _CD_TAXONOMY_LIST if family not in ("d", "D") else _D_TAXONOMY_LIST
+    if not items:
+        return None
+    by_code = {i.code.upper(): i for i in items if i.code}
+    narrative = (model_answer or "").strip()
+    code_guess = _extract_hsg_code_line(code)
+    if code_guess and code_guess not in by_code:
+        code_guess = ""
+    item: Optional[HGSTaxonomyItem] = by_code.get(code_guess) if code_guess else None
+    if not item and narrative:
+        inferred = infer_codes_from_text(narrative, items, top_k=1)
+        if inferred:
+            item = by_code.get((inferred[0] or "").upper())
+    if not item and (code or "").strip():
+        for ic in infer_codes_from_text(f"{code}\n{narrative}", items, top_k=1):
+            item = by_code.get((ic or "").upper())
+            if item:
+                break
+    if not item:
+        return None
+    cat_letter = (item.code or "").upper()[:1]
+    category_type = "KİŞİSEL" if cat_letter == "C" else "ORGANİZASYONEL"
+    if cat_letter not in ("C", "D"):
+        category_type = "ORGANİZASYONEL"
+    return {
+        "code": item.code,
+        "cause_tr": (item.title or "").strip() or narrative,
+        "category_type": category_type,
+        "explanation_tr": (base_explanation or "").strip() or f"5-Why zincirinin açıklaması: {narrative}",
+    }
+
 # Optional RAG
 try:
     from rag_pipeline.retrieval import RAGAnalyzer
@@ -262,10 +358,13 @@ class WhyAnswer(dspy.Signature):
     taxonomy_codes = dspy.InputField(desc="İlgili HSG245 kategori kodları")
     
     answer = dspy.OutputField(
-        desc="Cevap açıklaması - rapordaki somut olgulara dayalı. Metinde HSG kodu veya parantez içi kod yazma."
+        desc="Cevap açıklaması - rapordaki somut olgulara dayalı; olay-özel gerekçe. "
+             "Kök neden başlığı ayrıca resmi taksonomiden uygulanır; burada yine de C/D maddesini gerekçelendiren "
+             "kısa açıklama ver. Metinde HSG kodu veya parantez içi kod yazma."
     )
     hsg245_code = dspy.OutputField(
-        desc="İlgili HSG245 kodu (ör: B2.1, C3.2)"
+        desc="taxonomy_codes bölümünde listelenen geçerli bir HSG245 kodu; uydurma yok, tam yazım. "
+             "Why-4/5'te: yalnız Cx.x veya Dx.x (C ve D listesindeki gibi, ör. C3.2, D2.1)."
     )
     evidence = dspy.OutputField(
         desc="Olay raporundan bu cevabı destekleyen somut kanıt"
@@ -754,14 +853,32 @@ class WhyChain(dspy.Module):
             cause=final_answer,
             code=final_code
         )
-        
-        root_cause_payload = {
-            "code": final_code,
-            "cause_tr": final_answer,
-            "category_type": validation.category,
-            "explanation_tr": f"5-Why zincirinin sonucu: {final_answer}",
-            "confidence": float(validation.confidence) if validation.confidence else 0.8
-        }
+        base_explanation = f"5-Why zincirinin açıklaması: {final_answer}"
+        snapped = _try_snap_to_taxonomy(
+            final_code,
+            final_answer,
+            base_explanation,
+            family="cd",
+        )
+        conf = float(validation.confidence) if validation.confidence else 0.8
+        if snapped:
+            root_cause_payload = {
+                "code": snapped["code"],
+                "cause_tr": snapped["cause_tr"],
+                "category_type": snapped["category_type"],
+                "explanation_tr": snapped["explanation_tr"],
+                "confidence": conf,
+            }
+            chain = list(chain)
+            chain[-1] = {**chain[-1], "code": snapped["code"]}
+        else:
+            root_cause_payload = {
+                "code": final_code,
+                "cause_tr": final_answer,
+                "category_type": validation.category,
+                "explanation_tr": base_explanation,
+                "confidence": conf,
+            }
         try:
             root_cause_data = _validate_model_dict(RootCauseModel, root_cause_payload)
         except ValidationError:
@@ -813,12 +930,24 @@ class MetaRootCauseSynthesizer(dspy.Module):
             incident_summary=incident_summary,
             used_codes=", ".join(used_codes)
         )
-        
+        base_expl = "Tüm root causes'ın ortak paydası"
+        meta_code = (getattr(result, "meta_code", None) or "").strip()
+        meta_cause = (getattr(result, "meta_cause", None) or "").strip()
+        snapped = _try_snap_to_taxonomy(
+            meta_code, meta_cause, base_expl, family="d"
+        )
+        if snapped:
+            return {
+                "code": snapped["code"],
+                "cause_tr": snapped["cause_tr"],
+                "explanation_tr": base_expl,
+                "synthesized_from_codes": [rc.get("code") for rc in root_causes],
+            }
         return {
-            "code": result.meta_code,
-            "cause_tr": result.meta_cause,
-            "explanation_tr": f"Tüm root causes'ın ortak paydası",
-            "synthesized_from_codes": [rc.get("code") for rc in root_causes]
+            "code": meta_code,
+            "cause_tr": meta_cause,
+            "explanation_tr": base_expl,
+            "synthesized_from_codes": [rc.get("code") for rc in root_causes],
         }
 
 
