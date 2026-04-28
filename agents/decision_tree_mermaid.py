@@ -115,10 +115,13 @@ class DecisionTreeGenerator:
                     a_node = f"A{self.node_counter}"
                     self.answer_nodes[norm_qa] = a_node
                     a_fmt = self._fmt(answer, 72)
-                    lines.append(f'    {a_node}["{a_fmt}"]')
+                    if chain_len and why_idx == chain_len:
+                        lines.append(f'    {a_node}["<b>KÖK NEDEN</b><br/>{a_fmt}"]')
+                    else:
+                        lines.append(f'    {a_node}["{a_fmt}"]')
                     if chain_len and why_idx == chain_len:
                         lines.append(
-                            f"    style {a_node} fill:#111,stroke:#000,stroke-width:2px,color:#fff,font-size:13px,font-weight:bold"
+                            f"    style {a_node} fill:#e6e6e6,stroke:#000,stroke-width:2px,color:#222,font-size:13px,font-weight:bold"
                         )
                     else:
                         lines.append(f'    style {a_node} fill:#fff,stroke:#666,stroke-width:1px,font-size:14px')
@@ -126,7 +129,7 @@ class DecisionTreeGenerator:
                     a_node = self.answer_nodes[norm_qa]
                     if chain_len and why_idx == chain_len:
                         lines.append(
-                            f"    style {a_node} fill:#111,stroke:#000,stroke-width:2px,color:#fff,font-size:13px,font-weight:bold"
+                            f"    style {a_node} fill:#e6e6e6,stroke:#000,stroke-width:2px,color:#222,font-size:13px,font-weight:bold"
                         )
 
                 self._add_conn(lines, q_node, a_node)
@@ -146,7 +149,7 @@ class DecisionTreeGenerator:
                 )
                 lines.append(f'    {root_node}["{content}"]')
                 lines.append(
-                    f"    style {root_node} fill:#111,stroke:#000,stroke-width:2px,color:#fff,font-size:13px,font-weight:bold"
+                    f"    style {root_node} fill:#e6e6e6,stroke:#000,stroke-width:2px,color:#222,font-size:13px,font-weight:bold"
                 )
                 self._add_conn(lines, prev_node, root_node)
             lines.append('')
