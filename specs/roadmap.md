@@ -161,7 +161,7 @@ Source: synchronized from root `TODO.md`.
 ### P1.9 Model Strategy by Stage
 
 - ✅ **Implemented defaults** (`agents/model_constants.py`):
-  - **Analysis (DSPy, 5-Why, overview, assessment, action plan, chat using `OPENROUTER_DEFAULT_CHAT_MODEL`):** `qwen/qwen3-235b-a22b-thinking-2507`.
+  - **Analysis (DSPy, 5-Why, overview, assessment, action plan, chat using `OPENROUTER_DEFAULT_CHAT_MODEL`):** `qwen/qwen3.6-35b-a3b`.
   - **Report writing only (DOCX/HTML, `SkillBasedDocxAgent` / `resolve_openrouter_docx_model`):** `google/gemini-2.5-flash`, independent of analysis default.
   - Overrides: `OPENROUTER_DSPY_MODEL`, `OPENROUTER_DOCX_MODEL`, `OPENROUTER_DEFAULT_MODEL`, `OPENROUTER_MODEL_PRESET` (presets include `flash`, `qwen`, `qwen3`, `deepseek`, `v4pro`, `sonnet`). `OPENROUTER_TEST_MODEL` forces a single model for the whole stack—leave empty for the split. (DONE)
 - Training/synthetic generation profile (non-production defaults in scripts; align with `agents/synetic_data_preperation`):
