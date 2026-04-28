@@ -16,12 +16,13 @@ class DecisionTreeGenerator:
     def __init__(self):
         self.node_counter = 0
         self.question_nodes = {}
+        self.question_node_texts = {}
         self.answer_nodes = {}
         self.rendered_connections = set()
 
     def generate_html(self, rca_data: Dict[str, Any], output_path: Optional[str] = None, incident_title: str = "Kaza Analizi") -> str:
         branches = rca_data.get("branches", rca_data.get("analysis_branches", []))
-        incident_event = rca_data.get("incident_event", incident_title)
+        incident_event = self._resolve_incident_summary(rca_data, incident_title)
         if isinstance(incident_event, dict):
             incident_event = incident_event.get("title", incident_title)
 
@@ -47,12 +48,19 @@ class DecisionTreeGenerator:
 
         self.node_counter = 0
         self.question_nodes = {}
+        self.question_node_texts = {}
         self.answer_nodes = {}
         self.rendered_connections = set()
+
+        first_why_question = self._build_first_why_question(incident_event)
 
         for branch_idx, branch in enumerate(branches, 1):
             why_chain = branch.get("why_chain", branch.get("questions_and_answers", []))
             prev_node = "OLAY"
+            immediate_cause = branch.get("immediate_cause", {}) or {}
+            immediate_cause_text = strip_hse_codes(
+                str(immediate_cause.get("cause_tr", immediate_cause.get("cause", "")) or "")
+            )
 
             for why_idx, why_item in enumerate(why_chain, 1):
                 question = strip_hse_codes(
@@ -61,14 +69,21 @@ class DecisionTreeGenerator:
                 answer = strip_hse_codes(
                     str(why_item.get("answer_tr", why_item.get("answer", "")) or "")
                 )
+                if why_idx == 1:
+                    # Tüm dallar aynı ilk soruyla başlasın.
+                    question = first_why_question
+                    # İlk cevap doğrudan nedeni (immediate cause) temsil etsin.
+                    if immediate_cause_text:
+                        answer = immediate_cause_text
 
-                norm_q = self._norm(question)
+                norm_q = self._question_key(question)
                 norm_qa = self._norm(f"{question}|||{answer}")
 
                 if norm_q not in self.question_nodes:
                     self.node_counter += 1
                     q_node = f"Q{self.node_counter}"
                     self.question_nodes[norm_q] = q_node
+                    self.question_node_texts[q_node] = question
                     q_fmt = self._fmt(question, 72)
                     label = f"<b>Neden {why_idx}:</b><br/>{q_fmt}"
                     lines.append(f'    {q_node}["{label}"]')
@@ -135,6 +150,63 @@ class DecisionTreeGenerator:
         text = re.sub(r'[^\w\s]', '', text)
         text = re.sub(r'\s+', ' ', text)
         return text
+
+    def _tokens(self, text: str) -> set[str]:
+        cleaned = self._norm(text)
+        return {tok for tok in cleaned.split() if len(tok) >= 3}
+
+    def _jaccard(self, a: str, b: str) -> float:
+        ta, tb = self._tokens(a), self._tokens(b)
+        if not ta or not tb:
+            return 0.0
+        inter = len(ta & tb)
+        union = len(ta | tb)
+        return inter / union if union else 0.0
+
+    def _question_key(self, question: str) -> str:
+        """Benzer soruları tek düğüm altında birleştir."""
+        normalized = self._norm(question)
+        if not normalized:
+            return normalized
+
+        # Zaten aynı normalize soru varsa direkt kullan.
+        if normalized in self.question_nodes:
+            return normalized
+
+        # Semantik yakın soruları tek anahtar altında topla.
+        for existing_key, existing_node in self.question_nodes.items():
+            existing_text = self.question_node_texts.get(existing_node, existing_key)
+            if self._jaccard(question, existing_text) >= 0.72:
+                return existing_key
+        return normalized
+
+    def _resolve_incident_summary(self, rca_data: Dict[str, Any], incident_title: str) -> str:
+        """OLAY düğümünde başlık yerine olay özetini göster."""
+        candidates = [
+            rca_data.get("incident_summary"),
+            rca_data.get("incident_event"),
+            (rca_data.get("part3") or {}).get("incident_summary"),
+            (rca_data.get("part3_rca") or {}).get("incident_summary"),
+        ]
+        for candidate in candidates:
+            if isinstance(candidate, dict):
+                candidate = candidate.get("summary") or candidate.get("title")
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate.strip()
+        return incident_title
+
+    def _extract_subject_for_injury_question(self, incident_summary: str) -> str:
+        s = (incident_summary or "").strip()
+        if not s:
+            return "çalışan"
+        first_segment = re.split(r"[,.!?]", s, maxsplit=1)[0].strip()
+        if len(first_segment.split()) <= 10:
+            return first_segment
+        return "çalışan"
+
+    def _build_first_why_question(self, incident_summary: str) -> str:
+        subject = self._extract_subject_for_injury_question(incident_summary)
+        return f"Neden {subject} yaralandı?"
 
     def _fmt(self, text: str, max_line_length: int = 72) -> str:
         if not text:
