@@ -2493,7 +2493,6 @@ class SkillBasedDocxAgent:
             <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
             <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
             <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
-            <li><a href="#root-causes" onclick="scrollToSection('root-causes')"> Kök Nedenler</a></li>
             <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
             <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
             <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
@@ -2588,31 +2587,27 @@ class SkillBasedDocxAgent:
         # 1: Executive, 2: Incident, 3: Method, 4..: Branches
         next_section_no = 4 + len(branches)
 
-        # N+1. NİHAİ KÖK NEDENLER
-        html += self._html_root_causes(root_causes, section_no=next_section_no)
-        next_section_no += 1
-
-        # N+2. SİSTEMSEL FAKTÖRLER
+        # N+1. SİSTEMSEL FAKTÖRLER
         html += self._html_contributing_factors(contributing_factors, section_no=next_section_no)
         next_section_no += 1
         
-        # N+3. DÜZELTİCİ FAALİYETLER
+        # N+2. DÜZELTİCİ FAALİYETLER
         html += self._html_corrective_actions(corrective_actions, section_no=next_section_no)
         next_section_no += 1
         
-        # N+4. ÇIKARILAN DERSLER
+        # N+3. ÇIKARILAN DERSLER
         html += self._html_lessons_learned(lessons_learned, section_no=next_section_no)
         next_section_no += 1
         
-        # N+5. SONUÇ
+        # N+4. SONUÇ
         html += self._html_conclusion(conclusion, section_no=next_section_no)
         next_section_no += 1
         
-        # N+6. İMZA SAYFASI
+        # N+5. İMZA SAYFASI
         html += self._html_signatures(section_no=next_section_no)
         next_section_no += 1
 
-        # N+7. OLAY FOTOĞRAFLARI (2 sayfa × 4 foto)
+        # N+6. OLAY FOTOĞRAFLARI (2 sayfa × 4 foto)
         html += self._html_incident_photos()
 
         html += """
@@ -3453,7 +3448,7 @@ class SkillBasedDocxAgent:
         for measure in conclusion.get("short_term_measures", []):
             html += f'<li contenteditable="true">{measure}</li>\n'
         
-        html += """
+        html += f"""
             </ul>
             
             <div class="subsection-header">{section_no}.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
@@ -3463,7 +3458,7 @@ class SkillBasedDocxAgent:
         for improvement in conclusion.get("long_term_improvements", []):
             html += f'<li contenteditable="true">{improvement}</li>\n'
         
-        html += """
+        html += f"""
             </ul>
             
             <div class="subsection-header">{section_no}.4 Mevcut vs Hedef Karşılaştırması</div>
