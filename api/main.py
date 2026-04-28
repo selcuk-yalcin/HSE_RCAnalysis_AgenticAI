@@ -542,11 +542,38 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
         raise HTTPException(status_code=503, detail="Report agent is not initialized")
 
     incident = _require_incident_record(tenant_id, incident_id)
-    if incident.get("status") != "completed":
+    # Bazı akışlarda job "completed" görünse de incident.status gecikmeli yazılabiliyor.
+    # Rapor üretimini yalnızca status'a bağlamak yerine veri varlığını esas al.
+    has_part3 = isinstance(incident.get("part3"), dict) and bool(incident.get("part3"))
+    has_part4 = isinstance(incident.get("part4"), dict) and bool(incident.get("part4"))
+    if not has_part3:
         raise HTTPException(
             status_code=400,
-            detail="All parts must be completed before generating report",
+            detail="Investigation (Part 3) is not completed yet",
         )
+    if not has_part4:
+        if actionplan_agent is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Action Plan Agent not initialized; cannot auto-complete Part 4 for report generation",
+            )
+        try:
+            part3_data = incident.get("part3") or {}
+            incident["part4"] = actionplan_agent.generate_action_plan(
+                {
+                    "root_causes": part3_data.get("root_causes", []),
+                    "underlying_causes": part3_data.get("underlying_causes", []),
+                    "immediate_causes": part3_data.get("immediate_causes", []),
+                    "severity": ((incident.get("part2") or {}).get("investigation_level", "")),
+                }
+            )
+            incident["status"] = "completed"
+            _save_incident_record(tenant_id, incident_id, incident)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Part 4 auto-completion failed before report generation: {exc}",
+            ) from exc
 
     try:
         cached_artifacts = incident.get("report_artifacts") or {}
