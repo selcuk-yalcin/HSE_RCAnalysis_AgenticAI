@@ -3,7 +3,7 @@ OpenRouter model seçimi (agents geneli).
 
 Ayrılmış varsayılanlar:
 - Analiz (DSPy, kök neden, overview, değerlendirme, eylem planı vb.):
-  `deepseek/deepseek-v4-pro`
+  `qwen/qwen3-235b-a22b-thinking-2507`
 - Yalnızca rapor yazımı (DOCX/HTML: SkillBasedDocxAgent):
   `google/gemini-2.5-flash`
 
@@ -17,7 +17,7 @@ Ortam önceliği (özet):
 import os
 
 # --- Analiz / genel ajanlar (DSPy ve chat) ---
-_DEFAULT_ANALYSIS_MODEL = "deepseek/deepseek-v4-pro"
+_DEFAULT_ANALYSIS_MODEL = "qwen/qwen3-235b-a22b-thinking-2507"
 # --- Rapor üretimi (yalnızca DOCX/HTML) ---
 _DEFAULT_REPORT_MODEL = "google/gemini-2.5-flash"
 
@@ -29,6 +29,9 @@ _MODEL_PRESETS = {
     "claude_sonnet": "anthropic/claude-sonnet-4.5",
     "deepseek": "deepseek/deepseek-v4-pro",
     "v4pro": "deepseek/deepseek-v4-pro",
+    "qwen": "qwen/qwen3-235b-a22b-thinking-2507",
+    "qwen3": "qwen/qwen3-235b-a22b-thinking-2507",
+    "qwen-thinking": "qwen/qwen3-235b-a22b-thinking-2507",
 }
 
 
@@ -52,7 +55,7 @@ def _env(name: str) -> str:
 
 
 def resolve_openrouter_chat_model() -> str:
-    """Genel chat: TEST > analiz default/preset > deepseek (varsayılan)."""
+    """Genel chat: TEST > analiz default/preset > Qwen (varsayılan)."""
     return _env("OPENROUTER_TEST_MODEL") or _resolve_default_analysis_model()
 
 
@@ -61,7 +64,7 @@ OPENROUTER_DOCX_DEFAULT_MODEL = (os.getenv("OPENROUTER_DOCX_DEFAULT_MODEL") or "
 
 
 def resolve_openrouter_dspy_model() -> str:
-    """DSPy: TEST > OPENROUTER_DSPY_MODEL > analiz genel varsayılanı (deepseek)."""
+    """DSPy: TEST > OPENROUTER_DSPY_MODEL > analiz genel varsayılanı (Qwen)."""
     return (
         _env("OPENROUTER_TEST_MODEL")
         or _env("OPENROUTER_DSPY_MODEL")

@@ -127,6 +127,8 @@ Source: synchronized from root `TODO.md`.
 - Managed embeddings and vector store.
 - Tenant-isolated vector namespaces.
 - ✅ Controlled RAG prompt injection strategy. (DONE - Mongo context injection into `RootCauseAgentV3_1` incident summary path)
+- ✅ Vector RAG lazy import + soft degradation when optional deps missing (V3.1 can run without local torch/sentence-transformers; wired in `rag_pipeline/retrieval` + `RootCauseAgentV3_1`). (DONE)
+- ✅ Canonical root-cause labels: after 5-Why, map final C/D (and D-only meta-synthesis) to official HSG245 titles from `agents/knowledge.json` via `parse_hsg_taxonomy_items` / `infer_codes_from_text` (`_try_snap_to_taxonomy` in `rootcause_agent_v3_1.py`). (DONE)
 - Add normalized HGS taxonomy store in Mongo (`hgs_taxonomy.taxonomy_items`) for taxonomy-aware retrieval/questioning.
 
 ### P1.6 ABS-Guided DSPy Training + Deep HITL
@@ -158,12 +160,15 @@ Source: synchronized from root `TODO.md`.
 
 ### P1.9 Model Strategy by Stage
 
-- Training/synthetic generation profile:
-  - prefer `google/gemini-2.5-flash` for speed and cost efficiency.
-- Agentic RCA + report generation profile:
-  - prefer `anthropic/claude-sonnet-4.5` for depth, consistency, and report quality.
-- Runtime fallback policy:
-  - primary model failure should degrade gracefully to secondary profile.
+- ✅ **Implemented defaults** (`agents/model_constants.py`):
+  - **Analysis (DSPy, 5-Why, overview, assessment, action plan, chat using `OPENROUTER_DEFAULT_CHAT_MODEL`):** `qwen/qwen3-235b-a22b-thinking-2507`.
+  - **Report writing only (DOCX/HTML, `SkillBasedDocxAgent` / `resolve_openrouter_docx_model`):** `google/gemini-2.5-flash`, independent of analysis default.
+  - Overrides: `OPENROUTER_DSPY_MODEL`, `OPENROUTER_DOCX_MODEL`, `OPENROUTER_DEFAULT_MODEL`, `OPENROUTER_MODEL_PRESET` (presets include `flash`, `qwen`, `qwen3`, `deepseek`, `v4pro`, `sonnet`). `OPENROUTER_TEST_MODEL` forces a single model for the whole stack—leave empty for the split. (DONE)
+- Training/synthetic generation profile (non-production defaults in scripts; align with `agents/synetic_data_preperation`):
+  - prefer `google/gemini-2.5-flash` for speed and cost where still used.
+- Historical note: earlier drafts suggested `anthropic/claude-sonnet-4.5` for agentic + report; production split above uses Qwen (analysis) + Flash (report); DeepSeek was the prior code default before Qwen.
+- Runtime fallback policy (still open):
+  - primary model failure should degrade gracefully to a secondary profile.
 
 ## P2 (Mid-Term)
 
