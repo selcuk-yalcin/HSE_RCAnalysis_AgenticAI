@@ -119,6 +119,40 @@ def _parse_object_field(raw: str, label: str = "field") -> Dict:
           f"{cleaned[:200]}")
     return {}
 
+
+_FLOAT_RE = re.compile(r"[-+]?(?:\d*\.\d+|\d+)")
+
+
+def _safe_float(raw: Any, default: float = 0.8, min_value: float = 0.0, max_value: float = 1.0) -> float:
+    """Kirli LLM sayı stringlerini güvenle float'a çevirir ve aralıkta sınırlar."""
+    if raw is None:
+        return default
+    if isinstance(raw, (int, float)):
+        value = float(raw)
+    else:
+        s = str(raw).strip()
+        if not s:
+            return default
+        try:
+            value = float(s)
+        except Exception:  # noqa: BLE001
+            # Örn: "0.95\\n]]", "confidence=0.88", "%90" gibi kirli çıktılar
+            m = _FLOAT_RE.search(s.replace(",", "."))
+            if not m:
+                return default
+            try:
+                value = float(m.group(0))
+            except Exception:  # noqa: BLE001
+                return default
+
+    if value != value:  # NaN
+        return default
+    if value < min_value:
+        return min_value
+    if value > max_value:
+        return max_value
+    return value
+
 from .model_constants import resolve_openrouter_dspy_model
 
 try:
@@ -873,7 +907,7 @@ class WhyChain(dspy.Module):
             base_explanation,
             family="cd",
         )
-        conf = float(validation.confidence) if validation.confidence else 0.8
+        conf = _safe_float(getattr(validation, "confidence", None), default=0.8)
         if snapped:
             root_cause_payload = {
                 "code": snapped["code"],
