@@ -2584,24 +2584,33 @@ class SkillBasedDocxAgent:
         
         # META KÖK NEDEN KALDIRILDI - İstenmeyen karmaşıklık
         
+        # Branch sayısına göre dinamik bölüm numaraları
+        # 1: Executive, 2: Incident, 3: Method, 4..: Branches
+        next_section_no = 4 + len(branches)
+
         # N+1. SİSTEMSEL FAKTÖRLER
-        html += self._html_contributing_factors(contributing_factors)
+        html += self._html_contributing_factors(contributing_factors, section_no=next_section_no)
+        next_section_no += 1
         
         # N+2. DÜZELTİCİ FAALİYETLER
-        html += self._html_corrective_actions(corrective_actions)
+        html += self._html_corrective_actions(corrective_actions, section_no=next_section_no)
+        next_section_no += 1
         
         # N+3. ÇIKARILAN DERSLER
-        html += self._html_lessons_learned(lessons_learned)
+        html += self._html_lessons_learned(lessons_learned, section_no=next_section_no)
+        next_section_no += 1
         
-        # N+5. SONUÇ
-        html += self._html_conclusion(conclusion)
+        # N+4. SONUÇ
+        html += self._html_conclusion(conclusion, section_no=next_section_no)
+        next_section_no += 1
         
-        # N+6. İMZA SAYFASI
-        html += self._html_signatures()
+        # N+5. İMZA SAYFASI
+        html += self._html_signatures(section_no=next_section_no)
+        next_section_no += 1
 
         # N+7. 5-WHY DECISION TREE (Karar Ağacı)
         if investigation_data:
-            html += self._html_decision_tree(investigation_data)
+            html += self._html_decision_tree(investigation_data, section_no=next_section_no)
 
         # N+8. OLAY FOTOĞRAFLARI (2 sayfa × 4 foto)
         html += self._html_incident_photos()
@@ -3270,11 +3279,12 @@ class SkillBasedDocxAgent:
 """
         return html
 
-    def _html_contributing_factors(self, factors: List[Dict]) -> str:
+    def _html_contributing_factors(self, factors: List[Dict], section_no: int = 6) -> str:
         """Sistemsel faktörler HTML."""
         html = """
         <div class="section" id="contributing-factors">
-            <div class="section-header">6. DİĞER OLASI SİSTEMSEL FAKTÖRLER</div>
+"""
+        html += f"""            <div class="section-header">{section_no}. DİĞER OLASI SİSTEMSEL FAKTÖRLER</div>
             
             <table>
                 <thead>
@@ -3306,11 +3316,12 @@ class SkillBasedDocxAgent:
 """
         return html
 
-    def _html_corrective_actions(self, actions: List[Dict]) -> str:
+    def _html_corrective_actions(self, actions: List[Dict], section_no: int = 7) -> str:
         """Düzeltici faaliyetler HTML."""
         html = """
         <div class="section" id="corrective-actions">
-            <div class="section-header">7. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+"""
+        html += f"""            <div class="section-header">{section_no}. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
             
             <table>
                 <thead>
@@ -3348,7 +3359,7 @@ class SkillBasedDocxAgent:
 """
         return html
 
-    def _html_lessons_learned(self, lessons: Dict) -> str:
+    def _html_lessons_learned(self, lessons: Dict, section_no: int = 8) -> str:
         """Çıkarılan dersler HTML."""
         sections = [
             ("NE YAPILMALI", lessons.get("what_to_do", []), "green"),
@@ -3359,7 +3370,8 @@ class SkillBasedDocxAgent:
         
         html = """
         <div class="section" id="lessons-learned">
-            <div class="section-header">8. ÇIKARILAN DERSLER</div>
+"""
+        html += f"""            <div class="section-header">{section_no}. ÇIKARILAN DERSLER</div>
 """
         
         for title, items, color in sections:
@@ -3377,16 +3389,16 @@ class SkillBasedDocxAgent:
 """
         return html
 
-    def _html_conclusion(self, conclusion: Dict) -> str:
+    def _html_conclusion(self, conclusion: Dict, section_no: int = 10) -> str:
         """Sonuç ve öneriler HTML."""
         html = f"""
         <div class="section" id="conclusion">
-            <div class="section-header">10. SONUÇ VE ÖNERİLER</div>
+            <div class="section-header">{section_no}. SONUÇ VE ÖNERİLER</div>
             
-            <div class="subsection-header">10.1 Genel Değerlendirme</div>
+            <div class="subsection-header">{section_no}.1 Genel Değerlendirme</div>
             <div class="paragraph" contenteditable="true">{conclusion.get('overall_assessment', '')}</div>
             
-            <div class="subsection-header">10.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <div class="subsection-header">{section_no}.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
             <ul class="bullet-list">
 """
         
@@ -3396,7 +3408,7 @@ class SkillBasedDocxAgent:
         html += """
             </ul>
             
-            <div class="subsection-header">10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <div class="subsection-header">{section_no}.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
             <ul class="bullet-list">
 """
         
@@ -3406,7 +3418,7 @@ class SkillBasedDocxAgent:
         html += """
             </ul>
             
-            <div class="subsection-header">10.4 Mevcut vs Hedef Karşılaştırması</div>
+            <div class="subsection-header">{section_no}.4 Mevcut vs Hedef Karşılaştırması</div>
             <table class="comparison-table">
                 <thead>
                     <tr>
@@ -3434,11 +3446,12 @@ class SkillBasedDocxAgent:
 """
         return html
 
-    def _html_signatures(self) -> str:
+    def _html_signatures(self, section_no: int = 11) -> str:
         """İmza sayfası HTML."""
         html = """
         <div class="section signature-section" id="signatures">
-            <div class="section-header">11. ONAY VE İMZA SAYFASI</div>
+"""
+        html += f"""            <div class="section-header">{section_no}. ONAY VE İMZA SAYFASI</div>
             
             <table class="signature-table">
                 <thead>
@@ -3500,7 +3513,7 @@ class SkillBasedDocxAgent:
 """
         return html
 
-    def _html_decision_tree(self, investigation_data: Dict) -> str:
+    def _html_decision_tree(self, investigation_data: Dict, section_no: int = 12) -> str:
         """5-Why Decision Tree bölümü — Mermaid diagram embedded."""
         from agents.decision_tree_mermaid import DecisionTreeGenerator
         
@@ -3531,7 +3544,7 @@ class SkillBasedDocxAgent:
             
             html = f"""
         <div class="section" id="decision-tree" style="page-break-before: always;">
-            <div class="section-header">12. 5-WHY KARAR AĞACI (DECISION TREE)</div>
+            <div class="section-header">{section_no}. 5-WHY KARAR AĞACI (DECISION TREE)</div>
             <p style="font-size: 13px; color: #555; margin: 8px 0 12px;">
                 Üstten alta: OLAY → soru (kesik çerçeve) → cevap → kök neden. Yazdırırken dikey A4 için uygundur.
             </p>
