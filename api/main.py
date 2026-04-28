@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Annotated, Optional, Tuple, Type
 import inspect
 import json
+import time
 from celery.result import AsyncResult
 
 from dotenv import load_dotenv
@@ -542,9 +543,26 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
         raise HTTPException(status_code=503, detail="Report agent is not initialized")
 
     incident = _require_incident_record(tenant_id, incident_id)
-    # Bazı akışlarda job "completed" görünse de incident.status gecikmeli yazılabiliyor.
-    # Rapor üretimini yalnızca status'a bağlamak yerine veri varlığını esas al.
-    has_part3 = isinstance(incident.get("part3"), dict) and bool(incident.get("part3"))
+
+    # Önce daha önce üretilmiş artifact varsa doğrudan onu döndür.
+    # Böylece incident part3 senkronizasyonu gecikse bile kullanıcı raporu açabilir.
+    cached_artifacts = incident.get("report_artifacts") or {}
+    if _validate_artifact_paths(cached_artifacts):
+        return {
+            "docx_path": str(Path(cached_artifacts["docx_path"]).resolve()),
+            "html_path": str(Path(cached_artifacts["html_path"]).resolve()),
+            "decision_tree_path": str(Path(cached_artifacts["decision_tree_path"]).resolve()),
+        }
+
+    # Bazı akışlarda job "completed" görünse de incident kaydına part3 yazımı gecikebiliyor.
+    # Kısa bir retry penceresi tanı.
+    has_part3 = False
+    for _ in range(3):
+        has_part3 = isinstance(incident.get("part3"), dict) and bool(incident.get("part3"))
+        if has_part3:
+            break
+        time.sleep(0.6)
+        incident = _require_incident_record(tenant_id, incident_id)
     has_part4 = isinstance(incident.get("part4"), dict) and bool(incident.get("part4"))
     if not has_part3:
         raise HTTPException(
@@ -576,14 +594,6 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
             ) from exc
 
     try:
-        cached_artifacts = incident.get("report_artifacts") or {}
-        if _validate_artifact_paths(cached_artifacts):
-            return {
-                "docx_path": str(Path(cached_artifacts["docx_path"]).resolve()),
-                "html_path": str(Path(cached_artifacts["html_path"]).resolve()),
-                "decision_tree_path": str(Path(cached_artifacts["decision_tree_path"]).resolve()),
-            }
-
         part3_data = incident.get("part3") or {}
         part3_v2 = part3_data.get("_v2_raw") if isinstance(part3_data, dict) else None
         report_payload = {
