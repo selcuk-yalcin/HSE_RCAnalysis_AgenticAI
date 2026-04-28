@@ -1752,6 +1752,7 @@ class SkillBasedDocxAgent:
         analysis_method = content.get("analysis_method", {})
         branches = content.get("branches", [])
         root_causes = content.get("root_causes", [])
+        root_causes = self._ensure_root_causes_from_branches(root_causes, branches)
         contributing_factors = content.get("contributing_factors", [])
         corrective_actions = content.get("corrective_actions", [])
         lessons_learned = content.get("lessons_learned", {})
@@ -2498,7 +2499,6 @@ class SkillBasedDocxAgent:
             <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
             <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
             <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
-            <li><a href="#decision-tree" onclick="scrollToSection('decision-tree')"> 5-Why Karar Ağacı</a></li>
             <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
         </ul>
     </div>
@@ -2588,31 +2588,31 @@ class SkillBasedDocxAgent:
         # 1: Executive, 2: Incident, 3: Method, 4..: Branches
         next_section_no = 4 + len(branches)
 
-        # N+1. SİSTEMSEL FAKTÖRLER
+        # N+1. NİHAİ KÖK NEDENLER
+        html += self._html_root_causes(root_causes, section_no=next_section_no)
+        next_section_no += 1
+
+        # N+2. SİSTEMSEL FAKTÖRLER
         html += self._html_contributing_factors(contributing_factors, section_no=next_section_no)
         next_section_no += 1
         
-        # N+2. DÜZELTİCİ FAALİYETLER
+        # N+3. DÜZELTİCİ FAALİYETLER
         html += self._html_corrective_actions(corrective_actions, section_no=next_section_no)
         next_section_no += 1
         
-        # N+3. ÇIKARILAN DERSLER
+        # N+4. ÇIKARILAN DERSLER
         html += self._html_lessons_learned(lessons_learned, section_no=next_section_no)
         next_section_no += 1
         
-        # N+4. SONUÇ
+        # N+5. SONUÇ
         html += self._html_conclusion(conclusion, section_no=next_section_no)
         next_section_no += 1
         
-        # N+5. İMZA SAYFASI
+        # N+6. İMZA SAYFASI
         html += self._html_signatures(section_no=next_section_no)
         next_section_no += 1
 
-        # N+7. 5-WHY DECISION TREE (Karar Ağacı)
-        if investigation_data:
-            html += self._html_decision_tree(investigation_data, section_no=next_section_no)
-
-        # N+8. OLAY FOTOĞRAFLARI (2 sayfa × 4 foto)
+        # N+7. OLAY FOTOĞRAFLARI (2 sayfa × 4 foto)
         html += self._html_incident_photos()
 
         html += """
@@ -3165,11 +3165,59 @@ class SkillBasedDocxAgent:
         
         return html
 
-    def _html_root_causes(self, root_causes: List[Dict]) -> str:
+    def _ensure_root_causes_from_branches(
+        self,
+        root_causes: List[Dict[str, Any]],
+        branches: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        """Rapor kök nedenleri eksikse dallardan tamamla (5 dal -> 5 kök neden)."""
+        existing: List[Dict[str, Any]] = []
+        seen: set[str] = set()
+        for rc in root_causes or []:
+            if not isinstance(rc, dict):
+                continue
+            title = strip_hse_codes(str(rc.get("title", "") or "")).strip()
+            detail = strip_hse_codes(str(rc.get("detailed_description", "") or "")).strip()
+            key = self._normalized_key(title or detail)
+            if key and key not in seen:
+                seen.add(key)
+                existing.append(rc)
+
+        for br in branches or []:
+            if not isinstance(br, dict):
+                continue
+            title = strip_hse_codes(str(br.get("root_cause_title", "") or "")).strip()
+            detail = strip_hse_codes(str(br.get("root_cause_detail", "") or "")).strip()
+            if not title and not detail:
+                continue
+            key = self._normalized_key(title or detail)
+            if key in seen:
+                continue
+            seen.add(key)
+            existing.append(
+                {
+                    "title": title or "Kök Neden",
+                    "category": "",
+                    "contributing_organizations": "",
+                    "detailed_description": detail or title or "",
+                    "impacts": [],
+                }
+            )
+        return existing
+
+    @staticmethod
+    def _normalized_key(text: str) -> str:
+        s = (text or "").lower().strip()
+        s = re.sub(r"[^\w\s]", " ", s)
+        s = re.sub(r"\s+", " ", s)
+        return s
+
+    def _html_root_causes(self, root_causes: List[Dict], section_no: int = 6) -> str:
         """Nihai kök nedenler HTML."""
         html = """
         <div class="section" id="root-causes">
-            <div class="section-header">6. NİHAİ KÖK NEDENLER</div>
+"""
+        html += f"""            <div class="section-header">{section_no}. NİHAİ KÖK NEDENLER</div>
 """
         
         for i, rc in enumerate(root_causes):

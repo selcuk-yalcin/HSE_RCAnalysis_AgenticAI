@@ -40,7 +40,7 @@ class DecisionTreeGenerator:
 
     def _generate_mermaid_graph(self, branches: List[Dict], incident_event: str) -> str:
         lines = ['graph TD']
-        incident_event = strip_hse_codes(str(incident_event or ""))
+        incident_event = self._summarize_incident_event(incident_event)
         event_fmt = self._fmt(incident_event, 72)
         lines.append(f'    OLAY["<b>OLAY</b><br/>{event_fmt}"]')
         lines.append('    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold')
@@ -108,7 +108,7 @@ class DecisionTreeGenerator:
 
             root_cause = branch.get("root_cause", {})
             root_node = f"ROOT{branch_idx}"
-            root_title = strip_hse_codes(str(root_cause.get("title", "Kök Neden") or ""))
+            root_title = strip_hse_codes(str(root_cause.get("title", "") or ""))
             root_cause_text = strip_hse_codes(
                 str(root_cause.get("cause_tr", root_cause.get("cause", "")) or "")
             )
@@ -120,15 +120,11 @@ class DecisionTreeGenerator:
                 )
             )
 
-            header = "<b>KÖK NEDEN / ROOT CAUSE</b>"
-            title_fmt = self._fmt(root_title, 72)
-            content = f"{header}<br/>{title_fmt}"
-            if root_cause_text:
-                cause_fmt = self._fmt(root_cause_text, 72)
-                content += f"<br/>{cause_fmt}"
-            if root_explanation:
-                expl_fmt = self._fmt(root_explanation, 84)
-                content += f"<br/><span style='font-size:12px; font-weight:normal; color:#333'><b>Açıklama / Explanation:</b> {expl_fmt}</span>"
+            # Kök neden kutusunda gereksiz başlık/prefix kalabalığını kaldır.
+            primary_text = root_cause_text or root_title or "Kök neden"
+            content = self._fmt(primary_text, 72)
+            if root_explanation and self._norm(root_explanation) != self._norm(primary_text):
+                content += f"<br/><span style='font-size:12px; font-weight:normal; color:#333'>{self._fmt(root_explanation, 84)}</span>"
 
             lines.append(f'    {root_node}["{content}"]')
             lines.append(f'    style {root_node} fill:#e8e8e8,stroke:#000,stroke-width:2px,font-size:14px,font-weight:bold')
@@ -192,8 +188,43 @@ class DecisionTreeGenerator:
             if isinstance(candidate, dict):
                 candidate = candidate.get("summary") or candidate.get("title")
             if isinstance(candidate, str) and candidate.strip():
-                return candidate.strip()
+                return self._summarize_incident_event(candidate.strip())
         return incident_title
+
+    def _summarize_incident_event(self, text: Any) -> str:
+        """Tree'de olay kutusunu kısa özetle sınırla."""
+        s = strip_hse_codes(str(text or "")).strip()
+        if not s:
+            return "Kaza özeti mevcut değil."
+
+        # Gürültülü rapor eklerini kes.
+        cut_markers = (
+            "acil önlemler:",
+            "ek notlar:",
+            "kök neden (ilk değerlendirme):",
+            "aksiyonlar",
+            "hitl",
+            "[ v s ]",
+        )
+        lower_s = s.lower()
+        cut_idx = len(s)
+        for marker in cut_markers:
+            idx = lower_s.find(marker)
+            if idx != -1:
+                cut_idx = min(cut_idx, idx)
+        s = s[:cut_idx].strip()
+
+        # İlk 1-2 cümle yeterli.
+        sentences = re.split(r"(?<=[.!?])\s+", s)
+        short = " ".join(sentences[:2]).strip()
+        if not short:
+            short = s
+
+        # Çok uzarsa token bazlı kısalt.
+        words = short.split()
+        if len(words) > 45:
+            short = " ".join(words[:45]).rstrip(" ,;:") + "..."
+        return short
 
     def _extract_subject_for_injury_question(self, incident_summary: str) -> str:
         s = (incident_summary or "").strip()
