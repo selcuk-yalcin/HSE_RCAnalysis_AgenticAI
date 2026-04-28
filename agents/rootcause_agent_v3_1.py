@@ -288,6 +288,19 @@ def _mask_secret(value: str) -> str:
     return f"{value[:7]}...{value[-4:]}(len={len(value)})"
 
 
+def _dspy_lm_max_tokens() -> int:
+    """
+    Completion limit for DSPy (5-Why, CoT). 'Thinking' modelleri uzun iç düşünce üretebilir;
+    4000'de kesilme tekrar/parsel hataları ve UI timeout'una yol açıyordu. Ortam: OPENROUTER_DSPY_MAX_TOKENS.
+    """
+    raw = (os.getenv("OPENROUTER_DSPY_MAX_TOKENS") or "32000").strip()
+    try:
+        n = int(raw)
+        return max(2048, min(n, 200000))
+    except ValueError:
+        return 32000
+
+
 def _resolve_openrouter_api_key() -> str:
     """
     Resolve API key robustly for worker environments.
@@ -1018,7 +1031,7 @@ class RootCauseAgentV3_1:
             api_key=api_key,
             api_base=_api_base,
             extra_headers=openrouter_headers,
-            max_tokens=4000
+            max_tokens=_dspy_lm_max_tokens(),
         )
         dspy.configure(lm=dspy_lm)
         

@@ -10,6 +10,7 @@ Ayrılmış varsayılanlar:
 Ortam önceliği (özet):
 - Hepsini test için tek model: OPENROUTER_TEST_MODEL=...
 - Analiz özel: OPENROUTER_DEFAULT_MODEL, OPENROUTER_MODEL_PRESET, OPENROUTER_DSPY_MODEL
+- DSPy çıktı tavanı (5-Why kesilmesin): OPENROUTER_DSPY_MAX_TOKENS (varsayılan 32000, `rootcause_agent_v3_1`)
 - Sadece rapor özel: OPENROUTER_DOCX_MODEL (ve isteğe OPENROUTER_DOCX_DEFAULT_MODEL ile
   modüldeki rapor varsayılanını geçersizleştirmek; tipik kullanım OPENROUTER_DOCX_MODEL)
 """
