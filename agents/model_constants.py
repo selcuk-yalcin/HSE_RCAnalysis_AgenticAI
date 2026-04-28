@@ -18,7 +18,7 @@ Ortam önceliği (özet):
 import os
 
 # --- Analiz / genel ajanlar (DSPy ve chat) ---
-_DEFAULT_ANALYSIS_MODEL = "qwen/qwen3.6-flash"
+_DEFAULT_ANALYSIS_MODEL = "anthropic/claude-haiku-4.5"
 # --- Rapor üretimi (yalnızca DOCX/HTML) ---
 _DEFAULT_REPORT_MODEL = "google/gemini-2.5-flash"
 
@@ -28,11 +28,22 @@ _MODEL_PRESETS = {
     "gemini-2.5-flash": "google/gemini-2.5-flash",
     "sonnet": "anthropic/claude-sonnet-4.5",
     "claude_sonnet": "anthropic/claude-sonnet-4.5",
+    "haiku": "anthropic/claude-haiku-4.5",
+    "claude_haiku": "anthropic/claude-haiku-4.5",
+    "claude-haiku-4.5": "anthropic/claude-haiku-4.5",
     "deepseek": "deepseek/deepseek-v4-pro",
     "v4pro": "deepseek/deepseek-v4-pro",
     "qwen": "qwen/qwen3.6-flash",
     "qwen3": "qwen/qwen3.6-flash",
     "qwen-thinking": "qwen/qwen3.6-flash",
+    "qwen-vl-thinking": "qwen/qwen3-vl-30b-a3b-thinking",
+    "qwen3-vl": "qwen/qwen3-vl-30b-a3b-thinking",
+    "maestro": "arcee-ai/maestro-reasoning",
+    "maestro-reasoning": "arcee-ai/maestro-reasoning",
+    "gpt-5.4-mini": "openai/gpt-5.4-mini",
+    "gpt54mini": "openai/gpt-5.4-mini",
+    "kimi": "moonshotai/kimi-k2-thinking",
+    "kimi-k2-thinking": "moonshotai/kimi-k2-thinking",
 }
 
 
