@@ -491,6 +491,7 @@ class InvestigationData(BaseModel):
     why_probe_answers: list[dict] | None = None
     output_language: str = ""  # e.g. en, tr — passed to root cause agent
     oracle_context: str = ""  # optional; merged server-side from Oracle store when empty
+    analysis_model_preset: str = ""  # optional: quality | economy (DeepWhy form tier)
 
 
 class PipelineStartRequest(BaseModel):
@@ -504,6 +505,7 @@ class PipelineStartRequest(BaseModel):
     injuries: str = ""
     why_probe_answers: list[dict] | None = None
     output_language: str = ""
+    analysis_model_preset: str = ""
 
 class HitlQuestionsRequest(BaseModel):
     """Dinamik HITL soruları (LLM + taxonomy öncelikli, rule-based fallback)."""

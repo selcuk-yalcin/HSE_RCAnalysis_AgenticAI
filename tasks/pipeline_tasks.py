@@ -116,6 +116,7 @@ def run_pipeline_task(
         "why_probe_answers": investigation_payload.get("why_probe_answers", []) or [],
         "oracle_context": investigation_payload.get("oracle_context", ""),
         "output_language": investigation_payload.get("output_language", ""),
+        "analysis_model_preset": investigation_payload.get("analysis_model_preset", ""),
     }
 
     part3_raw = rootcause_agent.analyze_root_causes(

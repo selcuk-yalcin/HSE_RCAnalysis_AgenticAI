@@ -1045,29 +1045,9 @@ class RootCauseAgentV3_1:
         os.environ.setdefault("OR_SITE_URL", "https://inferaworld.com")
         os.environ.setdefault("OR_APP_NAME", "Infera RCA")
 
-        dspy_model = _openrouter_litellm_model()
-        openrouter_headers = {
-            "Authorization": f"Bearer {api_key}",
-            "HTTP-Referer": os.environ["OR_SITE_URL"],
-            "X-Title": os.environ["OR_APP_NAME"],
-        }
-        print(
-            "🔐 OpenRouter DSPy config: "
-            f"model={dspy_model}, api_base={_api_base}, "
-            f"key={_mask_secret(api_key)}"
-        )
+        self._configured_litellm_model_id: Optional[str] = None
+        self._reconfigure_dspy_lm(initial=True)
 
-        # DSPy LM — model MUST use 'openrouter/...' prefix so LiteLLM routes to OpenRouter.
-        # api_base is also supplied because some DSPy/LiteLLM versions do not
-        # reliably pick up OPENROUTER_API_BASE from env during worker runtime.
-        dspy_lm = dspy.LM(
-            model=dspy_model,
-            api_key=api_key,
-            api_base=_api_base,
-            extra_headers=openrouter_headers,
-            max_tokens=_dspy_lm_max_tokens(),
-        )
-        dspy.configure(lm=dspy_lm)
         
         # DSPy modules
         self.immediate_cause_finder = ImmediateCauseFinder()
@@ -1258,15 +1238,81 @@ class RootCauseAgentV3_1:
         # Bilgi yoksa varsayılan: kapsamlı analiz
         return 5
     
+    def _reconfigure_dspy_lm(self, initial: bool = False) -> None:
+        """Resolve OpenRouter DSPy LM from env + optional request tier; dspy.configure(lm=...)."""
+        api_key = _resolve_openrouter_api_key()
+        _api_base = _normalize_openrouter_api_base()
+        os.environ["OPENROUTER_API_KEY"] = api_key
+        os.environ["OPENAI_API_KEY"] = api_key
+        os.environ["OPENROUTER_API_BASE"] = _api_base
+
+        dspy_model = _openrouter_litellm_model()
+        if not initial and self._configured_litellm_model_id == dspy_model:
+            return
+
+        openrouter_headers = {
+            "Authorization": f"Bearer {api_key}",
+            "HTTP-Referer": os.environ.get("OR_SITE_URL", ""),
+            "X-Title": os.environ.get("OR_APP_NAME", ""),
+        }
+        label = (
+            "🔐 OpenRouter DSPy config:"
+            if initial
+            else "🔁 DSPy LM reconfigured (analysis tier/context):"
+        )
+        print(
+            f"{label} model={dspy_model}, api_base={_api_base}, key={_mask_secret(api_key)}"
+        )
+
+        dspy_lm = dspy.LM(
+            model=dspy_model,
+            api_key=api_key,
+            api_base=_api_base,
+            extra_headers=openrouter_headers,
+            max_tokens=_dspy_lm_max_tokens(),
+        )
+        dspy.configure(lm=dspy_lm)
+        self._configured_litellm_model_id = dspy_model
+
     def analyze_root_causes(
         self,
         part1_data: Dict,
         part2_data: Dict,
         investigation_data: Dict = None,
-        synthesize_meta_root: bool = True
+        synthesize_meta_root: bool = True,
     ) -> Dict:
         """
-        Ana analiz - V2.5 ile uyumlu output format
+        Ana analiz — V2.5 ile uyumlu output format.
+        Form / API: investigation_data.analysis_model_preset in (quality | economy).
+        """
+        preset = ""
+        if investigation_data and isinstance(investigation_data, dict):
+            preset = (investigation_data.get("analysis_model_preset") or "").strip().lower()
+
+        from agents.model_constants import analysis_tier_context
+
+        try:
+            with analysis_tier_context(preset):
+                self._reconfigure_dspy_lm(initial=False)
+                return self._analyze_root_causes_impl(
+                    part1_data,
+                    part2_data,
+                    investigation_data,
+                    synthesize_meta_root,
+                )
+        finally:
+            with analysis_tier_context(""):
+                self._reconfigure_dspy_lm(initial=False)
+
+    def _analyze_root_causes_impl(
+        self,
+        part1_data: Dict,
+        part2_data: Dict,
+        investigation_data: Dict = None,
+        synthesize_meta_root: bool = True,
+    ) -> Dict:
+        """
+        Ana analiz iç gövdesi (DSPy çağrıları burada).
         """
         
         print("\n" + "=" * 80)
