@@ -93,7 +93,7 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.10 User Report Library + Completion Email Delivery
 
-- Add per-user "My Reports" library in admin panel (list/filter/status/download/regenerate).
+- Add per-user "My Reports" library in admin panel (list/filter/status/download/regenerate). **See also P1.10** for the DeepWhy-dedicated **saved reports tab** (in-form UX + same ownership/tenant isolation principles).
 - Persist report ownership and lifecycle metadata (`owner_user_id`, `incident_id`, `status`, `artifact_urls`, timestamps).
 - Send automatic email notification when report generation completes (success/failure templates + secure links).
 - Add notification preferences (opt-in/out, tenant defaults) and idempotent delivery/retry policy.
@@ -160,6 +160,7 @@ Source: synchronized from root `TODO.md`.
 
 ### P1.7 Evidence Attachments in Analysis Flow
 
+- ✅ Manual form (DeepWhy): file picker + drag-and-drop under **Ek Notlar**; allowed types JPEG/PNG/WebP/GIF, PDF, TXT/CSV; list + remove in UI; text excerpts and file manifest merged into `how_happened` for `createIncident` / `investigate` / HITL (`admin_pan/Admin/src/rca-frontend/components/IncidentForm.jsx`, `investigationPayload.js`). (DONE — client-side slice)
 - Add incident-level file upload support (photo + document evidence).
 - Add backend attachment ingestion pipeline (validation, storage, metadata indexing).
 - Extract attachment context (OCR/text and image cues) for RCA/HITL prompt augmentation.
@@ -241,6 +242,25 @@ Source: synchronized from root `TODO.md`.
 - Historical note: earlier drafts suggested `anthropic/claude-sonnet-4.5` for agentic + report; production split now uses Haiku (analysis) + Flash (report), after prior DeepSeek/Qwen default iterations.
 - Runtime fallback policy (still open):
   - primary model failure should degrade gracefully to a secondary profile.
+
+### P1.10 DeepWhy — Saved Reports Tab + Per-User Multi-Tenant Persistence
+
+- Add a **third top-level tab** in the DeepWhy RCA shell (alongside "Manuel Form" and "Etkileşimli Analiz") for **saved drafts and generated reports** (working title: e.g. "Raporlarım" / "Kayıtlı Dosyalar").
+- In that tab, users must **list, open, edit, and re-save** in-progress manual forms and associated report metadata (status, last updated, linked job/incident id where applicable).
+- **Multi-tenant + user isolation:** persist artifacts under **`tenant_id` + `owner_user_id`** (and optional `incident_id` / `draft_id`); enforce authorization on every read/write. Prefer **logical isolation** (namespaced collections, compound unique indexes, or RLS) in the shared platform database—not a separate physical database per end user (operability and cost); document the data model and migration path.
+- Align with **P0.10 User Report Library** (admin-wide library vs. this DeepWhy-first tab can share the same backend tables/APIs once ownership metadata exists).
+- Acceptance:
+  - Authenticated user A cannot read or edit user B’s saved items within the same tenant (and never across tenants).
+  - Tab shows only the current user’s items; edits persist and reload correctly.
+  - Clear empty state and error handling when persistence or network fails.
+
+### P1.11 DeepWhy — Manual Form Entry: User-Selectable Model Tier
+
+- At the **top of the manual form flow** (before "Bildirim Yapan Kişi" and other sections), add a **fixed model tier control** (e.g. **higher-quality / slower-cost** vs **lighter / faster-cheaper**) with **short Turkish helper copy** explaining trade-offs in plain language.
+- Wire the selection to the **analysis pipeline** (respect existing presets in `agents/model_constants.py` / OpenRouter env overrides); persist the choice on the draft/report record for reproducibility and billing/analytics later if needed.
+- Acceptance:
+  - Default tier is sensible for new sessions; changing tier before submit updates the subsequent analysis request.
+  - Copy is concise, non-technical, and consistent with i18n direction (TR first; EN keys optional follow-up).
 
 ## P2 (Mid-Term)
 
