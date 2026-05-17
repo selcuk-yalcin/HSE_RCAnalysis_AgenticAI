@@ -200,6 +200,16 @@ async def startup_event():
         # Don't crash - let healthcheck show the error
         pass
 
+    try:
+        info = await asyncio.to_thread(saved_reports_store.ensure_collection)
+        print(
+            f"✅ Reports library ready: {info.get('database')}.{info.get('collection')} "
+            f"(documents={info.get('document_count')})"
+        )
+    except Exception as rexc:
+        print(f"⚠️  Reports library skipped — set MONGODB_URI on Railway: {rexc}")
+
+
 def _incidents(tenant_id: str) -> dict:
     return get_tenant_store(tenant_id).incidents_db
 
@@ -1398,6 +1408,29 @@ def _read_artifact_files(artifacts: dict) -> tuple[str, str]:
     report_html = html_path.read_text(encoding="utf-8", errors="replace") if html_path.exists() else ""
     tree_html = tree_path.read_text(encoding="utf-8", errors="replace") if tree_path.exists() else ""
     return report_html, tree_html
+
+
+@app.get("/api/v1/library/status")
+async def library_status():
+    """Ops: where reports are stored and whether Mongo is reachable (no auth required)."""
+    loc = saved_reports_store.store_location()
+    ok, err = await asyncio.to_thread(saved_reports_store.ping_store)
+    count = await asyncio.to_thread(saved_reports_store.count_all_documents)
+    if ok:
+        try:
+            await asyncio.to_thread(saved_reports_store.ensure_collection)
+        except Exception:  # noqa: BLE001
+            pass
+    return {
+        "success": True,
+        "data": {
+            **loc,
+            "ping_ok": ok,
+            "ping_error": err or None,
+            "document_count": count,
+            "atlas_path": f"{loc.get('database')}.{loc.get('collection')}",
+        },
+    }
 
 
 @app.get("/api/v1/library/items")

@@ -113,6 +113,16 @@ def count_all_documents() -> int:
         return -1
 
 
+def ensure_collection() -> dict[str, Any]:
+    """Create collection + indexes on deploy (empty collection becomes visible in Atlas)."""
+    col = _get_collection()
+    n = col.estimated_document_count()
+    info = store_location()
+    info["document_count"] = n
+    info["ready"] = True
+    return info
+
+
 def list_items(tenant_id: str, owner_user_id: str, *, kind: Optional[str] = None) -> list[dict[str, Any]]:
     col = _get_collection()
     query: dict[str, Any] = {"tenant_id": tenant_id, "owner_user_id": owner_user_id}
