@@ -1,20 +1,22 @@
 """
 OpenRouter model seçimi (agents geneli).
 
-Ayrılmış varsayılanlar:
-- Analiz (DSPy, kök neden, overview, değerlendirme, eylem planı vb.):
-  `anthropic/claude-haiku-4.5` (ortam/preset ile değişir)
+Sabit ayrım (üretim varsayılanı):
+- Analiz (DSPy, kök neden, overview, değerlendirme, eylem planı, HITL, chat):
+  `anthropic/claude-haiku-4.5`
 - Yalnızca rapor yazımı (DOCX/HTML: SkillBasedDocxAgent):
   `google/gemini-2.5-flash`
 
-İstek başına analiz kalitesi (DeepWhy form):
-- `quality` → güçlü model (varsayılan: Claude Sonnet)
-- `economy` → hızlı / düşük maliyet (varsayılan: Gemini Flash)
+Formdaki quality/economy seçimi analiz modelini değiştirmez (ikisi de Haiku);
+yalnızca ileride farklı analiz profilleri eklenirse kullanılabilir.
 
-Ortam önceliği (DSPy / analiz):
+Ortam önceliği (analiz):
 - Hepsini test için tek model: OPENROUTER_TEST_MODEL=...
-- Analiz özel: OPENROUTER_DSPY_MODEL, OPENROUTER_DEFAULT_MODEL, OPENROUTER_MODEL_PRESET
-- İstek içi tier yalnızca yukarıdakiler boşken veya tier geçerliyken resolve_openrouter_dspy_model tarafından uygulanır
+- Analiz özel override: OPENROUTER_DSPY_MODEL, OPENROUTER_DEFAULT_MODEL (genelde Haiku bırakın)
+- OPENROUTER_MODEL_PRESET (dikkat: preset analiz yolunu etkiler)
+
+Rapor:
+- OPENROUTER_DOCX_MODEL veya varsayılan Flash
 
 DSPy çıktı tavanı: OPENROUTER_DSPY_MAX_TOKENS (varsayılan 32000)
 """
@@ -25,21 +27,22 @@ import contextvars
 import os
 from contextlib import contextmanager
 
-# --- Analiz / genel ajanlar (DSPy ve chat) ---
-_DEFAULT_ANALYSIS_MODEL = "anthropic/claude-haiku-4.5"
-# --- Rapor üretimi (yalnızca DOCX/HTML) ---
-_DEFAULT_REPORT_MODEL = "google/gemini-2.5-flash"
+_HAIKU_MODEL = "anthropic/claude-haiku-4.5"
+_FLASH_MODEL = "google/gemini-2.5-flash"
+
+_DEFAULT_ANALYSIS_MODEL = _HAIKU_MODEL
+_DEFAULT_REPORT_MODEL = _FLASH_MODEL
 
 _MODEL_PRESETS = {
-    "flash": "google/gemini-2.5-flash",
-    "gemini_flash": "google/gemini-2.5-flash",
-    "gemini-2.5-flash": "google/gemini-2.5-flash",
+    "flash": _FLASH_MODEL,
+    "gemini_flash": _FLASH_MODEL,
+    "gemini-2.5-flash": _FLASH_MODEL,
     "sonnet": "anthropic/claude-sonnet-4.5",
     "claude_sonnet": "anthropic/claude-sonnet-4.5",
     "claude-sonnet-4.5": "anthropic/claude-sonnet-4.5",
-    "haiku": "anthropic/claude-haiku-4.5",
-    "claude_haiku": "anthropic/claude-haiku-4.5",
-    "claude-haiku-4.5": "anthropic/claude-haiku-4.5",
+    "haiku": _HAIKU_MODEL,
+    "claude_haiku": _HAIKU_MODEL,
+    "claude-haiku-4.5": _HAIKU_MODEL,
     "deepseek": "deepseek/deepseek-v4-pro",
     "v4pro": "deepseek/deepseek-v4-pro",
     "qwen": "qwen/qwen3.6-flash",
@@ -55,8 +58,6 @@ _MODEL_PRESETS = {
     "kimi-k2-thinking": "moonshotai/kimi-k2-thinking",
 }
 
-
-# Tek istek / tek analyze çağrısı için: "quality" | "economy" (boş = env varsayılanı)
 _request_analysis_tier: contextvars.ContextVar[str | None] = contextvars.ContextVar(
     "request_analysis_tier",
     default=None,
@@ -69,7 +70,7 @@ def _env(name: str) -> str:
 
 @contextmanager
 def analysis_tier_context(tier: str):
-    """Geçici analiz model katmanı (DSPy resolve_openrouter_dspy_model ile okunur)."""
+    """İstek bağlamı (şimdilik analiz modeli Haiku; tier ileride profil için)."""
     t = (tier or "").strip().lower()
     if t not in ("quality", "economy"):
         yield
@@ -81,27 +82,26 @@ def analysis_tier_context(tier: str):
         _request_analysis_tier.reset(token)
 
 
-def _tier_to_model_slug(tier: str) -> str | None:
-    if tier == "quality":
-        return _MODEL_PRESETS.get("sonnet") or _DEFAULT_ANALYSIS_MODEL
-    if tier == "economy":
-        return _MODEL_PRESETS.get("flash") or _DEFAULT_ANALYSIS_MODEL
-    return None
-
-
-def _resolve_default_analysis_model() -> str:
-    explicit = (_env("OPENROUTER_DEFAULT_MODEL") or "").strip()
+def _resolve_analysis_model() -> str:
+    """Tüm RCA/HITL/overview/aksiyon planı — varsayılan Haiku."""
+    test = _env("OPENROUTER_TEST_MODEL")
+    if test:
+        return test
+    explicit = _env("OPENROUTER_DSPY_MODEL") or _env("OPENROUTER_DEFAULT_MODEL")
     if explicit:
         return explicit
     preset = (_env("OPENROUTER_MODEL_PRESET") or "").strip().lower()
-    if preset:
-        return _MODEL_PRESETS.get(preset, _DEFAULT_ANALYSIS_MODEL)
-    return _DEFAULT_ANALYSIS_MODEL
+    if preset and preset in _MODEL_PRESETS:
+        # Preset flash ise bile analizde Haiku kullan (flash yalnızca rapor)
+        slug = _MODEL_PRESETS[preset]
+        if slug == _FLASH_MODEL:
+            return _HAIKU_MODEL
+        return slug
+    return _HAIKU_MODEL
 
 
 def resolve_openrouter_chat_model() -> str:
-    """Genel chat: TEST > analiz default/preset > kod varsayılanı."""
-    return _env("OPENROUTER_TEST_MODEL") or _resolve_default_analysis_model()
+    return _resolve_analysis_model()
 
 
 OPENROUTER_DEFAULT_CHAT_MODEL = resolve_openrouter_chat_model()
@@ -109,22 +109,10 @@ OPENROUTER_DOCX_DEFAULT_MODEL = (_env("OPENROUTER_DOCX_DEFAULT_MODEL") or "").st
 
 
 def resolve_openrouter_dspy_model() -> str:
-    """DSPy: TEST > OPENROUTER_DSPY_MODEL > istek-tier > OPENROUTER_DEFAULT_CHAT_MODEL."""
-    test = _env("OPENROUTER_TEST_MODEL")
-    if test:
-        return test
-    dspy = _env("OPENROUTER_DSPY_MODEL")
-    if dspy:
-        return dspy
-    tier_raw = _request_analysis_tier.get()
-    tier = (tier_raw or "").strip().lower()
-    if tier:
-        mapped = _tier_to_model_slug(tier)
-        if mapped:
-            return mapped
-    return OPENROUTER_DEFAULT_CHAT_MODEL
+    """DSPy kök neden — analiz yolu (Haiku)."""
+    return _resolve_analysis_model()
 
 
 def resolve_openrouter_docx_model() -> str:
-    """Rapor (DOCX/HTML): TEST > OPENROUTER_DOCX_MODEL > flash (analizden bağımsız)."""
+    """Rapor (DOCX/HTML): TEST > OPENROUTER_DOCX_MODEL > Flash."""
     return _env("OPENROUTER_TEST_MODEL") or _env("OPENROUTER_DOCX_MODEL") or OPENROUTER_DOCX_DEFAULT_MODEL

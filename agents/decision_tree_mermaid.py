@@ -5,9 +5,9 @@ from pathlib import Path
 import re
 
 try:
-    from .report_text_sanitize import strip_hse_codes
+    from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
 except ImportError:
-    from agents.report_text_sanitize import strip_hse_codes
+    from agents.report_text_sanitize import sanitize_report_text, taxonomy_display_title
 
 
 class DecisionTreeGenerator:
@@ -58,12 +58,17 @@ class DecisionTreeGenerator:
             why_chain = branch.get("why_chain", branch.get("questions_and_answers", []))
             prev_node = "OLAY"
             immediate_cause = branch.get("immediate_cause", {}) or {}
-            immediate_cause_text = strip_hse_codes(
+            immediate_cause_text = sanitize_report_text(
                 str(immediate_cause.get("cause_tr", immediate_cause.get("cause", "")) or "")
             )
             root_cause = branch.get("root_cause", {}) or {}
-            root_title = strip_hse_codes(str(root_cause.get("title", "") or ""))
-            root_cause_text = strip_hse_codes(
+            root_code = str(root_cause.get("code", "") or "")
+            root_title = taxonomy_display_title(
+                root_code,
+                str(root_cause.get("title", "") or ""),
+                str(root_cause.get("cause_tr", root_cause.get("cause", "")) or ""),
+            )
+            root_cause_text = sanitize_report_text(
                 str(root_cause.get("cause_tr", root_cause.get("cause", "")) or "")
             )
             root_explanation = self._clean_root_explanation(
@@ -72,10 +77,10 @@ class DecisionTreeGenerator:
             chain_len = len(why_chain)
 
             for why_idx, why_item in enumerate(why_chain, 1):
-                question = strip_hse_codes(
+                question = sanitize_report_text(
                     str(why_item.get("question_tr", why_item.get("question", "")) or "")
                 )
-                answer = strip_hse_codes(
+                answer = sanitize_report_text(
                     str(why_item.get("answer_tr", why_item.get("answer", "")) or "")
                 )
                 if why_idx == 1:
@@ -216,7 +221,7 @@ class DecisionTreeGenerator:
 
     def _summarize_incident_event(self, text: Any) -> str:
         """Tree'de olay kutusunu kısa özetle sınırla."""
-        s = strip_hse_codes(str(text or "")).strip()
+        s = sanitize_report_text(str(text or "")).strip()
         if not s:
             return "Kaza özeti mevcut değil."
 
@@ -263,7 +268,7 @@ class DecisionTreeGenerator:
         return f"Neden {subject} yaralandı?"
 
     def _clean_root_explanation(self, text: Any) -> str:
-        s = strip_hse_codes(str(text or "")).strip()
+        s = sanitize_report_text(str(text or "")).strip()
         if not s:
             return ""
         s = re.sub(r"^\s*5-why\s+zincirinin\s+açıklaması\s*:\s*", "", s, flags=re.IGNORECASE)
@@ -288,7 +293,7 @@ class DecisionTreeGenerator:
         if expl and self._norm(expl) not in {self._norm(title), self._norm(cause)}:
             parts.append(expl)
         if not parts:
-            parts.append(strip_hse_codes(str(fallback or "")).strip() or "Kök neden")
+            parts.append(sanitize_report_text(str(fallback or "")).strip() or "Kök neden")
         return " - ".join(parts)
 
     def _fmt(self, text: str, max_line_length: int = 72) -> str:
@@ -325,7 +330,7 @@ class DecisionTreeGenerator:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>5-WHY Decision Tree</title>
+    <title>5-Neden Karar Ağacı</title>
     <style>
         @page {{ size: A4 portrait; margin: 8mm; }}
         * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -381,11 +386,11 @@ class DecisionTreeGenerator:
 </head>
 <body>
     <header>
-        <div class="top-title">5-WHY ANALİZ AĞACI / DECISION TREE</div>
-        <h1>5-WHY ANALİZ AĞACI / DECISION TREE</h1>
+        <div class="top-title">5-Neden Analiz Ağacı</div>
+        <h1>5-Neden Analiz Ağacı</h1>
         <div class="subtitle">{safe_title}</div>
     </header>
-    <div class="legend">Üstten alta / Top to bottom: OLAY / EVENT → NEDEN / WHY (kesik çerçeve / dashed) → CEVAP / ANSWER → KÖK NEDEN / ROOT CAUSE (koyu / bold)</div>
+    <div class="legend">Üstten alta: OLAY → NEDEN (kesik çerçeve) → CEVAP → KÖK NEDEN (koyu)</div>
     <div id="diagram-wrap">
         <div class="mermaid">
 {mermaid_code}

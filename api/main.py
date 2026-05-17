@@ -559,11 +559,12 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
     # Bazı akışlarda job "completed" görünse de incident kaydına part3 yazımı gecikebiliyor.
     # Kısa bir retry penceresi tanı.
     has_part3 = False
-    for _ in range(3):
+    for _ in range(10):
         has_part3 = isinstance(incident.get("part3"), dict) and bool(incident.get("part3"))
-        if has_part3:
+        cached_artifacts = incident.get("report_artifacts") or {}
+        if has_part3 or _validate_artifact_paths(cached_artifacts):
             break
-        time.sleep(0.6)
+        time.sleep(0.8)
         incident = _require_incident_record(tenant_id, incident_id)
     has_part4 = isinstance(incident.get("part4"), dict) and bool(incident.get("part4"))
     if not has_part3:

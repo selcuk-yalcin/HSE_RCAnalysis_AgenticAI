@@ -81,6 +81,8 @@ Source: synchronized from root `TODO.md`.
 - ✅ Align report visual palette with admin panel theme tokens. (DONE)
 - ✅ Interactive analysis must open chat-first and show active chatbot surface immediately. (DONE)
 - ✅ Stream live root-cause/progress lines in Agent Pipeline area during analysis/report generation. (DONE)
+- ✅ Interactive **HTML Oluştur** flow: no blank-popup requirement; download-first + preview/tab/blob fallback (`ChatInterface.jsx`, `hsg245Api.js`). (DONE)
+- ✅ Report generation tolerates Part 3 / artifact write delay (frontend retry + API `_generate_report_artifacts` retry). (DONE)
 
 ### P0.9 Report Template, Branding, and Hologram
 
@@ -95,9 +97,14 @@ Source: synchronized from root `TODO.md`.
 
 - Add per-user "My Reports" library in admin panel (list/filter/status/download/regenerate). **See also P1.10** for the DeepWhy-dedicated **saved reports tab** (in-form UX + same ownership/tenant isolation principles).
 - Persist report ownership and lifecycle metadata (`owner_user_id`, `incident_id`, `status`, `artifact_urls`, timestamps).
+- **Auto-email on report complete (target UX):** when HTML/DOCX artifacts are ready, send one email to the
+  **logged-in user's registered address** (Kinde `email` / profile) with attachments (HTML + DOCX) or
+  signed download links; no manual "download then attach" step for the user.
 - Send automatic email notification when report generation completes (success/failure templates + secure links).
 - Add notification preferences (opt-in/out, tenant defaults) and idempotent delivery/retry policy.
 - Add audit trail for delivery events and authorization checks for report access links.
+- Backend: SMTP/transactional provider (e.g. Resend, SendGrid, SES), Celery task after
+  `_generate_report_artifacts`, template TR/EN, bounce handling.
 
 ### P0.11 Pricing Page Refresh (3-Tier Layout)
 
@@ -245,10 +252,12 @@ Source: synchronized from root `TODO.md`.
 
 ### P1.10 DeepWhy — Saved Reports Tab + Per-User Multi-Tenant Persistence
 
-- Add a **third top-level tab** in the DeepWhy RCA shell (alongside "Manuel Form" and "Etkileşimli Analiz") for **saved drafts and generated reports** (working title: e.g. "Raporlarım" / "Kayıtlı Dosyalar").
-- In that tab, users must **list, open, edit, and re-save** in-progress manual forms and associated report metadata (status, last updated, linked job/incident id where applicable).
+- ✅ Add a **third top-level tab** in the DeepWhy RCA shell (**Raporlar**) for saved drafts (`SavedReportsPanel`, `draftReportsStorage.js`). (DONE — browser-local drafts)
+- ✅ List, open (form seed), delete drafts; polished empty/hero UI; TR/EN copy. (DONE — client)
+- ✅ **Completed reports:** auto-save to Raporlar when analysis reaches report step; manual **Raporu Kaydet**; reopen from list in interactive view (`upsertSavedReport`, `kind: report`, `incidentId`). (DONE — client)
+- ⏳ **Server persistence:** list/filter/regenerate completed reports per `tenant_id` + `owner_user_id` (Mongo/API).
+- ⏳ Align with **P0.10** admin library + email delivery on the same ownership tables.
 - **Multi-tenant + user isolation:** persist artifacts under **`tenant_id` + `owner_user_id`** (and optional `incident_id` / `draft_id`); enforce authorization on every read/write. Prefer **logical isolation** (namespaced collections, compound unique indexes, or RLS) in the shared platform database—not a separate physical database per end user (operability and cost); document the data model and migration path.
-- Align with **P0.10 User Report Library** (admin-wide library vs. this DeepWhy-first tab can share the same backend tables/APIs once ownership metadata exists).
 - Acceptance:
   - Authenticated user A cannot read or edit user B’s saved items within the same tenant (and never across tenants).
   - Tab shows only the current user’s items; edits persist and reload correctly.
@@ -256,11 +265,19 @@ Source: synchronized from root `TODO.md`.
 
 ### P1.11 DeepWhy — Manual Form Entry: User-Selectable Model Tier
 
-- At the **top of the manual form flow** (before "Bildirim Yapan Kişi" and other sections), add a **fixed model tier control** (e.g. **higher-quality / slower-cost** vs **lighter / faster-cheaper**) with **short Turkish helper copy** explaining trade-offs in plain language.
-- Wire the selection to the **analysis pipeline** (respect existing presets in `agents/model_constants.py` / OpenRouter env overrides); persist the choice on the draft/report record for reproducibility and billing/analytics later if needed.
+- ✅ Model tier block at top of manual form (Hızlı / Derinlemesine); neutral TR/EN copy (no cost wording). (DONE)
+- ✅ Wire `analysis_model_preset` to investigate/pipeline (`investigationPayload.js`, API, Vercel gateway, `model_constants.py`, V3.1 LM reconfigure). (DONE)
+- ✅ **Derinlemesine** tier visible but locked (`ANALYSIS_QUALITY_TIER_SELECTABLE = false`) until product enables it. (DONE)
+- ⏳ Persist tier on server-side draft/report records (when P1.10 server persistence lands).
 - Acceptance:
   - Default tier is sensible for new sessions; changing tier before submit updates the subsequent analysis request.
   - Copy is concise, non-technical, and consistent with i18n direction (TR first; EN keys optional follow-up).
+
+### P1.12 Admin shell — default home (cpanel)
+
+- ✅ Post-login and `/` redirect to **`/dashboard`** (admin panel), not legislation chatbot (`config/appHome.js`, Kinde callback, routes). (DONE)
+- ✅ Mevzuat bot route/code retained; disabled via `LEGISLATION_CHATBOT_ENABLED = false` (redirect + hidden menu). (DONE)
+- ✅ Sidebar **Panel** link + logo → dashboard. (DONE)
 
 ## P2 (Mid-Term)
 

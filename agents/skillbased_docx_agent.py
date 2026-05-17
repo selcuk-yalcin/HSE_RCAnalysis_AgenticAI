@@ -40,9 +40,12 @@ except ImportError:
     from json_parser import extract_json_from_response
 
 try:
-    from agents.report_text_sanitize import strip_hse_codes
+    from agents.report_text_sanitize import sanitize_report_text, taxonomy_display_title
 except ImportError:
-    from .report_text_sanitize import strip_hse_codes
+    from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
+
+# Geriye dönük importlar
+strip_hse_codes = sanitize_report_text
 
 
 def _resolve_openrouter_chat_completions_url() -> str:
@@ -1312,8 +1315,14 @@ class SkillBasedDocxAgent:
                 a = strip_hse_codes(str(w.get("answer_tr") or w.get("answer") or ""))
                 why_chain.append({"number": w.get("level", w_i), "question": q, "answer": a})
 
-            root_title = strip_hse_codes(str(root.get("cause_tr") or root.get("cause") or root.get("title") or f"Kök Neden {idx}"))
-            root_detail = strip_hse_codes(str(root.get("explanation_tr") or root.get("explanation") or root_title))
+            root_title = taxonomy_display_title(
+                str(root.get("code") or ""),
+                str(root.get("title") or root.get("cause") or ""),
+                str(root.get("cause_tr") or root.get("cause") or f"Kök Neden {idx}"),
+            )
+            root_detail = sanitize_report_text(
+                str(root.get("explanation_tr") or root.get("explanation") or root_title)
+            )
             branches.append(
                 {
                     "branch_number": br.get("branch_number", idx),

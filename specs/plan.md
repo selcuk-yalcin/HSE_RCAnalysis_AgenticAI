@@ -21,7 +21,22 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
      generated contextually from `agents/knowledge_base.py` and answered via selectable options.
 3. Async pipeline starts (Part 3 + Part 4).
 4. User observes progress via WebSocket/polling.
-5. User exports report artifacts.
+5. User exports report artifacts (HTML/DOCX download; preview without mandatory popups).
+6. *(Planned)* On report completion, system emails artifacts to the authenticated user's
+   registered address (Kinde/profile email), with tenant-scoped secure links as fallback.
+
+## Report Delivery UX
+
+- **HTML oluştur** must not depend on `window.open('')` blank popups (blocked on cpanel and many
+  corporate browsers). Primary path: generate artifacts server-side, then **trigger file download**
+  via blob/anchor; optional preview opens HTML in a new tab from blob URL or falls back to download.
+- **Part 3 readiness:** UI and API tolerate short delays between pipeline `completed` and
+  `incident.part3` / `report_artifacts` persistence (retry before failing).
+- **Email delivery (planned, P0.10):** after successful generation, worker sends one message to
+  `owner_user_id` email with HTML (+ optional DOCX) attachments or signed download links;
+  idempotent per `incident_id` + job id; opt-in preferences per tenant/user.
+- **Raporlar (client, done):** completed analyses auto-save to the **Raporlar** tab (localStorage);
+  user can tap **Raporu Kaydet** or open saved entries back in interactive report step.
 
 ## Evidence Attachment and Multimodal Context
 
@@ -137,6 +152,10 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 
 ## Report Productization Requirements
 
+- Completion notification:
+  - automatic email to the account email used at login (Kinde),
+  - attach generated HTML (and DOCX when available) or time-limited signed URLs,
+  - success/failure templates; delivery audit log (see `specs/roadmap.md` P0.10).
 - Cover page personalization:
   - first page should be user-editable with alternative templates (e.g. formal, executive, minimal).
   - user should be able to switch template variant before export.

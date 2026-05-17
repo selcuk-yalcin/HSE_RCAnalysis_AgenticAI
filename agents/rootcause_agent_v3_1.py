@@ -261,11 +261,24 @@ def _try_snap_to_taxonomy(
     category_type = "KİŞİSEL" if cat_letter == "C" else "ORGANİZASYONEL"
     if cat_letter not in ("C", "D"):
         category_type = "ORGANİZASYONEL"
+    try:
+        from agents.report_text_sanitize import sanitize_report_text, taxonomy_display_title
+    except ImportError:
+        from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
+
+    cause_tr = taxonomy_display_title(
+        item.code,
+        (item.title or "").strip(),
+        sanitize_report_text(narrative),
+    )
+    explanation_tr = sanitize_report_text((base_explanation or "").strip())
+    if not explanation_tr:
+        explanation_tr = sanitize_report_text(narrative)
     return {
         "code": item.code,
-        "cause_tr": (item.title or "").strip() or narrative,
+        "cause_tr": cause_tr,
         "category_type": category_type,
-        "explanation_tr": (base_explanation or "").strip() or f"5-Why zincirinin açıklaması: {narrative}",
+        "explanation_tr": explanation_tr,
     }
 
 # Optional RAG
@@ -428,11 +441,12 @@ class ImmediateCauseIdentifier(dspy.Signature):
         desc=(
             "SADECE ve SADECE gecerli JSON ARRAY dondur. Markdown, aciklama, code fence YASAK. "
             "Format: [{code, standard_title_tr, category_type, cause_tr, evidence_tr}, ...]. "
-            "En fazla 5 neden. Her cause_tr kisa ve net olmalı (maks ~180 karakter). "
-            "Ilk neden (causes[0]) birincil zararlı mekanizmayı hedeflesin "
-            "(ör. elektrikte akıma kapılma/canlı devreye temas); prosedür ihlali sonraya kalsın. "
+            "2 ile 4 ayirt edici dogrudan neden yeterli; 5 zorunlu degil. "
+            "Benzer veya tekrarlayan temalari tek neden altinda birlestir. "
+            "Her cause_tr kisa ve net olmalı (maks ~180 karakter). "
+            "Ilk neden (causes[0]) birincil zararlı mekanizmayı hedeflesin. "
             "KRITIK: Her neden FARKLI bir açıdan olmalı (teknik/fiziksel/davranışsal/çevresel). "
-            "Aynı tema (ör. gözetim eksikliği, KKD kullanımı) farklı nedenlerde TEKRAR ETMEMELI!"
+            "Aynı tema (ör. gözetim eksikliği, KKD) farklı satırlarda TEKRAR ETMEMELI!"
         )
     )
 
@@ -619,8 +633,8 @@ class ImmediateCauseFinder(dspy.Module):
             retry_raw = getattr(retry, "causes", "") or ""
             causes = _parse_array_field(retry_raw, label="ImmediateCauseFinder.causes.retry")
 
-        # Max 5 cause
-        causes = self._normalize_causes(causes)[:5]
+        # En fazla 4 aday; benzerlik sonrası dal sayısı daha da düşebilir
+        causes = self._normalize_causes(causes)[:4]
         causes = self._promote_primary_mechanism(causes)
 
         # Hala bos ise minimal fallback ile zinciri ayakta tut.
@@ -743,6 +757,68 @@ def _validate_model_dict(model_cls: Any, payload: Dict[str, Any]) -> Dict[str, A
         return obj.model_dump()
     obj = model_cls.parse_obj(payload)  # pydantic v1
     return obj.dict()
+
+
+def _cause_text_for_similarity(cause: Dict) -> str:
+    return " ".join(
+        [
+            str(cause.get("cause_tr") or ""),
+            str(cause.get("standard_title_tr") or ""),
+            str(cause.get("code") or ""),
+        ]
+    ).strip()
+
+
+def _token_jaccard_similarity(a: str, b: str) -> float:
+    def _tokens(text: str) -> set[str]:
+        cleaned = "".join(
+            ch.lower() if ch.isalnum() or ch.isspace() else " "
+            for ch in (text or "")
+        )
+        return {t for t in cleaned.split() if len(t) >= 3}
+
+    ta, tb = _tokens(a), _tokens(b)
+    if not ta or not tb:
+        return 0.0
+    inter = len(ta & tb)
+    union = len(ta | tb)
+    return inter / union if union else 0.0
+
+
+def _dedupe_similar_immediate_causes(
+    causes: List[Dict],
+    threshold: float = 0.68,
+) -> List[Dict]:
+    """Benzer doğrudan nedenleri birleştir (5 dal zorunluluğunu kırar)."""
+    kept: List[Dict] = []
+    for cause in causes:
+        text = _cause_text_for_similarity(cause)
+        if not text:
+            continue
+        is_dup = False
+        for existing in kept:
+            if _token_jaccard_similarity(text, _cause_text_for_similarity(existing)) >= threshold:
+                is_dup = True
+                break
+        if not is_dup:
+            kept.append(cause)
+    return kept
+
+
+def _pairwise_similarity_stats(causes: List[Dict]) -> Tuple[float, float]:
+    """(ortalama benzerlik, maksimum çift benzerliği)"""
+    if len(causes) < 2:
+        return 0.0, 0.0
+    sims: List[float] = []
+    for i in range(len(causes)):
+        for j in range(i + 1, len(causes)):
+            sims.append(
+                _token_jaccard_similarity(
+                    _cause_text_for_similarity(causes[i]),
+                    _cause_text_for_similarity(causes[j]),
+                )
+            )
+    return sum(sims) / len(sims), max(sims)
 
 
 class WhyChain(dspy.Module):
@@ -919,11 +995,15 @@ class WhyChain(dspy.Module):
             chain = list(chain)
             chain[-1] = {**chain[-1], "code": snapped["code"]}
         else:
+            try:
+                from agents.report_text_sanitize import sanitize_report_text, taxonomy_display_title
+            except ImportError:
+                from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
             root_cause_payload = {
                 "code": final_code,
-                "cause_tr": final_answer,
+                "cause_tr": taxonomy_display_title(final_code, "", sanitize_report_text(final_answer)),
                 "category_type": validation.category,
-                "explanation_tr": base_explanation,
+                "explanation_tr": sanitize_report_text(base_explanation),
                 "confidence": conf,
             }
         try:
@@ -1188,10 +1268,74 @@ class RootCauseAgentV3_1:
     # MAIN ENTRY POINT
     # ─────────────────────────────────────────────────────────────────────────
 
+    def _effective_branch_limit(self, part2_data: Dict, causes: List[Dict]) -> int:
+        """
+        Ciddiyet + nedenler arası benzerlik → dal sayısı (5 zorunlu değil).
+        Yüksek benzerlikte en fazla 2 dal; orta benzerlikte 3; aksi halde ciddiyet tavanı (max 4).
+        """
+        base = self._determine_immediate_cause_limit(part2_data)
+        n = len(causes)
+        if n <= 1:
+            return n
+        avg_sim, max_sim = _pairwise_similarity_stats(causes)
+        if max_sim >= 0.78 or avg_sim >= 0.62:
+            cap = 2
+        elif max_sim >= 0.68 or avg_sim >= 0.50:
+            cap = 3
+        else:
+            cap = min(base, n)
+        effective = min(base, cap, n)
+        print(
+            f"🎚️  Dal hedefi: ciddiyet={base}, benzerlik ort={avg_sim:.2f} max={max_sim:.2f} → {effective} dal"
+        )
+        return effective
+
+    def _collapse_redundant_branches(self, rca_data: Dict, threshold: float = 0.72) -> None:
+        """Kök neden metinleri çok benzer dalları tekilleştir."""
+        branches = rca_data.get("analysis_branches") or []
+        if len(branches) < 2:
+            return
+        kept: List[Dict] = []
+        kept_roots: List[Dict] = []
+        for branch in branches:
+            root = branch.get("root_cause") or {}
+            title = str(root.get("cause_tr") or root.get("title") or "").strip()
+            code = str(root.get("code") or "").strip().upper()
+            redundant = False
+            for prev_b, prev_r in zip(kept, kept_roots):
+                prev_code = str(prev_r.get("code") or "").strip().upper()
+                if code and prev_code and code == prev_code:
+                    redundant = True
+                    break
+                if title and _token_jaccard_similarity(title, str(prev_r.get("cause_tr") or "")) >= threshold:
+                    redundant = True
+                    break
+                fp_a = " ".join(
+                    w.get("answer_tr", "") for w in (branch.get("why_chain") or [])
+                )
+                fp_b = " ".join(
+                    w.get("answer_tr", "") for w in (prev_b.get("why_chain") or [])
+                )
+                if _token_jaccard_similarity(fp_a, fp_b) >= threshold + 0.05:
+                    redundant = True
+                    break
+            if not redundant:
+                kept.append(branch)
+                kept_roots.append(root)
+        dropped = len(branches) - len(kept)
+        if dropped > 0:
+            print(f"🔗 Benzer kök neden: {dropped} dal birleştirildi → {len(kept)} dal")
+            for i, b in enumerate(kept, 1):
+                b["branch_number"] = i
+            rca_data["analysis_branches"] = kept
+            rca_data["final_root_causes"] = [b.get("root_cause", {}) for b in kept if b.get("root_cause")]
+            scores = rca_data.get("chain_quality_scores") or []
+            if len(scores) >= len(kept):
+                rca_data["chain_quality_scores"] = scores[: len(kept)]
+
     def _determine_immediate_cause_limit(self, part2_data: Dict) -> int:
         """
-        Olay ciddiyetine göre immediate-cause (dolayısıyla root-cause dalı) limitini belirle.
-        Hedef: düşük ciddiyette daha az dal (2), yüksek ciddiyette daha fazla dal (5).
+        Olay ciddiyetine göre üst sınır (en fazla 4 dal; 5 zorunlu değil).
 
         Öncelik:
           1) type_of_event (frontend kullanıcı seçimi)
@@ -1213,30 +1357,29 @@ class RootCauseAgentV3_1:
         if any(k in event_type for k in ("güvensiz durum", "guvensiz durum", "undesired circumstance")):
             return 3
         if any(k in event_type for k in ("maddi hasar", "property damage", "damage")):
-            return 4
+            return 3
         if any(k in event_type for k in ("kaza", "accident", "ill health")):
-            return 5
+            return 4
 
         if "high" in investigation_level:
-            return 5
-        if "medium" in investigation_level:
             return 4
+        if "medium" in investigation_level:
+            return 3
         if "low" in investigation_level:
             return 3
         if "basic" in investigation_level:
             return 2
 
         if "fatal" in severity_text or "major" in severity_text:
-            return 5
-        if "serious" in severity_text:
             return 4
+        if "serious" in severity_text:
+            return 3
         if "minor" in severity_text:
             return 3
         if "damage only" in severity_text:
             return 2
 
-        # Bilgi yoksa varsayılan: kapsamlı analiz
-        return 5
+        return 3
     
     def _reconfigure_dspy_lm(self, initial: bool = False) -> None:
         """Resolve OpenRouter DSPy LM from env + optional request tier; dspy.configure(lm=...)."""
@@ -1371,10 +1514,16 @@ class RootCauseAgentV3_1:
         )
         
         immediate_causes = immediate_causes_result["causes"]
-        cause_limit = self._determine_immediate_cause_limit(part2_data)
+        before_dedupe = len(immediate_causes)
+        immediate_causes = _dedupe_similar_immediate_causes(immediate_causes)
+        if before_dedupe > len(immediate_causes):
+            print(
+                f"🔗 Benzer doğrudan nedenler birleştirildi: {before_dedupe} → {len(immediate_causes)}"
+            )
+        cause_limit = self._effective_branch_limit(part2_data, immediate_causes)
         immediate_causes = immediate_causes[:cause_limit]
         rca_data["immediate_cause_limit"] = cause_limit
-        print(f"🎚️  Ciddiyete göre dal limiti: {cause_limit}")
+        rca_data["immediate_causes_after_dedupe"] = len(immediate_causes)
         
         if not immediate_causes:
             print("❌ Doğrudan neden bulunamadı!")
@@ -1447,6 +1596,8 @@ class RootCauseAgentV3_1:
             rca_data["chain_quality_scores"].append(chain_result.get("chain_quality", 0.9))
             
             self._print_branch_summary(branch)
+
+        self._collapse_redundant_branches(rca_data)
         
         print("\n" + "=" * 80)
         print("✅ TÜM DALLAR TAMAMLANDI!")
