@@ -561,7 +561,11 @@ Kurallar:
 """.strip()
 
     try:
-        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key,
+            timeout=12.0,
+        )
         resp = client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
