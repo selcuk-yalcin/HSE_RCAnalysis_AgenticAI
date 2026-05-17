@@ -255,7 +255,7 @@ Source: synchronized from root `TODO.md`.
 - ✅ Add a **third top-level tab** in the DeepWhy RCA shell (**Raporlar**) for saved drafts (`SavedReportsPanel`, `draftReportsStorage.js`). (DONE — browser-local drafts)
 - ✅ List, open (form seed), delete drafts; polished empty/hero UI; TR/EN copy. (DONE — client)
 - ✅ **Completed reports:** auto-save to Raporlar when analysis reaches report step; manual **Raporu Kaydet**; reopen from list in interactive view (`upsertSavedReport`, `kind: report`, `incidentId`). (DONE — client)
-- ⏳ **Server persistence:** list/filter/regenerate completed reports per `tenant_id` + `owner_user_id` (Mongo/API).
+- ✅ **Server persistence:** Mongo `deepwhy_saved_items` + `/api/v1/library/*` per `tenant_id` + `owner_user_id`; HTML report + decision tree stored on finalize. (DONE)
 - ⏳ Align with **P0.10** admin library + email delivery on the same ownership tables.
 - **Multi-tenant + user isolation:** persist artifacts under **`tenant_id` + `owner_user_id`** (and optional `incident_id` / `draft_id`); enforce authorization on every read/write. Prefer **logical isolation** (namespaced collections, compound unique indexes, or RLS) in the shared platform database—not a separate physical database per end user (operability and cost); document the data model and migration path.
 - Acceptance:

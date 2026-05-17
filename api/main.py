@@ -45,6 +45,8 @@ from shared.tenant_store import (
     DEFAULT_TENANT_ID,
 )
 from shared.tenant_auth import resolve_tenant_id
+from shared.owner_auth import resolve_owner_user_id
+from shared import saved_reports_store
 from shared.hybrid_cache import hybrid_get, hybrid_set
 from shared.oracle_memory import merge_oracle_into_investigation, upsert_context, list_recent
 from shared.ops_celery import celery_inspect_snapshot
@@ -73,6 +75,7 @@ app = FastAPI(
 )
 
 TenantId = Annotated[str, Depends(resolve_tenant_id)]
+OwnerUserId = Annotated[str, Depends(resolve_owner_user_id)]
 
 # CORS for Vercel admin panel
 app.add_middleware(
@@ -524,6 +527,23 @@ class HitlQuestionsRequest(BaseModel):
 
 class PDFGenerateRequest(BaseModel):
     incident_id: str
+
+
+class LibraryUpsertRequest(BaseModel):
+    kind: str = "draft"  # draft | report
+    snapshot: dict = {}
+    title_hint: str = ""
+    incident_id: str = ""
+    report_ready: bool = False
+    analysis_model_preset: str = ""
+    item_id: str = ""
+
+
+class LibraryFinalizeRequest(BaseModel):
+    incident_id: str
+    snapshot: dict = {}
+    title_hint: str = ""
+    analysis_model_preset: str = ""
 
 
 def _validate_artifact_paths(artifacts: dict) -> bool:
@@ -1353,6 +1373,134 @@ async def get_decision_tree_report(
         media_type="text/html; charset=utf-8",
         headers={"Content-Disposition": f"{disposition}; filename={filename}"},
     )
+
+def _read_artifact_files(artifacts: dict) -> tuple[str, str]:
+    html_path = Path(artifacts["html_path"])
+    tree_path = Path(artifacts["decision_tree_path"])
+    report_html = html_path.read_text(encoding="utf-8", errors="replace") if html_path.exists() else ""
+    tree_html = tree_path.read_text(encoding="utf-8", errors="replace") if tree_path.exists() else ""
+    return report_html, tree_html
+
+
+@app.get("/api/v1/library/items")
+async def library_list_items(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    kind: Optional[str] = Query(None),
+):
+    """List saved drafts/reports for the authenticated user within the tenant."""
+    try:
+        items = saved_reports_store.list_items(tenant_id, owner_user_id, kind=kind)
+        return {"success": True, "data": {"items": items}}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/api/v1/library/items")
+async def library_upsert_item(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    body: LibraryUpsertRequest,
+):
+    try:
+        item = saved_reports_store.upsert_item(
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            kind=body.kind,
+            snapshot=body.snapshot or {},
+            title_hint=body.title_hint or "",
+            incident_id=body.incident_id or "",
+            report_ready=body.report_ready,
+            analysis_model_preset=body.analysis_model_preset or "",
+            item_id=body.item_id or None,
+        )
+        return {"success": True, "data": item}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/api/v1/library/items/finalize")
+async def library_finalize_report(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    body: LibraryFinalizeRequest,
+):
+    """
+    After pipeline completes: upsert report row, generate HTML artifacts, store in Mongo for the user.
+    """
+    incident_id = (body.incident_id or "").strip()
+    if not incident_id:
+        raise HTTPException(status_code=400, detail="incident_id is required")
+    try:
+        item = saved_reports_store.upsert_item(
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            kind="report",
+            snapshot=body.snapshot or {},
+            title_hint=body.title_hint or "",
+            incident_id=incident_id,
+            report_ready=False,
+            analysis_model_preset=body.analysis_model_preset or "",
+        )
+        artifacts = _generate_report_artifacts(tenant_id, incident_id)
+        report_html, tree_html = _read_artifact_files(artifacts)
+        if not report_html:
+            raise HTTPException(status_code=500, detail="Report HTML could not be read")
+        updated = saved_reports_store.attach_artifacts(
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            item_id=item["id"],
+            report_html=report_html,
+            decision_tree_html=tree_html,
+        )
+        return {"success": True, "data": updated or item}
+    except HTTPException:
+        raise
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Finalize failed: {exc}") from exc
+
+
+@app.get("/api/v1/library/items/{item_id}/artifact/{artifact_type}")
+async def library_get_artifact(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    item_id: str,
+    artifact_type: str,
+):
+    if artifact_type not in ("report", "decision_tree"):
+        raise HTTPException(status_code=400, detail="artifact_type must be report or decision_tree")
+    try:
+        html = saved_reports_store.get_artifact_html(
+            tenant_id, owner_user_id, item_id, artifact_type
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    if not html:
+        raise HTTPException(status_code=404, detail="Artifact not found")
+    filename = "report.html" if artifact_type == "report" else "decision_tree.html"
+    return Response(
+        content=html.encode("utf-8"),
+        media_type="text/html; charset=utf-8",
+        headers={"Content-Disposition": f'inline; filename="{filename}"'},
+    )
+
+
+@app.delete("/api/v1/library/items/{item_id}")
+async def library_delete_item(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    item_id: str,
+):
+    try:
+        ok = saved_reports_store.delete_item(tenant_id, owner_user_id, item_id)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    if not ok:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"success": True}
+
 
 if __name__ == "__main__":
     import uvicorn
