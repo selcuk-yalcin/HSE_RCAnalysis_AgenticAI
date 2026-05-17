@@ -546,6 +546,15 @@ class LibraryFinalizeRequest(BaseModel):
     analysis_model_preset: str = ""
 
 
+class LibrarySaveHtmlRequest(BaseModel):
+    incident_id: str
+    snapshot: dict = {}
+    title_hint: str = ""
+    analysis_model_preset: str = ""
+    report_html: str = ""
+    decision_tree_html: str = ""
+
+
 def _validate_artifact_paths(artifacts: dict) -> bool:
     if not isinstance(artifacts, dict):
         return False
@@ -1206,7 +1215,10 @@ async def health_check():
 
     redis_ok, redis_ms = await _probe_redis_ms()
     mongo_ok, mongo_ms = await _probe_mongo_ms()
-    
+    reports_ping_ok, reports_ping_err = await asyncio.to_thread(saved_reports_store.ping_store)
+    reports_location = saved_reports_store.store_location()
+    reports_doc_count = await asyncio.to_thread(saved_reports_store.count_all_documents)
+
     return {
         "status": "healthy" if all_agents_ready else "degraded",
         "agents": agents_status,
@@ -1219,6 +1231,12 @@ async def health_check():
         "cache": {
             "hitl_cache_ttl_seconds": _hitl_cache_ttl_seconds(),
             "hybrid": {"redis_ping_ms": redis_ms, "redis_ok": redis_ok, "mongo_ping_ms": mongo_ms, "mongo_ok": mongo_ok},
+        },
+        "reports_library": {
+            **reports_location,
+            "ping_ok": reports_ping_ok,
+            "ping_error": reports_ping_err or None,
+            "document_count": reports_doc_count,
         },
         "rag": {"enabled": _env_bool("ROOTCAUSE_USE_RAG", True)},
         "pipeline_executor": "celery" if _use_celery_pipeline() else "inprocess",
@@ -1485,6 +1503,41 @@ async def library_get_artifact(
         media_type="text/html; charset=utf-8",
         headers={"Content-Disposition": f'inline; filename="{filename}"'},
     )
+
+
+@app.post("/api/v1/library/items/save-html")
+async def library_save_html(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    body: LibrarySaveHtmlRequest,
+):
+    """Store pre-generated HTML (avoids long-running finalize through serverless gateways)."""
+    incident_id = (body.incident_id or "").strip()
+    if not incident_id:
+        raise HTTPException(status_code=400, detail="incident_id is required")
+    if not (body.report_html or "").strip():
+        raise HTTPException(status_code=400, detail="report_html is required")
+    try:
+        item = saved_reports_store.upsert_item(
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            kind="report",
+            snapshot=body.snapshot or {},
+            title_hint=body.title_hint or "",
+            incident_id=incident_id,
+            report_ready=True,
+            analysis_model_preset=body.analysis_model_preset or "",
+        )
+        updated = saved_reports_store.attach_artifacts(
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            item_id=item["id"],
+            report_html=body.report_html or "",
+            decision_tree_html=body.decision_tree_html or "",
+        )
+        return {"success": True, "data": updated or item}
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.delete("/api/v1/library/items/{item_id}")

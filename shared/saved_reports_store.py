@@ -28,7 +28,13 @@ def _get_collection() -> Collection:
     uri = (os.getenv("MONGODB_URI") or "").strip()
     if not uri:
         raise RuntimeError("MONGODB_URI is not configured")
-    db_name = (os.getenv("MONGODB_DB") or os.getenv("MONGODB_DATABASE") or "deepwhy").strip()
+    # Atlas: use same cluster as RAG (e.g. mevzuatdb) — DB name often "rca", NOT "analysis_cache".
+    db_name = (
+        os.getenv("MONGODB_REPORTS_DB")
+        or os.getenv("MONGODB_DB")
+        or os.getenv("MONGODB_DATABASE")
+        or "rca"
+    ).strip()
     client = MongoClient(uri, serverSelectionTimeoutMS=5000)
     col = client[db_name][COLLECTION_NAME]
     if not _indexes_ensured:
@@ -72,6 +78,39 @@ def _public_doc(doc: dict) -> dict[str, Any]:
         "updated_at": doc.get("updated_at") or "",
     }
     return out
+
+
+def store_location() -> dict[str, str]:
+    """Where reports are persisted (for health checks / ops)."""
+    uri = (os.getenv("MONGODB_URI") or "").strip()
+    db_name = (
+        os.getenv("MONGODB_REPORTS_DB")
+        or os.getenv("MONGODB_DB")
+        or os.getenv("MONGODB_DATABASE")
+        or "rca"
+    ).strip()
+    return {
+        "configured": bool(uri),
+        "database": db_name,
+        "collection": COLLECTION_NAME,
+        "note": "User reports are NOT stored in analysis_cache (that is RCA pipeline cache).",
+    }
+
+
+def ping_store() -> tuple[bool, str]:
+    try:
+        col = _get_collection()
+        col.database.client.admin.command("ping")
+        return True, ""
+    except Exception as exc:  # noqa: BLE001
+        return False, str(exc)
+
+
+def count_all_documents() -> int:
+    try:
+        return _get_collection().count_documents({})
+    except Exception:  # noqa: BLE001
+        return -1
 
 
 def list_items(tenant_id: str, owner_user_id: str, *, kind: Optional[str] = None) -> list[dict[str, Any]]:
