@@ -30,6 +30,7 @@ COPY --from=deps /usr/local/bin /usr/local/bin
 
 COPY api api
 COPY agents agents
+COPY hitl_test hitl_test
 COPY shared shared
 COPY tasks tasks
 COPY rag_pipeline rag_pipeline
