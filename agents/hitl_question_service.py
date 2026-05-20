@@ -216,6 +216,21 @@ def _infer_response_mode(soru: str) -> str:
     if len(t) < 8:
         return "yes_no_unknown"
     low = t.lower()
+    if re.search(
+        r"\b(kaç|kac|ne\s+kadar|ne\s+zaman|hangi\s+tarih|kim(dir|in|i)?|nerede|nereden|nereye)\b",
+        low,
+    ):
+        return "free_text"
+    if re.search(r"\bkaç\s*(yıl|ay|gün|saat|dakika|metre|kg|ton|adet)\b", low):
+        return "free_text"
+    if re.search(r"\b(yıllık|aylık)\s+deneyim\b", low) or re.search(r"\bkaç\s+yıllık\b", low):
+        return "free_text"
+    if re.search(r"\bdeneyim\S*\s+(var|yok)\b", low) and re.search(r"\bkaç\b", low):
+        return "free_text"
+    if re.search(r"\b(miktar|sayı|adet|süre|mesafe|yükseklik)\b", low):
+        return "free_text"
+    if re.search(r"\b(listele|belirt|açıkla|acikla|detaylandır|tanımla|tarif\s+et|yazın|yazin)\b", low):
+        return "free_text"
     # Birden fazla mı/mi sorusu eki = çoklu seçenek; Evet/Hayır yeterli değil
     tr_q_particles = re.findall(r"(?i)\b(mı|mi|mu|mü)\b", t)
     if len(tr_q_particles) >= 2:
