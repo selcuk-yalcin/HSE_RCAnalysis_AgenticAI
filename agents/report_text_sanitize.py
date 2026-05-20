@@ -38,6 +38,67 @@ _RE_META_KOD_LINES = re.compile(
     r"(?im)^\s*\*?\*?(?:Birincil|İkincil|Üçüncül|Üçüncü)\s+Kod\*?\*?\s*:.*$",
 )
 
+# Uzun olay metninde rapor özeti dışı bölümleri ayırır (Acil önlemler, kök neden vb.)
+_EVENT_SUMMARY_SECTION_MARKERS = (
+    "Acil Önlemler",
+    "Acil önlemler",
+    "Ek Notlar",
+    "Ek notlar",
+    "Kök Neden",
+    "Kök neden",
+    "Düzeltici Aksiyon",
+    "Düzeltici aksiyon",
+    "Emergency Measures",
+    "Root Cause",
+    "Corrective Action",
+)
+
+
+def full_incident_narrative_for_tree(text: str) -> str:
+    """Karar ağacı OLAY kutusu: ek bölümleri keser, olay anlatımının tamamını korur."""
+    if not text:
+        return ""
+    raw = str(text).strip()
+    cut_at = len(raw)
+    for marker in _EVENT_SUMMARY_SECTION_MARKERS:
+        idx = raw.find(marker)
+        if idx > 80:
+            cut_at = min(cut_at, idx)
+    lower = raw.lower()
+    for marker in (
+        "acil önlemler:",
+        "ek notlar:",
+        "kök neden (ilk değerlendirme):",
+        "düzeltici aksiyon",
+        "hitl",
+        "[ v s ]",
+    ):
+        idx = lower.find(marker)
+        if idx > 80:
+            cut_at = min(cut_at, idx)
+    return raw[:cut_at].strip()
+
+
+def short_incident_summary(text: str, max_chars: int = 360) -> str:
+    """Yalnızca olay özetini döndürür; ek bölümleri ve fazla uzunluğu keser."""
+    if not text:
+        return ""
+    raw = str(text).strip()
+    cut_at = len(raw)
+    for marker in _EVENT_SUMMARY_SECTION_MARKERS:
+        idx = raw.find(marker)
+        if idx > 80:
+            cut_at = min(cut_at, idx)
+    summary = raw[:cut_at].strip()
+    if len(summary) > max_chars:
+        truncated = summary[:max_chars]
+        last_stop = max(truncated.rfind("."), truncated.rfind("!"), truncated.rfind("?"))
+        if last_stop > int(max_chars * 0.45):
+            summary = truncated[: last_stop + 1].strip()
+        else:
+            summary = truncated.rstrip() + "…"
+    return summary
+
 _RE_ORPHAN_EMPTY = re.compile(r"\(\s*\)")
 _RE_INLINE_CODES = re.compile(
     r"(?i)(?:\*{0,2})\b(?:HSG|HGS|HSG245)?\s*(?:[A-Z]\d+(?:\.\d+)?|[A-Z]-\d+(?:\.\d+)?)\b(?:\*{0,2})"

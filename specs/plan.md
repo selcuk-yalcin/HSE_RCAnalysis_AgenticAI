@@ -35,8 +35,9 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 - **Email delivery (planned, P0.10):** after successful generation, worker sends one message to
   `owner_user_id` email with HTML (+ optional DOCX) attachments or signed download links;
   idempotent per `incident_id` + job id; opt-in preferences per tenant/user.
-- **Raporlar (client, done):** completed analyses auto-save to the **Raporlar** tab (localStorage);
-  user can tap **Raporu Kaydet** or open saved entries back in interactive report step.
+- **Raporlar (done — server + UI):** Mongo `rca.deepwhy_saved_items` per `tenant_id` + `owner_user_id`;
+  tab lists reports/drafts, HTML + decision tree artifacts, Word download, rename-on-click titles,
+  two-column layout (reports + sticky drafts sidebar). Email delivery still planned (P0.10).
 
 ## Evidence Attachment and Multimodal Context
 
@@ -52,6 +53,73 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
   - file type and size validation,
   - malware/unsafe file screening policy,
   - retention/deletion controls aligned with tenant policy.
+
+### Multimodal enrichment pipeline (target architecture)
+
+User inputs feed a **three-layer** enrichment path before the existing RCA pipeline runs unchanged:
+
+```
+Kullanıcı Girdileri
+├── Olay metni (mevcut)
+├── Fotoğraflar (JPG/PNG)
+├── Dökümanlar (PDF/DOCX)
+└── Şirket profili (opsiyonel)
+        ↓
+[1. ÇIKARMA KATMANI]     — paralel, dosya tipine göre farklı extractor
+        ↓
+[2. BAĞLAM BİRLEŞTİRME]   — tek enriched_context bloğu
+        ↓
+[3. MEVCUT RCA PIPELINE] — RootCauseAgentV3_1 + rapor üretimi
+        ↓
+Şirkete özgün rapor
+```
+
+**Layer 1 — Extraction (per file type, parallel)**
+
+| Kaynak | Yöntem | Structured çıktı (özet JSON, ham metin değil) |
+|--------|--------|--------------------------------------------------|
+| Fotoğraflar | Vision model (Claude / GPT-4o Vision) | `ekipman_tipi`, `kkd_durumu`, `loto_durumu`, `alan_koşulları`, `görsel_kanıtlar[]`, `anomaliler[]`, `güven_skoru` |
+| PDF/DOCX | PyMuPDF / python-docx → LLM özet | `döküman_tipi`, `son_güncelleme_tarihi`, `ilgili_maddeler[]`, `eksik_imzalar[]`, `geçerlilik_durumu`, `güven_skoru` |
+| Sertifikalar | OCR (Tesseract) veya Vision | isim, tarih, kapsam; olaydaki kişiyle eşleştirme |
+
+Token budget (hedef): ~500 token/fotoğraf, ~800 token/döküman — çıkarma adımları **özet JSON** döndürür.
+
+**Layer 2 — Context merge**
+
+Tüm extractor çıktıları tek `enriched_context` metnine birleştirilir (bölümler: GÖRSEL KANIT, DÖKÜMAN KANIT, SERTİFİKA DURUMU, ŞİRKET PROFİLİ). Bu blok **mevcut `incident_summary` sonuna eklenir**; pipeline imzaları ve agent graph aynı kalır.
+
+Düşük güven skorlu kanıtlar raporda “olası” olarak işaretlenir.
+
+**Layer 3 — Company memory (oracle)**
+
+Per-tenant şirket profili (MongoDB veya JSON), örnek alanlar:
+
+- `şirket_id`, `geçmiş_kök_nedenler[]`, `tekrar_örüntüsü`, `sektör`, `ekipman_parkı[]`, `bilinen_riskler[]`
+
+At runtime: `investigation_data["oracle_context"] = şirket_profili` (field already exists in codebase). Her tamamlanan rapor sonrası profil güncellenir (yeni kök neden kodu, tekrar sayacı).
+
+**Data flow summary**
+
+```
+Fotoğraflar  → Vision API  → görsel_kanıtlar{}
+PDF/DOCX     → OCR + LLM   → döküman_kanıtlar{}
+Sertifikalar → OCR         → sertifika_durumu{}
+Şirket DB    → sorgu       → şirket_profili{}
+                    ↓
+              enriched_context
+                    ↓
+         incident_summary'e ekle
+                    ↓
+         RootCauseAgentV3_1.analyze_root_causes()
+                    ↓
+         tenant-specific report
+```
+
+**Implementation constraints**
+
+- Extraction jobs run with `asyncio.gather()`; RCA pipeline starts only after all extractions complete (or explicit partial-failure policy).
+- Tenant + `owner_user_id` isolation for attachments and company profile stores (same cluster as `deepwhy_saved_items` / `rca`).
+- **Current state:** manual form sends client-side text excerpts + file manifest in `how_happened` (P1.7 partial); server-side Layer 1–3 not yet implemented — see `specs/roadmap.md` **P1.13**.
 
 ## System Architecture
 

@@ -165,14 +165,42 @@ Source: synchronized from root `TODO.md`.
   - `skillbased_docx_agent.py` contains no hardcoded TR-only section titles without i18n mapping.
   - Regression checks confirm no Turkish headers appear in EN report mode.
 
-### P1.7 Evidence Attachments in Analysis Flow
+### P1.7 Evidence Attachments in Analysis Flow (client slice)
 
-- ✅ Manual form (DeepWhy): file picker + drag-and-drop under **Ek Notlar**; allowed types JPEG/PNG/WebP/GIF, PDF, TXT/CSV; list + remove in UI; text excerpts and file manifest merged into `how_happened` for `createIncident` / `investigate` / HITL (`admin_pan/Admin/src/rca-frontend/components/IncidentForm.jsx`, `investigationPayload.js`). (DONE — client-side slice)
-- Add incident-level file upload support (photo + document evidence).
-- Add backend attachment ingestion pipeline (validation, storage, metadata indexing).
-- Extract attachment context (OCR/text and image cues) for RCA/HITL prompt augmentation.
-- Show attachment-derived evidence summary in interactive analysis view.
-- Keep tenant-isolated attachment storage and configurable retention policy.
+- ✅ Manual form (DeepWhy): file picker + drag-and-drop under **Ek Notlar**; allowed types JPEG/PNG/WebP/GIF, PDF, TXT/CSV; list + remove in UI; text excerpts and file manifest merged into `how_happened` for `createIncident` / `investigate` / HITL (`IncidentForm.jsx`, `investigationPayload.js`). (DONE — client-side only)
+- ⏳ Server upload + durable storage — superseded by **P1.13** (multimodal extraction pipeline).
+- ⏳ OCR/Vision enrichment — **P1.13 Layer 1**.
+- ⏳ Interactive analysis evidence summary UI — **P1.13**.
+
+### P1.13 Multimodal Evidence Extraction + Enriched Context (Layer 1–3)
+
+Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
+
+**Layer 1 — Extraction (parallel, per file type)**
+
+- ⏳ Incident attachment API: upload JPG/PNG/PDF/DOCX; validate size/type; tenant-isolated object storage (S3/GridFS/Railway volume).
+- ⏳ **Photos → Vision:** structured JSON per image (`ekipman_tipi`, `kkd_durumu`, `loto_durumu`, `alan_koşulları`, `görsel_kanıtlar[]`, `anomaliler[]`, `güven_skoru`); target ~500 tokens/image; merge photo JSON array.
+- ⏳ **PDF/DOCX → text + LLM:** PyMuPDF / python-docx raw text → LLM extract (`döküman_tipi`, `son_güncelleme_tarihi`, `ilgili_maddeler[]`, `eksik_imzalar[]`, `geçerlilik_durumu`); target ~800 tokens/doc.
+- ⏳ **Certificates → OCR/Vision:** extract name, date, scope; match to persons named in incident.
+- ⏳ `asyncio.gather()` orchestrator: all extractions finish before RCA pipeline starts; surface per-file failures without blocking whole job (policy TBD).
+
+**Layer 2 — Context merge**
+
+- ⏳ Build `enriched_context` block sections: `[GÖRSEL KANIT]`, `[DÖKÜMAN KANIT]`, `[SERTİFİKA DURUMU]`, `[ŞİRKET PROFİLİ]`.
+- ⏳ Append to end of existing `incident_summary` before `RootCauseAgentV3_1.analyze_root_causes()` — no signature/graph changes.
+- ⏳ Low-confidence evidence flagged in merged text for report wording (“olası”, güven %).
+
+**Layer 3 — Company memory (oracle profile)**
+
+- ⏳ Mongo collection or JSON store per `tenant_id` / `şirket_id`: `geçmiş_kök_nedenler[]`, `tekrar_örüntüsü`, `sektör`, `ekipman_parkı[]`, `bilinen_riskler[]`.
+- ⏳ Load into `investigation_data["oracle_context"]` at pipeline start (field exists).
+- ⏳ Post-report hook: append new root-cause codes, increment repeat counters, update `tekrar_örüntüsü` summary.
+
+**Acceptance**
+
+- Upload 2 photos + 1 PDF → pipeline receives enriched summary; RCA output references attachment-derived facts with confidence labels.
+- Company profile from report N influences report N+1 via `oracle_context`.
+- Token budget respected (summarized JSON only, no raw PDF dump in prompt).
 
 ## P1 (Near-Term)
 
@@ -252,15 +280,18 @@ Source: synchronized from root `TODO.md`.
 
 ### P1.10 DeepWhy — Saved Reports Tab + Per-User Multi-Tenant Persistence
 
-- ✅ Add a **third top-level tab** in the DeepWhy RCA shell (**Raporlar**) for saved drafts (`SavedReportsPanel`, `draftReportsStorage.js`). (DONE — browser-local drafts)
-- ✅ List, open (form seed), delete drafts; polished empty/hero UI; TR/EN copy. (DONE — client)
-- ✅ **Completed reports:** auto-save to Raporlar when analysis reaches report step; manual **Raporu Kaydet**; reopen from list in interactive view (`upsertSavedReport`, `kind: report`, `incidentId`). (DONE — client)
-- ✅ **Server persistence:** Mongo `deepwhy_saved_items` + `/api/v1/library/*` per `tenant_id` + `owner_user_id`; HTML report + decision tree stored on finalize. (DONE)
-- ⏳ Align with **P0.10** admin library + email delivery on the same ownership tables.
-- **Multi-tenant + user isolation:** persist artifacts under **`tenant_id` + `owner_user_id`** (and optional `incident_id` / `draft_id`); enforce authorization on every read/write. Prefer **logical isolation** (namespaced collections, compound unique indexes, or RLS) in the shared platform database—not a separate physical database per end user (operability and cost); document the data model and migration path.
+- ✅ Add a **third top-level tab** in the DeepWhy RCA shell (**Raporlar**) (`SavedReportsPanel`, `draftReportsStorage.js`, `reportsLibraryApi.js`). (DONE)
+- ✅ List, open draft (form seed), delete; TR/EN copy; localStorage fallback when Mongo unavailable. (DONE)
+- ✅ **Completed reports:** auto-save after analysis; manual **Raporu Kaydet**; reopen HTML/decision tree from library. (DONE)
+- ✅ **Server persistence:** Mongo `rca.deepwhy_saved_items` + `/api/v1/library/*`; `ensure_collection` on API startup; health `reports_library` probe. (DONE)
+- ✅ **Multi-tenant + user isolation:** `tenant_id` + `owner_user_id` on every read/write; `X-Tenant-ID` + `X-User-ID` from Kinde via Vercel gateway; Kinde `org_code` → `tenant_id` on login when present. (DONE)
+- ✅ **Reports UX:** chip actions (Görüntüle / HTML / Word / karar ağacı); download via gateway (`download_html_report`, `download_decision_tree`, `download_docx_report`); rename report title on click; two-column layout (reports left, sticky drafts sidebar). (DONE)
+- ✅ `library_save_html` fallback when finalize times out on serverless. (DONE)
+- ⏳ Align with **P0.10** email delivery on same ownership tables.
+- ⏳ Store `decision_tree_html` reliably on every auto-save (sync button + pipeline hook).
 - Acceptance:
   - Authenticated user A cannot read or edit user B’s saved items within the same tenant (and never across tenants).
-  - Tab shows only the current user’s items; edits persist and reload correctly.
+  - Tab shows only the current user’s items; title rename and downloads persist after reload.
   - Clear empty state and error handling when persistence or network fails.
 
 ### P1.11 DeepWhy — Manual Form Entry: User-Selectable Model Tier
@@ -268,10 +299,38 @@ Source: synchronized from root `TODO.md`.
 - ✅ Model tier block at top of manual form (Hızlı / Derinlemesine); neutral TR/EN copy (no cost wording). (DONE)
 - ✅ Wire `analysis_model_preset` to investigate/pipeline (`investigationPayload.js`, API, Vercel gateway, `model_constants.py`, V3.1 LM reconfigure). (DONE)
 - ✅ **Derinlemesine** tier visible but locked (`ANALYSIS_QUALITY_TIER_SELECTABLE = false`) until product enables it. (DONE)
-- ⏳ Persist tier on server-side draft/report records (when P1.10 server persistence lands).
+- ✅ Persist `analysis_model_preset` on server-side library upsert/finalize records. (DONE)
 - Acceptance:
   - Default tier is sensible for new sessions; changing tier before submit updates the subsequent analysis request.
   - Copy is concise, non-technical, and consistent with i18n direction (TR first; EN keys optional follow-up).
+
+### P1.14 DeepWhy — Akıllı Hibrit Kök Neden (Smart Hybrid RCA)
+
+Sistem önerir, kullanıcı onaylar: dallı kök neden yapısı tamamen serbest veya tamamen sabit değil; deneyime göre rehberlik + esneklik.
+
+**Yapılacaklar:**
+
+- ⏳ **Şiddet / olay tipine göre önerilen dal sayısı** (v1 kuralları):
+  - Ölümlü / ağır yaralanma → varsayılan **3 dal** + uyarı: *"Bu şiddet için en az 3 dal önerilir."*
+  - Hafif yaralanma → varsayılan **2 dal**
+  - Ramak kala → **1 dal** yeterli
+- ⏳ **Önerilen dal şablonları** (kullanıcı kabul eder, yeniden adlandırır veya sıfırdan yazar):
+  - Dal 1: İnsan / Davranış
+  - Dal 2: Gözetim / Organizasyon
+  - Dal 3: Sistem / Prosedür
+- ⏳ **Dal ekleme UX:** `+ Dal ekle` her zaman görünür; mevcut dal boşken yeni dal eklenemez — *"Önce mevcut dalı doldurun."*
+- ⏳ **Minimum dal:** Kullanıcı en az **1 zorunlu dal** altına inemez; üstüne ekleme serbest.
+- ⏳ **Doluluk / kalite skoru:** Rapor tamamlanınca dal bazlı doldurma skoru; zorunlu dallar eksikse *"Bu rapor onaya hazır değil."*
+- ⏳ **HITL + pipeline entegrasyonu:** Önerilen dallar `part3` / decision tree üretimine beslenir; kullanıcı onayı sonrası RCA çalışır.
+- ⏳ **API + tenant config:** Şiddet eşikleri ve şablon etiketleri tenant bazlı yapılandırılabilir (varsayılan TR/EN).
+- ⏳ **Karar ağacı:** OLAY kutusunda olay anlatımının **tamamı** (ek bölümler hariç) — bkz. `full_incident_narrative_for_tree` (DONE).
+
+**Acceptance:**
+
+- Yeni HSE kullanıcısı analiz başlatınca önerilen dal sayısını ve şablonları görür; tek tıkla kabul veya düzenleme yapabilir.
+- Deneyimli kullanıcı ek dal ekleyebilir; boş dal varken yeni dal engellenir.
+- Ölümlü/ağır vaka için 3 dal önerisi ve eksik dal uyarısı gösterilir.
+- Onay sonrası üretilen 5-Why / decision tree, onaylanmış dal yapısıyla uyumludur.
 
 ### P1.12 Admin shell — default home (cpanel)
 

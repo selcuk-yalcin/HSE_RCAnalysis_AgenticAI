@@ -89,19 +89,8 @@ def run_pipeline_task(
             "incident_id": incident_id,
             "tenant_id": tenant_id,
             "stage": "investigate",
-            "progress": 20,
+            "progress": 10,
             "message": "Kok neden analizi calisiyor",
-        },
-    )
-    # Cooperative checkpoint to keep state updates flowing on long RCA runs.
-    self.update_state(
-        state="PROGRESS",
-        meta={
-            "incident_id": incident_id,
-            "tenant_id": tenant_id,
-            "stage": "investigate",
-            "progress": 30,
-            "message": "RCA branch generation in progress",
         },
     )
 
@@ -131,8 +120,8 @@ def run_pipeline_task(
             "incident_id": incident_id,
             "tenant_id": tenant_id,
             "stage": "investigate",
-            "progress": 60,
-            "message": "RCA completed, preparing action plan",
+            "progress": 55,
+            "message": "RCA tamamlandi, aksiyon plani hazirlaniyor",
         },
     )
 
@@ -142,7 +131,7 @@ def run_pipeline_task(
             "incident_id": incident_id,
             "tenant_id": tenant_id,
             "stage": "actionplan",
-            "progress": 75,
+            "progress": 62,
             "message": "Aksiyon plani olusturuluyor",
         },
     )

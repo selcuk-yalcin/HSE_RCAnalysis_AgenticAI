@@ -777,7 +777,7 @@ async def _run_pipeline_job(job_id: str, incident_id: str, tenant_id: str, paylo
             job_id,
             status="running",
             stage="investigate",
-            progress=15,
+            progress=10,
             message=_job_stage_message("investigate"),
         )
 
@@ -792,8 +792,17 @@ async def _run_pipeline_job(job_id: str, incident_id: str, tenant_id: str, paylo
             tenant_id,
             job_id,
             status="running",
+            stage="investigate",
+            progress=55,
+            message="RCA tamamlandi, aksiyon plani hazirlaniyor",
+        )
+
+        _set_job_state(
+            tenant_id,
+            job_id,
+            status="running",
             stage="actionplan",
-            progress=70,
+            progress=62,
             message=_job_stage_message("actionplan"),
             part3_summary={
                 "immediate": len((part3_result.get("data") or {}).get("immediate_causes") or []),

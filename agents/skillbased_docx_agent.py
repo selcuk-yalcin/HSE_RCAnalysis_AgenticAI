@@ -40,9 +40,17 @@ except ImportError:
     from json_parser import extract_json_from_response
 
 try:
-    from agents.report_text_sanitize import sanitize_report_text, taxonomy_display_title
+    from agents.report_text_sanitize import (
+        sanitize_report_text,
+        short_incident_summary,
+        taxonomy_display_title,
+    )
 except ImportError:
-    from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
+    from .report_text_sanitize import (
+        sanitize_report_text,
+        short_incident_summary,
+        taxonomy_display_title,
+    )
 
 # Geriye dönük importlar
 strip_hse_codes = sanitize_report_text
@@ -427,6 +435,7 @@ KURALLAR:
 - root_causes dizisi ham verideki tüm kök nedenleri içermeli
 - Sınıflandırma / HSG kodları (ör. D4.1, C3.1, H-1.5, K-01), parantez içi kodlar veya "Birincil Kod:" gibi etiketler narrative metinlerde, kök neden açıklamalarında ve why_chain soru-cevaplarında YAZILMAYACAK. JSON şemasındaki code alanlarını boş string bırak veya kullanma.
 - executive_summary: where_happened ve who_affected alanlarını her zaman boş string "" bırak; yer ve kişi bilgisini yalnızca what_happened içinde anlat.
+- Olay özeti yalnızca cover.incident_summary_short içinde olmalı (2-3 cümle). incident_details.event_table içine "Özet" veya uzun anlatım EKLEME.
 - why_chain: NEDEN 1, doğrudan nedeni tek cümleyle sor (ör. doğrudan neden "keskin talaşa temas" ise soru "Neden keskin talaş yüzeyine doğrudan temas oluştu?" gibi); olay özetini baştan sona tekrarlayan uzun soru yazma. NEDEN 2–5: Bir önceki yanıtın ana noktasını konu alan kısa "Neden ...?" zinciri kur.
 - SADECE JSON döndür, başka hiçbir şey yazma
 """
@@ -1386,7 +1395,9 @@ class SkillBasedDocxAgent:
                 "date": datetime.now().strftime("%Y-%m-%d"),
                 "location": location,
                 "incident_type": incident_type,
-                "incident_summary_short": strip_hse_codes(incident_summary[:420]),
+                "incident_summary_short": short_incident_summary(
+                    strip_hse_codes(incident_summary), 360
+                ),
             },
             "executive_summary": {
                 "what_happened": strip_hse_codes(incident_summary),
@@ -1402,9 +1413,11 @@ class SkillBasedDocxAgent:
                     "Olay Tipi": incident_type,
                 },
                 "event_table": {
-                    "Özet": strip_hse_codes(incident_summary[:700]),
                     "Analiz Seviyesi": str(part2.get("investigation_level") or ""),
                 },
+                "event_summary_only": short_incident_summary(
+                    strip_hse_codes(incident_summary), 360
+                ),
                 "timeline": [],
             },
             "analysis_method": {
@@ -1721,12 +1734,35 @@ class SkillBasedDocxAgent:
             if not rca_data:
                 print("  Uyarı: RCA verisi bulunamadı, decision tree oluşturulamadı")
                 return
+
+            tree_payload = dict(rca_data) if isinstance(rca_data, dict) else {}
+            part1 = data.get("part1") if isinstance(data.get("part1"), dict) else {}
+            overview = part1.get("overview") if isinstance(part1.get("overview"), dict) else {}
+            tree_payload["part1"] = part1
+            try:
+                from agents.report_text_sanitize import full_incident_narrative_for_tree
+            except ImportError:
+                from .report_text_sanitize import full_incident_narrative_for_tree
+            narrative_candidates = [
+                overview.get("what_happened"),
+                part1.get("description"),
+                tree_payload.get("incident_summary"),
+                tree_payload.get("incident_event"),
+            ]
+            best_narrative = ""
+            for src in narrative_candidates:
+                if isinstance(src, str) and src.strip():
+                    prepared = full_incident_narrative_for_tree(src.strip())
+                    if len(prepared) > len(best_narrative):
+                        best_narrative = prepared
+            if best_narrative:
+                tree_payload["incident_summary"] = best_narrative
             
             # Decision tree HTML'ini oluştur
             from agents.decision_tree_mermaid import DecisionTreeGenerator
             gen = DecisionTreeGenerator()
             gen.generate_html(
-                rca_data=rca_data,
+                rca_data=tree_payload,
                 output_path=output_path,
                 incident_title=incident_title
             )
@@ -1734,8 +1770,39 @@ class SkillBasedDocxAgent:
         except Exception as e:
             print(f"  Uyarı: Decision tree oluşturulurken hata: {e}")
 
+    def _prepare_content_for_display(self, content: Dict) -> Dict:
+        """Kapak özeti ve olay detayları tablosunu sadeleştirir (yalnızca olay özeti)."""
+        if not isinstance(content, dict):
+            return content
+        out = copy.deepcopy(content)
+        cover = out.setdefault("cover", {})
+        exec_sum = out.get("executive_summary") or {}
+        raw_short = (
+            cover.get("incident_summary_short")
+            or exec_sum.get("what_happened")
+            or ""
+        )
+        short = short_incident_summary(strip_hse_codes(str(raw_short)), 360)
+        if not short:
+            short = short_incident_summary(
+                strip_hse_codes(str(exec_sum.get("what_happened") or "")), 360
+            )
+        cover["incident_summary_short"] = short
+
+        details = out.setdefault("incident_details", {})
+        event_table = dict(details.get("event_table") or {})
+        for bulky_key in ("Özet", "Olay Özeti", "Summary", "Incident Summary"):
+            val = event_table.pop(bulky_key, None)
+            if val and not short:
+                short = short_incident_summary(strip_hse_codes(str(val)), 360)
+                cover["incident_summary_short"] = short
+        details["event_table"] = event_table
+        details["event_summary_only"] = short or details.get("event_summary_only") or ""
+        return out
+
     def _build_html(self, content: Dict, output_path: str, lang: Optional[Dict] = None, investigation_data: Optional[Dict] = None) -> None:
         """Düzenlenebilir HTML rapor oluşturur."""
+        content = self._prepare_content_for_display(content)
         html = self._generate_html_template(content, lang, investigation_data)
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html)
@@ -1797,9 +1864,9 @@ class SkillBasedDocxAgent:
         }}
         
         .cover {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 80px 40px;
+            background: #2c5282;
+            color: #f7fafc;
+            padding: 56px 32px;
             text-align: center;
         }}
         
@@ -1833,14 +1900,14 @@ class SkillBasedDocxAgent:
         }}
         
         .info-item {{
-            background: #eef2ff;
+            background: #edf2f7;
             padding: 15px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #2c5282;
         }}
         
         .info-label {{
             font-weight: bold;
-            color: #667eea;
+            color: #2c5282;
             font-size: 0.9em;
         }}
         
@@ -1850,11 +1917,44 @@ class SkillBasedDocxAgent:
         }}
         
         .incident-summary {{
-            background: #667eea;
-            color: white;
-            padding: 20px;
-            margin: 30px 0;
-            border-radius: 5px;
+            background: #edf2f7;
+            color: #1a202c;
+            padding: 18px 22px;
+            margin: 24px auto;
+            max-width: 720px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e0;
+            text-align: left;
+        }}
+        
+        .incident-summary h3 {{
+            color: #2c5282;
+            margin: 0 0 10px 0;
+            font-size: 1.05em;
+        }}
+        
+        .incident-summary p {{
+            margin: 0;
+            line-height: 1.55;
+            font-size: 0.95em;
+        }}
+        
+        .event-summary-compact {{
+            max-width: 720px;
+            margin: 16px 0 24px 0;
+            padding: 14px 18px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            line-height: 1.55;
+            font-size: 0.95em;
+        }}
+        
+        .event-summary-compact .label {{
+            font-weight: bold;
+            color: #2c5282;
+            display: block;
+            margin-bottom: 8px;
         }}
         
         .content {{
@@ -1867,8 +1967,8 @@ class SkillBasedDocxAgent:
         }}
         
         .section-header {{
-            background: #667eea;
-            color: white;
+            background: #2c5282;
+            color: #f7fafc;
             padding: 15px 20px;
             margin: 30px 0 20px 0;
             font-size: 1.3em;
@@ -1877,12 +1977,12 @@ class SkillBasedDocxAgent:
         }}
         
         .subsection-header {{
-            color: #764ba2;
+            color: #2c5282;
             font-size: 1.1em;
             font-weight: bold;
             margin: 25px 0 15px 0;
             padding-bottom: 5px;
-            border-bottom: 2px solid #764ba2;
+            border-bottom: 2px solid #cbd5e0;
         }}
         
         .paragraph {{
@@ -2519,12 +2619,6 @@ class SkillBasedDocxAgent:
         <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
              Kaydet
         </button>
-        <button class="toolbar-btn btn-print" onclick="printReport()" title="Yazdır / PDF Kaydet">
-             Yazdır
-        </button>
-        <button class="toolbar-btn btn-export" onclick="exportPDF()" title="PDF Olarak İndir">
-             PDF İndir
-        </button>
         <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
              Word İndir
         </button>
@@ -2899,11 +2993,6 @@ class SkillBasedDocxAgent:
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Ctrl+P: Print
-            if (e.ctrlKey && e.key === 'p') {
-                e.preventDefault();
-                printReport();
-            }
             // Ctrl+S: Save
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
@@ -2924,7 +3013,6 @@ class SkillBasedDocxAgent:
         console.log(' KULLANIM İPUÇLARI:');
         console.log(' Ctrl+E: Düzenleme modunu aç/kapat');
         console.log(' Ctrl+S: Kaydet');
-        console.log(' Ctrl+P: Yazdır / PDF kaydet');
         console.log(' HTML İndir: Raporu HTML dosyası olarak indir');
         console.log(' Sıfırla: Tüm değişiklikleri geri al');
     </script>
@@ -3006,6 +3094,19 @@ class SkillBasedDocxAgent:
             </table>
             
             <div class="subsection-header">2.2 Olay Detayları</div>
+"""
+        
+        summary_only = strip_hse_codes(str(details.get("event_summary_only") or ""))
+        if summary_only:
+            html += f"""
+            <div class="event-summary-compact">
+                <span class="label">Olay Özeti</span>
+                <span contenteditable="true">{summary_only}</span>
+            </div>
+            <table>
+"""
+        else:
+            html += """
             <table>
 """
         
@@ -3555,10 +3656,6 @@ class SkillBasedDocxAgent:
                 <p style="margin: 0; color: #666;">
                     <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
                     Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
-                </p>
-                <p style="margin: 10px 0 0 0; color: #666;">
-                    <strong> Yazdırma:</strong> Bu raporu PDF olarak kaydetmek için <code>Ctrl+P</code> (veya Cmd+P) tuşlarına basın 
-                    ve "PDF olarak kaydet" seçeneğini seçin.
                 </p>
             </div>
         </div>

@@ -5,9 +5,17 @@ from pathlib import Path
 import re
 
 try:
-    from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
+    from .report_text_sanitize import (
+        full_incident_narrative_for_tree,
+        sanitize_report_text,
+        taxonomy_display_title,
+    )
 except ImportError:
-    from agents.report_text_sanitize import sanitize_report_text, taxonomy_display_title
+    from agents.report_text_sanitize import (
+        full_incident_narrative_for_tree,
+        sanitize_report_text,
+        taxonomy_display_title,
+    )
 
 
 class DecisionTreeGenerator:
@@ -40,10 +48,16 @@ class DecisionTreeGenerator:
 
     def _generate_mermaid_graph(self, branches: List[Dict], incident_event: str) -> str:
         lines = ['graph TD']
-        incident_event = self._summarize_incident_event(incident_event)
-        event_fmt = self._fmt(incident_event, 72)
+        incident_event = full_incident_narrative_for_tree(
+            sanitize_report_text(str(incident_event or ""))
+        )
+        if not incident_event:
+            incident_event = "Kaza özeti mevcut değil."
+        event_fmt = self._fmt(incident_event, max_line_length=58, max_lines=80)
         lines.append(f'    OLAY["<b>OLAY</b><br/>{event_fmt}"]')
-        lines.append('    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:16px,font-weight:bold')
+        lines.append(
+            '    style OLAY fill:#fff,stroke:#333,stroke-width:2px,font-size:14px,font-weight:bold'
+        )
         lines.append('')
 
         self.node_counter = 0
@@ -205,54 +219,38 @@ class DecisionTreeGenerator:
         return normalized
 
     def _resolve_incident_summary(self, rca_data: Dict[str, Any], incident_title: str) -> str:
-        """OLAY düğümünde başlık yerine olay özetini göster."""
-        candidates = [
-            rca_data.get("incident_summary"),
-            rca_data.get("incident_event"),
-            (rca_data.get("part3") or {}).get("incident_summary"),
-            (rca_data.get("part3_rca") or {}).get("incident_summary"),
-        ]
-        for candidate in candidates:
-            if isinstance(candidate, dict):
-                candidate = candidate.get("summary") or candidate.get("title")
-            if isinstance(candidate, str) and candidate.strip():
-                return self._summarize_incident_event(candidate.strip())
-        return incident_title
+        """OLAY düğümünde olay anlatımının tamamını göster (en uzun geçerli kaynak)."""
+        candidates: list[str] = []
+        for key in ("incident_summary", "incident_event", "how_happened", "description"):
+            val = rca_data.get(key)
+            if isinstance(val, dict):
+                val = val.get("summary") or val.get("title") or val.get("what_happened")
+            if isinstance(val, str) and val.strip():
+                candidates.append(val.strip())
+        for nested in ("part3", "part3_rca", "part1"):
+            block = rca_data.get(nested) or {}
+            if not isinstance(block, dict):
+                continue
+            for key in ("incident_summary", "how_happened", "description"):
+                val = block.get(key)
+                if isinstance(val, str) and val.strip():
+                    candidates.append(val.strip())
+            overview = block.get("overview")
+            if isinstance(overview, dict):
+                wh = overview.get("what_happened")
+                if isinstance(wh, str) and wh.strip():
+                    candidates.append(wh.strip())
 
-    def _summarize_incident_event(self, text: Any) -> str:
-        """Tree'de olay kutusunu kısa özetle sınırla."""
-        s = sanitize_report_text(str(text or "")).strip()
-        if not s:
-            return "Kaza özeti mevcut değil."
-
-        # Gürültülü rapor eklerini kes.
-        cut_markers = (
-            "acil önlemler:",
-            "ek notlar:",
-            "kök neden (ilk değerlendirme):",
-            "aksiyonlar",
-            "hitl",
-            "[ v s ]",
+        best = ""
+        for raw in candidates:
+            prepared = full_incident_narrative_for_tree(sanitize_report_text(raw))
+            if len(prepared) > len(best):
+                best = prepared
+        if best:
+            return best
+        return full_incident_narrative_for_tree(sanitize_report_text(str(incident_title or ""))) or (
+            incident_title or "Kaza Analizi"
         )
-        lower_s = s.lower()
-        cut_idx = len(s)
-        for marker in cut_markers:
-            idx = lower_s.find(marker)
-            if idx != -1:
-                cut_idx = min(cut_idx, idx)
-        s = s[:cut_idx].strip()
-
-        # İlk 1-2 cümle yeterli.
-        sentences = re.split(r"(?<=[.!?])\s+", s)
-        short = " ".join(sentences[:2]).strip()
-        if not short:
-            short = s
-
-        # Çok uzarsa token bazlı kısalt.
-        words = short.split()
-        if len(words) > 45:
-            short = " ".join(words[:45]).rstrip(" ,;:") + "..."
-        return short
 
     def _extract_subject_for_injury_question(self, incident_summary: str) -> str:
         s = (incident_summary or "").strip()
@@ -296,7 +294,7 @@ class DecisionTreeGenerator:
             parts.append(sanitize_report_text(str(fallback or "")).strip() or "Kök neden")
         return " - ".join(parts)
 
-    def _fmt(self, text: str, max_line_length: int = 72) -> str:
+    def _fmt(self, text: str, max_line_length: int = 72, max_lines: int = 40) -> str:
         if not text:
             return ""
         text = text.strip()
@@ -315,8 +313,7 @@ class DecisionTreeGenerator:
         if current:
             lines_out.append(' '.join(current))
 
-        # Çok uzun düğümlerde tam cümle kaybını azalt (önceki: 12 satır kesiyordu)
-        return '<br/>'.join(lines_out[:40])
+        return '<br/>'.join(lines_out[: max(1, int(max_lines))])
 
     def _generate_html_template(self, mermaid_code: str, incident_title: str) -> str:
         safe_title = (
@@ -406,7 +403,7 @@ class DecisionTreeGenerator:
                 padding: 20,
                 nodeSpacing: 28,
                 rankSpacing: 56,
-                useMaxWidth: false,
+                useMaxWidth: true,
                 htmlLabels: true,
                 diagramPadding: 16
             }},
