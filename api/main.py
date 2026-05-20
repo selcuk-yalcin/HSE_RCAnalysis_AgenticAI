@@ -314,6 +314,53 @@ def _default_part2_data() -> dict:
     }
 
 
+def _build_part2_from_form_assessment(assessment: "AssessmentData") -> dict:
+    """Map form assessment fields to Part 2 without LLM (interactive HITL fast path)."""
+    harm = (assessment.actual_harm or "").strip()
+    riddor_raw = (assessment.riddor_reportable or "").strip().lower()
+    riddor_y = riddor_raw in ("yes", "y", "evet")
+    if riddor_raw in ("no", "n", "hayır", "hayir"):
+        riddor = "N"
+    elif riddor_y:
+        riddor = "Y"
+    else:
+        riddor = "N"
+
+    harm_low = harm.lower()
+    if "fatal" in harm_low or "major" in harm_low:
+        level, priority = "High level", "High"
+        team = ["H&S Manager", "Line Manager", "Technical Expert"]
+    elif "serious" in harm_low:
+        level, priority = "Medium level", "Medium"
+        team = ["H&S Officer", "Line Manager"]
+    elif "minor" in harm_low:
+        level, priority = "Low level", "Low"
+        team = ["H&S Officer", "Line Manager"]
+    else:
+        level, priority = "Basic", "Low"
+        team = ["H&S Officer"]
+
+    if riddor_y and level == "Basic":
+        level, priority = "Medium level", "Medium"
+
+    return {
+        "type_of_event": assessment.event_type or "Accident",
+        "actual_potential_harm": harm or "Minor",
+        "riddor_reportable": riddor,
+        "riddor_date_reported": datetime.now().strftime("%d.%m.%y") if riddor == "Y" else "",
+        "accident_book_entry": "Y",
+        "accident_book_date": datetime.now().strftime("%d.%m.%y"),
+        "accident_book_ref": f"AB-{datetime.now().strftime('%Y%m%d')}",
+        "investigation_level": level,
+        "initial_assessment_by": "Form snapshot (HITL fast path)",
+        "assessment_date": datetime.now().strftime("%d.%m.%y"),
+        "further_investigation_required": "Y",
+        "priority": priority,
+        "investigation_team": team,
+        "assessment_source": "form_snapshot",
+    }
+
+
 def _sync_incident_from_pipeline_result(result_payload: dict):
     incident_id = (result_payload or {}).get("incident_id")
     if not incident_id:
@@ -1003,6 +1050,24 @@ async def add_assessment(tenant_id: TenantId, incident_id: str, assessment: Asse
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/incidents/{incident_id}/assessment/form")
+async def add_assessment_from_form(tenant_id: TenantId, incident_id: str, assessment: AssessmentData):
+    """
+    Part 2 from manual form fields only (no LLM). Used by interactive HITL so the UI
+    is not blocked by 4+ OpenRouter calls before the chat tab opens.
+    """
+    try:
+        incident = _require_incident_record(tenant_id, incident_id)
+        part2_data = _build_part2_from_form_assessment(assessment)
+        incident["part2"] = part2_data
+        incident["status"] = "assessed"
+        _save_incident_record(tenant_id, incident_id, incident)
+        return {"success": True, "data": part2_data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/api/v1/incidents/{incident_id}/investigate")
 async def investigate_incident(tenant_id: TenantId, incident_id: str, investigation: InvestigationData):
