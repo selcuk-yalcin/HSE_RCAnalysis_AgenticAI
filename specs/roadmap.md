@@ -17,7 +17,9 @@ Source: synchronized from root `TODO.md`.
 - ✅ Remove generic first-step prompts; start with incident summary + analysis notice. (DONE)
 - ✅ After first immediate-cause stage, generate deeper selectable questions from `agents/knowledge_base.py`. (DONE - taxonomy/KB-backed probes)
 - ✅ Fallback from static logic to LLM by quality threshold. (DONE - hybrid static + LLM candidate flow)
-- ⚠️ Improve Why-chain continuity and answer handling options. (PARTIAL - improved but still iterative)
+- ✅ HITL answer UX: `free_text`, `yes_no_unknown`, choice chips; hybrid optional text under Yes/No; auto-advance on chip click or Enter (`hitlResponseMode.js`, `ChatInterface.jsx`). (DONE)
+- ✅ Backend `response_mode` inference for open questions (kaç/deneyim/miktar/listele — not forced to yes/no) (`agents/hitl_question_service.py`). (DONE)
+- ⚠️ Improve Why-chain continuity. (PARTIAL — answer handling done; branch flow still iterative)
 - ⏳ Persist HITL logs for training reuse.
 - ✅ Keep a single primary large-area frontend analysis flow (remove duplicated secondary Why widgets). (DONE)
 - ✅ Show initial immediate causes without taxonomy codes in chat intro, then switch directly to deep-dive collaboration prompts. (DONE)
@@ -80,6 +82,7 @@ Source: synchronized from root `TODO.md`.
 - ✅ Ensure report shell labels (DOCX + HTML) follow selected language (minimum: non-TR must not render Turkish headers). (DONE - baseline)
 - ✅ Align report visual palette with admin panel theme tokens. (DONE)
 - ✅ Interactive analysis must open chat-first and show active chatbot surface immediately. (DONE)
+- ✅ Fast HITL bootstrap: `POST /assessment/form` (no LLM) before chat tab — avoids stuck “Assessment calisiyor” on interactive submit (`api/main.py`, `RcaFrontendHub.jsx`, gateway `add_assessment_form`). (DONE)
 - ✅ Stream live root-cause/progress lines in Agent Pipeline area during analysis/report generation. (DONE)
 - ✅ Interactive **HTML Oluştur** flow: no blank-popup requirement; download-first + preview/tab/blob fallback (`ChatInterface.jsx`, `hsg245Api.js`). (DONE)
 - ✅ Report generation tolerates Part 3 / artifact write delay (frontend retry + API `_generate_report_artifacts` retry). (DONE)
@@ -131,8 +134,8 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.12 Language-Aware HITL Questions
 
-- Ensure HITL question text is generated and returned in the user-selected UI language.
-- Propagate selected language from frontend into HITL question APIs (`global` + `why_probe` modes).
+- ⚠️ Ensure HITL question text is generated and returned in the user-selected UI language. (PARTIAL — UI i18n + labels; LLM batches may still drift)
+- ✅ Propagate selected language from frontend into HITL question APIs (`global` + `why_probe` modes). (DONE)
 - Localize all question payload fields consistently:
   - `question_tr` / `question_en`,
   - choice labels/options,
@@ -364,3 +367,9 @@ Sistem önerir, kullanıcı onaylar: dallı kök neden yapısı tamamen serbest 
 - Maintain key rotation playbook.
 - Archive legacy agent versions.
 - Exclude generated outputs from git tracking.
+
+### Deploy / Railway (ops — completed slices)
+
+- ✅ Slim `Dockerfile` + `requirements-railway.txt` for Agents/worker images (Railpack/Nixpacks disk exhaustion mitigation). (DONE)
+- ✅ Include `hitl_test/` in production Docker image — required by `agents/hitl_question_service.py` at runtime (fixes HITL `hitl/questions` 500). (DONE)
+- ✅ Witness rows on manual form: add/remove, embedded editable names, role-only (no contact), template reporter/witness placeholders (`admin_pan` IncidentForm). (DONE)

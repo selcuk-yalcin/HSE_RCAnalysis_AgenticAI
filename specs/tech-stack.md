@@ -33,8 +33,8 @@
 ## Deployment
 
 - Railway:
-  - API service (`uvicorn api.main:app`)
-  - Worker service (`python -m celery -A celery_app:celery_app worker ...`)
+  - API service (`uvicorn api.main:app`) — prefer slim **`Dockerfile`** build (`builder: DOCKERFILE` in `railway.json`); image copies `api`, `agents`, `hitl_test`, `shared`, `tasks`, `rag_pipeline`, `scripts`.
+  - Worker service (`sh scripts/railway_celery_worker.sh` or equivalent Celery worker command)
   - Worker scaling policy:
     - `CELERY_POOL=prefork`
     - `--autoscale=5,1` via `CELERY_AUTOSCALE_MAX=5`, `CELERY_AUTOSCALE_MIN=1`

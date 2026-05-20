@@ -19,6 +19,10 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
      not taxonomy-generic opening questions.
    - After initial immediate-cause extraction, deepening questions should be
      generated contextually from `agents/knowledge_base.py` and answered via selectable options.
+   - **Answer modes (done):** `yes_no_unknown`, `free_text` (kaç/deneyim/miktar heuristics),
+     `choice` chips; hybrid optional textarea under Yes/No; Enter or chip click advances to next question.
+   - **Interactive bootstrap (done):** `POST /api/v1/incidents/{id}/assessment/form` saves Part 2 from
+     form fields without Assessment Agent LLM, then opens chat tab immediately.
 3. Async pipeline starts (Part 3 + Part 4).
 4. User observes progress via WebSocket/polling.
 5. User exports report artifacts (HTML/DOCX download; preview without mandatory popups).
@@ -156,7 +160,9 @@ Sertifikalar → OCR         → sertifika_durumu{}
 
 - Tenant isolation for incidents/jobs/cache keys.
 - Fail-safe fallback from V3.1 to V2 for root cause engine.
-- Build/deploy resilience on Railway.
+- Build/deploy resilience on Railway:
+  - slim `Dockerfile` image for API/worker (avoids cold-build disk exhaustion),
+  - production image must include `hitl_test/` (HITL question service imports at runtime).
 - Deterministic operational visibility for worker/job status.
 - Action Plan JSON must be schema-valid or recoverable via retry/sanitizer path
   (markdown-fence/trailing-comma tolerant pre-parser).
@@ -196,7 +202,12 @@ Sertifikalar → OCR         → sertifika_durumu{}
 - Visual consistency target:
   - report output theme should align with admin panel primary/secondary palette.
 - Interactive entry behavior:
-  - switching to interactive analysis should open chat-first experience immediately.
+  - switching to interactive analysis should open chat-first experience immediately
+    (fast `assessment/form` path; no blocking on four Assessment Agent LLM calls).
+- HITL answer collection:
+  - questions that need quantities or narrative use `free_text` (not Yes/No only);
+  - binary questions may show Yes/No/Unknown plus optional written answer;
+  - single-choice chips and Enter submit auto-advance to the next question.
 - Pipeline transparency:
   - while root cause and report stages run, users should see continuously streaming progress
     and Why-chain lines to reduce waiting friction.
