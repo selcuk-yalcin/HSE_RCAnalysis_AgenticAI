@@ -117,6 +117,7 @@ Source: synchronized from root `TODO.md`.
   - Enterprise (`$299/ay`)
 - Define and render per-tier limits and included capabilities:
   - monthly report quota,
+  - **monthly token / analysis credit budget** (maps to **P1.15** user token accounts),
   - analysis method coverage (5-Why / Bow-tie),
   - output formats (Word/PDF/HTML),
   - user seat limit,
@@ -309,31 +310,67 @@ Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
 
 ### P1.14 DeepWhy — Akıllı Hibrit Kök Neden (Smart Hybrid RCA)
 
-Sistem önerir, kullanıcı onaylar: dallı kök neden yapısı tamamen serbest veya tamamen sabit değil; deneyime göre rehberlik + esneklik.
+**Ürün ilkesi (Seçenek C — önerilen):** Sistem önerir, kullanıcı onaylar. Dal sayısı tamamen serbest veya tamamen sabit değil; yeni HSE uzmanına rehberlik, deneyimli kullanıcıya esneklik.
+
+**Mantık (şiddet → önerilen dal):**
+
+| Şiddet / olay tipi | Önerilen dal | UX uyarısı |
+|--------------------|--------------|------------|
+| Ölümlü / ağır yaralanma | **3** | *"Bu şiddet için en az 3 dal önerilir."* |
+| Hafif yaralanma | **2** | — |
+| Ramak kala | **1** | — |
+
+**Varsayılan dal şablonları** (kabul / yeniden adlandır / sıfırdan yaz):
+
+1. İnsan / Davranış  
+2. Gözetim / Organizasyon  
+3. Sistem / Prosedür  
 
 **Yapılacaklar:**
 
-- ⏳ **Şiddet / olay tipine göre önerilen dal sayısı** (v1 kuralları):
-  - Ölümlü / ağır yaralanma → varsayılan **3 dal** + uyarı: *"Bu şiddet için en az 3 dal önerilir."*
-  - Hafif yaralanma → varsayılan **2 dal**
-  - Ramak kala → **1 dal** yeterli
-- ⏳ **Önerilen dal şablonları** (kullanıcı kabul eder, yeniden adlandırır veya sıfırdan yazar):
-  - Dal 1: İnsan / Davranış
-  - Dal 2: Gözetim / Organizasyon
-  - Dal 3: Sistem / Prosedür
-- ⏳ **Dal ekleme UX:** `+ Dal ekle` her zaman görünür; mevcut dal boşken yeni dal eklenemez — *"Önce mevcut dalı doldurun."*
-- ⏳ **Minimum dal:** Kullanıcı en az **1 zorunlu dal** altına inemez; üstüne ekleme serbest.
-- ⏳ **Doluluk / kalite skoru:** Rapor tamamlanınca dal bazlı doldurma skoru; zorunlu dallar eksikse *"Bu rapor onaya hazır değil."*
-- ⏳ **HITL + pipeline entegrasyonu:** Önerilen dallar `part3` / decision tree üretimine beslenir; kullanıcı onayı sonrası RCA çalışır.
-- ⏳ **API + tenant config:** Şiddet eşikleri ve şablon etiketleri tenant bazlı yapılandırılabilir (varsayılan TR/EN).
-- ⏳ **Karar ağacı:** OLAY kutusunda olay anlatımının **tamamı** (ek bölümler hariç) — bkz. `full_incident_narrative_for_tree` (DONE).
+- ⏳ **v1 lookup tablosu (MVP):** Formdaki `injurySeverity` + `eventCategory` → önerilen dal sayısı + şablon etiketleri (kod sabitleri; tenant override sonra).
+- ⏳ **Dal kurulum ekranı:** Analiz/HITL öncesi veya kök neden adımında önerilen dalları göster; tek tık *Kabul et* / satır satır düzenle.
+- ⏳ **Dal ekleme:** `+ Dal ekle` her zaman görünür; **mevcut dal boşken** yeni dal açılamaz — *"Önce mevcut dalı doldurun."*
+- ⏳ **Minimum dal:** En az **1 zorunlu dal** (silme ile altına inilemez); üstüne ekleme serbest. MVP: kullanıcı dal **silemez**, sadece ekler/doldurur (kalite tabanı).
+- ⏳ **Doluluk / kalite skoru:** Rapor tamamlanınca dal bazlı doldurma yüzdesi; zorunlu dallar eksikse onay engeli — *"Bu rapor onaya hazır değil."*
+- ⏳ **HITL + pipeline:** Onaylanmış dal yapısı `why_probe` dallarına ve `part3` branch sayısına beslenir; RCA pipeline kullanıcı onayından sonra başlar.
+- ⏳ **API + tenant config:** Şiddet eşikleri, şablon TR/EN etiketleri, min/max dal (`tenant_id` config veya Mongo).
+- ⏳ **Frontend:** `RcaFrontendHub` / form veya `ChatInterface` dal editörü bileşeni; durum incident veya draft snapshot’ta persist.
+- ✅ **Karar ağacı:** OLAY kutusunda olay anlatımının **tamamı** — `full_incident_narrative_for_tree` (`report_text_sanitize.py`). (DONE)
 
 **Acceptance:**
 
-- Yeni HSE kullanıcısı analiz başlatınca önerilen dal sayısını ve şablonları görür; tek tıkla kabul veya düzenleme yapabilir.
+- Yeni kullanıcı analiz başlatınca önerilen dal sayısı + şablonları görür; kabul veya düzenleyebilir.
 - Deneyimli kullanıcı ek dal ekleyebilir; boş dal varken yeni dal engellenir.
 - Ölümlü/ağır vaka için 3 dal önerisi ve eksik dal uyarısı gösterilir.
-- Onay sonrası üretilen 5-Why / decision tree, onaylanmış dal yapısıyla uyumludur.
+- Onay sonrası 5-Why / decision tree, onaylanmış dal yapısıyla uyumludur.
+
+**İlgili dosyalar (hedef):** `admin_pan` RCA form/chat, `api/main.py`, `agents/rootcause_agent_v3_1.py`, `tasks/pipeline_tasks.py`.
+
+### P1.15 Kullanıcı Token Hesabı ve Kullanım Kotası
+
+Her kullanıcı için token bakiyesi; LLM/pipeline tüketimi düşülür; bakiye bitince analiz ve rapor üretimi kısıtlanır. **P0.11** fiyatlandırma katmanlarıyla hizalanacak (Starter / Professional / Enterprise aylık token veya rapor kotası).
+
+**Yapılacaklar:**
+
+- ✅ **Veri modeli:** `user_token_accounts` + `token_ledger` Mongo (`shared/token_account.py`); in-memory fallback when `MONGODB_URI` unset. (DONE)
+- ✅ **Ledger / audit:** Debit/credit with `idempotency_key`, `prompt_tokens`, `completion_tokens`, module, incident/job ids. (DONE)
+- ✅ **Tüketim noktaları:** Pipeline (Celery + in-process), investigate, assessment (LLM), action plan, HITL LLM (`usage_context`), HTML/DOCX reports — estimate + OpenRouter `usage` where available. (DONE)
+- ✅ **API enforcement:** `402` + `insufficient_tokens` on protected routes; `OwnerUserId` dependency on billable endpoints. (DONE)
+- ⚠️ **Worker reserve/release:** Pipeline debits on task complete (idempotent per `job_id`); explicit reserve-before-run optional follow-up. (PARTIAL)
+- ✅ **Frontend UX:** Dashboard `pages/Dashboard/index.jsx` + `usageApi.js`; DeepWhy token strip + disabled submit when blocked. (DONE)
+- ✅ **Admin top-up:** `POST /api/v1/usage/top-up` (v1 manual credit). (DONE)
+- ⏳ **Plan eşlemesi:** `P0.11` tier → monthly token budget config (env defaults only today).
+- ✅ **Grace & uyarı:** `warn_level` ok / warning / critical / blocked; dashboard + RCA banners. (DONE)
+
+**Acceptance:**
+
+- İki farklı kullanıcı aynı tenant’ta birbirinin token bakiyesini tüketemez.
+- Pipeline tamamlandığında ledger toplamı OpenRouter usage ile makul uyumda (± yapılandırılabilir tolerans).
+- Bakiye 0 iken `pipeline/start`, `investigate`, `hitl` (LLM path) ve rapor üretimi reddedilir; health ve kütüphane listeleme çalışır.
+- Idempotent tekrar denemede çift düşüm olmaz (`idempotency_key` = `job_id` veya request id).
+
+**İlgili dosyalar (hedef):** `api/main.py`, `shared/` (yeni `token_account.py`), `tasks/pipeline_tasks.py`, `agents/model_constants.py`, `admin_pan` `hsg245Api.js`, Kinde `owner_user_id` header’ları.
 
 ### P1.12 Admin shell — default home (cpanel)
 

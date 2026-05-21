@@ -68,6 +68,7 @@ def run_pipeline_task(
     part2_data: Dict[str, Any],
     investigation_payload: Dict[str, Any],
     tenant_id: str = "default",
+    owner_user_id: str = "anonymous",
 ) -> Dict[str, Any]:
     from agents.actionplan_agent import ActionPlanAgent
     from agents.rootcause_agent_v2 import RootCauseAgentV2
@@ -164,9 +165,10 @@ def run_pipeline_task(
         },
     )
 
-    return {
+    result = {
         "tenant_id": tenant_id,
         "incident_id": incident_id,
+        "owner_user_id": owner_user_id,
         "part3": part3_data,
         "part4": part4_data,
         "actionplan_meta": actionplan_meta,
@@ -174,4 +176,22 @@ def run_pipeline_task(
         "progress": 100,
         "message": "Pipeline tamamlandi",
     }
+    try:
+        from shared import token_account
+
+        job_id = str(getattr(self.request, "id", "") or "")
+        token_account.debit_tokens(
+            tenant_id,
+            owner_user_id,
+            amount=token_account.estimate_cost("pipeline"),
+            reason="pipeline",
+            module="deepwhy",
+            incident_id=incident_id,
+            job_id=job_id,
+            operation_label=f"Kök neden pipeline ({incident_id})",
+            idempotency_key=f"pipeline:{tenant_id}:{job_id}" if job_id else "",
+        )
+    except Exception:  # noqa: BLE001
+        pass
+    return result
 

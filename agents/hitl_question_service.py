@@ -539,6 +539,21 @@ def _llm_question_candidates(
     api_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
     if not api_key:
         return []
+    try:
+        from shared.usage_context import get_usage_context
+        from shared import token_account
+
+        ctx = get_usage_context()
+        if ctx and token_account.enforcement_enabled():
+            ok, _ = token_account.check_sufficient(
+                ctx["tenant_id"],
+                ctx["owner_user_id"],
+                token_account.estimate_cost("hitl_question"),
+            )
+            if not ok:
+                return []
+    except Exception:  # noqa: BLE001
+        pass
     taxonomy_ctx = _taxonomy_prompt_context(focus_codes)
     if not taxonomy_ctx:
         return []
@@ -588,6 +603,18 @@ Kurallar:
             max_tokens=1200,
         )
         content = (resp.choices[0].message.content or "").strip()
+        try:
+            from shared.usage_context import record_openai_completion
+
+            record_openai_completion(
+                resp,
+                reason="hitl_question",
+                incident_id="",
+                operation_label="HITL soru üretimi",
+                model=model,
+            )
+        except Exception:  # noqa: BLE001
+            pass
         items = _extract_json_array(content)
         out: list[dict[str, Any]] = []
         for i, it in enumerate(items[:max_questions], start=1):

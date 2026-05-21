@@ -212,6 +212,34 @@ Sertifikalar → OCR         → sertifika_durumu{}
   - while root cause and report stages run, users should see continuously streaming progress
     and Why-chain lines to reduce waiting friction.
 
+## Smart Hybrid RCA (Planned — P1.14)
+
+Branch count and labels are **suggested from incident severity**, then **confirmed by the user** (Option C — recommended hybrid):
+
+- Fatal / serious harm → default **3 branches** with guidance copy (*at least 3 branches recommended*).
+- Minor injury → **2 branches**; near-miss → **1 branch**.
+- Default templates: Human/Behavior, Supervision/Organization, System/Procedure — user may accept, rename, or rewrite.
+- `+ Add branch` always visible; **cannot add** while an existing branch is empty (*fill current branch first*).
+- **Minimum one mandatory branch**; MVP may disallow deletion below minimum while allowing adds (quality floor for new users).
+- On report completion: per-branch completeness score; block approval if required branches are incomplete.
+- Approved branch structure feeds HITL why-probe paths and Part 3 / decision tree generation.
+
+MVP implementation: severity → branch-count lookup table in frontend + API persistence on incident/draft; tenant-configurable thresholds later.
+
+## User Token Quota (Planned — P1.15)
+
+Per-user token account scoped by `tenant_id` + `owner_user_id` (Kinde):
+
+- **Balance** decremented on billable operations (pipeline, HITL LLM, full assessment, report generation).
+- **Ledger** records each debit/credit with idempotency keys tied to `job_id` / request id.
+- **Enforcement** at API (and optionally worker pre-flight): insufficient balance returns explicit error; UI disables new analysis/report actions.
+- **Pricing alignment:** tier definitions in P0.11 map to monthly token budgets and per-report credit costs.
+- **UX:** remaining balance indicator; warnings at 80%/95%; hard stop at zero while preserving read access to saved reports.
+
+Storage target: Mongo (`user_token_accounts`, `token_ledger` in `MONGODB_DB` / `rca`); in-memory fallback for local dev. Implemented: `shared/token_account.py`, usage API routes, Dashboard wiring, DeepWhy enforcement strip.
+
+Env: `TOKEN_PERIOD_LIMIT`, `TOKEN_DEFAULT_BALANCE`, `TOKEN_ENFORCEMENT`, `TOKEN_*_ESTIMATE` per operation.
+
 ## Pricing Page Refresh Requirements
 
 - Pricing page should be refreshed with a 3-tier card layout matching the target design language
@@ -220,8 +248,8 @@ Sertifikalar → OCR         → sertifika_durumu{}
   - Starter: `$29/ay`
   - Professional: `$99/ay` (badge: "En popüler")
   - Enterprise: `$299/ay`
-- Each tier must include clear capacity and capability limits (report quota, analysis method scope,
-  output formats, user seats, support/SLA level, API/SSO availability where applicable).
+- Each tier must include clear capacity and capability limits (report quota, **token/analysis credit budget**,
+  analysis method scope, output formats, user seats, support/SLA level, API/SSO availability where applicable).
 - Tier footer labels should communicate target segment:
   - Starter: KOBİ / bireysel HSE
   - Professional: Orta ölçekli işletme

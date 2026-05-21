@@ -47,6 +47,8 @@ from shared.tenant_store import (
 from shared.tenant_auth import resolve_tenant_id
 from shared.owner_auth import resolve_owner_user_id
 from shared import saved_reports_store
+from shared import token_account
+from shared.usage_context import bind_usage_context, clear_usage_context
 from shared.hybrid_cache import hybrid_get, hybrid_set
 from shared.oracle_memory import merge_oracle_into_investigation, upsert_context, list_recent
 from shared.ops_celery import celery_inspect_snapshot
@@ -110,6 +112,49 @@ def _env_bool(name: str, default: bool = False) -> bool:
 
 def _use_celery_pipeline() -> bool:
     return _env_bool("USE_CELERY_PIPELINE", False)
+
+
+def _raise_insufficient_tokens(message: str) -> None:
+    raise HTTPException(
+        status_code=402,
+        detail={"code": "insufficient_tokens", "message": message},
+    )
+
+
+def _enforce_token_cost(tenant_id: str, owner_user_id: str, reason: str) -> None:
+    if not token_account.enforcement_enabled():
+        return
+    cost = token_account.estimate_cost(reason)
+    ok, msg = token_account.check_sufficient(tenant_id, owner_user_id, cost)
+    if not ok:
+        _raise_insufficient_tokens(msg)
+
+
+def _debit_token_estimate(
+    tenant_id: str,
+    owner_user_id: str,
+    reason: str,
+    *,
+    module: str = "deepwhy",
+    incident_id: str = "",
+    job_id: str = "",
+    operation_label: str = "",
+    idempotency_key: str = "",
+) -> None:
+    try:
+        token_account.debit_tokens(
+            tenant_id,
+            owner_user_id,
+            amount=token_account.estimate_cost(reason),
+            reason=reason,
+            module=module,
+            incident_id=incident_id,
+            job_id=job_id,
+            operation_label=operation_label or reason,
+            idempotency_key=idempotency_key,
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"⚠️  Token debit skipped ({reason}): {exc}")
 
 
 def _hitl_cache_ttl_seconds() -> int:
@@ -208,6 +253,15 @@ async def startup_event():
         )
     except Exception as rexc:
         print(f"⚠️  Reports library skipped — set MONGODB_URI on Railway: {rexc}")
+
+    try:
+        info = await asyncio.to_thread(token_account.ensure_collections)
+        print(
+            f"✅ Token accounts ready ({info.get('backend')}): "
+            f"{info.get('account_documents')} accounts, {info.get('ledger_documents')} ledger rows"
+        )
+    except Exception as texc:
+        print(f"⚠️  Token accounts init: {texc}")
 
 
 def _incidents(tenant_id: str) -> dict:
@@ -603,6 +657,11 @@ class LibraryFinalizeRequest(BaseModel):
     analysis_model_preset: str = ""
 
 
+class TokenTopUpRequest(BaseModel):
+    amount: int
+    owner_user_id: str = ""
+
+
 class LibrarySaveHtmlRequest(BaseModel):
     incident_id: str
     snapshot: dict = {}
@@ -817,7 +876,13 @@ async def _actionplan_core(tenant_id: str, incident_id: str) -> dict:
     return {"success": True, "data": part4_data}
 
 
-async def _run_pipeline_job(job_id: str, incident_id: str, tenant_id: str, payload: dict):
+async def _run_pipeline_job(
+    job_id: str,
+    incident_id: str,
+    tenant_id: str,
+    payload: dict,
+    owner_user_id: str = "anonymous",
+):
     try:
         _set_job_state(
             tenant_id,
@@ -875,6 +940,15 @@ async def _run_pipeline_job(job_id: str, incident_id: str, tenant_id: str, paylo
             },
             finished_at=_utc_now_iso(),
             error=None,
+        )
+        _debit_token_estimate(
+            tenant_id,
+            owner_user_id,
+            "pipeline",
+            incident_id=incident_id,
+            job_id=job_id,
+            operation_label=f"Kök neden pipeline ({incident_id})",
+            idempotency_key=f"pipeline:{tenant_id}:{job_id}",
         )
     except HTTPException as he:
         _set_job_state(
@@ -967,7 +1041,12 @@ async def create_incident(tenant_id: TenantId, incident: IncidentCreate):
         )
 
 @app.post("/api/v1/incidents/{incident_id}/hitl/questions")
-async def hitl_dynamic_questions(tenant_id: TenantId, incident_id: str, body: HitlQuestionsRequest):
+async def hitl_dynamic_questions(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    incident_id: str,
+    body: HitlQuestionsRequest,
+):
     """
     Sıralı HITL soruları: HSG245 disambiguation + taxonomy + LLM.
     Her soru `response_mode`: `yes_no_unknown` | `free_text` | `choice` (chip listesi: `choice_options`, `choice_multi`).
@@ -984,39 +1063,52 @@ async def hitl_dynamic_questions(tenant_id: TenantId, incident_id: str, body: Hi
     if cached_payload:
         return {"success": True, "data": cached_payload, "cached": True, "cache_layer": src}
 
-    if (body.mode or "").lower() == "why_probe" or body.why_level > 0:
-        payload = next_why_probe_questions(
-            how_happened=body.how_happened or "",
-            root_cause_initial=body.root_cause_initial or "",
-            answered_ids=body.answered_ids or [],
-            immediate_code=body.immediate_code or "",
-            why_level=max(1, body.why_level or 1),
-            current_why_question=body.current_why_question or "",
-            previous_why_answer=body.previous_why_answer or "",
-            batch_size=bs,
-            known_fields=body.known_fields or [],
-        )
-    else:
-        payload = next_hitl_questions(
-            body.how_happened or "",
-            body.root_cause_initial or "",
-            body.answered_ids or [],
-            body.immediate_causes,
-            bs,
-            known_fields=body.known_fields or [],
-        )
-    hybrid_set(
-        tenant_id,
-        "hitl_questions",
-        payload_for_key,
-        payload,
-        _hitl_cache_ttl_seconds(),
+    bind_usage_context(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        module="hitl",
     )
-    return {"success": True, "data": payload, "cached": False, "cache_layer": "miss"}
+    try:
+        if (body.mode or "").lower() == "why_probe" or body.why_level > 0:
+            payload = next_why_probe_questions(
+                how_happened=body.how_happened or "",
+                root_cause_initial=body.root_cause_initial or "",
+                answered_ids=body.answered_ids or [],
+                immediate_code=body.immediate_code or "",
+                why_level=max(1, body.why_level or 1),
+                current_why_question=body.current_why_question or "",
+                previous_why_answer=body.previous_why_answer or "",
+                batch_size=bs,
+                known_fields=body.known_fields or [],
+            )
+        else:
+            payload = next_hitl_questions(
+                body.how_happened or "",
+                body.root_cause_initial or "",
+                body.answered_ids or [],
+                body.immediate_causes,
+                bs,
+                known_fields=body.known_fields or [],
+            )
+        hybrid_set(
+            tenant_id,
+            "hitl_questions",
+            payload_for_key,
+            payload,
+            _hitl_cache_ttl_seconds(),
+        )
+        return {"success": True, "data": payload, "cached": False, "cache_layer": "miss"}
+    finally:
+        clear_usage_context()
 
 
 @app.post("/api/v1/incidents/{incident_id}/assessment")
-async def add_assessment(tenant_id: TenantId, incident_id: str, assessment: AssessmentData):
+async def add_assessment(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    incident_id: str,
+    assessment: AssessmentData,
+):
     """
     Part 2: Add assessment with Assessment Agent
     """
@@ -1027,6 +1119,7 @@ async def add_assessment(tenant_id: TenantId, incident_id: str, assessment: Asse
         )
     
     try:
+        _enforce_token_cost(tenant_id, owner_user_id, "assessment")
         incident = _require_incident_record(tenant_id, incident_id)
         
         # Process with Assessment Agent
@@ -1043,7 +1136,14 @@ async def add_assessment(tenant_id: TenantId, incident_id: str, assessment: Asse
         incident["part2"] = part2_data
         incident["status"] = "assessed"
         _save_incident_record(tenant_id, incident_id, incident)
-        
+        _debit_token_estimate(
+            tenant_id,
+            owner_user_id,
+            "assessment",
+            incident_id=incident_id,
+            operation_label=f"Değerlendirme ({incident_id})",
+            idempotency_key=f"assessment:{tenant_id}:{incident_id}",
+        )
         return {
             "success": True,
             "data": part2_data
@@ -1070,24 +1170,49 @@ async def add_assessment_from_form(tenant_id: TenantId, incident_id: str, assess
 
 
 @app.post("/api/v1/incidents/{incident_id}/investigate")
-async def investigate_incident(tenant_id: TenantId, incident_id: str, investigation: InvestigationData):
+async def investigate_incident(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    incident_id: str,
+    investigation: InvestigationData,
+):
     """
     Part 3: Full investigation with Root Cause Agent
     NOTE: Can work standalone with just incident description for testing
     """
+    _enforce_token_cost(tenant_id, owner_user_id, "investigate")
     inv_dict = merge_oracle_into_investigation(tenant_id, investigation.model_dump())
     investigation = InvestigationData(**inv_dict)
-    return await _investigate_core(tenant_id, incident_id, investigation)
+    bind_usage_context(tenant_id=tenant_id, owner_user_id=owner_user_id, module="deepwhy")
+    try:
+        result = await _investigate_core(tenant_id, incident_id, investigation)
+    finally:
+        clear_usage_context()
+    _debit_token_estimate(
+        tenant_id,
+        owner_user_id,
+        "investigate",
+        incident_id=incident_id,
+        operation_label=f"Kök neden analizi ({incident_id})",
+        idempotency_key=f"investigate:{tenant_id}:{incident_id}",
+    )
+    return result
 
 
 @app.post("/api/v1/incidents/{incident_id}/pipeline/start")
-async def start_pipeline_job(tenant_id: TenantId, incident_id: str, request: PipelineStartRequest):
+async def start_pipeline_job(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    incident_id: str,
+    request: PipelineStartRequest,
+):
     """
     Part 3 + Part 4 asenkron job baslatir.
     Frontend, /api/v1/jobs/{job_id} endpoint'ini poll ederek canli akis gosterir.
     """
     incident = _require_incident_record(tenant_id, incident_id)
     payload = merge_oracle_into_investigation(tenant_id, request.model_dump())
+    _enforce_token_cost(tenant_id, owner_user_id, "pipeline")
 
     if _use_celery_pipeline():
         if run_pipeline_task is None:
@@ -1104,6 +1229,7 @@ async def start_pipeline_job(tenant_id: TenantId, incident_id: str, request: Pip
             part2_data=part2_data,
             investigation_payload=payload,
             tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
         )
 
         return {
@@ -1138,7 +1264,7 @@ async def start_pipeline_job(tenant_id: TenantId, incident_id: str, request: Pip
         "result": None,
         "error": None,
     }
-    asyncio.create_task(_run_pipeline_job(job_id, incident_id, tenant_id, payload))
+    asyncio.create_task(_run_pipeline_job(job_id, incident_id, tenant_id, payload, owner_user_id))
 
     return {
         "success": True,
@@ -1211,11 +1337,21 @@ async def job_status_ws(
         return
 
 @app.post("/api/v1/incidents/{incident_id}/actionplan")
-async def generate_action_plan(tenant_id: TenantId, incident_id: str):
+async def generate_action_plan(tenant_id: TenantId, owner_user_id: OwnerUserId, incident_id: str):
     """
     Part 4: Generate action plan with ActionPlan Agent
     """
-    return await _actionplan_core(tenant_id, incident_id)
+    _enforce_token_cost(tenant_id, owner_user_id, "actionplan")
+    result = await _actionplan_core(tenant_id, incident_id)
+    _debit_token_estimate(
+        tenant_id,
+        owner_user_id,
+        "actionplan",
+        incident_id=incident_id,
+        operation_label=f"Aksiyon planı ({incident_id})",
+        idempotency_key=f"actionplan:{tenant_id}:{incident_id}",
+    )
+    return result
 
 @app.get("/api/v1/incidents/{incident_id}")
 async def get_incident(tenant_id: TenantId, incident_id: str):
@@ -1322,6 +1458,12 @@ async def health_check():
             "ping_error": reports_ping_err or None,
             "document_count": reports_doc_count,
         },
+        "token_accounts": {
+            **token_account.store_location(),
+            "enforcement_enabled": token_account.enforcement_enabled(),
+            "ping_ok": (await asyncio.to_thread(token_account.ping_store))[0],
+            "ping_error": (await asyncio.to_thread(token_account.ping_store))[1] or None,
+        },
         "rag": {"enabled": _env_bool("ROOTCAUSE_USE_RAG", True)},
         "pipeline_executor": "celery" if _use_celery_pipeline() else "inprocess",
         "api_key_configured": bool(api_key),
@@ -1397,12 +1539,25 @@ async def meta_learning_info():
 
 
 @app.post("/api/v1/reports/generate")
-async def generate_pdf_report(tenant_id: TenantId, request: PDFGenerateRequest):
+async def generate_pdf_report(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    request: PDFGenerateRequest,
+):
     """
     Generate PDF report for completed incident
     """
     incident_id = request.incident_id
+    _enforce_token_cost(tenant_id, owner_user_id, "report_docx")
     artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    _debit_token_estimate(
+        tenant_id,
+        owner_user_id,
+        "report_docx",
+        incident_id=incident_id,
+        operation_label=f"Word rapor ({incident_id})",
+        idempotency_key=f"report_docx:{tenant_id}:{incident_id}",
+    )
     filepath = artifacts["docx_path"]
     return FileResponse(
         filepath,
@@ -1415,12 +1570,25 @@ async def generate_pdf_report(tenant_id: TenantId, request: PDFGenerateRequest):
 
 
 @app.post("/api/v1/reports/html")
-async def generate_html_report(tenant_id: TenantId, request: PDFGenerateRequest):
+async def generate_html_report(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    request: PDFGenerateRequest,
+):
     """
     Generate HTML report artifacts and return URLs for preview/download.
     """
     incident_id = request.incident_id
+    _enforce_token_cost(tenant_id, owner_user_id, "report_html")
     artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    _debit_token_estimate(
+        tenant_id,
+        owner_user_id,
+        "report_html",
+        incident_id=incident_id,
+        operation_label=f"HTML rapor ({incident_id})",
+        idempotency_key=f"report_html:{tenant_id}:{incident_id}",
+    )
     return {
         "success": True,
         "data": {
@@ -1482,6 +1650,54 @@ def _read_artifact_files(artifacts: dict) -> tuple[str, str]:
     report_html = html_path.read_text(encoding="utf-8", errors="replace") if html_path.exists() else ""
     tree_html = tree_path.read_text(encoding="utf-8", errors="replace") if tree_path.exists() else ""
     return report_html, tree_html
+
+
+@app.get("/api/v1/usage/summary")
+async def usage_summary(tenant_id: TenantId, owner_user_id: OwnerUserId):
+    """Dashboard: balance, limit, usage percent, AI question count."""
+    data = await asyncio.to_thread(token_account.get_usage_summary, tenant_id, owner_user_id)
+    return {"success": True, "data": data}
+
+
+@app.get("/api/v1/usage/timeseries")
+async def usage_timeseries(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    days: int = Query(7, ge=1, le=90),
+):
+    series = await asyncio.to_thread(token_account.get_timeseries, tenant_id, owner_user_id, days)
+    return {"success": True, "data": {"days": days, "series": series}}
+
+
+@app.get("/api/v1/usage/by-module")
+async def usage_by_module(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    days: int = Query(30, ge=1, le=365),
+):
+    rows = await asyncio.to_thread(token_account.get_module_breakdown, tenant_id, owner_user_id, days)
+    return {"success": True, "data": {"modules": rows}}
+
+
+@app.get("/api/v1/usage/recent")
+async def usage_recent(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    limit: int = Query(20, ge=1, le=100),
+):
+    rows = await asyncio.to_thread(token_account.get_recent_operations, tenant_id, owner_user_id, limit)
+    return {"success": True, "data": {"operations": rows}}
+
+
+@app.post("/api/v1/usage/top-up")
+async def usage_top_up(tenant_id: TenantId, owner_user_id: OwnerUserId, body: TokenTopUpRequest):
+    """Manual credit (v1 admin); target user defaults to caller."""
+    target = (body.owner_user_id or owner_user_id).strip()
+    amount = max(0, int(body.amount))
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="amount must be positive")
+    acc = await asyncio.to_thread(token_account.top_up, tenant_id, target, amount)
+    return {"success": True, "data": acc}
 
 
 @app.get("/api/v1/library/status")
