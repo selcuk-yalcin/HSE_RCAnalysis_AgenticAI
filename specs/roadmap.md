@@ -302,10 +302,12 @@ Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
   - Tab shows only the current user’s items; title rename and downloads persist after reload.
   - Clear empty state and error handling when persistence or network fails.
 
-### P1.16 DeepWhy — Videos Library Tab (browser-local MVP)
+### P1.16 DeepWhy — Report Guide Video Tab
 
-- ✅ Add **Videolar** top tab + **Videolar** folder column inside **Raporlar** (next to Taslaklar) (`SavedVideosPanel` embedded, `SavedReportsPanel.jsx`). (DONE)
-- ✅ Upload video files (MP4/WebM, max ~250 MB) + optional title / Incident ID. (DONE — `videosStorage.js`, IndexedDB)
+- ✅ **Rapor Rehberi** tab (`?tab=guide`): fullscreen admin informational video (`ReportGuideVideoPanel`). (DONE)
+- ✅ Video source: `public/media/rca-report-guide/report-guide.mp4` or `VITE_RCA_GUIDE_VIDEO_URL` (MP4/YouTube/Vimeo). (DONE)
+- ✅ Removed user upload UI from tab and Raporlar sidebar; link **Rehberi izle** on Raporlar header. (DONE)
+- ⏳ (Superseded) browser-local user video library (`SavedVideosPanel` / IndexedDB) — not exposed in UI.
 - ✅ Save external share links (YouTube, Drive, etc.) with in-panel play or open-in-new-tab. (DONE)
 - ⏳ Server-side upload + tenant-scoped object storage (S3/GridFS) for cross-device access.
 - ⏳ Link videos to saved reports / incidents in Mongo library.

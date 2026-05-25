@@ -26,7 +26,7 @@
 - Redis for broker, result backend, and cache.
 - Hybrid cache strategy: Redis L1 + Mongo L2.
 - **P1.15 (done):** per-user token accounts + append-only token ledger in Mongo (`shared/token_account.py`); usage API; enforcement in FastAPI + pipeline; Dashboard + DeepWhy token strip in `admin_pan`.
-- **P1.16 (browser MVP):** incident/training videos in IndexedDB via `videosStorage.js` (no server blob store yet).
+- **P1.16:** Rapor Rehberi tab — static/cdn video via `VITE_RCA_GUIDE_VIDEO_URL` or `public/media/rca-report-guide/report-guide.mp4`.
 - Vector retrieval for RAG (Railway target):
   - Primary store: MongoDB Atlas Vector Search (`rca.taxonomy` style collections).
   - Embeddings: managed API embeddings preferred for production cost/runtime stability.

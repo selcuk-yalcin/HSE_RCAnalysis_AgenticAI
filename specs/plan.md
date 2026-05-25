@@ -31,7 +31,7 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 4. User observes progress via WebSocket/polling; chat shows `activity_lines` from worker
    (immediate causes, 5-Why branches, action plan stages) then a formatted summary.
 5. User exports report artifacts (HTML/DOCX download; preview without mandatory popups).
-6. *(Done — local MVP)* User may store incident/training **videos** under **Videolar** tab
+6. *(Done)* **Rapor Rehberi** tab embeds admin-provided fullscreen guide video (how reports are prepared); no user upload
    (IndexedDB per browser; file upload or external URL).
 6. *(Planned)* On report completion, system emails artifacts to the authenticated user's
    registered address (Kinde/profile email), with tenant-scoped secure links as fallback.
@@ -49,9 +49,9 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 - **Raporlar (done — server + UI):** Mongo `rca.deepwhy_saved_items` per `tenant_id` + `owner_user_id`;
   tab lists reports/drafts, HTML + decision tree artifacts, Word download, rename-on-click titles,
   two-column layout (reports + sticky drafts sidebar). Email delivery still planned (P0.10).
-- **Videolar (done — browser-local MVP):** fourth tab beside Raporlar; upload MP4/WebM or save
-  external link; playback in-panel (`SavedVideosPanel`, `videosStorage.js`). Cloud persistence
-  planned (P1.16).
+- **Rapor Rehberi (done):** fourth tab (`?tab=guide`); fullscreen embedded admin video
+  (`ReportGuideVideoPanel`, `public/media/rca-report-guide/` or `VITE_RCA_GUIDE_VIDEO_URL`).
+  Legacy `?tab=videos` redirects to `guide`. User upload library removed from UI.
 
 ## Evidence Attachment and Multimodal Context
 
@@ -140,7 +140,7 @@ Sertifikalar → OCR         → sertifika_durumu{}
 - Frontend: `admin_pan/Admin/src/rca-frontend/`
   - `RcaFrontendHub.jsx` controls form, interactive, reports, and videos tabs.
   - `ChatInterface.jsx` handles HITL intro stream, question panel, and pipeline activity in chat.
-  - `SavedVideosPanel.jsx` + `videosStorage.js` (IndexedDB) for per-browser video library.
+  - `ReportGuideVideoPanel.jsx` + `reportGuideVideo.js` for embedded guide video.
 - API: `api/main.py`
   - Multi-tenant request resolution,
   - Incident lifecycle endpoints,
