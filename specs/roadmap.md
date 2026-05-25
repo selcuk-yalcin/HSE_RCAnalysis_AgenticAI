@@ -304,7 +304,7 @@ Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
 
 ### P1.16 DeepWhy — Videos Library Tab (browser-local MVP)
 
-- ✅ Add **Videolar** tab next to **Raporlar** (`RcaFrontendHub.jsx`, `SavedVideosPanel.jsx`). (DONE)
+- ✅ Add **Videolar** top tab + **Videolar** folder column inside **Raporlar** (next to Taslaklar) (`SavedVideosPanel` embedded, `SavedReportsPanel.jsx`). (DONE)
 - ✅ Upload video files (MP4/WebM, max ~250 MB) + optional title / Incident ID. (DONE — `videosStorage.js`, IndexedDB)
 - ✅ Save external share links (YouTube, Drive, etc.) with in-panel play or open-in-new-tab. (DONE)
 - ⏳ Server-side upload + tenant-scoped object storage (S3/GridFS) for cross-device access.
