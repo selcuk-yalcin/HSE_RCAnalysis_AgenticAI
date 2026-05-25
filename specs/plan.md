@@ -15,6 +15,10 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 1. User submits incident form (Part 1 + Part 2 bootstrap).
    - User can attach extra photos/documents as incident evidence.
 2. HITL questioning refines context with incident-specific prompts.
+   - **Tab gating (done):** Interactive analysis opens only after Manual Form submit
+     via **Etkileşimli Analize Geç** (`hitlSeed`); direct tab / `?tab=chat` redirects to form.
+   - **Intro stream (done):** show “doğrudan nedenler belirleniyor…” and stream lines from
+     form `rootCauseInitial` / incident narrative (`streamHitlIntro.js`), then HITL questions.
    - Entry UX should start with incident summary and an explicit analysis notice,
      not taxonomy-generic opening questions.
    - After initial immediate-cause extraction, deepening questions should be
@@ -24,8 +28,11 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
    - **Interactive bootstrap (done):** `POST /api/v1/incidents/{id}/assessment/form` saves Part 2 from
      form fields without Assessment Agent LLM, then opens chat tab immediately.
 3. Async pipeline starts (Part 3 + Part 4).
-4. User observes progress via WebSocket/polling.
+4. User observes progress via WebSocket/polling; chat shows `activity_lines` from worker
+   (immediate causes, 5-Why branches, action plan stages) then a formatted summary.
 5. User exports report artifacts (HTML/DOCX download; preview without mandatory popups).
+6. *(Done — local MVP)* User may store incident/training **videos** under **Videolar** tab
+   (IndexedDB per browser; file upload or external URL).
 6. *(Planned)* On report completion, system emails artifacts to the authenticated user's
    registered address (Kinde/profile email), with tenant-scoped secure links as fallback.
 
@@ -42,6 +49,9 @@ DeepWhy is an HSG245-based multi-agent Root Cause Analysis platform that combine
 - **Raporlar (done — server + UI):** Mongo `rca.deepwhy_saved_items` per `tenant_id` + `owner_user_id`;
   tab lists reports/drafts, HTML + decision tree artifacts, Word download, rename-on-click titles,
   two-column layout (reports + sticky drafts sidebar). Email delivery still planned (P0.10).
+- **Videolar (done — browser-local MVP):** fourth tab beside Raporlar; upload MP4/WebM or save
+  external link; playback in-panel (`SavedVideosPanel`, `videosStorage.js`). Cloud persistence
+  planned (P1.16).
 
 ## Evidence Attachment and Multimodal Context
 
@@ -128,8 +138,9 @@ Sertifikalar → OCR         → sertifika_durumu{}
 ## System Architecture
 
 - Frontend: `admin_pan/Admin/src/rca-frontend/`
-  - `RcaFrontendHub.jsx` controls form and interactive tabs.
-  - `ChatInterface.jsx` handles HITL and live pipeline flow.
+  - `RcaFrontendHub.jsx` controls form, interactive, reports, and videos tabs.
+  - `ChatInterface.jsx` handles HITL intro stream, question panel, and pipeline activity in chat.
+  - `SavedVideosPanel.jsx` + `videosStorage.js` (IndexedDB) for per-browser video library.
 - API: `api/main.py`
   - Multi-tenant request resolution,
   - Incident lifecycle endpoints,
@@ -155,6 +166,7 @@ Sertifikalar → OCR         → sertifika_durumu{}
   - `branch_critic.py`, `actionplan_agent.py`, reporting agents.
 - Shared services: `shared/`
   - Tenant store/auth, hybrid cache, oracle context.
+  - `pipeline_progress.py` — Celery `activity_lines` for live UI during RCA.
 
 ## Non-Functional Requirements
 
@@ -209,8 +221,9 @@ Sertifikalar → OCR         → sertifika_durumu{}
   - binary questions may show Yes/No/Unknown plus optional written answer;
   - single-choice chips and Enter submit auto-advance to the next question.
 - Pipeline transparency:
-  - while root cause and report stages run, users should see continuously streaming progress
-    and Why-chain lines to reduce waiting friction.
+  - while root cause and report stages run, users see streaming progress in chat
+    (`activity_lines` from worker + summary blocks for immediate/root causes and actions).
+  - HITL phase disables free-text chat input; answers only via question panel.
 
 ## Smart Hybrid RCA (Planned — P1.14)
 

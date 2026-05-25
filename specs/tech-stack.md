@@ -25,6 +25,8 @@
 - Tenant-scoped in-memory stores (`shared/tenant_store.py`).
 - Redis for broker, result backend, and cache.
 - Hybrid cache strategy: Redis L1 + Mongo L2.
+- **P1.15 (done):** per-user token accounts + append-only token ledger in Mongo (`shared/token_account.py`); usage API; enforcement in FastAPI + pipeline; Dashboard + DeepWhy token strip in `admin_pan`.
+- **P1.16 (browser MVP):** incident/training videos in IndexedDB via `videosStorage.js` (no server blob store yet).
 - Vector retrieval for RAG (Railway target):
   - Primary store: MongoDB Atlas Vector Search (`rca.taxonomy` style collections).
   - Embeddings: managed API embeddings preferred for production cost/runtime stability.

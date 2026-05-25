@@ -84,15 +84,14 @@ def run_pipeline_task(
 
     actionplan_agent = ActionPlanAgent()
 
-    self.update_state(
-        state="PROGRESS",
-        meta={
-            "incident_id": incident_id,
-            "tenant_id": tenant_id,
-            "stage": "investigate",
-            "progress": 10,
-            "message": "Kok neden analizi calisiyor",
-        },
+    from shared.pipeline_progress import celery_progress_reporter
+
+    progress = celery_progress_reporter(self, incident_id, tenant_id)
+    progress.emit(
+        "Kök neden analizi başlatıldı",
+        stage="investigate",
+        progress=10,
+        message="Kok neden analizi calisiyor",
     )
 
     inv = {
@@ -109,32 +108,33 @@ def run_pipeline_task(
         "analysis_model_preset": investigation_payload.get("analysis_model_preset", ""),
     }
 
+    analyze_kwargs = {}
+    if hasattr(rootcause_agent, "analyze_root_causes"):
+        import inspect
+
+        sig = inspect.signature(rootcause_agent.analyze_root_causes)
+        if "progress_reporter" in sig.parameters:
+            analyze_kwargs["progress_reporter"] = progress
+
     part3_raw = rootcause_agent.analyze_root_causes(
         part1_data,
         part2_data,
         inv,
+        **analyze_kwargs,
     )
     part3_data = _transform_v2_to_frontend(part3_raw)
-    self.update_state(
-        state="PROGRESS",
-        meta={
-            "incident_id": incident_id,
-            "tenant_id": tenant_id,
-            "stage": "investigate",
-            "progress": 55,
-            "message": "RCA tamamlandi, aksiyon plani hazirlaniyor",
-        },
+    progress.emit(
+        "RCA tamamlandı, aksiyon planı hazırlanıyor",
+        stage="investigate",
+        progress=55,
+        message="RCA tamamlandi, aksiyon plani hazirlaniyor",
     )
 
-    self.update_state(
-        state="PROGRESS",
-        meta={
-            "incident_id": incident_id,
-            "tenant_id": tenant_id,
-            "stage": "actionplan",
-            "progress": 62,
-            "message": "Aksiyon plani olusturuluyor",
-        },
+    progress.emit(
+        "Aksiyon planı oluşturuluyor",
+        stage="actionplan",
+        progress=62,
+        message="Aksiyon plani olusturuluyor",
     )
 
     part4_data = actionplan_agent.generate_action_plan(
@@ -149,20 +149,17 @@ def run_pipeline_task(
         "fallback_used": bool((part4_data or {}).get("_fallback")),
         "action_count": len((part4_data or {}).get("immediate_actions", []) or []),
     }
-    self.update_state(
-        state="PROGRESS",
-        meta={
-            "incident_id": incident_id,
-            "tenant_id": tenant_id,
-            "stage": "actionplan",
-            "progress": 90,
-            "message": (
-                "Action plan fallback used"
-                if actionplan_meta["fallback_used"]
-                else "Action plan generated"
-            ),
-            "actionplan_meta": actionplan_meta,
-        },
+    progress.emit(
+        "Action plan fallback used"
+        if actionplan_meta["fallback_used"]
+        else "Aksiyon planı oluşturuldu",
+        stage="actionplan",
+        progress=90,
+        message=(
+            "Action plan fallback used"
+            if actionplan_meta["fallback_used"]
+            else "Action plan generated"
+        ),
     )
 
     result = {

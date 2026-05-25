@@ -463,6 +463,8 @@ def _normalize_celery_job(task_id: str) -> dict:
             "stage": result_payload.get("stage", "completed"),
             "progress": int(result_payload.get("progress", 100)),
             "message": result_payload.get("message", "Pipeline tamamlandi"),
+            "activity_lines": meta.get("activity_lines") or [],
+            "latest_activity": meta.get("latest_activity"),
             "result": result_payload,
             "error": None,
         }
@@ -489,6 +491,8 @@ def _normalize_celery_job(task_id: str) -> dict:
             "stage": meta.get("stage", "running"),
             "progress": int(meta.get("progress", 10)),
             "message": meta.get("message", "Pipeline calisiyor"),
+            "activity_lines": meta.get("activity_lines") or [],
+            "latest_activity": meta.get("latest_activity"),
             "result": None,
             "error": None,
         }

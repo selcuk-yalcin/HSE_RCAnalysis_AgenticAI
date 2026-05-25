@@ -1423,10 +1423,12 @@ class RootCauseAgentV3_1:
         part2_data: Dict,
         investigation_data: Dict = None,
         synthesize_meta_root: bool = True,
+        progress_reporter=None,
     ) -> Dict:
         """
         Ana analiz — V2.5 ile uyumlu output format.
         Form / API: investigation_data.analysis_model_preset in (quality | economy).
+        progress_reporter: shared.pipeline_progress.PipelineProgressReporter (opsiyonel).
         """
         preset = ""
         if investigation_data and isinstance(investigation_data, dict):
@@ -1434,6 +1436,7 @@ class RootCauseAgentV3_1:
 
         from agents.model_constants import analysis_tier_context
 
+        self._progress_reporter = progress_reporter
         try:
             with analysis_tier_context(preset):
                 self._reconfigure_dspy_lm(initial=False)
@@ -1444,8 +1447,23 @@ class RootCauseAgentV3_1:
                     synthesize_meta_root,
                 )
         finally:
+            self._progress_reporter = None
             with analysis_tier_context(""):
                 self._reconfigure_dspy_lm(initial=False)
+
+    def _progress(self, line: str, *, stage: str = None, progress: int = None) -> None:
+        """Worker log satırını Celery meta veya stdout'a yazar."""
+        text = str(line or "").strip()
+        if not text:
+            return
+        rep = getattr(self, "_progress_reporter", None)
+        if rep is not None:
+            if hasattr(rep, "emit"):
+                rep.emit(text, stage=stage, progress=progress)
+            elif callable(rep):
+                rep(text, stage=stage, progress=progress)
+            return
+        print(text)
 
     def _analyze_root_causes_impl(
         self,
@@ -1458,9 +1476,11 @@ class RootCauseAgentV3_1:
         Ana analiz iç gövdesi (DSPy çağrıları burada).
         """
         
-        print("\n" + "=" * 80)
-        print("🔴 BÖLÜM 3: HİYERARŞİK KÖK NEDEN ANALİZİ (V3.1 - DSPy)")
-        print("=" * 80)
+        self._progress(
+            "BÖLÜM 3: Hiyerarşik kök neden analizi (V3.1)",
+            stage="investigate",
+            progress=12,
+        )
         
         # Olay özeti hazırla
         incident_summary = self._prepare_incident_summary(
@@ -1493,7 +1513,10 @@ class RootCauseAgentV3_1:
                     + incident_summary
                 )
         
-        print(f"\n📋 OLAY ÖZETİ (ilk 300 karakter):\n{incident_summary[:300]}...\n")
+        self._progress(
+            f"Olay özeti: {incident_summary[:220]}…",
+            progress=14,
+        )
         
         rca_data = {
             "incident_summary": incident_summary,
@@ -1504,8 +1527,10 @@ class RootCauseAgentV3_1:
         }
         
         # ADIM 1: Immediate Causes (A/B)
-        print("\n🔍 ADIM 1: Doğrudan Nedenleri Belirleme (A/B Kategorileri)")
-        print("-" * 80)
+        self._progress(
+            "ADIM 1: Doğrudan nedenler belirleniyor (A/B)",
+            progress=18,
+        )
         
         immediate_causes_result = self.immediate_cause_finder(
             incident_summary=incident_summary,
@@ -1529,14 +1554,20 @@ class RootCauseAgentV3_1:
             print("❌ Doğrudan neden bulunamadı!")
             return rca_data
         
-        print(f"✅ {len(immediate_causes)} doğrudan neden bulundu\n")
-        
+        self._progress(
+            f"{len(immediate_causes)} doğrudan neden bulundu",
+            progress=24,
+        )
+
         for cause in immediate_causes:
-            print(f"  [{cause.get('code')}] {cause.get('cause_tr')}")
-        
+            code = cause.get("code") or "?"
+            self._progress(
+                f"Doğrudan neden [{code}]: {cause.get('cause_tr', '')}",
+                progress=26,
+            )
+
         # ADIM 2: 5-Why zinciri her dal için
-        print("\n🔗 ADIM 2: 5-Why Analizi (Her Dal için)")
-        print("-" * 80)
+        self._progress("ADIM 2: 5-Why analizi (her dal)", progress=28)
         
         used_root_codes: List[str] = []
         all_previous_why_answers: List[str] = []
@@ -1553,12 +1584,14 @@ class RootCauseAgentV3_1:
                     continue
                 probe_by_branch_and_level.setdefault(b, {}).setdefault(l, []).append(item)
         
+        branch_total = max(1, len(immediate_causes))
         for idx, immediate_cause in enumerate(immediate_causes, 1):
-            print(f"\n{'=' * 80}")
-            print(f"⚡ DAL {idx}: {immediate_cause.get('category_type', '???')}")
-            print(f"📌 Doğrudan Neden [{immediate_cause.get('code', '???')}]:")
-            print(f"   {immediate_cause.get('cause_tr', '')}")
-            print(f"{'=' * 80}\n")
+            branch_pct = 28 + int((idx - 1) / branch_total * 22)
+            self._progress(
+                f"DAL {idx}/{branch_total} — [{immediate_cause.get('code', '?')}] "
+                f"{immediate_cause.get('cause_tr', '')}",
+                progress=branch_pct,
+            )
             
             # DSPy 5-Why chain
             chain_result = self.why_chain(
@@ -1599,10 +1632,15 @@ class RootCauseAgentV3_1:
 
         self._collapse_redundant_branches(rca_data)
         
-        print("\n" + "=" * 80)
-        print("✅ TÜM DALLAR TAMAMLANDI!")
-        print(f"Ortalama Zincir Kalitesi: {sum(rca_data['chain_quality_scores']) / len(rca_data['chain_quality_scores']):.2%}")
-        print("=" * 80)
+        avg_q = (
+            sum(rca_data["chain_quality_scores"]) / len(rca_data["chain_quality_scores"])
+            if rca_data["chain_quality_scores"]
+            else 0.0
+        )
+        self._progress(
+            f"Tüm dallar tamamlandı (ortalama zincir kalitesi: {avg_q:.0%})",
+            progress=52,
+        )
 
         # ADIM 2.5: Branch Critic (dallar arası tekrar engelleme + regenerate)
         if self.branch_critic and len(rca_data["analysis_branches"]) > 1:
@@ -1753,20 +1791,22 @@ class RootCauseAgentV3_1:
         return summary + "\n".join(lines)
     
     def _print_branch_summary(self, branch: Dict):
-        """Branch özeti yazdır"""
+        """Branch özeti — UI activity stream."""
         whys = branch.get("why_chain", [])
         root = branch.get("root_cause", {})
         quality = branch.get("chain_quality", 0.0)
-        
-        print(f"\n📊 ZINCIR KALİTESİ: {quality:.1%}")
-        print(f"   {len(whys)} Why sorusu başarıyla işlendi")
-        
+        bnum = branch.get("branch_number", "?")
+
+        self._progress(
+            f"Dal {bnum}: zincir kalitesi {quality:.0%}, {len(whys)} Why işlendi",
+        )
         for why in whys:
-            print(f"  ❓ Why-{why.get('level')}: {why.get('question_tr')[:70]}...")
-        
-        print(f"\n  🎯 KÖK NEDEN: [{root.get('code')}] {root.get('cause_tr')[:70]}...")
-        print(f"     Kategori: {root.get('category_type')}")
-        print(f"     Güven: {root.get('confidence', 0.8):.1%}\n")
+            self._progress(
+                f"  Why-{why.get('level')}: {str(why.get('question_tr', ''))[:90]}",
+            )
+        self._progress(
+            f"  Kök neden [{root.get('code')}]: {str(root.get('cause_tr', ''))[:100]}",
+        )
     
     def _generate_hierarchical_report(self, rca_data: Dict) -> str:
         """Hiyerarşik rapor oluştur"""

@@ -29,9 +29,10 @@ Source: synchronized from root `TODO.md`.
 ### P0.3 Frontend Live Streaming
 
 - Branch/why-level granular progress callbacks.
-- Enriched job payload fields for UI.
-- Live timeline component in chat UI.
-- WebSocket reconnect and robust failure UX.
+- ✅ Enriched job payload: Celery `activity_lines` + `latest_activity` on pipeline jobs (`shared/pipeline_progress.py`, `rootcause_agent_v3_1.py`, `tasks/pipeline_tasks.py`, `api/main.py` `_normalize_celery_job`). (DONE)
+- ✅ Chat UI streams pipeline activity + final RCA summary after HITL (`ChatInterface.jsx`, `formatPipelineChat.js`; WebSocket/polling `onUpdate`). (DONE)
+- ⏳ Live timeline component in chat UI (dedicated stepper beyond bullet list).
+- ⏳ WebSocket reconnect and robust failure UX.
 - ✅ Increase frontend pipeline timeout defaults from 6 minutes to 20 minutes for polling/WebSocket job tracking to reduce premature "Pipeline timeout (360s)" errors on long RCA runs. (DONE)
 
 ### P0.4 Worker OpenRouter 401 Stabilization
@@ -84,6 +85,9 @@ Source: synchronized from root `TODO.md`.
 - ✅ Interactive analysis must open chat-first and show active chatbot surface immediately. (DONE)
 - ✅ Fast HITL bootstrap: `POST /assessment/form` (no LLM) before chat tab — avoids stuck “Assessment calisiyor” on interactive submit (`api/main.py`, `RcaFrontendHub.jsx`, gateway `add_assessment_form`). (DONE)
 - ✅ Stream live root-cause/progress lines in Agent Pipeline area during analysis/report generation. (DONE)
+- ✅ HITL intro: stream per-incident immediate causes (“doğrudan nedenler belirleniyor…”) instead of static list (`streamHitlIntro.js`, `deriveImmediateCauseLines`). (DONE)
+- ✅ Lock **Etkileşimli Analiz** tab until Manuel Form → **Etkileşimli Analize Geç**; block free `sendMessage` chat (timeout path removed). (DONE — `RcaFrontendHub.jsx`, `ChatInterface.jsx`)
+- ✅ Post-HITL pipeline lines in chat message (worker progress → UI via `activity_lines`). (DONE — see P0.3)
 - ✅ Interactive **HTML Oluştur** flow: no blank-popup requirement; download-first + preview/tab/blob fallback (`ChatInterface.jsx`, `hsg245Api.js`). (DONE)
 - ✅ Report generation tolerates Part 3 / artifact write delay (frontend retry + API `_generate_report_artifacts` retry). (DONE)
 
@@ -284,7 +288,7 @@ Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
 
 ### P1.10 DeepWhy — Saved Reports Tab + Per-User Multi-Tenant Persistence
 
-- ✅ Add a **third top-level tab** in the DeepWhy RCA shell (**Raporlar**) (`SavedReportsPanel`, `draftReportsStorage.js`, `reportsLibraryApi.js`). (DONE)
+- ✅ Add top-level **Raporlar** tab in the DeepWhy RCA shell (`SavedReportsPanel`, `draftReportsStorage.js`, `reportsLibraryApi.js`). (DONE)
 - ✅ List, open draft (form seed), delete; TR/EN copy; localStorage fallback when Mongo unavailable. (DONE)
 - ✅ **Completed reports:** auto-save after analysis; manual **Raporu Kaydet**; reopen HTML/decision tree from library. (DONE)
 - ✅ **Server persistence:** Mongo `rca.deepwhy_saved_items` + `/api/v1/library/*`; `ensure_collection` on API startup; health `reports_library` probe. (DONE)
@@ -297,6 +301,17 @@ Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
   - Authenticated user A cannot read or edit user B’s saved items within the same tenant (and never across tenants).
   - Tab shows only the current user’s items; title rename and downloads persist after reload.
   - Clear empty state and error handling when persistence or network fails.
+
+### P1.16 DeepWhy — Videos Library Tab (browser-local MVP)
+
+- ✅ Add **Videolar** tab next to **Raporlar** (`RcaFrontendHub.jsx`, `SavedVideosPanel.jsx`). (DONE)
+- ✅ Upload video files (MP4/WebM, max ~250 MB) + optional title / Incident ID. (DONE — `videosStorage.js`, IndexedDB)
+- ✅ Save external share links (YouTube, Drive, etc.) with in-panel play or open-in-new-tab. (DONE)
+- ⏳ Server-side upload + tenant-scoped object storage (S3/GridFS) for cross-device access.
+- ⏳ Link videos to saved reports / incidents in Mongo library.
+- Acceptance:
+  - User can add a created training/incident video and play it back in the same browser session.
+  - Videos tab does not block form/HITL/report flows.
 
 ### P1.11 DeepWhy — Manual Form Entry: User-Selectable Model Tier
 
