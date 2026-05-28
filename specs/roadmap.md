@@ -93,49 +93,70 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.9 Report Template, Branding, and Hologram
 
-- Add editable and alternative cover-page templates for report generation.
-- Keep DOCX and HTML report structures aligned section-by-section.
-- Add user-facing option to hide/remove technical code identifiers from report body.
-- Confirm final code-visibility policy with Baris Bey before release.
-- Add optional logo insertion support (tenant-level default + per-report override).
-- Add watermark/hologram support for draft/final report modes.
+- ✅ `shared/report_layout_config.py` — tek kaynak bölüm modeli, `show_technical_codes`, logo URL, watermark (`draft|final|none`). (DONE)
+- ✅ `SkillBasedDocxAgent` + `_generate_report_artifacts` layout snapshot; HTML watermark + kapak logosu. (DONE)
+- ✅ `format_report_text` / `set_report_text_policy` — teknik kod görünürlüğü tenant/rapor bayrağına bağlı. (DONE)
+- Hedef: rapor çıktısını kurumsal, tutarlı ve denetlenebilir hale getirmek (DOCX + HTML aynı içerik modeli).
+- Çözüm:
+  - Tek kaynak şablon modeli (`report_layout_config`) tanımla: kapak, bölüm sırası, görünür alanlar.
+  - DOCX/HTML renderer'ları aynı bölüm sözlüğünden beslensin; renderer'a özel hardcode metin kaldır.
+  - Teknik kod alanları için `show_technical_codes` bayrağı ekle (tenant default + rapor override).
+  - Logo politikası: tenant seviyesi varsayılan logo + rapor bazlı geçici override.
+  - Draft/final ayrımı için watermark katmanı (`DRAFT`, `FINAL`) ve görünürlük kuralları.
+- Teslim kriterleri:
+  - Aynı incident için DOCX ve HTML bölüm başlıkları/sırası birebir uyumlu.
+  - "Teknik kodları gizle" seçildiğinde kullanıcıya dönük raporda kodlar görünmez.
+  - Logo/watermark tenant kuralına göre deterministik uygulanır.
 
 ### P0.10 User Report Library + Completion Email Delivery
 
-- Add per-user "My Reports" library in admin panel (list/filter/status/download/regenerate). **See also P1.10** for the DeepWhy-dedicated **saved reports tab** (in-form UX + same ownership/tenant isolation principles).
-- Persist report ownership and lifecycle metadata (`owner_user_id`, `incident_id`, `status`, `artifact_urls`, timestamps).
-- **Auto-email on report complete (target UX):** when HTML/DOCX artifacts are ready, send one email to the
-  **logged-in user's registered address** (Kinde `email` / profile) with attachments (HTML + DOCX) or
-  signed download links; no manual "download then attach" step for the user.
-- Send automatic email notification when report generation completes (success/failure templates + secure links).
-- Add notification preferences (opt-in/out, tenant defaults) and idempotent delivery/retry policy.
-- Add audit trail for delivery events and authorization checks for report access links.
-- Backend: SMTP/transactional provider (e.g. Resend, SendGrid, SES), Celery task after
-  `_generate_report_artifacts`, template TR/EN, bounce handling.
+- ✅ `report_deliveries` koleksiyonu + idempotency (`delivery_key`). (DONE)
+- ✅ Celery `send_report_delivery_email` + imzalı indirme linkleri (`signed_links`, `GET /api/v1/reports/delivery/download`). (DONE)
+- ✅ `library_finalize_report` sonrası kuyruk; `GET /api/v1/deliveries` audit. (DONE)
+- ⚠️ SMTP ortam değişkenleri (`SMTP_HOST`, …) yapılandırılmadan e-posta gönderilmez; worker gerekir. (OPS)
+- Hedef: rapor üretimi tamamlandığında kullanıcıya güvenli, otomatik ve izlenebilir teslimat.
+- Çözüm (MVP -> hardening):
+  - Veri modeli: `report_deliveries` koleksiyonu (`report_id`, `owner_user_id`, `tenant_id`, `channel=email`, `status`, `attempt_count`, `last_error`, `sent_at`).
+  - Pipeline bitişinde event üret: `report.artifacts_ready` -> Celery `send_report_delivery_email`.
+  - E-posta içeriği: attachment yerine imzalı, süreli link (HTML/DOCX) kullan; büyük dosya ve spam riskini azalt.
+  - Kullanıcı ayarı: `notify_report_ready_email` (user override) + tenant default.
+  - İdempotency: `delivery_key = report_id + owner_user_id + artifact_version`; tekrar çalışmada çift mail engelle.
+  - Retry politikası: exponential backoff (örn. 1m/5m/30m), max attempt sonrası `failed_permanent`.
+  - Audit: her deneme logu + provider response id sakla; admin panelde delivery timeline görünür olsun.
+- Güvenlik:
+  - Link doğrulaması `tenant_id + owner_user_id` ile zorunlu.
+  - Signed URL TTL kısa (örn. 24h) ve tek tenant scope.
+- Teslim kriterleri:
+  - Başarılı raporda kullanıcıya tekil "rapor hazır" maili gider.
+  - Aynı event tekrar işlense de duplicate e-posta gönderilmez.
+  - Başarısız gönderimler audit ekranında sebebiyle görünür.
 
 ### P0.11 Pricing Page Refresh (3-Tier Layout)
 
-- Rebuild pricing section with 3 plan cards matching target visual style:
-  - Starter (`$29/ay`)
-  - Professional (`$99/ay`, highlighted as "En popüler")
-  - Enterprise (`$299/ay`)
-- Define and render per-tier limits and included capabilities:
-  - monthly report quota,
-  - **monthly token / analysis credit budget** (maps to **P1.15** user token accounts),
-  - analysis method coverage (5-Why / Bow-tie),
-  - output formats (Word/PDF/HTML),
-  - user seat limit,
-  - API/SSO/SLA options where relevant.
-- Add segment labels on cards:
-  - KOBİ / bireysel HSE,
-  - Orta ölçekli işletme,
-  - Büyük sanayi / holding.
-- Move tier content to config-driven structure (single source for UI + future billing mapping).
-- Keep TR copy first, but prepare EN i18n keys for later language switch.
-- Acceptance:
-  - Pricing UI matches approved 3-card design composition and emphasis hierarchy.
-  - Tier content is editable via config without component rewrite.
-  - Mobile/tablet breakpoints preserve readability and card priority order.
+- ✅ `shared/pricing_plans.json` + `plan_config.py`; `token_account.period_limit` plan bütçesiyle eşlendi. (DONE)
+- ✅ `GET /api/v1/pricing/plans` + admin `pages-pricing.jsx` config-driven 3 kart (Starter $29 / Pro $99 / Enterprise $299). (DONE)
+- Hedef: fiyatlandırma sayfasını ürün kapasitesi ile birebir bağlı, tek kaynaktan yönetilen yapıya çevirmek.
+- Çözüm:
+  - Plan konfigürasyonu merkezi hale getir: `pricing_plans.{ts,json}` + i18n label key'leri.
+  - 3 plan kartı:
+    - Starter (`$29/ay`)
+    - Professional (`$99/ay`, "En popüler")
+    - Enterprise (`$299/ay`)
+  - Her plan için zorunlu alanlar:
+    - `monthly_report_quota`
+    - `monthly_token_budget` (P1.15 hesaplarıyla eşlenir)
+    - `analysis_features` (5-Why / Bow-tie)
+    - `formats` (Word/PDF/HTML)
+    - `seat_limit`
+    - `api_sso_sla`
+  - UI bileşeni sadece config okur; kart metni komponent içinde hardcode edilmez.
+  - "Satın al / İletişime geç" CTA davranışı plan tipine göre route edilir.
+- Entegrasyon notu:
+  - P0.11 plan kodları ile P1.15 token budget mapping aynı enum'u paylaşmalı (`starter|pro|enterprise`).
+- Teslim kriterleri:
+  - Tasarım 3 kart hiyerarşisini mobil/tablet/desktop'ta korur.
+  - Plan limiti değişikliği sadece config güncellemesiyle yayına alınır.
+  - TR metin birincil, EN key'ler hazır durumda tutulur.
 
 ### P0.12 Language-Aware HITL Questions
 

@@ -34,7 +34,7 @@ celery_app = Celery(
     "hse_rca_tasks",
     broker=REDIS_URL,
     backend=REDIS_URL,
-    include=["tasks.pipeline_tasks"],
+    include=["tasks.pipeline_tasks", "tasks.report_delivery_tasks"],
 )
 
 celery_app.conf.update(

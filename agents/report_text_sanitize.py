@@ -208,6 +208,25 @@ def _looks_like_english_taxonomy_title(text: str) -> bool:
     )
 
 
+_report_text_show_codes: bool = False
+
+
+def set_report_text_policy(*, show_technical_codes: bool = False) -> None:
+    """Thread-local policy for P0.9 code visibility (used during report generation)."""
+    global _report_text_show_codes
+    _report_text_show_codes = bool(show_technical_codes)
+
+
+def format_report_text(text: str, *, show_technical_codes: bool | None = None) -> str:
+    """Apply export text policy. When show_technical_codes=True, keep taxonomy codes."""
+    show = _report_text_show_codes if show_technical_codes is None else show_technical_codes
+    if not text or not isinstance(text, str):
+        return text
+    if show:
+        return strip_emojis(text).strip()
+    return strip_hse_codes(text)
+
+
 def sanitize_report_text(text: str) -> str:
     """Tam rapor metni temizliği (kod + emoji + HSG etiketi + EN gürültü)."""
-    return strip_hse_codes(text)
+    return format_report_text(text)

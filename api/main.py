@@ -46,7 +46,11 @@ from shared.tenant_store import (
 )
 from shared.tenant_auth import resolve_tenant_id
 from shared.owner_auth import resolve_owner_user_id
+from shared.report_layout_config import resolve_report_layout
+from shared.plan_config import load_pricing_catalog
+from shared.signed_links import verify_token
 from shared import saved_reports_store
+from shared import report_deliveries
 from shared import token_account
 from shared.usage_context import bind_usage_context, clear_usage_context
 from shared.hybrid_cache import hybrid_get, hybrid_set
@@ -748,6 +752,7 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
     try:
         part3_data = incident.get("part3") or {}
         part3_v2 = part3_data.get("_v2_raw") if isinstance(part3_data, dict) else None
+        layout = resolve_report_layout(incident, tenant_id=tenant_id)
         report_payload = {
             "ref_no": incident_id,
             "part1": incident.get("part1", {}),
@@ -755,7 +760,9 @@ def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
             # SkillBasedDocxAgent expects part3_rca (raw V2 preferred).
             "part3_rca": part3_v2 if isinstance(part3_v2, dict) else part3_data,
             "part4": incident.get("part4", {}),
+            "report_layout": layout,
         }
+        incident["report_layout_snapshot"] = layout
         preferred_language = (
             (incident.get("output_language") or "").strip()
             or ((part3_v2 or {}).get("output_language") if isinstance(part3_v2, dict) else "")
@@ -1764,11 +1771,65 @@ async def library_upsert_item(
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
+@app.get("/api/v1/pricing/plans")
+async def pricing_plans():
+    """P0.11 — Public pricing catalog for admin panel."""
+    return {"success": True, "data": load_pricing_catalog()}
+
+
+@app.get("/api/v1/deliveries")
+async def list_report_deliveries(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    limit: int = Query(20, ge=1, le=100),
+):
+    """P0.10 — Email delivery audit timeline for current user."""
+    try:
+        rows = await asyncio.to_thread(
+            report_deliveries.list_deliveries, tenant_id, owner_user_id, limit=limit
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return {"success": True, "data": {"deliveries": rows}}
+
+
+@app.get("/api/v1/reports/delivery/download")
+async def report_delivery_download(token: str = Query(..., min_length=8)):
+    """Signed, time-limited HTML or DOCX download (P0.10)."""
+    payload = verify_token(token)
+    if not payload:
+        raise HTTPException(status_code=403, detail="Invalid or expired link")
+    tenant_id = (payload.get("tenant_id") or "").strip()
+    owner_user_id = (payload.get("owner_user_id") or "").strip()
+    incident_id = (payload.get("incident_id") or "").strip()
+    artifact = (payload.get("artifact") or "html").strip().lower()
+    if not tenant_id or not owner_user_id or not incident_id:
+        raise HTTPException(status_code=400, detail="Malformed token")
+    incident = _require_incident_record(tenant_id, incident_id)
+    artifacts = incident.get("report_artifacts") or {}
+    if not _validate_artifact_paths(artifacts):
+        artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    if artifact == "docx":
+        path = Path(artifacts["docx_path"])
+        if not path.exists():
+            raise HTTPException(status_code=404, detail="DOCX not found")
+        return FileResponse(
+            path,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            filename=f"{incident_id}_report.docx",
+        )
+    path = Path(artifacts["html_path"])
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="HTML not found")
+    return FileResponse(path, media_type="text/html; charset=utf-8", filename=f"{incident_id}_report.html")
+
+
 @app.post("/api/v1/library/items/finalize")
 async def library_finalize_report(
     tenant_id: TenantId,
     owner_user_id: OwnerUserId,
     body: LibraryFinalizeRequest,
+    x_user_email: Optional[str] = Header(None, alias="X-User-Email"),
 ):
     """
     After pipeline completes: upsert report row, generate HTML artifacts, store in Mongo for the user.
@@ -1798,6 +1859,19 @@ async def library_finalize_report(
             report_html=report_html,
             decision_tree_html=tree_html,
         )
+        artifact_version = (artifacts.get("generated_at") or "v1").strip()
+        try:
+            await asyncio.to_thread(
+                report_deliveries.enqueue_report_ready_email,
+                tenant_id=tenant_id,
+                owner_user_id=owner_user_id,
+                recipient_email=(x_user_email or "").strip(),
+                report_id=str((updated or item).get("id") or incident_id),
+                incident_id=incident_id,
+                artifact_version=artifact_version,
+            )
+        except Exception as mail_exc:  # noqa: BLE001
+            print(f"⚠️  Report delivery enqueue skipped: {mail_exc}")
         return {"success": True, "data": updated or item}
     except HTTPException:
         raise

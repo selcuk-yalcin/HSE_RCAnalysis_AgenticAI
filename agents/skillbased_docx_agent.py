@@ -42,15 +42,19 @@ except ImportError:
 try:
     from agents.report_text_sanitize import (
         sanitize_report_text,
+        set_report_text_policy,
         short_incident_summary,
         taxonomy_display_title,
     )
+    from shared.report_layout_config import resolve_report_layout
 except ImportError:
     from .report_text_sanitize import (
         sanitize_report_text,
+        set_report_text_policy,
         short_incident_summary,
         taxonomy_display_title,
     )
+    from shared.report_layout_config import resolve_report_layout
 
 # Geriye dönük importlar
 strip_hse_codes = sanitize_report_text
@@ -1177,6 +1181,26 @@ class SkillBasedDocxAgent:
         print(f" DOCX RAPOR URETME V2 (OpenRouter model: {self.model})")
         print("=" * 70)
 
+        layout = resolve_report_layout(investigation_data)
+        investigation_data = {**investigation_data, "report_layout": layout}
+        set_report_text_policy(show_technical_codes=bool(layout.get("show_technical_codes")))
+        try:
+            return self._generate_report_impl(
+                investigation_data,
+                output_path,
+                timeout_seconds,
+                preferred_language,
+            )
+        finally:
+            set_report_text_policy(show_technical_codes=False)
+
+    def _generate_report_impl(
+        self,
+        investigation_data: Dict,
+        output_path: str,
+        timeout_seconds: int,
+        preferred_language: str,
+    ) -> str:
         raw_data = self._build_raw_payload(investigation_data)
 
         #  Dil tespiti 
@@ -1807,6 +1831,47 @@ class SkillBasedDocxAgent:
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html)
 
+    def _html_branding_extras(
+        self, investigation_data: Optional[Dict] = None
+    ) -> tuple[str, str, str]:
+        """Returns (watermark_css, watermark_html, cover_logo_html)."""
+        layout = resolve_report_layout(investigation_data)
+        wm_mode = str(layout.get("watermark_mode") or "final").lower()
+        wm_label = ""
+        if wm_mode == "draft":
+            wm_label = "DRAFT"
+        elif wm_mode == "final":
+            wm_label = "FINAL"
+        watermark_css = ""
+        watermark_html = ""
+        if wm_label:
+            watermark_css = f"""
+        body::before {{
+            content: "{wm_label}";
+            position: fixed;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-32deg);
+            font-size: 96px;
+            font-weight: 800;
+            color: rgba(44, 82, 130, 0.08);
+            z-index: 0;
+            pointer-events: none;
+            letter-spacing: 0.2em;
+        }}
+        .container {{ position: relative; z-index: 1; }}
+            """
+            watermark_html = f'<div class="report-watermark" aria-hidden="true">{wm_label}</div>'
+        logo_url = (layout.get("logo_url") or "").strip()
+        logo_html = ""
+        if logo_url:
+            logo_html = (
+                f'<div class="tenant-logo" style="margin-bottom:20px;">'
+                f'<img src="{logo_url}" alt="Logo" style="max-height:72px;max-width:240px;" />'
+                f"</div>"
+            )
+        return watermark_css, watermark_html, logo_html
+
     def _generate_html_template(self, content: Dict, lang: Optional[Dict] = None, investigation_data: Optional[Dict] = None) -> str:
         """Modern, responsive ve düzenlenebilir HTML rapor şablonu."""
         lang = lang or {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr"}
@@ -1814,6 +1879,7 @@ class SkillBasedDocxAgent:
         lang_code = (lang.get("code") or "tr").lower()
         is_rtl = lang.get("rtl", False)
         dir_attr = ' dir="rtl"' if is_rtl else ''
+        watermark_css, watermark_html, cover_logo_html = self._html_branding_extras(investigation_data)
         rtl_css = """
         body { direction: rtl; text-align: right; }
         .container { direction: rtl; }
@@ -2587,9 +2653,11 @@ class SkillBasedDocxAgent:
             50% {{ background: #FFFACD; }}
             100% {{ background: transparent; }}
         }}
+        {watermark_css}
     </style>
 </head>
 <body>
+    {watermark_html}
     <!-- Navigasyon Toggle Butonu -->
     <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
     
@@ -2636,6 +2704,7 @@ class SkillBasedDocxAgent:
     <div class="container">
         <!-- KAPAK SAYFASI -->
         <div class="cover" id="cover">
+            {cover_logo_html}
             <h1 contenteditable="true">{cover.get('title', 'KÖK NEDEN ANALİZİ RAPORU')}</h1>
             <div class="subtitle" contenteditable="true">{cover.get('subtitle', 'Profesyonel Araştırma ve Analiz Raporu')}</div>
             

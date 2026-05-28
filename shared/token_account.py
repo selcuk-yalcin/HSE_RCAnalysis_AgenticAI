@@ -15,6 +15,8 @@ from pymongo import ASCENDING, DESCENDING, MongoClient
 from pymongo.collection import Collection
 from pymongo.errors import DuplicateKeyError
 
+from shared.plan_config import monthly_token_budget_for_plan, normalize_plan_tier
+
 ACCOUNTS_COLLECTION = "user_token_accounts"
 LEDGER_COLLECTION = "token_ledger"
 _indexes_ensured = False
@@ -41,7 +43,7 @@ def enforcement_enabled() -> bool:
     return raw not in ("0", "false", "no", "off")
 
 
-def period_limit() -> int:
+def period_limit(plan_tier: str | None = None) -> int:
     for name in ("TOKEN_PERIOD_LIMIT", "TOKEN_DEFAULT_LIMIT"):
         raw = (os.getenv(name) or "").strip()
         if raw:
@@ -49,7 +51,8 @@ def period_limit() -> int:
                 return max(1000, int(raw))
             except ValueError:
                 pass
-    return 220_000
+    tier = normalize_plan_tier(plan_tier or os.getenv("TOKEN_DEFAULT_PLAN_TIER") or "starter")
+    return monthly_token_budget_for_plan(tier)
 
 
 def default_signup_balance() -> int:
@@ -154,7 +157,8 @@ def ensure_collections() -> dict[str, Any]:
 
 
 def _new_account_doc(tenant_id: str, owner_user_id: str) -> dict[str, Any]:
-    limit = period_limit()
+    tier = normalize_plan_tier(os.getenv("TOKEN_DEFAULT_PLAN_TIER") or "starter")
+    limit = period_limit(tier)
     balance = default_signup_balance()
     now = _utc_now_iso()
     return {
@@ -164,7 +168,7 @@ def _new_account_doc(tenant_id: str, owner_user_id: str) -> dict[str, Any]:
         "reserved": 0,
         "period_limit": limit,
         "lifetime_used": 0,
-        "plan_tier": (os.getenv("TOKEN_DEFAULT_PLAN_TIER") or "starter").strip(),
+        "plan_tier": tier,
         "period_reset_at": now,
         "created_at": now,
         "updated_at": now,
