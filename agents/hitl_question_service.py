@@ -15,6 +15,16 @@ from openai import OpenAI
 from agents.hitl_disambiguation_bank import build_questions_for_causes
 from agents.hgs_taxonomy import parse_hsg_taxonomy_items, infer_codes_from_text
 from agents.model_constants import resolve_openrouter_chat_model
+from shared.hitl_i18n import (
+    has_turkish_chars,
+    hitl_ui_label,
+    normalize_hitl_lang,
+    pick_choice_options,
+    question_batch_has_language_drift,
+    response_guidance,
+    safe_fallback_question,
+    shape_bilingual_question_fields,
+)
 
 _HS_CODE_RE = re.compile(r"\b([ABCD][0-9]+\.[0-9]+)\b", re.IGNORECASE)
 _GENERIC_PATTERNS = (
@@ -133,11 +143,12 @@ def _normalize_str_list(v: Any, max_n: int = 30) -> list[str]:
     return []
 
 
-def _enrich_hitl_ui(soru: str, q: dict) -> dict[str, Any]:
+def _enrich_hitl_ui(soru: str, q: dict, lang: str = "tr") -> dict[str, Any]:
     """
     response_mode: yes_no_unknown | free_text | choice
     choice_options: Trafik etiketleri (TR); aynı uzunlukta choice_options_en = gösterim dili.
     """
+    lang_code = normalize_hitl_lang(lang)
     s = (soru or "").strip()
     low = s.lower()
     o_tr = _normalize_str_list((q or {}).get("choice_options") or (q or {}).get("options"))
@@ -196,7 +207,7 @@ def _enrich_hitl_ui(soru: str, q: dict) -> dict[str, Any]:
     elif ex in ("yes_no", "yesno", "yes_no", "yes_no_unknown", "bool"):
         m3 = "yes_no_unknown"
     else:
-        m3 = _infer_response_mode(s)
+        m3 = _infer_response_mode(s, lang_code)
     if m3 not in ("free_text", "yes_no_unknown"):
         m3 = "yes_no_unknown"
     return {
@@ -207,7 +218,7 @@ def _enrich_hitl_ui(soru: str, q: dict) -> dict[str, Any]:
     }
 
 
-def _infer_response_mode(soru: str) -> str:
+def _infer_response_mode(soru: str, lang: str = "tr") -> str:
     """
     UI'nin Evet/Hayır/Bilinmiyor mı yoksa serbest metin mi toplayacağını seçer.
     Açık choice-style sorularda (ör. 'A mı, B mı, C mü?') free_text.
@@ -216,6 +227,16 @@ def _infer_response_mode(soru: str) -> str:
     if len(t) < 8:
         return "yes_no_unknown"
     low = t.lower()
+    if normalize_hitl_lang(lang) == "en":
+        if re.search(r"\b(how many|how much|when|which date|who|where|from|to)\b", low):
+            return "free_text"
+        if re.search(r"\b(list|describe|explain|specify|detail|state)\b", low):
+            return "free_text"
+        if " or " in low and "?" in t and len(t) > 35:
+            return "free_text"
+        if re.search(r"\b(was|were|is|are|did|does|has|have)\b", low) and "?" in t:
+            return "yes_no_unknown"
+        return "free_text" if "?" in t and len(t) > 48 else "yes_no_unknown"
     if re.search(
         r"\b(kaç|kac|ne\s+kadar|ne\s+zaman|hangi\s+tarih|kim(dir|in|i)?|nerede|nereden|nereye)\b",
         low,
@@ -533,6 +554,7 @@ def _llm_question_candidates(
     previous_why_answer: str = "",
     known_fields: list[str] | None = None,
     max_questions: int = 6,
+    output_language: str = "tr",
 ) -> list[dict[str, Any]]:
     if not _HITL_LLM_ENABLED:
         return []
@@ -562,6 +584,13 @@ def _llm_question_candidates(
         model = f"openrouter/{model}"
 
     known = ", ".join(known_fields or [])
+    lang = normalize_hitl_lang(output_language)
+    lang_name = "Turkish" if lang == "tr" else "English"
+    lang_rule = (
+        "Tüm sorular Türkçe olmalı; JSON alanı question_tr kullan."
+        if lang == "tr"
+        else "All questions must be in English only; use question_en field (not Turkish)."
+    )
     prompt = f"""
 Sen HSE RCA HITL soru asistanısın.
 Yalnızca olayla doğrudan ilgili, dalı derinleştiren, non-generic sorular üret.
@@ -583,10 +612,11 @@ Taxonomy odak kodları:
 Kurallar:
 - Olaya özgü sor; yalnız kopya-şablon sorma. Kanıt veya ayrıntı ister.
 - HSG koduna bağla.
-- Türkçe, kısa, net.
+- {lang_rule}
+- Dil: {lang_name}. Tek dilde yaz; karışık TR+EN kullanma.
 - Cevap türü: (1) basit "answer_format": "yes_no" (2) açık metin: "free_text" (3) tıklanabilir etiket listesi: "answer_format": "choice", "options": ["3–8 kısa kategori"], "options_en" (aynı sıra, İngilizce), "multi": true bir veya false tek seçim.
-- "hangi KKD" gibi cevabı belli liste olan sorulara "choice" + options koy; Evet/Hayır yeterli değilse "yes_no" kullanma.
-- JSON array: [{{"question_tr":"...","code":"A1.1","answer_format":"yes_no"|"free_text"|"choice","options":[]|null,"options_en":[]|null,"multi":false,"reason":"..."}}]
+- "hangi KKD" / "which PPE" gibi cevabı belli liste olan sorulara "choice" + options koy; Evet/Hayır yeterli değilse "yes_no" kullanma.
+- JSON array: [{{"question_tr":"...","question_en":"...","code":"A1.1","answer_format":"yes_no"|"free_text"|"choice","options":[]|null,"options_en":[]|null,"multi":false,"reason":"..."}}]
 - En fazla {max_questions} soru.
 """.strip()
 
@@ -618,10 +648,19 @@ Kurallar:
         items = _extract_json_array(content)
         out: list[dict[str, Any]] = []
         for i, it in enumerate(items[:max_questions], start=1):
-            q = str(it.get("question_tr") or "").strip()
+            q_tr = str(it.get("question_tr") or "").strip()
+            q_en = str(it.get("question_en") or "").strip()
+            if lang == "en":
+                q = q_en or q_tr
+            else:
+                q = q_tr or q_en
             code = str(it.get("code") or "").strip().upper()
             if not q:
                 continue
+            if lang == "en" and has_turkish_chars(q):
+                continue
+            if lang == "tr" and q_en and not q_tr and has_turkish_chars(q_en):
+                q = q_en
             af = str(it.get("answer_format") or "").strip().lower()
             c_opts = _normalize_str_list(it.get("options") or it.get("choice_options"))
             c_en = _normalize_str_list(it.get("options_en") or it.get("choice_options_en"))
@@ -633,14 +672,15 @@ Kurallar:
             elif af in ("yes_no", "yesno", "boolean", "bool"):
                 rmode = "yes_no_unknown"
             else:
-                rmode = _infer_response_mode(q)
+                rmode = _infer_response_mode(q, lang)
             row: dict[str, Any] = {
                 "id": _stable_id("llm", str(why_level), code, str(i), q),
                 "source": "why_probe_llm",
                 "code": code,
                 "cause_desc": code,
                 "hsg245": code,
-                "soru": q,
+                "soru": q_tr or q,
+                "soru_en": q_en or (q if lang == "en" else ""),
                 "yönler": {},
                 "why_level": why_level,
                 "response_mode": rmode,
@@ -661,6 +701,7 @@ def build_hitl_question_pool(
     how_happened: str,
     root_cause_initial: str,
     immediate_causes: list[dict] | None = None,
+    output_language: str = "tr",
 ) -> list[dict[str, Any]]:
     """
     API + Gradio için tek havuz: önce immediate cause disambiguation, sonra eksik kategori soruları.
@@ -708,6 +749,7 @@ def build_hitl_question_pool(
         why_level=1,
         known_fields=[],
         max_questions=6,
+        output_language=output_language,
     )
     for row in llm_rows:
         soru = str(row.get("soru") or "").strip()
@@ -719,6 +761,56 @@ def build_hitl_question_pool(
     return pool[:20]
 
 
+def _fallback_pool_row(q: dict, lang: str) -> dict:
+    source = str(q.get("source") or "generic")
+    text = safe_fallback_question(lang, source)
+    out = dict(q)
+    if lang == "en":
+        out["soru_en"] = text
+        if not out.get("soru"):
+            out["soru"] = text
+    else:
+        out["soru"] = text
+    return out
+
+
+def _shape_question(q: dict, output_language: str = "tr", *, _retried: bool = False) -> dict[str, Any]:
+    lang = normalize_hitl_lang(output_language)
+    source = str(q.get("source", "disambiguation") or "disambiguation")
+    soru = str(q.get("soru", "") or q.get("question_tr", "") or "").strip()
+    soru_en = str(q.get("soru_en", "") or q.get("question_en", "") or "").strip()
+    question_tr, question_en = shape_bilingual_question_fields(soru, soru_en, lang, source=source)
+    display = question_en if lang == "en" else question_tr
+    u = _enrich_hitl_ui(display, q, lang)
+    tr_opts, en_opts = pick_choice_options({**q, **u}, lang)
+    mode = u.get("response_mode", "yes_no_unknown")
+    shaped: dict[str, Any] = {
+        "id": q["id"],
+        "source": source,
+        "hsg_hint": q.get("hsg245", ""),
+        "code": q.get("code", ""),
+        "cause_desc": q.get("cause_desc", ""),
+        "question_tr": question_tr,
+        "question_en": question_en,
+        "soru": question_tr,
+        "yönler": q.get("yönler") or {},
+        "response_mode": mode,
+        "choice_options": tr_opts,
+        "choice_options_en": en_opts,
+        "choice_multi": bool(u.get("choice_multi", False)),
+        "helper_hint": hitl_ui_label(
+            lang,
+            "choice_other_hint" if mode == "choice" else "yes_no_hint",
+        ),
+        "response_guidance": response_guidance(mode, lang),
+    }
+    if q.get("why_level") is not None:
+        shaped["why_level"] = q.get("why_level")
+    if question_batch_has_language_drift([shaped], lang) and not _retried:
+        return _shape_question(_fallback_pool_row(q, lang), output_language, _retried=True)
+    return shaped
+
+
 def next_hitl_questions(
     how_happened: str,
     root_cause_initial: str,
@@ -726,42 +818,31 @@ def next_hitl_questions(
     immediate_causes: list[dict] | None = None,
     batch_size: int = 1,
     known_fields: list[str] | None = None,
+    output_language: str = "tr",
 ) -> dict[str, Any]:
     """
     Cevaplanmış id'leri düşürür; sıradaki batch_size soruyu döndürür.
     """
     answered = set(answered_ids or [])
     pool = _filter_questions(
-        build_hitl_question_pool(how_happened, root_cause_initial, immediate_causes),
+        build_hitl_question_pool(
+            how_happened,
+            root_cause_initial,
+            immediate_causes,
+            output_language=output_language,
+        ),
         known_fields=known_fields,
         incident_context="\n".join([how_happened or "", root_cause_initial or ""]),
     )
     pending = [q for q in pool if q.get("id") not in answered]
     batch = pending[: max(1, batch_size)]
 
-    def _shape(q: dict) -> dict[str, Any]:
-        soru = str(q.get("soru", "") or "")
-        u = _enrich_hitl_ui(soru, q)
-        return {
-            "id": q["id"],
-            "source": q.get("source", "disambiguation"),
-            "hsg_hint": q.get("hsg245", ""),
-            "code": q.get("code", ""),
-            "cause_desc": q.get("cause_desc", ""),
-            "question_tr": soru,
-            "question_en": soru,
-            "yönler": q.get("yönler") or {},
-            "response_mode": u.get("response_mode", "yes_no_unknown"),
-            "choice_options": u.get("choice_options") or [],
-            "choice_options_en": u.get("choice_options_en") or [],
-            "choice_multi": bool(u.get("choice_multi", False)),
-        }
-
     return {
-        "questions": [_shape(q) for q in batch],
+        "questions": [_shape_question(q, output_language) for q in batch],
         "total_pool": len(pool),
         "remaining_after_batch": max(0, len(pending) - len(batch)),
         "done": len(pending) == 0,
+        "output_language": normalize_hitl_lang(output_language),
     }
 
 
@@ -773,6 +854,7 @@ def build_why_probe_question_pool(
     current_why_question: str = "",
     previous_why_answer: str = "",
     known_fields: list[str] | None = None,
+    output_language: str = "tr",
 ) -> list[dict[str, Any]]:
     """
     Why zinciri içinde ara netleştirme soruları üretir.
@@ -806,6 +888,7 @@ def build_why_probe_question_pool(
         previous_why_answer=previous_why_answer or "",
         known_fields=known_fields or [],
         max_questions=6,
+        output_language=output_language,
     )
     for row in llm_rows:
         soru = str(row.get("soru") or "").strip()
@@ -889,6 +972,7 @@ def next_why_probe_questions(
     previous_why_answer: str = "",
     batch_size: int = 1,
     known_fields: list[str] | None = None,
+    output_language: str = "tr",
 ) -> dict[str, Any]:
     """
     Why-level ara sorular: her seviyede daha net sebep ayrımı için döngüsel API.
@@ -902,32 +986,15 @@ def next_why_probe_questions(
         current_why_question=current_why_question,
         previous_why_answer=previous_why_answer,
         known_fields=known_fields,
+        output_language=output_language,
     )
     pending = [q for q in pool if q.get("id") not in answered]
     batch = pending[: max(1, batch_size)]
 
-    def _shape(q: dict) -> dict[str, Any]:
-        soru = str(q.get("soru", "") or "")
-        u = _enrich_hitl_ui(soru, q)
-        return {
-            "id": q["id"],
-            "source": q.get("source", "why_probe"),
-            "hsg_hint": q.get("hsg245", ""),
-            "code": q.get("code", ""),
-            "cause_desc": q.get("cause_desc", ""),
-            "question_tr": soru,
-            "question_en": soru,
-            "yönler": q.get("yönler") or {},
-            "why_level": q.get("why_level", why_level),
-            "response_mode": u.get("response_mode", "yes_no_unknown"),
-            "choice_options": u.get("choice_options") or [],
-            "choice_options_en": u.get("choice_options_en") or [],
-            "choice_multi": bool(u.get("choice_multi", False)),
-        }
-
     return {
-        "questions": [_shape(q) for q in batch],
+        "questions": [_shape_question(q, output_language) for q in batch],
         "total_pool": len(pool),
         "remaining_after_batch": max(0, len(pending) - len(batch)),
         "done": len(pending) == 0,
+        "output_language": normalize_hitl_lang(output_language),
     }

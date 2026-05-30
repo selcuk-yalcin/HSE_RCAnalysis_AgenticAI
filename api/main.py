@@ -46,7 +46,7 @@ from shared.tenant_store import (
 )
 from shared.tenant_auth import resolve_tenant_id
 from shared.owner_auth import resolve_owner_user_id
-from shared.report_layout_config import resolve_report_layout
+from shared.report_layout_config import resolve_report_layout, list_layout_catalog, normalize_layout_patch
 from shared.plan_config import load_pricing_catalog
 from shared.signed_links import verify_token
 from shared import saved_reports_store
@@ -643,9 +643,17 @@ class HitlQuestionsRequest(BaseModel):
     mode: str = "global"
     batch_size: int = 1
     known_fields: list[str] = []
+    output_language: str = ""
 
 class PDFGenerateRequest(BaseModel):
     incident_id: str
+    report_layout: Optional[dict] = None
+    force_regenerate: bool = False
+
+
+class ReportLayoutRequest(BaseModel):
+    report_layout: dict = {}
+    force_regenerate: bool = True
 
 
 class LibraryUpsertRequest(BaseModel):
@@ -663,6 +671,7 @@ class LibraryFinalizeRequest(BaseModel):
     snapshot: dict = {}
     title_hint: str = ""
     analysis_model_preset: str = ""
+    report_layout: Optional[dict] = None
 
 
 class TokenTopUpRequest(BaseModel):
@@ -692,12 +701,45 @@ def _validate_artifact_paths(artifacts: dict) -> bool:
     return True
 
 
-def _generate_report_artifacts(tenant_id: str, incident_id: str) -> dict:
+def _apply_report_layout_to_incident(
+    tenant_id: str,
+    incident_id: str,
+    layout_patch: Optional[dict],
+    *,
+    force_regenerate: bool = True,
+) -> dict:
+    incident = _require_incident_record(tenant_id, incident_id)
+    patch = normalize_layout_patch(layout_patch)
+    layout = resolve_report_layout(incident, tenant_id=tenant_id, override=patch)
+    incident["report_layout"] = layout
+    incident["report_layout_snapshot"] = layout
+    if force_regenerate:
+        incident.pop("report_artifacts", None)
+    _save_incident_record(tenant_id, incident_id, incident)
+    return layout
+
+
+def _generate_report_artifacts(
+    tenant_id: str,
+    incident_id: str,
+    *,
+    layout_override: Optional[dict] = None,
+    force_regenerate: bool = False,
+) -> dict:
     """Generate DOCX + HTML + decision tree artifacts and return absolute paths."""
     if pdf_agent is None:
         raise HTTPException(status_code=503, detail="Report agent is not initialized")
 
     incident = _require_incident_record(tenant_id, incident_id)
+
+    if layout_override or force_regenerate:
+        _apply_report_layout_to_incident(
+            tenant_id,
+            incident_id,
+            layout_override,
+            force_regenerate=bool(force_regenerate or layout_override),
+        )
+        incident = _require_incident_record(tenant_id, incident_id)
 
     # Önce daha önce üretilmiş artifact varsa doğrudan onu döndür.
     # Böylece incident part3 senkronizasyonu gecikse bile kullanıcı raporu açabilir.
@@ -1065,10 +1107,12 @@ async def hitl_dynamic_questions(
     _require_incident_record(tenant_id, incident_id)
     bs = body.batch_size if body.batch_size and body.batch_size > 0 else 1
     bs = min(bs, 5)
+    output_language = (body.output_language or "").strip()
     payload_for_key = {
         "tenant_id": tenant_id,
         "incident_id": incident_id,
         "body": body.model_dump(),
+        "output_language": output_language,
     }
     cached_payload, src = hybrid_get(tenant_id, "hitl_questions", payload_for_key)
     if cached_payload:
@@ -1091,6 +1135,7 @@ async def hitl_dynamic_questions(
                 previous_why_answer=body.previous_why_answer or "",
                 batch_size=bs,
                 known_fields=body.known_fields or [],
+                output_language=output_language,
             )
         else:
             payload = next_hitl_questions(
@@ -1100,6 +1145,7 @@ async def hitl_dynamic_questions(
                 body.immediate_causes,
                 bs,
                 known_fields=body.known_fields or [],
+                output_language=output_language,
             )
         hybrid_set(
             tenant_id,
@@ -1549,6 +1595,29 @@ async def meta_learning_info():
     }
 
 
+@app.get("/api/v1/reports/layout-options")
+async def report_layout_options(lang: str = Query("tr", max_length=8)):
+    """P0.9 — Cover templates, watermark modes, and section list for UI picker."""
+    return {"success": True, "data": list_layout_catalog(lang)}
+
+
+@app.put("/api/v1/incidents/{incident_id}/report-layout")
+async def update_incident_report_layout(
+    tenant_id: TenantId,
+    owner_user_id: OwnerUserId,
+    incident_id: str,
+    body: ReportLayoutRequest,
+):
+    _ = owner_user_id
+    layout = _apply_report_layout_to_incident(
+        tenant_id,
+        incident_id,
+        body.report_layout,
+        force_regenerate=body.force_regenerate,
+    )
+    return {"success": True, "data": {"incident_id": incident_id, "report_layout": layout}}
+
+
 @app.post("/api/v1/reports/generate")
 async def generate_pdf_report(
     tenant_id: TenantId,
@@ -1560,7 +1629,12 @@ async def generate_pdf_report(
     """
     incident_id = request.incident_id
     _enforce_token_cost(tenant_id, owner_user_id, "report_docx")
-    artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    artifacts = _generate_report_artifacts(
+        tenant_id,
+        incident_id,
+        layout_override=request.report_layout,
+        force_regenerate=request.force_regenerate,
+    )
     _debit_token_estimate(
         tenant_id,
         owner_user_id,
@@ -1585,13 +1659,19 @@ async def generate_html_report(
     tenant_id: TenantId,
     owner_user_id: OwnerUserId,
     request: PDFGenerateRequest,
+    x_user_email: Optional[str] = Header(None, alias="X-User-Email"),
 ):
     """
     Generate HTML report artifacts and return URLs for preview/download.
     """
     incident_id = request.incident_id
     _enforce_token_cost(tenant_id, owner_user_id, "report_html")
-    artifacts = _generate_report_artifacts(tenant_id, incident_id)
+    artifacts = _generate_report_artifacts(
+        tenant_id,
+        incident_id,
+        layout_override=request.report_layout,
+        force_regenerate=request.force_regenerate,
+    )
     _debit_token_estimate(
         tenant_id,
         owner_user_id,
@@ -1599,6 +1679,14 @@ async def generate_html_report(
         incident_id=incident_id,
         operation_label=f"HTML rapor ({incident_id})",
         idempotency_key=f"report_html:{tenant_id}:{incident_id}",
+    )
+    await _enqueue_report_delivery_email(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        recipient_email=(x_user_email or "").strip(),
+        report_id=incident_id,
+        incident_id=incident_id,
+        artifacts=artifacts,
     )
     return {
         "success": True,
@@ -1661,6 +1749,34 @@ def _read_artifact_files(artifacts: dict) -> tuple[str, str]:
     report_html = html_path.read_text(encoding="utf-8", errors="replace") if html_path.exists() else ""
     tree_html = tree_path.read_text(encoding="utf-8", errors="replace") if tree_path.exists() else ""
     return report_html, tree_html
+
+
+async def _enqueue_report_delivery_email(
+    *,
+    tenant_id: str,
+    owner_user_id: str,
+    recipient_email: str,
+    report_id: str,
+    incident_id: str,
+    artifacts: dict,
+) -> None:
+    """Queue completion email when report artifacts are ready (idempotent)."""
+    email = (recipient_email or "").strip()
+    if not email or "@" not in email:
+        return
+    artifact_version = str(artifacts.get("generated_at") or incident_id).strip()
+    try:
+        await asyncio.to_thread(
+            report_deliveries.maybe_enqueue_report_email,
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            recipient_email=email,
+            report_id=report_id,
+            incident_id=incident_id,
+            artifact_version=artifact_version,
+        )
+    except Exception as mail_exc:  # noqa: BLE001
+        print(f"⚠️  Report delivery enqueue skipped: {mail_exc}")
 
 
 @app.get("/api/v1/usage/summary")
@@ -1790,7 +1906,16 @@ async def list_report_deliveries(
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    return {"success": True, "data": {"deliveries": rows}}
+    from shared.email_sender import get_smtp_public_config
+
+    return {
+        "success": True,
+        "data": {
+            "deliveries": rows,
+            "smtp": get_smtp_public_config(),
+            "notify_default": report_deliveries.notify_enabled_for_user(tenant_id=tenant_id),
+        },
+    }
 
 
 @app.get("/api/v1/reports/delivery/download")
@@ -1848,6 +1973,13 @@ async def library_finalize_report(
             report_ready=False,
             analysis_model_preset=body.analysis_model_preset or "",
         )
+        if body.report_layout:
+            _apply_report_layout_to_incident(
+                tenant_id,
+                incident_id,
+                body.report_layout,
+                force_regenerate=True,
+            )
         artifacts = _generate_report_artifacts(tenant_id, incident_id)
         report_html, tree_html = _read_artifact_files(artifacts)
         if not report_html:
@@ -1859,19 +1991,14 @@ async def library_finalize_report(
             report_html=report_html,
             decision_tree_html=tree_html,
         )
-        artifact_version = (artifacts.get("generated_at") or "v1").strip()
-        try:
-            await asyncio.to_thread(
-                report_deliveries.enqueue_report_ready_email,
-                tenant_id=tenant_id,
-                owner_user_id=owner_user_id,
-                recipient_email=(x_user_email or "").strip(),
-                report_id=str((updated or item).get("id") or incident_id),
-                incident_id=incident_id,
-                artifact_version=artifact_version,
-            )
-        except Exception as mail_exc:  # noqa: BLE001
-            print(f"⚠️  Report delivery enqueue skipped: {mail_exc}")
+        await _enqueue_report_delivery_email(
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            recipient_email=(x_user_email or "").strip(),
+            report_id=str((updated or item).get("id") or incident_id),
+            incident_id=incident_id,
+            artifacts=artifacts,
+        )
         return {"success": True, "data": updated or item}
     except HTTPException:
         raise
@@ -1911,6 +2038,7 @@ async def library_save_html(
     tenant_id: TenantId,
     owner_user_id: OwnerUserId,
     body: LibrarySaveHtmlRequest,
+    x_user_email: Optional[str] = Header(None, alias="X-User-Email"),
 ):
     """Store pre-generated HTML (avoids long-running finalize through serverless gateways)."""
     incident_id = (body.incident_id or "").strip()
@@ -1935,6 +2063,14 @@ async def library_save_html(
             item_id=item["id"],
             report_html=body.report_html or "",
             decision_tree_html=body.decision_tree_html or "",
+        )
+        await _enqueue_report_delivery_email(
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            recipient_email=(x_user_email or "").strip(),
+            report_id=str((updated or item).get("id") or incident_id),
+            incident_id=incident_id,
+            artifacts={"generated_at": incident_id},
         )
         return {"success": True, "data": updated or item}
     except RuntimeError as exc:

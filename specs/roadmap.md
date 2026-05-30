@@ -112,8 +112,32 @@ Source: synchronized from root `TODO.md`.
 
 - ✅ `report_deliveries` koleksiyonu + idempotency (`delivery_key`). (DONE)
 - ✅ Celery `send_report_delivery_email` + imzalı indirme linkleri (`signed_links`, `GET /api/v1/reports/delivery/download`). (DONE)
-- ✅ `library_finalize_report` sonrası kuyruk; `GET /api/v1/deliveries` audit. (DONE)
-- ⚠️ SMTP ortam değişkenleri (`SMTP_HOST`, …) yapılandırılmadan e-posta gönderilmez; worker gerekir. (OPS)
+- ✅ Rapor hazır e-postası: `library_finalize`, `POST /reports/html`, `library/save-html` sonrası kuyruk. (DONE)
+- ✅ Dashboard: teslimat zaman çizelgesi + SMTP durumu (`GET /api/v1/deliveries`). (DONE)
+- ⚠️ SMTP ortam değişkenleri yapılandırılmadan e-posta gönderilmez; Celery worker gerekir. (OPS)
+
+#### E-posta kurulum rehberi (Railway / production)
+
+| Değişken | Örnek | Açıklama |
+|----------|-------|----------|
+| `SMTP_HOST` | `smtp.gmail.com` veya `smtp.sendgrid.net` | SMTP sunucusu |
+| `SMTP_PORT` | `587` | TLS portu (465 SSL alternatif) |
+| `SMTP_USER` | `reports@inferaworld.com` | SMTP kullanıcı adı |
+| `SMTP_PASSWORD` | `***` | Uygulama şifresi / API key |
+| `SMTP_FROM` | `Infera Raporlar <reports@inferaworld.com>` | **Gönderen adresi** (alıcıda görünen) |
+| `SMTP_USE_TLS` | `1` | STARTTLS (varsayılan açık) |
+| `REPORT_DELIVERY_API_BASE` | `https://api.inferaworld.com` | İndirme linklerinin taban URL'si |
+| `REPORT_LINK_TTL_SECONDS` | `86400` | İmzalı link süresi (24 saat) |
+| `REPORT_NOTIFY_EMAIL_DEFAULT` | `1` | Tenant varsayılan: e-posta açık |
+
+**Gönderen adresi (`SMTP_FROM`):** Varsayılan `noreply@inferaworld.com`. Production'da domain doğrulaması olan bir adres kullanın (SendGrid, Amazon SES, Gmail Workspace, Resend vb.). `SMTP_FROM` boşsa `SMTP_USER` kullanılır.
+
+**Alıcı adresi:** Oturum açmış kullanıcının e-postası — frontend `X-User-Email` header'ı (`authUser.email`, örn. `yalcinselcuk0@gmail.com`).
+
+**Worker:** API + Celery worker aynı SMTP env değişkenlerine sahip olmalı. Worker olmadan API senkron fallback dener (`process_delivery`).
+
+**Test:** Rapor oluştur → Panel → Rapor E-posta Teslimatları bölümünde `pending` / `sent` durumunu kontrol et.
+
 - Hedef: rapor üretimi tamamlandığında kullanıcıya güvenli, otomatik ve izlenebilir teslimat.
 - Çözüm (MVP -> hardening):
   - Veri modeli: `report_deliveries` koleksiyonu (`report_id`, `owner_user_id`, `tenant_id`, `channel=email`, `status`, `attempt_count`, `last_error`, `sent_at`).
@@ -160,39 +184,39 @@ Source: synchronized from root `TODO.md`.
 
 ### P0.12 Language-Aware HITL Questions
 
-- ⚠️ Ensure HITL question text is generated and returned in the user-selected UI language. (PARTIAL — UI i18n + labels; LLM batches may still drift)
-- ✅ Propagate selected language from frontend into HITL question APIs (`global` + `why_probe` modes). (DONE)
-- Localize all question payload fields consistently:
+- ✅ Ensure HITL question text is generated and returned in the user-selected UI language.
+- ✅ Propagate selected language from frontend into HITL question APIs (`global` + `why_probe` modes).
+- ✅ Localize all question payload fields consistently:
   - `question_tr` / `question_en`,
   - choice labels/options,
-  - helper hints and response-mode guidance text.
-- Prevent mixed-language batches (single question set should not contain TR+EN drift).
-- Keep fallback behavior deterministic:
+  - helper hints and response-mode guidance text (`helper_hint`, `response_guidance`).
+- ✅ Prevent mixed-language batches (single question set should not include TR+EN shell drift).
+- ✅ Keep fallback behavior deterministic:
   - if target language generation fails, retry once with same language,
   - then return known-safe localized templates (not opposite language).
 - Acceptance:
   - Changing UI language immediately changes subsequent HITL questions and options.
   - Same incident asked in TR vs EN yields language-consistent wording with equivalent intent.
-  - No mixed-language question batches in regression tests.
+  - No mixed-language question batches in regression tests (`tests/test_hitl_i18n.py`).
 
 ### P0.13 End-to-End Language-Aware Report Rendering
 
-- Ensure report output language follows selected UI/investigation language end-to-end (HTML + DOCX).
-- Remove/replace embedded Turkish static headings in `agents/skillbased_docx_agent.py` with language-keyed labels.
-- Localize all report shell sections consistently:
+- ✅ Ensure report output language follows selected UI/investigation language end-to-end (HTML + DOCX).
+- ✅ Remove/replace embedded Turkish static headings in `agents/skillbased_docx_agent.py` with language-keyed labels (`shared/report_i18n.py`).
+- ✅ Localize all report shell sections consistently:
   - cover, table-of-contents labels, section headers, subsection headers,
   - table column titles, action/status labels, signature page labels,
   - helper notes/tooltips and print/export helper text.
-- Prevent mixed-language report artifacts (single artifact should not include TR+EN shell drift).
-- Keep report body and shell language aligned:
+- ✅ Prevent mixed-language report artifacts (single artifact should not include TR+EN shell drift).
+- ✅ Keep report body and shell language aligned:
   - dynamic RCA content + static template headings must use the same selected language.
-- Add fallback policy for missing translations:
+- ✅ Add fallback policy for missing translations:
   - first fallback to English keyset,
   - then explicit placeholder marker for missing key (to avoid silent Turkish leakage).
 - Acceptance:
   - Switching language before report generation produces full-shell localized report artifacts.
   - `skillbased_docx_agent.py` contains no hardcoded TR-only section titles without i18n mapping.
-  - Regression checks confirm no Turkish headers appear in EN report mode.
+  - Regression checks confirm no Turkish headers appear in EN report mode (`tests/test_report_i18n.py`).
 
 ### P1.7 Evidence Attachments in Analysis Flow (client slice)
 

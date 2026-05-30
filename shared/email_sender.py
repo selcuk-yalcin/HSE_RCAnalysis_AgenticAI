@@ -16,6 +16,18 @@ def smtp_configured() -> bool:
     return bool(host)
 
 
+def get_smtp_public_config() -> dict[str, str | bool]:
+    """Non-secret SMTP summary for ops UI / dashboard."""
+    from_addr = (os.getenv("SMTP_FROM") or os.getenv("SMTP_USER") or "noreply@inferaworld.com").strip()
+    return {
+        "configured": smtp_configured(),
+        "from_address": from_addr,
+        "host": (os.getenv("SMTP_HOST") or "").strip(),
+        "port": (os.getenv("SMTP_PORT") or "587").strip(),
+        "use_tls": (os.getenv("SMTP_USE_TLS") or "1").strip().lower() not in ("0", "false", "no"),
+    }
+
+
 def send_email(
     to_address: str,
     subject: str,

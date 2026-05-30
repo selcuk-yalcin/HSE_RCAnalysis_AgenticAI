@@ -270,3 +270,25 @@ def process_delivery(delivery_key: str) -> dict[str, Any]:
 
 def reset_memory_store() -> None:
     _mem_deliveries.clear()
+
+
+def maybe_enqueue_report_email(
+    *,
+    tenant_id: str,
+    owner_user_id: str,
+    recipient_email: str,
+    report_id: str,
+    incident_id: str,
+    artifact_version: str = "v1",
+    user_prefs: Optional[dict] = None,
+) -> Optional[dict[str, Any]]:
+    """Idempotent enqueue used by all report-ready API paths."""
+    return enqueue_report_ready_email(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        recipient_email=recipient_email,
+        report_id=report_id,
+        incident_id=incident_id,
+        artifact_version=artifact_version,
+        user_prefs=user_prefs,
+    )

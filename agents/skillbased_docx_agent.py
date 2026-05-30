@@ -18,6 +18,8 @@ ORTAM DEĞİŞKENLERİ:
   OPENROUTER_API_KEY = "sk-or-v1-..."
 """
 
+from __future__ import annotations
+
 import requests
 import json
 import os
@@ -47,6 +49,13 @@ try:
         taxonomy_display_title,
     )
     from shared.report_layout_config import resolve_report_layout
+    from shared.report_i18n import (
+        apply_shell_language,
+        get_report_lang,
+        report_label,
+        set_report_lang,
+        shell_fallback_replacements,
+    )
 except ImportError:
     from .report_text_sanitize import (
         sanitize_report_text,
@@ -55,6 +64,13 @@ except ImportError:
         taxonomy_display_title,
     )
     from shared.report_layout_config import resolve_report_layout
+    from shared.report_i18n import (
+        apply_shell_language,
+        get_report_lang,
+        report_label,
+        set_report_lang,
+        shell_fallback_replacements,
+    )
 
 # Geriye dönük importlar
 strip_hse_codes = sanitize_report_text
@@ -106,105 +122,28 @@ ROOT_CAUSE_COLORS = [
 ]
 
 
-REPORT_LABELS = {
-    "tr": {
-        "cover_title": "KÖK NEDEN ANALİZİ RAPORU",
-        "cover_subtitle": "Profesyonel Araştırma ve Analiz Raporu",
-        "cover_confidentiality": "GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR",
-        "ref_no": "Referans No",
-        "date": "Tarih",
-        "location": "Lokasyon",
-        "incident_type": "Olay Tipi",
-        "incident_summary": "OLAY ÖZETİ",
-    },
-    "en": {
-        "cover_title": "ROOT CAUSE ANALYSIS REPORT",
-        "cover_subtitle": "Professional Investigation and Analysis Report",
-        "cover_confidentiality": "CONFIDENTIAL - ACCESS LIMITED TO AUTHORIZED PERSONNEL ONLY",
-        "ref_no": "Reference No",
-        "date": "Date",
-        "location": "Location",
-        "incident_type": "Incident Type",
-        "incident_summary": "INCIDENT SUMMARY",
-    },
-}
-
-
 def _label(lang_code: str, key: str) -> str:
-    normalized = (lang_code or "tr").strip().lower()
-    # For non-TR languages, keep static labels in English instead of Turkish.
-    bucket = REPORT_LABELS["tr"] if normalized == "tr" else REPORT_LABELS["en"]
-    return bucket.get(key, key)
+    return report_label(lang_code, key)
+
+
+def _L(key: str, lang_code: Optional[str] = None) -> str:
+    return report_label(lang_code or get_report_lang(), key)
 
 
 def _translate_html_static_labels(html: str, lang_code: str) -> str:
-    if (lang_code or "tr").lower() == "tr":
-        return html
-    # Keep static report shell in English for non-TR languages.
-    replacements = {
-        "YÖNETİCİ ÖZETİ": "EXECUTIVE SUMMARY",
-        "Olay Özeti": "Incident Summary",
-        "Temel Bulgular": "Key Findings",
-        "Acil Eylemler": "Immediate Actions",
-        "OLAY BİLGİLERİ": "INCIDENT DETAILS",
-        "Detaylı Bilgi Tablosu": "Detailed Information Table",
-        "Olay Detayları": "Incident Details",
-        "Kronolojik Olay Akışı": "Chronological Incident Timeline",
-        "ANALİZ YÖNTEMİ - 5 WHY": "ANALYSIS METHOD - 5 WHY",
-        "Analiz Ekibi": "Analysis Team",
-        "Kök Neden": "Root Cause",
-        "META KÖK NEDEN ANALİZİ": "META ROOT CAUSE ANALYSIS",
-        "Sistemik Zayıflık": "Systemic Weakness",
-        "SİSTEMSEL FAKTÖRLER": "SYSTEMIC FACTORS",
-        "DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER": "CORRECTIVE AND PREVENTIVE ACTIONS",
-        "CIKARILAN DERSLER": "LESSONS LEARNED",
-        "SONUC VE ONERILER": "CONCLUSION AND RECOMMENDATIONS",
-        "ONAY VE IMZA SAYFASI": "APPROVAL AND SIGNATURE PAGE",
-        "Kök Nedenler": "Root Causes",
-        "Tarih": "Date",
-        "İsim": "Name",
-        "Rol": "Role",
-        "Ünvan": "Title",
-    }
-    translated = html
-    for tr_text, en_text in replacements.items():
-        translated = translated.replace(tr_text, en_text)
-    return translated
+    return apply_shell_language(html, lang_code)
 
 
 def _translate_docx_static_labels(doc: Document, lang_code: str) -> None:
     if (lang_code or "tr").lower() == "tr":
         return
-    replacements = {
-        "YÖNETİCİ ÖZETİ": "EXECUTIVE SUMMARY",
-        "Olay Özeti": "Incident Summary",
-        "Temel Bulgular": "Key Findings",
-        "Acil Eylemler": "Immediate Actions",
-        "OLAY BİLGİLERİ": "INCIDENT DETAILS",
-        "Detaylı Bilgi Tablosu": "Detailed Information Table",
-        "Olay Detayları": "Incident Details",
-        "Kronolojik Olay Akışı": "Chronological Incident Timeline",
-        "ANALİZ YÖNTEMİ - 5 WHY": "ANALYSIS METHOD - 5 WHY",
-        "Analiz Ekibi": "Analysis Team",
-        "Kök Neden": "Root Cause",
-        "META KÖK NEDEN ANALİZİ": "META ROOT CAUSE ANALYSIS",
-        "Sistemik Zayıflık": "Systemic Weakness",
-        "SİSTEMSEL FAKTÖRLER": "SYSTEMIC FACTORS",
-        "DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER": "CORRECTIVE AND PREVENTIVE ACTIONS",
-        "CIKARILAN DERSLER": "LESSONS LEARNED",
-        "SONUC VE ONERILER": "CONCLUSION AND RECOMMENDATIONS",
-        "ONAY VE IMZA SAYFASI": "APPROVAL AND SIGNATURE PAGE",
-        "Tarih": "Date",
-        "İsim": "Name",
-        "Rol": "Role",
-        "Ünvan": "Title",
-    }
+    pairs = shell_fallback_replacements(lang_code)
 
     def _translate_text(text: str) -> str:
         if not text:
             return text
         out = text
-        for tr_text, en_text in replacements.items():
+        for tr_text, en_text in pairs.items():
             out = out.replace(tr_text, en_text)
         return out
 
@@ -619,13 +558,13 @@ def _build_cover(doc, cover: dict, lang_code: str = "tr"):
 
 
 def _build_executive_summary(doc, es: dict, root_causes: list):
-    _add_section_header(doc, "1", "YÖNETİCİ ÖZETİ")
-    _add_subsection_header(doc, "1.1 Olay Özeti")
+    _add_section_header(doc, "1", _L("section_executive_summary"))
+    _add_subsection_header(doc, f"1.1 {_L('subsection_incident_summary')}")
     for field in ["what_happened", "immediate_response"]:
         if es.get(field):
             _add_paragraph(doc, strip_hse_codes(str(es[field])), space_after=6)
     doc.add_paragraph()
-    _add_subsection_header(doc, "1.2 Temel Bulgular")
+    _add_subsection_header(doc, f"1.2 {_L('subsection_key_findings')}")
     for finding in es.get("key_findings", []):
         p = doc.add_paragraph()
         p.paragraph_format.space_before = Pt(2)
@@ -634,12 +573,12 @@ def _build_executive_summary(doc, es: dict, root_causes: list):
         run.font.size = Pt(10)
         run.font.color.rgb = COLOR["dark_grey"]
     doc.add_paragraph()
-    _add_subsection_header(doc, "1.3 Acil Eylemler")
+    _add_subsection_header(doc, f"1.3 {_L('subsection_immediate_actions')}")
     actions = es.get("immediate_actions", [])
     if actions:
         table = doc.add_table(rows=len(actions) + 1, cols=3)
         table.style = 'Table Grid'
-        for j, h in enumerate(["Acil Eylem", "Sorumlu", "Durum"]):
+        for j, h in enumerate([_L("th_immediate_action"), _L("th_responsible"), _L("th_status")]):
             c = table.rows[0].cells[j]
             _set_cell_bg(c, COLOR["dark_blue"])
             _set_cell_margins(c)
@@ -660,18 +599,18 @@ def _build_executive_summary(doc, es: dict, root_causes: list):
 
 
 def _build_incident_details(doc, details: dict):
-    _add_section_header(doc, "2", "OLAY BİLGİLERİ")
-    _add_subsection_header(doc, "2.1 Detaylı Bilgi Tablosu")
+    _add_section_header(doc, "2", _L("section_incident_details"))
+    _add_subsection_header(doc, f"2.1 {_L('subsection_info_table')}")
     _add_info_table(doc, details.get("info_table", {}))
-    _add_subsection_header(doc, "2.2 Olay Detayları")
+    _add_subsection_header(doc, f"2.2 {_L('subsection_event_details')}")
     _add_info_table(doc, details.get("event_table", {}))
     doc.add_paragraph()
-    _add_subsection_header(doc, "2.3 Kronolojik Olay Akışı")
+    _add_subsection_header(doc, f"2.3 {_L('subsection_timeline')}")
     timeline = details.get("timeline", [])
     if timeline:
         table = doc.add_table(rows=len(timeline) + 1, cols=2)
         table.style = 'Table Grid'
-        for j, h in enumerate(["Zaman", "Olay"]):
+        for j, h in enumerate([_L("th_time"), _L("th_event")]):
             c = table.rows[0].cells[j]
             _set_cell_bg(c, COLOR["mid_blue"])
             _set_cell_margins(c)
@@ -697,25 +636,25 @@ def _build_incident_details(doc, details: dict):
     doc.add_paragraph()
     sev = details.get("severity", {})
     if sev:
-        _add_subsection_header(doc, "2.4 Aciliyet Seviyeleri")
+        _add_subsection_header(doc, f"2.4 {_L('subsection_severity')}")
         _add_info_table(doc, {
-            "Gerçek Zarar": sev.get("actual_harm", ""),
-            "Potansiyel Zarar": sev.get("potential_harm", ""),
-            "Soruşturma Seviyesi": sev.get("investigation_level", ""),
+            _L("severity_actual"): sev.get("actual_harm", ""),
+            _L("severity_potential"): sev.get("potential_harm", ""),
+            _L("severity_investigation"): sev.get("investigation_level", ""),
         })
     _add_page_break(doc)
 
 
 def _build_analysis_method(doc, method: dict):
-    _add_section_header(doc, "3", "ANALİZ YÖNTEMİ - 5 WHY")
-    _add_subsection_header(doc, "3.1 5-Why Tekniği")
+    _add_section_header(doc, "3", _L("section_analysis_method"))
+    _add_subsection_header(doc, f"3.1 {_L('subsection_five_why')}")
     _add_paragraph(doc, method.get("five_why_explanation", ""), space_after=8)
-    _add_subsection_header(doc, "3.2 Faktör Kategorileri")
+    _add_subsection_header(doc, f"3.2 {_L('subsection_factor_categories')}")
     codes = method.get("code_system", [])
     if codes:
         table = doc.add_table(rows=len(codes) + 1, cols=2)
         table.style = 'Table Grid'
-        for j, h in enumerate(["Kategori", "Açıklama"]):
+        for j, h in enumerate([_L("th_category"), _L("th_description")]):
             c = table.rows[0].cells[j]
             _set_cell_bg(c, COLOR["dark_blue"])
             _set_cell_margins(c)
@@ -736,12 +675,12 @@ def _build_analysis_method(doc, method: dict):
                 run.font.size = Pt(10)
                 run.font.color.rgb = COLOR["dark_blue"] if j == 0 else COLOR["dark_grey"]
     doc.add_paragraph()
-    _add_subsection_header(doc, "3.3 Analiz Ekibi")
+    _add_subsection_header(doc, f"3.3 {_L('subsection_analysis_team')}")
     members = method.get("team_members", [])
     if members:
         table = doc.add_table(rows=len(members) + 1, cols=3)
         table.style = 'Table Grid'
-        for j, h in enumerate(["İsim", "Rol", "Tarih"]):
+        for j, h in enumerate([_L("th_name"), _L("th_role"), _L("th_date")]):
             c = table.rows[0].cells[j]
             _set_cell_bg(c, COLOR["mid_blue"])
             _set_cell_margins(c)
@@ -773,20 +712,20 @@ def _build_branches(doc, branches: list):
         _set_cell_bg(cell, color)
         _set_cell_margins(cell, 120, 120, 160, 160)
         p = cell.paragraphs[0]
-        run = p.add_run(branch.get("branch_title", f"KRİTİK FAKTÖR {bn}"))
+        run = p.add_run(branch.get("branch_title", f"{_L('branch_critical_factor')} {bn}"))
         run.bold = True
         run.font.size = Pt(11)
         run.font.color.rgb = COLOR["white"]
         doc.add_paragraph()
-        _add_subsection_header(doc, f"{3+bn}.1 Başlangıç Durumu ve Doğrudan Neden")
+        _add_subsection_header(doc, f"{3+bn}.1 {_L('subsection_branch_start')}")
         _add_paragraph(doc, strip_hse_codes(str(branch.get("initial_condition", "") or "")), space_after=6)
         _add_paragraph(doc, strip_hse_codes(str(branch.get("direct_cause", "") or "")), bold=True, space_after=8)
-        _add_subsection_header(doc, f"{3+bn}.2 5-Why Analiz Tablosu")
+        _add_subsection_header(doc, f"{3+bn}.2 {_L('subsection_why_table')}")
         why_chain = branch.get("why_chain", [])
         if why_chain:
             table = doc.add_table(rows=len(why_chain) + 1, cols=2)
             table.style = 'Table Grid'
-            for j, h in enumerate(["Neden #", "Soru ve Yanıt"]):
+            for j, h in enumerate([_L("why_number_col"), _L("why_qa_col")]):
                 c = table.rows[0].cells[j]
                 _set_cell_bg(c, COLOR["dark_blue"])
                 _set_cell_margins(c)
@@ -799,9 +738,9 @@ def _build_branches(doc, branches: list):
                 bg = COLOR["light_grey"] if i % 2 == 0 else COLOR["white"]
                 q = strip_hse_codes(str(why.get("question", "") or why.get("question_tr", "") or ""))
                 a = strip_hse_codes(str(why.get("answer", "") or why.get("answer_tr", "") or ""))
-                qa = f"NEDEN: {q}\nYANIT: {a}"
+                qa = f"{_L('why_prefix')}: {q}\n{_L('answer_prefix')}: {a}"
                 wn = why.get('number') or why.get('level') or (i + 1)
-                vals = [f"NEDEN {wn}", qa]
+                vals = [f"{_L('why_prefix')} {wn}", qa]
                 for j, val in enumerate(vals):
                     c = row.cells[j]
                     _set_cell_bg(c, bg)
@@ -810,13 +749,13 @@ def _build_branches(doc, branches: list):
                     run.font.size = Pt(9)
                     run.bold = (j == 0)
         doc.add_paragraph()
-        _add_subsection_header(doc, f"{3+bn}.3 Kök Neden")
-        rc_title = f"KOK NEDEN {bn}: {strip_hse_codes(str(branch.get('root_cause_title','') or ''))}"
+        _add_subsection_header(doc, f"{3+bn}.3 {_L('subsection_root_cause')}")
+        rc_title = f"{_L('root_cause_prefix')} {bn}: {strip_hse_codes(str(branch.get('root_cause_title','') or ''))}"
         rc_content = strip_hse_codes(str(branch.get('root_cause_detail','') or ''))
         _add_colored_box(doc, rc_title, rc_content, color)
         org_factors = branch.get("organizational_factors", [])
         if org_factors:
-            _add_subsection_header(doc, f"{3+bn}.4 Organizasyonel Faktörler")
+            _add_subsection_header(doc, f"{3+bn}.4 {_L('subsection_org_factors')}")
             _add_bullet_list(doc, [strip_hse_codes(str(x)) for x in org_factors])
         _add_page_break(doc)
 
@@ -826,8 +765,8 @@ def _build_meta_root_cause(doc, meta: dict):
     if not meta or not meta.get("exists"):
         return
     
-    _add_section_header(doc, "5", "META KÖK NEDEN ANALİZİ")
-    _add_subsection_header(doc, "5.1 Stratejik Kök Neden (Tüm Dalların Ortak Paydası)")
+    _add_section_header(doc, "5", _L("section_meta_root_cause"))
+    _add_subsection_header(doc, f"5.1 {_L('subsection_systemic_weakness')}")
     
     # Ana meta kök neden kutusu
     meta_title = strip_hse_codes(str(meta.get('title', 'Meta Kök Neden') or ''))
@@ -860,13 +799,14 @@ def _build_meta_root_cause(doc, meta: dict):
 
 
 def _build_contributing_factors(doc, factors: list):
-    _add_section_header(doc, "6", "SİSTEMSEL FAKTÖRLER")
+    _add_section_header(doc, "6", _L("section_contributing_short"))
     doc.add_paragraph()
-    priority_colors = {"Yüksek": COLOR["red"], "Orta": COLOR["orange"], "Düşük": COLOR["green"]}
+    priority_colors = {"Yüksek": COLOR["red"], "Orta": COLOR["orange"], "Düşük": COLOR["green"],
+                       "High": COLOR["red"], "Medium": COLOR["orange"], "Low": COLOR["green"]}
     if factors:
         table = doc.add_table(rows=len(factors) + 1, cols=3)
         table.style = 'Table Grid'
-        for j, h in enumerate(["Faktör Türü", "Açıklama", "Etki Seviyesi"]):
+        for j, h in enumerate([_L("th_factor_type"), _L("th_description"), _L("th_impact_level")]):
             c = table.rows[0].cells[j]
             _set_cell_bg(c, COLOR["dark_blue"])
             _set_cell_margins(c)
@@ -895,16 +835,18 @@ def _build_contributing_factors(doc, factors: list):
 
 
 def _build_corrective_actions(doc, actions: list):
-    _add_section_header(doc, "7", "DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER")
+    _add_section_header(doc, "7", _L("section_corrective_actions"))
     doc.add_paragraph()
     priority_colors = {
         "ACİL": COLOR["red"], "YÜKSEK": COLOR["orange"],
         "ORTA": COLOR["green"], "DÜŞÜK": COLOR["mid_blue"],
+        "URGENT": COLOR["red"], "HIGH": COLOR["orange"],
+        "MEDIUM": COLOR["green"], "LOW": COLOR["mid_blue"],
     }
     if actions:
         table = doc.add_table(rows=len(actions) + 1, cols=6)
         table.style = 'Table Grid'
-        for j, h in enumerate(["No", "Faaliyet", "Öncelik", "Sorumlu", "Süre", "KPI"]):
+        for j, h in enumerate([_L("th_no"), _L("th_activity"), _L("th_priority"), _L("th_responsible"), _L("th_duration"), _L("th_kpi")]):
             c = table.rows[0].cells[j]
             _set_cell_bg(c, COLOR["dark_blue"])
             _set_cell_margins(c)
@@ -935,13 +877,13 @@ def _build_corrective_actions(doc, actions: list):
 
 
 def _build_lessons_learned(doc, lessons: dict):
-    _add_section_header(doc, "9", "CIKARILAN DERSLER")
+    _add_section_header(doc, "9", _L("section_lessons_learned"))
     doc.add_paragraph()
     sections = [
-        ("NE YAPILMALI", lessons.get("what_to_do", []), COLOR["green"]),
-        ("UZUN VADELI COZUMLER", lessons.get("long_term", []), COLOR["mid_blue"]),
-        ("ILETISIM VE PAYLASIM", lessons.get("communication", []), COLOR["orange"]),
-        ("EGITIM VE FARKINDALIK", lessons.get("training", []), COLOR["red"]),
+        (_L("lesson_what_to_do"), lessons.get("what_to_do", []), COLOR["green"]),
+        (_L("lesson_long_term"), lessons.get("long_term", []), COLOR["mid_blue"]),
+        (_L("lesson_communication"), lessons.get("communication", []), COLOR["orange"]),
+        (_L("lesson_training"), lessons.get("training", []), COLOR["red"]),
     ]
     for title, items, color in sections:
         if items:
@@ -950,21 +892,21 @@ def _build_lessons_learned(doc, lessons: dict):
 
 
 def _build_conclusion(doc, conclusion: dict):
-    _add_section_header(doc, "10", "SONUC VE ONERILER")
-    _add_subsection_header(doc, "10.1 Genel Değerlendirme")
+    _add_section_header(doc, "10", _L("section_conclusion"))
+    _add_subsection_header(doc, f"10.1 {_L('subsection_general_assessment')}")
     _add_paragraph(doc, conclusion.get("overall_assessment",""), space_after=8)
-    _add_subsection_header(doc, "10.2 Kısa Vadeli Önlemler (1-2 Ay)")
+    _add_subsection_header(doc, f"10.2 {_L('subsection_short_term')}")
     _add_bullet_list(doc, conclusion.get("short_term_measures",[]))
     doc.add_paragraph()
-    _add_subsection_header(doc, "10.3 Uzun Vadeli İyileştirmeler (3-12 Ay)")
+    _add_subsection_header(doc, f"10.3 {_L('subsection_long_term')}")
     _add_bullet_list(doc, conclusion.get("long_term_improvements",[]))
     doc.add_paragraph()
-    _add_subsection_header(doc, "10.4 Mevcut vs Hedef Karşılaştırması")
+    _add_subsection_header(doc, f"10.4 {_L('subsection_comparison')}")
     comparison = conclusion.get("comparison_table", [])
     if comparison:
         table = doc.add_table(rows=len(comparison) + 1, cols=3)
         table.style = 'Table Grid'
-        for j, h in enumerate(["Kriter", "Mevcut Durum", "Hedeflenen"]):
+        for j, h in enumerate([_L("th_criterion"), _L("th_current"), _L("th_target")]):
             c = table.rows[0].cells[j]
             _set_cell_bg(c, COLOR["dark_blue"])
             _set_cell_margins(c)
@@ -996,16 +938,16 @@ def _build_conclusion(doc, conclusion: dict):
 
 
 def _build_signature_page(doc):
-    _add_section_header(doc, "11", "ONAY VE IMZA SAYFASI")
+    _add_section_header(doc, "11", _L("section_signatures"))
     doc.add_paragraph()
     roles = [
-        ("HAZIRLAYAN", "HSE Uzmanı", "HSE Kök Neden Analisti"),
-        ("INCELEYEN", "HSE Yöneticisi", "HSE Departman Yöneticisi"),
-        ("ONAYLAYAN", "Tesis Müdürü", "Genel Operasyon Müdürü"),
+        (_L("sig_role_prepared"), "HSE Uzmanı", "HSE Kök Neden Analisti"),
+        (_L("sig_role_reviewed"), "HSE Yöneticisi", "HSE Departman Yöneticisi"),
+        (_L("sig_role_approved"), "Tesis Müdürü", "Genel Operasyon Müdürü"),
     ]
     table = doc.add_table(rows=len(roles) + 1, cols=4)
     table.style = 'Table Grid'
-    for j, h in enumerate(["Rol", "İsim", "Ünvan", "İmza / Tarih"]):
+    for j, h in enumerate([_L("th_role"), _L("th_name"), _L("th_title"), _L("th_signature")]):
         c = table.rows[0].cells[j]
         _set_cell_bg(c, COLOR["dark_blue"])
         _set_cell_margins(c)
@@ -1037,7 +979,7 @@ def _build_signature_page(doc):
     doc.add_paragraph()
     disclaimer_text = doc.add_paragraph()
     disclaimer_text.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = disclaimer_text.add_run("Bu rapor yapay zeka ile hazırlanmıştır.\nBir uzman tarafından kontrol edilmesi önerilir.")
+    run = disclaimer_text.add_run(_L("ai_disclaimer"))
     run.font.size = Pt(10)
     run.font.color.rgb = COLOR["dark_grey"]
     run.italic = True
@@ -1209,7 +1151,11 @@ class SkillBasedDocxAgent:
             or raw_data.get("part1", {}).get("description", "")
             or json.dumps(raw_data, ensure_ascii=False)[:800]
         )
-        preferred = (preferred_language or "").strip().lower()
+        preferred = (
+            (preferred_language or "").strip().lower()
+            or str(investigation_data.get("output_language") or "").strip().lower()
+            or str(investigation_data.get("preferred_language") or "").strip().lower()
+        )
         forced_lang_map = {
             "tr": {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr", "font_hint": ""},
             "en": {"code": "en", "name": "English", "rtl": False, "html_lang": "en", "font_hint": ""},
@@ -1219,6 +1165,7 @@ class SkillBasedDocxAgent:
             "ar": {"code": "ar", "name": "Arabic", "rtl": True, "html_lang": "ar", "font_hint": "Arial Unicode MS"},
         }
         lang = forced_lang_map.get(preferred) or detect_language(source_text)
+        set_report_lang(lang["code"])
         print(f" Tespit edilen dil: {lang['name']} ({lang['code']}) | RTL: {lang['rtl']}")
         # 
 
@@ -1688,6 +1635,7 @@ class SkillBasedDocxAgent:
     def _build_docx(self, content: Dict, output_path: str, lang: Optional[Dict] = None) -> None:
         lang = lang or {"code": "tr", "name": "Turkish", "rtl": False}
         lang_code = (lang.get("code") or "tr").lower()
+        set_report_lang(lang_code)
         doc = Document()
         section = doc.sections[0]
         section.page_width = Cm(21.59)
@@ -1833,8 +1781,8 @@ class SkillBasedDocxAgent:
 
     def _html_branding_extras(
         self, investigation_data: Optional[Dict] = None
-    ) -> tuple[str, str, str]:
-        """Returns (watermark_css, watermark_html, cover_logo_html)."""
+    ) -> tuple[str, str, str, str, str]:
+        """Returns (watermark_css, watermark_html, cover_logo_html, cover_tpl_css, cover_class)."""
         layout = resolve_report_layout(investigation_data)
         wm_mode = str(layout.get("watermark_mode") or "final").lower()
         wm_label = ""
@@ -1863,23 +1811,56 @@ class SkillBasedDocxAgent:
             """
             watermark_html = f'<div class="report-watermark" aria-hidden="true">{wm_label}</div>'
         logo_url = (layout.get("logo_url") or "").strip()
-        logo_html = ""
+        cover_logo_html = ""
         if logo_url:
-            logo_html = (
+            cover_logo_html = (
                 f'<div class="tenant-logo" style="margin-bottom:20px;">'
                 f'<img src="{logo_url}" alt="Logo" style="max-height:72px;max-width:240px;" />'
                 f"</div>"
             )
-        return watermark_css, watermark_html, logo_html
+        cover_tpl = str(layout.get("cover_template") or "standard").lower()
+        if cover_tpl not in ("standard", "formal", "executive", "minimal"):
+            cover_tpl = "standard"
+        cover_class = f"cover cover--{cover_tpl}"
+        cover_tpl_css = f"""
+        .cover--formal {{
+            background: linear-gradient(160deg, #0f172a 0%, #1e293b 55%, #334155 100%);
+            border-bottom: 6px solid #cbd5e1;
+        }}
+        .cover--formal h1 {{ letter-spacing: 0.08em; font-family: Georgia, 'Times New Roman', serif; }}
+        .cover--executive {{
+            background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+            color: #0f172a;
+            border-top: 8px solid #b45309;
+            border-bottom: 1px solid #e2e8f0;
+        }}
+        .cover--executive .confidential-banner {{ background: #b45309; color: #fff; }}
+        .cover--executive .info-item {{ background: #fff; border-left-color: #b45309; color: #334155; }}
+        .cover--executive .info-label {{ color: #b45309; }}
+        .cover--minimal {{
+            background: #f8fafc;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            padding-top: 40px;
+        }}
+        .cover--minimal .confidential-banner {{
+            background: transparent;
+            color: #64748b;
+            border: 1px dashed #cbd5e0;
+        }}
+        .cover--minimal h1 {{ text-transform: none; font-size: 2.1em; color: #0f172a; }}
+        """
+        return watermark_css, watermark_html, cover_logo_html, cover_tpl_css, cover_class
 
     def _generate_html_template(self, content: Dict, lang: Optional[Dict] = None, investigation_data: Optional[Dict] = None) -> str:
         """Modern, responsive ve düzenlenebilir HTML rapor şablonu."""
         lang = lang or {"code": "tr", "name": "Turkish", "rtl": False, "html_lang": "tr"}
         html_lang = lang.get("html_lang", "tr")
         lang_code = (lang.get("code") or "tr").lower()
+        set_report_lang(lang_code)
         is_rtl = lang.get("rtl", False)
         dir_attr = ' dir="rtl"' if is_rtl else ''
-        watermark_css, watermark_html, cover_logo_html = self._html_branding_extras(investigation_data)
+        watermark_css, watermark_html, cover_logo_html, cover_tpl_css, cover_class = self._html_branding_extras(investigation_data)
         rtl_css = """
         body { direction: rtl; text-align: right; }
         .container { direction: rtl; }
@@ -1947,6 +1928,7 @@ class SkillBasedDocxAgent:
             font-style: italic;
             margin-bottom: 30px;
         }}
+        {cover_tpl_css}
         
         .confidential-banner {{
             background: #C0392B;
@@ -2659,42 +2641,42 @@ class SkillBasedDocxAgent:
 <body>
     {watermark_html}
     <!-- Navigasyon Toggle Butonu -->
-    <button class="nav-toggle" onclick="toggleNav()"> İçindekiler</button>
+    <button class="nav-toggle" onclick="toggleNav()"> {_label(lang_code, 'nav_toc')}</button>
     
     <!-- Navigasyon Menüsü -->
     <div class="nav-menu" id="navMenu" style="display: none;">
-        <h3>İÇİNDEKİLER</h3>
+        <h3>{_label(lang_code, 'nav_toc_title')}</h3>
         <ul>
-            <li><a href="#cover" onclick="scrollToSection('cover')"> Kapak Sayfası</a></li>
-            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> Yönetici Özeti</a></li>
-            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> Olay Bilgileri</a></li>
-            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> Analiz Yöntemi</a></li>
-            <li><a href="#branches" onclick="scrollToSection('branches')"> 5-Why Dalları</a></li>
-            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> Katkıda Bulunan Faktörler</a></li>
-            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> Düzeltici Faaliyetler</a></li>
-            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> Çıkarılan Dersler</a></li>
-            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> Sonuç</a></li>
-            <li><a href="#signatures" onclick="scrollToSection('signatures')"> İmzalar</a></li>
-            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> Olay Fotoğrafları</a></li>
+            <li><a href="#cover" onclick="scrollToSection('cover')"> {_label(lang_code, 'nav_cover')}</a></li>
+            <li><a href="#executive-summary" onclick="scrollToSection('executive-summary')"> {_label(lang_code, 'nav_executive_summary')}</a></li>
+            <li><a href="#incident-details" onclick="scrollToSection('incident-details')"> {_label(lang_code, 'nav_incident_details')}</a></li>
+            <li><a href="#analysis-method" onclick="scrollToSection('analysis-method')"> {_label(lang_code, 'nav_analysis_method')}</a></li>
+            <li><a href="#branches" onclick="scrollToSection('branches')"> {_label(lang_code, 'nav_branches')}</a></li>
+            <li><a href="#contributing-factors" onclick="scrollToSection('contributing-factors')"> {_label(lang_code, 'nav_contributing')}</a></li>
+            <li><a href="#corrective-actions" onclick="scrollToSection('corrective-actions')"> {_label(lang_code, 'nav_corrective')}</a></li>
+            <li><a href="#lessons-learned" onclick="scrollToSection('lessons-learned')"> {_label(lang_code, 'nav_lessons')}</a></li>
+            <li><a href="#conclusion" onclick="scrollToSection('conclusion')"> {_label(lang_code, 'nav_conclusion')}</a></li>
+            <li><a href="#signatures" onclick="scrollToSection('signatures')"> {_label(lang_code, 'nav_signatures')}</a></li>
+            <li><a href="#incident-photos" onclick="scrollToSection('incident-photos')"> {_label(lang_code, 'nav_photos')}</a></li>
         </ul>
     </div>
     
     <!-- Düzenleme Toolbar -->
     <div class="edit-toolbar" id="editToolbar">
         <button class="toolbar-btn btn-edit-mode" onclick="toggleEditMode()">
-            <span id="editModeText"> Düzenleme Modu: KAPALI</span>
+            <span id="editModeText"> {_label(lang_code, 'toolbar_edit_off')}</span>
         </button>
-        <button class="toolbar-btn btn-save" onclick="saveReport()" title="Değişiklikleri Kaydet">
-             Kaydet
+        <button class="toolbar-btn btn-save" onclick="saveReport()" title="{_label(lang_code, 'toolbar_save')}">
+             {_label(lang_code, 'toolbar_save')}
         </button>
-        <button class="toolbar-btn btn-export" onclick="exportWord()" title="Word Olarak İndir">
-             Word İndir
+        <button class="toolbar-btn btn-export" onclick="exportWord()" title="{_label(lang_code, 'toolbar_word')}">
+             {_label(lang_code, 'toolbar_word')}
         </button>
-        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="HTML Olarak İndir">
-             HTML İndir
+        <button class="toolbar-btn btn-export" onclick="exportHTML()" title="{_label(lang_code, 'toolbar_html')}">
+             {_label(lang_code, 'toolbar_html')}
         </button>
-        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="Orijinal Haline Döndür">
-             Sıfırla
+        <button class="toolbar-btn btn-reset" onclick="resetReport()" title="{_label(lang_code, 'toolbar_reset')}">
+             {_label(lang_code, 'toolbar_reset')}
         </button>
     </div>
     
@@ -2703,36 +2685,36 @@ class SkillBasedDocxAgent:
     
     <div class="container">
         <!-- KAPAK SAYFASI -->
-        <div class="cover" id="cover">
+        <div class="{cover_class}" id="cover">
             {cover_logo_html}
-            <h1 contenteditable="true">{cover.get('title', 'KÖK NEDEN ANALİZİ RAPORU')}</h1>
-            <div class="subtitle" contenteditable="true">{cover.get('subtitle', 'Profesyonel Araştırma ve Analiz Raporu')}</div>
+            <h1 contenteditable="true">{cover.get('title', _label(lang_code, 'cover_title'))}</h1>
+            <div class="subtitle" contenteditable="true">{cover.get('subtitle', _label(lang_code, 'cover_subtitle'))}</div>
             
             <div class="confidential-banner" contenteditable="true">
-                {cover.get('confidentiality', 'GİZLİ - SADECE YETKİLİ PERSONELİN ERİŞİMİNE AÇIKTIR')}
+                {cover.get('confidentiality', _label(lang_code, 'cover_confidentiality'))}
             </div>
             
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Referans No</div>
+                    <div class="info-label">{_label(lang_code, 'ref_no')}</div>
                     <div class="info-value" contenteditable="true">{cover.get('ref_no', 'N/A')}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Tarih</div>
+                    <div class="info-label">{_label(lang_code, 'date')}</div>
                     <div class="info-value" contenteditable="true">{cover.get('date', 'N/A')}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Lokasyon</div>
+                    <div class="info-label">{_label(lang_code, 'location')}</div>
                     <div class="info-value" contenteditable="true">{cover.get('location', 'N/A')}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Olay Tipi</div>
+                    <div class="info-label">{_label(lang_code, 'incident_type')}</div>
                     <div class="info-value" contenteditable="true">{cover.get('incident_type', 'N/A')}</div>
                 </div>
             </div>
             
             <div class="incident-summary">
-                <h3>OLAY ÖZETİ</h3>
+                <h3>{_label(lang_code, 'incident_summary')}</h3>
                 <p contenteditable="true">{cover.get('incident_summary_short', '')}</p>
             </div>
         </div>
@@ -2824,6 +2806,15 @@ class SkillBasedDocxAgent:
         
         // Düzenleme modu toggle
         let editMode = false;
+        const LBL_EDIT_ON = ' {_label(lang_code, "toolbar_edit_on")}';
+        const LBL_EDIT_OFF = ' {_label(lang_code, "toolbar_edit_off")}';
+        const LBL_NOTIFY_EDIT_ON = ' {_label(lang_code, "notify_edit_on")}';
+        const LBL_NOTIFY_EDIT_OFF = ' {_label(lang_code, "notify_edit_off")}';
+        const LBL_NOTIFY_SAVED = ' {_label(lang_code, "notify_saved")}';
+        const LBL_NOTIFY_WORD_PREP = ' {_label(lang_code, "notify_word_prep")}';
+        const LBL_NOTIFY_WORD_DL = ' {_label(lang_code, "notify_word_dl")}';
+        const LBL_NOTIFY_HTML_DL = ' {_label(lang_code, "notify_html_dl")}';
+        const LBL_COVER_TITLE = '{_label(lang_code, "cover_title")}';
         function toggleEditMode() {
             editMode = !editMode;
             const editableElements = document.querySelectorAll('[contenteditable]');
@@ -2832,14 +2823,14 @@ class SkillBasedDocxAgent:
             
             if (editMode) {
                 editableElements.forEach(el => el.setAttribute('contenteditable', 'true'));
-                editModeText.textContent = ' Düzenleme Modu: AÇIK';
+                editModeText.textContent = LBL_EDIT_ON;
                 toolbar.classList.add('active');
-                showNotification(' Düzenleme modu AÇIK - İstediğiniz alanı düzenleyebilirsiniz', 'success');
+                showNotification(LBL_NOTIFY_EDIT_ON, 'success');
             } else {
                 editableElements.forEach(el => el.setAttribute('contenteditable', 'false'));
-                editModeText.textContent = ' Düzenleme Modu: KAPALI';
+                editModeText.textContent = LBL_EDIT_OFF;
                 toolbar.classList.remove('active');
-                showNotification(' Düzenleme modu KAPALI', 'info');
+                showNotification(LBL_NOTIFY_EDIT_OFF, 'info');
             }
         }
         
@@ -2849,7 +2840,7 @@ class SkillBasedDocxAgent:
             const timestamp = new Date().toISOString();
             localStorage.setItem('hse_report_saved', html);
             localStorage.setItem('hse_report_saved_time', timestamp);
-            showNotification(' Rapor başarıyla kaydedildi!', 'success');
+            showNotification(LBL_NOTIFY_SAVED, 'success');
             console.log('Rapor kaydedildi:', timestamp);
         }
         
@@ -2878,7 +2869,7 @@ class SkillBasedDocxAgent:
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showNotification(' HTML dosyası indiriliyor...', 'success');
+            showNotification(LBL_NOTIFY_HTML_DL, 'success');
         }
         
         // PDF olarak indir (düzenlenebilir)
@@ -2913,7 +2904,7 @@ class SkillBasedDocxAgent:
                 toggleEditMode();
             }
             
-            showNotification(' Word dosyası hazırlanıyor...', 'info');
+            showNotification(LBL_NOTIFY_WORD_PREP, 'info');
             
             // docx kütüphanesi yükle
             const script = document.createElement('script');
@@ -2933,7 +2924,7 @@ class SkillBasedDocxAgent:
                             properties: {},
                             children: [
                                 new docx.Paragraph({
-                                    text: 'KÖK NEDEN ANALİZİ RAPORU',
+                                    text: LBL_COVER_TITLE,
                                     heading: docx.HeadingLevel.HEADING_1,
                                     alignment: docx.AlignmentType.CENTER,
                                     spacing: { after: 400 }
@@ -2955,7 +2946,7 @@ class SkillBasedDocxAgent:
                         a.click();
                         document.body.removeChild(a);
                         URL.revokeObjectURL(url);
-                        showNotification(' Word dosyası indiriliyor...', 'success');
+                        showNotification(LBL_NOTIFY_WORD_DL, 'success');
                     });
                 } catch (error) {
                     showNotification(' Word export başarısız: ' + error.message, 'error');
@@ -3088,38 +3079,38 @@ class SkillBasedDocxAgent:
 </body>
 </html>
 """
-        return html
+        return _translate_html_static_labels(html, lang_code)
 
     def _html_executive_summary(self, es: Dict, root_causes: List[Dict]) -> str:
         """Yönetici özeti HTML."""
-        html = """
+        html = f"""
         <div class="section" id="executive-summary">
-            <div class="section-header">1. YÖNETİCİ ÖZETİ</div>
+            <div class="section-header">1. {_L('section_executive_summary')}</div>
             
-            <div class="subsection-header">1.1 Olay Özeti</div>
+            <div class="subsection-header">1.1 {_L('subsection_incident_summary')}</div>
 """
         
         for field in ["what_happened", "immediate_response"]:
             if es.get(field):
                 html += f'<div class="paragraph" contenteditable="true">{strip_hse_codes(str(es[field]))}</div>\n'
         
-        html += """
-            <div class="subsection-header">1.2 Temel Bulgular</div>
+        html += f"""
+            <div class="subsection-header">1.2 {_L('subsection_key_findings')}</div>
             <ul class="bullet-list">
 """
         for finding in es.get("key_findings", []):
             html += f'<li contenteditable="true">{strip_hse_codes(str(finding))}</li>\n'
         
-        html += """
+        html += f"""
             </ul>
             
-            <div class="subsection-header">1.3 Acil Eylemler</div>
+            <div class="subsection-header">1.3 {_L('subsection_immediate_actions')}</div>
             <table>
                 <thead>
                     <tr>
-                        <th>Acil Eylem</th>
-                        <th>Sorumlu</th>
-                        <th>Durum</th>
+                        <th>{_L('th_immediate_action')}</th>
+                        <th>{_L('th_responsible')}</th>
+                        <th>{_L('th_status')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3143,11 +3134,11 @@ class SkillBasedDocxAgent:
 
     def _html_incident_details(self, details: Dict) -> str:
         """Olay bilgileri HTML."""
-        html = """
+        html = f"""
         <div class="section" id="incident-details">
-            <div class="section-header">2. OLAY BİLGİLERİ</div>
+            <div class="section-header">2. {_L('section_incident_details')}</div>
             
-            <div class="subsection-header">2.1 Detaylı Bilgi Tablosu</div>
+            <div class="subsection-header">2.1 {_L('subsection_info_table')}</div>
             <table>
 """
         
@@ -3159,17 +3150,17 @@ class SkillBasedDocxAgent:
                 </tr>
 """
         
-        html += """
+        html += f"""
             </table>
             
-            <div class="subsection-header">2.2 Olay Detayları</div>
+            <div class="subsection-header">2.2 {_L('subsection_event_details')}</div>
 """
         
         summary_only = strip_hse_codes(str(details.get("event_summary_only") or ""))
         if summary_only:
             html += f"""
             <div class="event-summary-compact">
-                <span class="label">Olay Özeti</span>
+                <span class="label">{_L('event_summary_label')}</span>
                 <span contenteditable="true">{summary_only}</span>
             </div>
             <table>
@@ -3187,10 +3178,10 @@ class SkillBasedDocxAgent:
                 </tr>
 """
         
-        html += """
+        html += f"""
             </table>
             
-            <div class="subsection-header">2.3 Kronolojik Olay Akışı</div>
+            <div class="subsection-header">2.3 {_L('subsection_timeline')}</div>
             <div class="timeline">
 """
         
@@ -3212,18 +3203,18 @@ class SkillBasedDocxAgent:
         """Analiz yöntemi HTML."""
         html = f"""
         <div class="section" id="analysis-method">
-            <div class="section-header">3. ANALİZ YÖNTEMİ - 5 WHY</div>
+            <div class="section-header">3. {_L('section_analysis_method')}</div>
             
-            <div class="subsection-header">3.1 5-Why Tekniği</div>
+            <div class="subsection-header">3.1 {_L('subsection_five_why')}</div>
             <div class="paragraph" contenteditable="true">{method.get('five_why_explanation', '')}</div>
             
-            <div class="subsection-header">3.2 Kod Sistemi</div>
+            <div class="subsection-header">3.2 {_L('subsection_code_system')}</div>
             <table>
                 <thead>
                     <tr>
-                        <th>Kod</th>
-                        <th>Kategori</th>
-                        <th>Açıklama</th>
+                        <th>{_L('th_code')}</th>
+                        <th>{_L('th_category')}</th>
+                        <th>{_L('th_description')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3238,17 +3229,17 @@ class SkillBasedDocxAgent:
                     </tr>
 """
         
-        html += """
+        html += f"""
                 </tbody>
             </table>
             
-            <div class="subsection-header">3.3 Analiz Ekibi</div>
+            <div class="subsection-header">3.3 {_L('subsection_analysis_team')}</div>
             <table>
                 <thead>
                     <tr>
-                        <th>İsim</th>
-                        <th>Rol</th>
-                        <th>Tarih</th>
+                        <th>{_L('th_name')}</th>
+                        <th>{_L('th_role')}</th>
+                        <th>{_L('th_date')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3280,13 +3271,13 @@ class SkillBasedDocxAgent:
             bn = branch.get("branch_number", 1)
             html += f"""
             <div class="subsection">
-            <div class="section-header">{3+bn}. {branch.get('branch_title', f'KRİTİK FAKTÖR {bn}')}</div>
+            <div class="section-header">{3+bn}. {branch.get('branch_title', f"{_L('branch_critical_factor')} {bn}")}</div>
             
-            <div class="subsection-header">{3+bn}.1 Başlangıç Durumu ve Doğrudan Neden</div>
+            <div class="subsection-header">{3+bn}.1 {_L('subsection_branch_start')}</div>
             <div class="paragraph" contenteditable="true">{strip_hse_codes(str(branch.get('initial_condition', '') or ''))}</div>
             <div class="paragraph" contenteditable="true" style="font-weight: bold;">{strip_hse_codes(str(branch.get('direct_cause', '') or ''))}</div>
             
-            <div class="subsection-header">{3+bn}.2 5-Why Analiz Zinciri</div>
+            <div class="subsection-header">{3+bn}.2 {_L('subsection_why_chain')}</div>
             <div class="why-chain">
 """
             
@@ -3297,7 +3288,7 @@ class SkillBasedDocxAgent:
                 wn = why.get('number') or why.get('level') or (idx + 1)
                 html += f"""
                 <div class="why-item">
-                    <div class="why-number">NEDEN {wn}</div>
+                    <div class="why-number">{_L('why_prefix')} {wn}</div>
                     <div class="why-question" contenteditable="true">{qtxt}</div>
                     <div class="why-answer" contenteditable="true">→ {atxt}</div>
                 </div>
@@ -3311,16 +3302,16 @@ class SkillBasedDocxAgent:
             html += f"""
             </div>
             
-            <div class="subsection-header">{3+bn}.3 Kök Neden ({root_cause_title})</div>
+            <div class="subsection-header">{3+bn}.3 {_L('subsection_root_cause')} ({root_cause_title})</div>
             <div class="colored-box box-{color}">
-                <div class="box-header" contenteditable="true">KÖK NEDEN {bn}: {root_cause_title}</div>
+                <div class="box-header" contenteditable="true">{_L('root_cause_prefix')} {bn}: {root_cause_title}</div>
                 <div class="box-content" contenteditable="true">{strip_hse_codes(str(branch.get('root_cause_detail', '') or ''))}</div>
             </div>
 """
             
             if branch.get("organizational_factors"):
                 html += f"""
-            <div class="subsection-header">{3+bn}.4 Organizasyonel Faktörler</div>
+            <div class="subsection-header">{3+bn}.4 {_L('subsection_org_factors')}</div>
             <ul class="bullet-list">
 """
                 for factor in branch.get("organizational_factors", []):
@@ -3391,28 +3382,28 @@ class SkillBasedDocxAgent:
         html = """
         <div class="section" id="root-causes">
 """
-        html += f"""            <div class="section-header">{section_no}. NİHAİ KÖK NEDENLER</div>
+        html += f"""            <div class="section-header">{section_no}. {_L('section_final_root_causes')}</div>
 """
         
         for i, rc in enumerate(root_causes):
             html += f"""
             <div class="root-cause-box root-cause-{i+1}">
-                <div class="root-cause-header" contenteditable="true">KÖK NEDEN {i+1}: {strip_hse_codes(str(rc.get('title', '') or ''))}</div>
+                <div class="root-cause-header" contenteditable="true">{_L('root_cause_prefix')} {i+1}: {strip_hse_codes(str(rc.get('title', '') or ''))}</div>
                 <div class="root-cause-content">
                     <table style="margin-bottom: 20px;">
                         <tr>
-                            <td style="background: #D6E4F0; font-weight: bold;">Kategori</td>
+                            <td style="background: #D6E4F0; font-weight: bold;">{_L('th_category')}</td>
                             <td contenteditable="true">{strip_hse_codes(str(rc.get('category', '') or ''))}</td>
                         </tr>
                         <tr>
-                            <td style="background: #D6E4F0; font-weight: bold;">İlgili Birimler</td>
+                            <td style="background: #D6E4F0; font-weight: bold;">{_L('th_related_units')}</td>
                             <td contenteditable="true">{strip_hse_codes(str(rc.get('contributing_organizations', '') or ''))}</td>
                         </tr>
                     </table>
                     
                     <div class="paragraph" contenteditable="true">{strip_hse_codes(str(rc.get('detailed_description', '') or ''))}</div>
                     
-                    <h4 style="margin-top: 20px; color: #1B3A5C;">Bu Nedenden Kaynaklanan Etkiler:</h4>
+                    <h4 style="margin-top: 20px; color: #1B3A5C;">{_L('impacts_from_cause')}</h4>
                     <ul class="bullet-list">
 """
             
@@ -3506,14 +3497,14 @@ class SkillBasedDocxAgent:
         html = """
         <div class="section" id="contributing-factors">
 """
-        html += f"""            <div class="section-header">{section_no}. DİĞER OLASI SİSTEMSEL FAKTÖRLER</div>
+        html += f"""            <div class="section-header">{section_no}. {_L('section_systemic_factors')}</div>
             
             <table>
                 <thead>
                     <tr>
-                        <th>Faktör Türü</th>
-                        <th>Açıklama</th>
-                        <th>Etki Seviyesi</th>
+                        <th>{_L('th_factor_type')}</th>
+                        <th>{_L('th_description')}</th>
+                        <th>{_L('th_impact_level')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3543,17 +3534,17 @@ class SkillBasedDocxAgent:
         html = """
         <div class="section" id="corrective-actions">
 """
-        html += f"""            <div class="section-header">{section_no}. DÜZELTİCİ VE ÖNLEYİCİ FAALİYETLER</div>
+        html += f"""            <div class="section-header">{section_no}. {_L('section_corrective_actions')}</div>
             
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 5%;">No</th>
-                        <th style="width: 35%;">Faaliyet</th>
-                        <th style="width: 10%;">Öncelik</th>
-                        <th style="width: 15%;">Sorumlu</th>
-                        <th style="width: 10%;">Süre</th>
-                        <th style="width: 25%;">KPI</th>
+                        <th style="width: 5%;">{_L('th_no')}</th>
+                        <th style="width: 35%;">{_L('th_activity')}</th>
+                        <th style="width: 10%;">{_L('th_priority')}</th>
+                        <th style="width: 15%;">{_L('th_responsible')}</th>
+                        <th style="width: 10%;">{_L('th_duration')}</th>
+                        <th style="width: 25%;">{_L('th_kpi')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3584,16 +3575,16 @@ class SkillBasedDocxAgent:
     def _html_lessons_learned(self, lessons: Dict, section_no: int = 8) -> str:
         """Çıkarılan dersler HTML."""
         sections = [
-            ("NE YAPILMALI", lessons.get("what_to_do", []), "green"),
-            ("UZUN VADELİ ÇÖZÜMLER", lessons.get("long_term", []), "blue"),
-            ("İLETİŞİM VE PAYLAŞIM", lessons.get("communication", []), "orange"),
-            ("EĞİTİM VE FARKINDALIK", lessons.get("training", []), "red"),
+            (_L("lesson_what_to_do"), lessons.get("what_to_do", []), "green"),
+            (_L("lesson_long_term"), lessons.get("long_term", []), "blue"),
+            (_L("lesson_communication"), lessons.get("communication", []), "orange"),
+            (_L("lesson_training"), lessons.get("training", []), "red"),
         ]
         
         html = """
         <div class="section" id="lessons-learned">
 """
-        html += f"""            <div class="section-header">{section_no}. ÇIKARILAN DERSLER</div>
+        html += f"""            <div class="section-header">{section_no}. {_L('section_lessons_learned')}</div>
 """
         
         for title, items, color in sections:
@@ -3615,12 +3606,12 @@ class SkillBasedDocxAgent:
         """Sonuç ve öneriler HTML."""
         html = f"""
         <div class="section" id="conclusion">
-            <div class="section-header">{section_no}. SONUÇ VE ÖNERİLER</div>
+            <div class="section-header">{section_no}. {_L('section_conclusion')}</div>
             
-            <div class="subsection-header">{section_no}.1 Genel Değerlendirme</div>
+            <div class="subsection-header">{section_no}.1 {_L('subsection_general_assessment')}</div>
             <div class="paragraph" contenteditable="true">{conclusion.get('overall_assessment', '')}</div>
             
-            <div class="subsection-header">{section_no}.2 Kısa Vadeli Önlemler (1-2 Ay)</div>
+            <div class="subsection-header">{section_no}.2 {_L('subsection_short_term')}</div>
             <ul class="bullet-list">
 """
         
@@ -3630,7 +3621,7 @@ class SkillBasedDocxAgent:
         html += f"""
             </ul>
             
-            <div class="subsection-header">{section_no}.3 Uzun Vadeli İyileştirmeler (3-12 Ay)</div>
+            <div class="subsection-header">{section_no}.3 {_L('subsection_long_term')}</div>
             <ul class="bullet-list">
 """
         
@@ -3640,13 +3631,13 @@ class SkillBasedDocxAgent:
         html += f"""
             </ul>
             
-            <div class="subsection-header">{section_no}.4 Mevcut vs Hedef Karşılaştırması</div>
+            <div class="subsection-header">{section_no}.4 {_L('subsection_comparison')}</div>
             <table class="comparison-table">
                 <thead>
                     <tr>
-                        <th>Kriter</th>
-                        <th>Mevcut Durum</th>
-                        <th>Hedeflenen</th>
+                        <th>{_L('th_criterion')}</th>
+                        <th>{_L('th_current')}</th>
+                        <th>{_L('th_target')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3673,20 +3664,20 @@ class SkillBasedDocxAgent:
         html = """
         <div class="section signature-section" id="signatures">
 """
-        html += f"""            <div class="section-header">{section_no}. ONAY VE İMZA SAYFASI</div>
+        html += f"""            <div class="section-header">{section_no}. {_L('section_signatures')}</div>
             
             <table class="signature-table">
                 <thead>
                     <tr>
-                        <th>Rol</th>
-                        <th>İsim</th>
-                        <th>Ünvan</th>
-                        <th>İmza / Tarih</th>
+                        <th>{_L('th_role')}</th>
+                        <th>{_L('th_name')}</th>
+                        <th>{_L('th_title')}</th>
+                        <th>{_L('th_signature')}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="font-weight: bold; color: #1B3A5C;">HAZIRLAYAN</td>
+                        <td style="font-weight: bold; color: #1B3A5C;">{_L('sig_role_prepared')}</td>
                         <td contenteditable="true">HSE Uzmanı</td>
                         <td contenteditable="true">HSE Kök Neden Analisti</td>
                         <td contenteditable="true">
@@ -3697,7 +3688,7 @@ class SkillBasedDocxAgent:
                         </td>
                     </tr>
                     <tr>
-                        <td style="font-weight: bold; color: #1B3A5C;">İNCELEYEN</td>
+                        <td style="font-weight: bold; color: #1B3A5C;">{_L('sig_role_reviewed')}</td>
                         <td contenteditable="true">HSE Yöneticisi</td>
                         <td contenteditable="true">HSE Departman Yöneticisi</td>
                         <td contenteditable="true">
@@ -3708,7 +3699,7 @@ class SkillBasedDocxAgent:
                         </td>
                     </tr>
                     <tr>
-                        <td style="font-weight: bold; color: #1B3A5C;">ONAYLAYAN</td>
+                        <td style="font-weight: bold; color: #1B3A5C;">{_L('sig_role_approved')}</td>
                         <td contenteditable="true">Tesis Müdürü</td>
                         <td contenteditable="true">Genel Operasyon Müdürü</td>
                         <td contenteditable="true">
@@ -3723,8 +3714,7 @@ class SkillBasedDocxAgent:
             
             <div style="margin-top: 40px; padding: 20px; background: #F5F5F5; border-left: 4px solid #2E6DA4;">
                 <p style="margin: 0; color: #666;">
-                    <strong> Not:</strong> Bu HTML raporu tamamen düzenlenebilir. Herhangi bir alana tıklayarak içeriği değiştirebilirsiniz.
-                    Değişiklikleriniz tarayıcınızın yerel belleğine otomatik olarak kaydedilir.
+                    <strong> Note:</strong> {_L('html_edit_note')}
                 </p>
             </div>
         </div>
