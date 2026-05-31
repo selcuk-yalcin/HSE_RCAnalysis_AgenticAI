@@ -6,9 +6,13 @@ from __future__ import annotations
 
 import os
 import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
+
+AttachmentTuple = Tuple[str, bytes, str]  # filename, payload, mime_type
 
 
 def smtp_configured() -> bool:
@@ -34,9 +38,11 @@ def send_email(
     html_body: str,
     *,
     text_body: Optional[str] = None,
+    attachments: Optional[List[AttachmentTuple]] = None,
 ) -> Tuple[bool, str, str]:
     """
     Returns (ok, provider_message_id, error_message).
+    attachments: list of (filename, bytes, mime_type)
     """
     to_address = (to_address or "").strip()
     if not to_address:
@@ -51,13 +57,30 @@ def send_email(
     from_addr = (os.getenv("SMTP_FROM") or user or "noreply@inferaworld.com").strip()
     use_tls = (os.getenv("SMTP_USE_TLS") or "1").strip().lower() not in ("0", "false", "no")
 
-    msg = MIMEMultipart("alternative")
+    plain = text_body or html_body
+    att_list = attachments or []
+
+    if att_list:
+        msg = MIMEMultipart("mixed")
+        alt = MIMEMultipart("alternative")
+        alt.attach(MIMEText(plain, "plain", "utf-8"))
+        alt.attach(MIMEText(html_body, "html", "utf-8"))
+        msg.attach(alt)
+        for filename, payload, mime_type in att_list:
+            main, sub = (mime_type.split("/", 1) + ["octet-stream"])[:2]
+            part = MIMEBase(main, sub)
+            part.set_payload(payload)
+            encoders.encode_base64(part)
+            part.add_header("Content-Disposition", "attachment", filename=filename)
+            msg.attach(part)
+    else:
+        msg = MIMEMultipart("alternative")
+        msg.attach(MIMEText(plain, "plain", "utf-8"))
+        msg.attach(MIMEText(html_body, "html", "utf-8"))
+
     msg["Subject"] = subject
     msg["From"] = from_addr
     msg["To"] = to_address
-    plain = text_body or html_body
-    msg.attach(MIMEText(plain, "plain", "utf-8"))
-    msg.attach(MIMEText(html_body, "html", "utf-8"))
 
     try:
         with smtplib.SMTP(host, port, timeout=30) as server:

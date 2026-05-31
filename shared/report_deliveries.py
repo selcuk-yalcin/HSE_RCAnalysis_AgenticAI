@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional
 
 from pymongo import ASCENDING, DESCENDING, MongoClient
@@ -13,6 +14,7 @@ from pymongo.collection import Collection
 from pymongo.errors import DuplicateKeyError
 
 from shared.email_sender import send_email
+from shared.report_delivery_email import build_report_ready_email, normalize_delivery_lang
 from shared.signed_links import sign_payload
 
 COLLECTION_NAME = "report_deliveries"
@@ -122,6 +124,10 @@ def enqueue_report_ready_email(
     incident_id: str,
     artifact_version: str = "v1",
     user_prefs: Optional[dict] = None,
+    output_language: str = "tr",
+    html_path: str = "",
+    docx_path: str = "",
+    library_item_id: str = "",
 ) -> Optional[dict[str, Any]]:
     """Create pending delivery row and schedule Celery task when available."""
     if not notify_enabled_for_user(tenant_id=tenant_id, user_prefs=user_prefs):
@@ -150,6 +156,10 @@ def enqueue_report_ready_email(
         "provider_message_id": "",
         "sent_at": "",
         "artifact_version": artifact_version,
+        "output_language": normalize_delivery_lang(output_language),
+        "html_path": (html_path or "").strip(),
+        "docx_path": (docx_path or "").strip(),
+        "library_item_id": (library_item_id or "").strip(),
         "created_at": now,
         "updated_at": now,
     }
@@ -196,8 +206,42 @@ def _save_doc(doc: dict) -> None:
         _mem_deliveries[delivery_key] = doc
 
 
+def _load_report_html_bytes(doc: dict) -> tuple[bytes, str]:
+    """Load HTML report bytes for email attachment. Returns (payload, filename)."""
+    incident_id = (doc.get("incident_id") or "report").strip()
+    filename = f"{incident_id}_report.html"
+    max_bytes = int((os.getenv("REPORT_EMAIL_MAX_ATTACHMENT_BYTES") or "8388608").strip() or "8388608")
+
+    html_path = (doc.get("html_path") or "").strip()
+    if html_path:
+        path = Path(html_path)
+        if path.is_file():
+            raw = path.read_bytes()
+            if len(raw) <= max_bytes:
+                return raw, filename
+
+    library_item_id = (doc.get("library_item_id") or doc.get("report_id") or "").strip()
+    tenant_id = doc.get("tenant_id") or ""
+    owner_user_id = doc.get("owner_user_id") or ""
+    if library_item_id and tenant_id and owner_user_id:
+        try:
+            from shared import saved_reports_store
+
+            html = saved_reports_store.get_artifact_html(
+                tenant_id, owner_user_id, library_item_id, "report"
+            )
+            if html:
+                raw = html.encode("utf-8")
+                if len(raw) <= max_bytes:
+                    return raw, filename
+        except Exception:
+            pass
+
+    return b"", filename
+
+
 def process_delivery(delivery_key: str) -> dict[str, Any]:
-    """Send email with signed links; idempotent when already sent."""
+    """Send localized email with HTML attachment; idempotent when already sent."""
     doc = _load_by_key(delivery_key)
     if not doc:
         return {"ok": False, "error": "not_found"}
@@ -245,17 +289,36 @@ def process_delivery(delivery_key: str) -> dict[str, Any]:
     html_link = f"{base_url}/api/v1/reports/delivery/download?token={html_token}"
     docx_link = f"{base_url}/api/v1/reports/delivery/download?token={docx_token}"
 
-    subject = "Kök neden analiz raporunuz hazır"
-    body_html = f"""
-    <p>Merhaba,</p>
-    <p>Olay referansı <strong>{incident_id}</strong> için raporunuz hazır.</p>
-    <ul>
-      <li><a href="{html_link}">HTML raporu görüntüle</a> (24 saat geçerli)</li>
-      <li><a href="{docx_link}">Word (DOCX) indir</a> (24 saat geçerli)</li>
-    </ul>
-    <p>Bu bağlantılar yalnızca hesabınıza özeldir.</p>
-    """
-    ok, msg_id, err = send_email(doc.get("recipient_email") or "", subject, body_html)
+    output_language = doc.get("output_language") or "tr"
+    subject, body_html, body_plain = build_report_ready_email(
+        incident_id=incident_id,
+        output_language=output_language,
+        docx_link=docx_link,
+    )
+
+    html_bytes, attach_name = _load_report_html_bytes(doc)
+    attachments = []
+    if html_bytes:
+        attachments.append((attach_name, html_bytes, "text/html"))
+    else:
+        # Fallback when attachment unavailable — include HTML download link in body
+        fallback_note_tr = (
+            f'<p><a href="{html_link}">HTML raporu indir</a> (24 saat geçerli)</p>'
+        )
+        fallback_note_en = (
+            f'<p><a href="{html_link}">Download HTML report</a> (valid 24 hours)</p>'
+        )
+        note = fallback_note_en if normalize_delivery_lang(output_language) == "en" else fallback_note_tr
+        body_html = body_html + note
+        body_plain = body_plain + f"\nHTML: {html_link}\n"
+
+    ok, msg_id, err = send_email(
+        doc.get("recipient_email") or "",
+        subject,
+        body_html,
+        text_body=body_plain,
+        attachments=attachments or None,
+    )
     if ok:
         doc["status"] = "sent"
         doc["sent_at"] = _utc_now_iso()
@@ -281,6 +344,10 @@ def maybe_enqueue_report_email(
     incident_id: str,
     artifact_version: str = "v1",
     user_prefs: Optional[dict] = None,
+    output_language: str = "tr",
+    html_path: str = "",
+    docx_path: str = "",
+    library_item_id: str = "",
 ) -> Optional[dict[str, Any]]:
     """Idempotent enqueue used by all report-ready API paths."""
     return enqueue_report_ready_email(
@@ -291,4 +358,8 @@ def maybe_enqueue_report_email(
         incident_id=incident_id,
         artifact_version=artifact_version,
         user_prefs=user_prefs,
+        output_language=output_language,
+        html_path=html_path,
+        docx_path=docx_path,
+        library_item_id=library_item_id,
     )

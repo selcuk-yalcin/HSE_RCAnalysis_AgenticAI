@@ -113,6 +113,8 @@ Source: synchronized from root `TODO.md`.
 - ✅ `report_deliveries` koleksiyonu + idempotency (`delivery_key`). (DONE)
 - ✅ Celery `send_report_delivery_email` + imzalı indirme linkleri (`signed_links`, `GET /api/v1/reports/delivery/download`). (DONE)
 - ✅ Rapor hazır e-postası: `library_finalize`, `POST /reports/html`, `library/save-html` sonrası kuyruk. (DONE)
+- ✅ E-posta dili: `output_language` (TR/EN) — konu + gövde (`shared/report_delivery_email.py`). (DONE)
+- ✅ HTML rapor **e-posta eki** (`{incident_id}_report.html`); DOCX imzalı link opsiyonel. (DONE)
 - ✅ Dashboard: teslimat zaman çizelgesi + SMTP durumu (`GET /api/v1/deliveries`). (DONE)
 - ⚠️ SMTP ortam değişkenleri yapılandırılmadan e-posta gönderilmez; Celery worker gerekir. (OPS)
 
@@ -137,6 +139,55 @@ Source: synchronized from root `TODO.md`.
 **Worker:** API + Celery worker aynı SMTP env değişkenlerine sahip olmalı. Worker olmadan API senkron fallback dener (`process_delivery`).
 
 **Test:** Rapor oluştur → Panel → Rapor E-posta Teslimatları bölümünde `pending` / `sent` durumunu kontrol et.
+
+#### Hostinger SMTP — `info@inferaworld.com` (production hedefi)
+
+Production gönderici: **Hostinger** posta kutusu `info@inferaworld.com` ([mail.hostinger.com](https://mail.hostinger.com/mailboxes/INBOX)).
+
+**hPanel adımları (tek seferlik):**
+
+1. hPanel → **Emails** → `inferaworld.com` → `info@inferaworld.com` posta kutusunu oluştur.
+2. **Connect Apps & Devices** → **Manual Configuration** → SMTP bilgilerini al.
+3. Webmail ile girişi doğrula: `info@inferaworld.com` + posta kutusu şifresi.
+
+**Railway env (API + Celery worker — ikisine de aynı değerler):**
+
+| Değişken | Değer | Not |
+|----------|-------|-----|
+| `SMTP_HOST` | `smtp.hostinger.com` | Hostinger outgoing server |
+| `SMTP_PORT` | `587` | STARTTLS — mevcut kod `587 + STARTTLS` kullanır |
+| `SMTP_USE_TLS` | `1` | Varsayılan açık |
+| `SMTP_USER` | `info@inferaworld.com` | Tam e-posta adresi (kullanıcı adı) |
+| `SMTP_PASSWORD` | `***` | Posta kutusu şifresi — **Railway'e sonra eklenecek** |
+| `SMTP_FROM` | `Infera Raporlar <info@inferaworld.com>` | Alıcıda görünen gönderen |
+| `REPORT_DELIVERY_API_BASE` | `https://web-production-c9d02.up.railway.app` | Production API taban URL (Railway) |
+| `REPORT_LINK_TTL_SECONDS` | `86400` | İmzalı link süresi (24 saat) |
+| `REPORT_NOTIFY_EMAIL_DEFAULT` | `1` | Tenant varsayılan: e-posta açık |
+
+> Port **465** (SSL) Hostinger'da desteklenir; kod `587 + STARTTLS` beklediği için **587** kullanın.
+
+**Akış (rapor bitince):**
+
+1. Kullanıcı rapor oluşturur / finalize eder (`library_finalize`, `POST /reports/html`, `library/save-html`).
+2. Frontend `localStorage.authUser.email` → gateway `X-User-Email` header'ı ile API'ye iletir.
+3. API `report_deliveries` kaydı oluşturur → Celery `send_report_delivery_email`.
+4. Worker Hostinger SMTP üzerinden gönderir: **FROM** `info@inferaworld.com`, **TO** oturum açmış kullanıcı.
+5. E-posta: konu *"Kök neden analiz raporunuz hazır"* + imzalı HTML/DOCX indirme linkleri (24 saat).
+
+**Doğrulama:**
+
+- Panel → **Rapor E-posta Teslimatları** → durum `sent`.
+- Gelen kutusu + spam klasörü kontrolü.
+- SMTP yapılandırılmamışsa durum `pending` / `failed`; dashboard SMTP uyarı bandı görünür.
+
+**Sık sorunlar:**
+
+| Belirti | Olası neden | Çözüm |
+|---------|-------------|--------|
+| `Authentication failed` | Yanlış kullanıcı/şifre | `SMTP_USER` tam adres; şifre posta kutusu şifresi |
+| `pending` kalıyor | Worker yok / env eksik | Celery worker çalışsın; worker'da da aynı SMTP env |
+| Linkler açılmıyor | Yanlış API base | `REPORT_DELIVERY_API_BASE` production URL olmalı |
+| Alıcı boş | Kullanıcı e-postası yok | Giriş yapılmış olmalı; `authUser.email` dolu |
 
 - Hedef: rapor üretimi tamamlandığında kullanıcıya güvenli, otomatik ve izlenebilir teslimat.
 - Çözüm (MVP -> hardening):

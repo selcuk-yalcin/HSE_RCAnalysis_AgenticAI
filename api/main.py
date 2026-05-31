@@ -1759,11 +1759,20 @@ async def _enqueue_report_delivery_email(
     report_id: str,
     incident_id: str,
     artifacts: dict,
+    output_language: str = "",
+    library_item_id: str = "",
 ) -> None:
     """Queue completion email when report artifacts are ready (idempotent)."""
     email = (recipient_email or "").strip()
     if not email or "@" not in email:
         return
+    lang = (output_language or "").strip()
+    if not lang:
+        try:
+            incident = _require_incident_record(tenant_id, incident_id)
+            lang = (incident.get("output_language") or "tr").strip()
+        except Exception:
+            lang = "tr"
     artifact_version = str(artifacts.get("generated_at") or incident_id).strip()
     try:
         await asyncio.to_thread(
@@ -1774,6 +1783,10 @@ async def _enqueue_report_delivery_email(
             report_id=report_id,
             incident_id=incident_id,
             artifact_version=artifact_version,
+            output_language=lang,
+            html_path=str(artifacts.get("html_path") or ""),
+            docx_path=str(artifacts.get("docx_path") or ""),
+            library_item_id=library_item_id,
         )
     except Exception as mail_exc:  # noqa: BLE001
         print(f"⚠️  Report delivery enqueue skipped: {mail_exc}")
@@ -1998,6 +2011,8 @@ async def library_finalize_report(
             report_id=str((updated or item).get("id") or incident_id),
             incident_id=incident_id,
             artifacts=artifacts,
+            output_language=(body.snapshot or {}).get("output_language") or "",
+            library_item_id=str((updated or item).get("id") or item.get("id") or ""),
         )
         return {"success": True, "data": updated or item}
     except HTTPException:
@@ -2071,6 +2086,8 @@ async def library_save_html(
             report_id=str((updated or item).get("id") or incident_id),
             incident_id=incident_id,
             artifacts={"generated_at": incident_id},
+            output_language=(body.snapshot or {}).get("output_language") or "",
+            library_item_id=str((updated or item).get("id") or item.get("id") or ""),
         )
         return {"success": True, "data": updated or item}
     except RuntimeError as exc:

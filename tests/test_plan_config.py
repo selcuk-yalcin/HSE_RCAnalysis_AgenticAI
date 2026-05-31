@@ -22,4 +22,4 @@ def test_monthly_token_budget_mapping():
     assert monthly_token_budget_for_plan("starter") == 220_000
     assert monthly_token_budget_for_plan("pro") == 900_000
     pro = get_plan("pro")
-    assert pro["price_monthly"] == 99
+    assert pro["monthly_report_quota"] == 50
