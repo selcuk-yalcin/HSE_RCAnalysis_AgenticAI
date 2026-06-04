@@ -21,6 +21,9 @@ DEFAULT_DIM = 384
 DEFAULT_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
 ENV_BACKEND = "TAXONOMY_EMBEDDING_BACKEND"
 
+# Process-wide ST cache — worker pipeline'da model tekrar tekrar yüklenmesin.
+_ST_MODEL_CACHE: Dict[str, Any] = {}
+
 
 def _tokenize(text: str) -> List[str]:
     return re.findall(r"[\w\u00c0-\u024f]+", (text or "").lower(), flags=re.UNICODE)
@@ -95,10 +98,22 @@ def probe_effective_backend(backend: Backend = "auto") -> Backend:
     return used  # type: ignore[return-value]
 
 
-def _sentence_transformer_embed(texts: List[str], model_name: str) -> List[List[float]]:
-    from sentence_transformers import SentenceTransformer  # noqa: WPS433
+def get_sentence_transformer(model_name: str = DEFAULT_MODEL) -> Any:
+    """Lazy singleton — aynı process içinde model bir kez yüklenir."""
+    if model_name not in _ST_MODEL_CACHE:
+        from sentence_transformers import SentenceTransformer  # noqa: WPS433
 
-    model = SentenceTransformer(model_name)
+        _ST_MODEL_CACHE[model_name] = SentenceTransformer(model_name)
+    return _ST_MODEL_CACHE[model_name]
+
+
+def clear_sentence_transformer_cache() -> None:
+    """Test / reload için cache temizle."""
+    _ST_MODEL_CACHE.clear()
+
+
+def _sentence_transformer_embed(texts: List[str], model_name: str) -> List[List[float]]:
+    model = get_sentence_transformer(model_name)
     vectors = model.encode(texts, convert_to_tensor=False, show_progress_bar=len(texts) > 8)
     return [v.tolist() for v in vectors]
 

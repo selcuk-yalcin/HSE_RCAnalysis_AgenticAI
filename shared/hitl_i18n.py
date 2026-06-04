@@ -212,3 +212,70 @@ def _llm_translate_to_english(texts: List[str], retries: int = 1) -> List[str]:
     except Exception:
         return []
     return []
+
+
+_CODE_IN_PARENS_RE = re.compile(
+    r"\b[A-D]\d+\.\d+\s*\([^)]+\)",
+    re.IGNORECASE,
+)
+_CODE_BACKTICK_RE = re.compile(
+    r"`[A-D]\d+\.\d+`",
+    re.IGNORECASE,
+)
+_CODE_BRACKET_PREFIX_RE = re.compile(
+    r"^\s*\[[^\]]*[A-D]\d+\.\d+[^\]]*\]\s*",
+    re.IGNORECASE,
+)
+_CODE_FOR_CLAUSE_RE = re.compile(
+    r"^[A-D]\d+\.\d+\s*\([^)]+\)\s*(için|icin|for)\s*:\s*",
+    re.IGNORECASE,
+)
+
+
+def show_taxonomy_codes_in_hitl() -> bool:
+    """Varsayılan: kodları kullanıcıya gösterme (HITL_SHOW_TAXONOMY_CODES=1 ile açılır)."""
+    import os
+
+    return (os.getenv("HITL_SHOW_TAXONOMY_CODES") or "0").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+
+
+def strip_taxonomy_codes_for_display(text: str) -> str:
+    """Kullanıcıya gösterilecek soru metninden taksonomi kodlarını temizle."""
+    s = (text or "").strip()
+    if not s:
+        return s
+    s = _CODE_BRACKET_PREFIX_RE.sub("", s)
+    s = _CODE_FOR_CLAUSE_RE.sub("", s)
+    s = _CODE_BACKTICK_RE.sub("", s)
+    s = _CODE_IN_PARENS_RE.sub("", s)
+    s = re.sub(r"\s{2,}", " ", s).strip()
+    s = re.sub(r"\s+([?.!,;:])", r"\1", s)
+    # HSG şablon kalıntısı
+    s = re.sub(
+        r"Bu olayda sahaya ne kadar uyuyordu\?",
+        "Bu ifade olayda ne kadar geçerliydi?",
+        s,
+        flags=re.IGNORECASE,
+    )
+    return s.strip()
+
+
+def sanitize_hsg_hint_for_display(hint: str) -> str:
+    """
+    hsg245_link gibi ipuçlarından kod listesini kaldır.
+    Sadece kod içeriyorsa boş döner (UI'da gizlenir).
+    """
+    raw = (hint or "").strip()
+    if not raw:
+        return ""
+    if show_taxonomy_codes_in_hitl():
+        return raw
+    cleaned = strip_taxonomy_codes_for_display(raw)
+    if not cleaned or _CODE_IN_PARENS_RE.search(raw):
+        return ""
+    return cleaned

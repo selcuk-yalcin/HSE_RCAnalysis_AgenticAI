@@ -1613,7 +1613,7 @@ class RootCauseAgentV3_1:
         vblock = self._vector_rag_excerpt(incident_summary)
         if vblock:
             incident_summary = f"{incident_summary}\n\n{vblock}"
-            print("🔍 RAG vector taxonomy context injected (MongoVectorRetriever)")
+            print("🔍 RAG vector taxonomy context injected (BarselTaxonomyRetriever / two-stage)")
 
         if investigation_data and isinstance(investigation_data, dict):
             oc = (investigation_data.get("oracle_context") or "").strip()

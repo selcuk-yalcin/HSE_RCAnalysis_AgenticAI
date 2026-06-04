@@ -31,7 +31,10 @@ from shared.hitl_i18n import (
     question_batch_has_language_drift,
     response_guidance,
     safe_fallback_question,
+    sanitize_hsg_hint_for_display,
     shape_bilingual_question_fields,
+    show_taxonomy_codes_in_hitl,
+    strip_taxonomy_codes_for_display,
 )
 
 _HS_CODE_RE = re.compile(r"\b([ABCD][0-9]+\.[0-9]+)\b", re.IGNORECASE)
@@ -416,7 +419,7 @@ def _build_deep_questions_from_hsg_taxonomy(code: str, why_level: int) -> list[d
 
     out: list[dict] = []
     for idx, choose in enumerate(item.choose_if[:2], start=1):
-        q = f"{item.code} ({item.title}) icin: {choose} Bu olayda sahaya ne kadar uyuyordu?"
+        q = f"Bu olayda şu ifade ne kadar geçerliydi: {choose}?"
         out.append(
             {
                 "id": _stable_id("tx-c", code, str(why_level), str(idx), q),
@@ -431,7 +434,10 @@ def _build_deep_questions_from_hsg_taxonomy(code: str, why_level: int) -> list[d
         )
     if item.not_this_if:
         nt = item.not_this_if[0]
-        q = f"Bu durum `{item.code}` yerine `{nt}` olabilir mi? Ayirmamiza yardim edecek kanit var mi?"
+        q = (
+            f"Bu durum «{item.title}» yerine «{nt}» ile mi açıklanmalı? "
+            f"Ayırmamıza yardımcı somut kanıt var mı?"
+        )
         out.append(
             {
                 "id": _stable_id("tx-n", code, str(why_level), q),
@@ -464,10 +470,7 @@ def _build_deep_questions_from_barsel_taxonomy(
         max_problems=2,
     )
     for idx, problem in enumerate(problems, start=1):
-        q = (
-            f"[{item.code} — {item.title}] Bu olayda şu durum geçerli miydi: "
-            f"{problem}"
-        )
+        q = f"Bu olayda şu durum geçerli miydi: {problem}?"
         out.append(
             {
                 "id": _stable_id("bx-p", code, str(why_level), str(idx), q),
@@ -485,10 +488,7 @@ def _build_deep_questions_from_barsel_taxonomy(
         split_selection_criteria(item.selection_criteria, max_clauses=1),
         start=1,
     ):
-        q = (
-            f"{item.code} ({item.title}) için seçim ölçütü: {clause}. "
-            f"Bu olayda ne kadar karşılanıyordu?"
-        )
+        q = f"Bu olayda şu koşul ne ölçüde geçerliydi: {clause}?"
         out.append(
             {
                 "id": _stable_id("bx-s", code, str(why_level), str(idx), q),
@@ -505,8 +505,8 @@ def _build_deep_questions_from_barsel_taxonomy(
     contrast = find_contrast_code(item, _BARSEL_ITEMS)
     if contrast:
         q = (
-            f"Bu olay `{item.code}` ({item.title}) mi yoksa "
-            f"`{contrast.code}` ({contrast.title}) mi? "
+            f"Bu olay «{item.title}» kapsamında mı, yoksa "
+            f"«{contrast.title}» kapsamında mı değerlendirilmeli? "
             f"Ayırmamıza yardımcı somut kanıt var mı?"
         )
         out.append(
@@ -919,14 +919,18 @@ def _shape_question(q: dict, output_language: str = "tr", *, _retried: bool = Fa
     soru = str(q.get("soru", "") or q.get("question_tr", "") or "").strip()
     soru_en = str(q.get("soru_en", "") or q.get("question_en", "") or "").strip()
     question_tr, question_en = shape_bilingual_question_fields(soru, soru_en, lang, source=source)
+    if not show_taxonomy_codes_in_hitl():
+        question_tr = strip_taxonomy_codes_for_display(question_tr)
+        question_en = strip_taxonomy_codes_for_display(question_en)
     display = question_en if lang == "en" else question_tr
     u = _enrich_hitl_ui(display, q, lang)
     tr_opts, en_opts = pick_choice_options({**q, **u}, lang)
     mode = u.get("response_mode", "yes_no_unknown")
+    hint_raw = str(q.get("hsg245") or "")
     shaped: dict[str, Any] = {
         "id": q["id"],
         "source": source,
-        "hsg_hint": q.get("hsg245", ""),
+        "hsg_hint": hint_raw if show_taxonomy_codes_in_hitl() else sanitize_hsg_hint_for_display(hint_raw),
         "code": q.get("code", ""),
         "cause_desc": q.get("cause_desc", ""),
         "question_tr": question_tr,

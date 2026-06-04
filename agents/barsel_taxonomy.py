@@ -477,6 +477,14 @@ def pick_typical_problems_for_hitl(
 ) -> List[str]:
     probs = [p for p in item.typical_problems if p.strip()]
     if not probs:
+        if item.definition:
+            first = re.split(r"[.!?]\s+", item.definition.strip(), maxsplit=1)[0].strip()
+            if len(first) >= 20:
+                probs = [first]
+        if not probs and item.keywords:
+            kw = ", ".join(item.keywords[:3])
+            probs = [f"Olayda «{kw}» gibi ifadeler geçiyor muydu?"]
+    if not probs:
         return []
     incident = incident_text or ""
 

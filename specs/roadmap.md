@@ -439,7 +439,46 @@ export ROOTCAUSE_TAXONOMY_RAG_K=8
 export HITL_USE_BARSEL=1
 ```
 
-**Embedding uyumu (kritik):** Mongo `rca.taxonomy_barsel` vektörleri import sırasında hangi backend ile üretildiyse query tarafı aynı backend'i kullanmalı. Retriever Mongo'daki `embedding` alanını aday skorlamada kullanır; yalnızca sorgu metni embed edilir. Yerel bozuk torch → `TAXONOMY_EMBEDDING_BACKEND=hash` + hash ile yeniden import. Production Railway worker → `sentence-transformers` (`requirements-railway.txt`) + `TAXONOMY_EMBEDDING_BACKEND=sentence_transformers`. Doğrulama: `verify_taxonomy_embeddings.py`.
+**Embedding uyumu (kritik):** Mongo `rca.taxonomy_barsel` vektörleri import sırasında hangi backend ile üretildiyse query tarafı aynı backend'i kullanmalı. Retriever Mongo'daki `embedding` alanını aday skorlamada kullanır; yalnızca sorgu metni embed edilir. Yerel bozuk torch → `TAXONOMY_EMBEDDING_BACKEND=hash` + **ayrı test koleksiyonu** (prod Mongo'ya hash import yasak). Production Railway → `sentence-transformers` (`requirements-railway.txt`) + `TAXONOMY_EMBEDDING_BACKEND=sentence_transformers`. Doğrulama: `verify_taxonomy_embeddings.py`.
+
+#### Production embedding rollout (OPS)
+
+| Adım | Durum | İş | Not |
+|------|--------|-----|-----|
+| **OPS-E1** | ✅ | Kod: embedding alignment + `verify_taxonomy_embeddings.py` → `main` (`351a3c0`) | `taxonomy_embeddings.py`, retriever, `requirements-railway.txt` |
+| **OPS-E2** | ✅ | Mongo ST re-import: 156 doküman + `embedding_meta` | `TAXONOMY_EMBEDDING_BACKEND=sentence_transformers python rag_pipeline/indexing/build_mongodb_vector_store.py` |
+| **OPS-E3** | ✅ | Yerel verify: `✅ Backend uyumlu` | Mongo=`sentence_transformers`, query=`sentence_transformers` |
+| **OPS-E4** | ⏳ | Railway env (**API + worker**): `TAXONOMY_EMBEDDING_BACKEND=sentence_transformers` | `railway variables set …` veya dashboard; `auto` Railway'de ST ile çalışsa da explicit önerilir |
+| **OPS-E5** | ⏳ | Railway env (**API + worker**): `TAXONOMY_COLLECTION=taxonomy_barsel` | Varsayılan zaten `taxonomy_barsel`; yine de her iki serviste set edin |
+| **OPS-E6** | ✅ | Image redeploy: `sentence-transformers` kurulu, startup'ta model yükleniyor | Log: `Loading weights … 199/199` + `BarselTaxonomyRetriever` |
+| **OPS-E7** | ⏳ | Railway one-off verify (opsiyonel): `railway run python rag_pipeline/retrieval/verify_taxonomy_embeddings.py` | CLI login + servis link gerekir |
+| **OPS-E8** | ⏳ | Opsiyonel: `HF_TOKEN` (HF Hub rate-limit uyarısı) | Log: *unauthenticated requests to the HF Hub* — model cache sonrası kritik değil |
+| **OPS-E9** | ⏳ | Opsiyonel: `TZ=UTC` API + worker | Log: `TZ=unset`; `scripts/railway_celery_worker.sh` zaten `TZ` default UTC |
+| **OPS-E10** | ⏳ | Yerel dev (bozuk torch): `.venv-st-import` (Python 3.10 + ST), prod Mongo'ya **hash import yasak** | `HF_HUB_OFFLINE=1` model cache varsa; verify ile ST doğrula |
+
+**Railway env (tam set — API + Celery worker):**
+
+```bash
+TAXONOMY_EMBEDDING_BACKEND=sentence_transformers
+TAXONOMY_COLLECTION=taxonomy_barsel
+BARSEL_TWO_STAGE_RAG=1
+ROOTCAUSE_USE_RAG=1
+ROOTCAUSE_USE_VECTOR_RAG=1
+ROOTCAUSE_USE_ABS_RAG=0
+ROOTCAUSE_TAXONOMY_SOURCE=barsel
+ROOTCAUSE_TAXONOMY_MODE=rag
+ROOTCAUSE_TAXONOMY_RAG_K=8
+HITL_USE_BARSEL=1
+```
+
+**Startup doğrulama (production log checklist):**
+
+- [x] `Loading weights … 199/199` — `paraphrase-multilingual-MiniLM-L12-v2` yüklendi
+- [x] `✓ RAG Analyzer başlatıldı (BarselTaxonomyRetriever).`
+- [x] `✅ Root Cause Agent initialized [v3.1] (RAG on)`
+- [x] `GET /api/v1/health` → 200
+- [ ] `BARSEL embedding OK` (logger INFO; stdout'ta görünmeyebilir — uyumsuzlukta WARNING/RuntimeError beklenir)
+- [ ] Explicit `TAXONOMY_EMBEDDING_BACKEND` Railway dashboard'da doğrulandı (OPS-E4/E5)
 
 ### P1.6 Barsel Guided DSPy Training + Deep HITL
 
