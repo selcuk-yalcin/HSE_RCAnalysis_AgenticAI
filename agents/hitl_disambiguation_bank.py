@@ -314,6 +314,8 @@ def build_questions_for_causes(
     if _hitl_use_barsel_disambiguation():
         from agents.barsel_disambiguation_bank import build_barsel_questions_for_causes
 
+        from agents.barsel_taxonomy import hitl_mongo_only_sources
+
         rows = build_barsel_questions_for_causes(
             immediate_causes,
             incident_context=incident_context,
@@ -322,6 +324,8 @@ def build_questions_for_causes(
         )
         if rows:
             return rows
+        if hitl_mongo_only_sources():
+            return []
     return _build_hsg_questions_for_causes(immediate_causes)
 
 

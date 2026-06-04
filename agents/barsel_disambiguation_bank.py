@@ -14,6 +14,8 @@ from agents.barsel_taxonomy import (
     BarselTaxonomyItem,
     extract_taxonomy_code,
     find_contrast_code,
+    hitl_allow_legacy_fallback,
+    hitl_mongo_only_sources,
     load_barsel_taxonomy_items,
     pick_keywords_for_hitl,
     pick_typical_problems_for_hitl,
@@ -378,15 +380,19 @@ def get_barsel_disambiguation_questions(
     incident_context: str = "",
 ) -> list[dict[str, Any]]:
     code = extract_taxonomy_code(cause_code) or (cause_code or "").strip().upper()
-    if items is None:
+    legacy = hitl_allow_legacy_fallback()
+    if items is None and by_code is None:
+        if hitl_mongo_only_sources():
+            return []
         items = load_barsel_taxonomy_items()
     if by_code is None:
-        by_code = {i.code.upper(): i for i in items if i.code}
+        by_code = {i.code.upper(): i for i in (items or []) if i.code}
+    pool_items = items if items is not None else list(by_code.values())
 
     item = by_code.get(code)
     if item:
-        qs = _questions_from_barsel_item(item, items, incident_context)
-        if len(qs) >= 2:
+        qs = _questions_from_barsel_item(item, pool_items, incident_context)
+        if len(qs) >= 2 or not legacy:
             return qs
         seen = {q["soru"] for q in qs}
         for fb in _band_fallback_questions(code):
@@ -396,7 +402,9 @@ def get_barsel_disambiguation_questions(
             if len(qs) >= 5:
                 break
         return qs
-    return _band_fallback_questions(code)
+    if legacy:
+        return _band_fallback_questions(code)
+    return []
 
 
 def build_barsel_questions_for_causes(
@@ -409,6 +417,8 @@ def build_barsel_questions_for_causes(
     if barsel_by_code is not None:
         by_code = {k.upper(): v for k, v in barsel_by_code.items() if v.code}
         items = barsel_items if barsel_items is not None else list(by_code.values())
+    elif hitl_mongo_only_sources():
+        return []
     else:
         items = load_barsel_taxonomy_items()
         if not items:

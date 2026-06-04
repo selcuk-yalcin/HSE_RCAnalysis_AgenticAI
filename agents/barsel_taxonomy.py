@@ -482,6 +482,42 @@ def hitl_mongo_rag_enabled() -> bool:
     return bool((os.getenv("MONGODB_URI") or "").strip())
 
 
+def hitl_allow_legacy_fallback() -> bool:
+    """Yerel JSON + HSG knowledge.json HITL yedeği (offline dev için)."""
+    return (os.getenv("HITL_ALLOW_JSON_HSG_FALLBACK") or "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+
+
+def hitl_mongo_only_sources() -> bool:
+    """Mongo RAG açıkken JSON/HSG'den soru üretme (varsayılan)."""
+    return hitl_mongo_rag_enabled() and not hitl_allow_legacy_fallback()
+
+
+def _supplement_codes_from_retriever_docs(
+    by_code: Dict[str, BarselTaxonomyItem],
+    focus_codes: Iterable[str],
+    retriever: Any,
+) -> None:
+    """Agent/RCA kodlarını retriever bellek indeksinden tamamla (JSON yedeği yok)."""
+    if retriever is None or not getattr(retriever, "connected", False):
+        return
+    want: set[str] = set()
+    for raw in focus_codes:
+        code = extract_taxonomy_code(str(raw or "")) or str(raw or "").strip().upper()
+        if code:
+            want.add(code)
+    if not want:
+        return
+    for doc in getattr(retriever, "_docs", []) or []:
+        code = str(doc.get("code") or "").strip().upper()
+        if code in want and code not in by_code:
+            by_code[code] = barsel_item_from_retriever_hit(doc)
+
+
 def _hitl_rag_k() -> int:
     try:
         return max(3, min(12, int(os.getenv("HITL_RAG_K") or "6")))
@@ -549,40 +585,51 @@ def build_hitl_taxonomy_index(
     retriever: Any = None,
 ) -> tuple[List[BarselTaxonomyItem], Dict[str, BarselTaxonomyItem]]:
     """
-    HITL için taksonomi indeksi: Mongo RAG (olay metni) + agent kodları + statik JSON.
+    HITL taksonomi indeksi.
+
+    Varsayılan (HITL_ALLOW_JSON_HSG_FALLBACK yok): yalnızca Mongo RAG + retriever doc lookup.
+    Legacy fallback açıksa: statik JSON ile birleştirilir.
     """
-    static = static_by_code or {}
+    mongo_only = hitl_mongo_only_sources()
+    static = {} if mongo_only else (static_by_code or {})
     by_code: Dict[str, BarselTaxonomyItem] = dict(static)
 
     query = (incident_context or "").strip()
-    if hitl_mongo_rag_enabled() and retriever is not None and getattr(retriever, "connected", False):
-        if query:
-            try:
-                hits = retriever.retrieve(
-                    query[:4000],
-                    k=_hitl_rag_k(),
-                    min_score=0.02,
-                    keyword_pool=max(20, _hitl_rag_k() * 3),
-                )
-            except Exception:
-                hits = []
-            for hit in hits:
-                item = barsel_item_from_retriever_hit(hit)
-                if not item.code:
-                    continue
-                prev = by_code.get(item.code)
-                by_code[item.code] = merge_barsel_items(item, prev) if prev else item
+    rag_active = (
+        hitl_mongo_rag_enabled()
+        and retriever is not None
+        and getattr(retriever, "connected", False)
+    )
+    if rag_active and query:
+        try:
+            hits = retriever.retrieve(
+                query[:4000],
+                k=_hitl_rag_k(),
+                min_score=0.02,
+                keyword_pool=max(20, _hitl_rag_k() * 3),
+            )
+        except Exception:
+            hits = []
+        for hit in hits:
+            item = barsel_item_from_retriever_hit(hit)
+            if not item.code:
+                continue
+            prev = by_code.get(item.code)
+            by_code[item.code] = merge_barsel_items(item, prev) if prev else item
 
-    for raw in focus_codes or []:
-        code = extract_taxonomy_code(str(raw or "")) or str(raw or "").strip().upper()
-        if code and code not in by_code and code in static:
-            by_code[code] = static[code]
-
-    if query and len(by_code) < 3:
-        pool = list(by_code.values()) or list(static.values())
-        for code in infer_barsel_codes_from_text(query, pool, top_k=3):
-            if code not in by_code and code in static:
+    if rag_active:
+        _supplement_codes_from_retriever_docs(by_code, focus_codes or [], retriever)
+    elif not mongo_only:
+        for raw in focus_codes or []:
+            code = extract_taxonomy_code(str(raw or "")) or str(raw or "").strip().upper()
+            if code and code not in by_code and code in static:
                 by_code[code] = static[code]
+
+        if query and len(by_code) < 3:
+            pool = list(by_code.values()) or list(static.values())
+            for code in infer_barsel_codes_from_text(query, pool, top_k=3):
+                if code not in by_code and code in static:
+                    by_code[code] = static[code]
 
     return list(by_code.values()), by_code
 

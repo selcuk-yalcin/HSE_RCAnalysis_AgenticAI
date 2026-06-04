@@ -17,6 +17,7 @@ from agents.barsel_taxonomy import (
     BarselTaxonomyItem,
     build_hitl_taxonomy_index,
     find_contrast_code,
+    hitl_mongo_only_sources,
     hitl_mongo_rag_enabled,
     infer_barsel_codes_from_text,
     load_barsel_taxonomy_items,
@@ -156,10 +157,11 @@ def _hitl_taxonomy_index(
 ) -> tuple[list[BarselTaxonomyItem], dict[str, BarselTaxonomyItem]]:
     if not _USE_BARSEL_HITL:
         return [], {}
+    static = {} if hitl_mongo_only_sources() else _BARSEL_BY_CODE
     return build_hitl_taxonomy_index(
         incident_context,
         focus_codes or [],
-        static_by_code=_BARSEL_BY_CODE,
+        static_by_code=static,
         retriever=_hitl_barsel_retriever(),
     )
 
@@ -606,6 +608,8 @@ def _build_deep_questions_from_taxonomy(
             barsel_by_code=by_code,
             barsel_items=items,
         )
+    if hitl_mongo_only_sources():
+        return []
     return _build_deep_questions_from_hsg_taxonomy(code, why_level)
 
 
@@ -676,6 +680,9 @@ def _taxonomy_gap_questions(full_text: str, max_categories: int = 4, per_cat: in
                     }
                 )
             return out
+
+    if hitl_mongo_only_sources():
+        return []
 
     # Local imports: hitl_test modülleri repo kökünden import edilir (api/main sys.path).
     from hitl_test.hybrid_input_processor import HybridInputProcessor
@@ -939,10 +946,11 @@ def build_hitl_question_pool(
         for c in (immediate_causes or [])
         if isinstance(c, dict) and (c or {}).get("code")
     ]
+    static_pool = [] if hitl_mongo_only_sources() else _BARSEL_ITEMS
     causes = _immediate_causes_from_payload(
         immediate_causes,
         root_cause_initial or "",
-        barsel_items=_BARSEL_ITEMS or None,
+        barsel_items=static_pool or None,
     )
     focus_codes = [str((c or {}).get("code") or "").strip().upper() for c in causes if (c or {}).get("code")]
     barsel_items, barsel_by_code = _hitl_taxonomy_index(full_text, focus_codes or pre_codes)

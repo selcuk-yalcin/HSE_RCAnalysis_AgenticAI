@@ -78,6 +78,7 @@ def test_get_barsel_disambiguation_from_typical_problems():
 
 
 def test_build_barsel_questions_for_causes_no_hsg_codes_in_soru(monkeypatch):
+    monkeypatch.setenv("HITL_USE_MONGO_RAG", "0")
     monkeypatch.setattr(
         "agents.barsel_disambiguation_bank.load_barsel_taxonomy_items",
         lambda *a, **k: FIXTURE_ITEMS,
@@ -94,6 +95,7 @@ def test_build_barsel_questions_for_causes_no_hsg_codes_in_soru(monkeypatch):
 
 
 def test_build_questions_routes_to_barsel_by_default(monkeypatch):
+    monkeypatch.setenv("HITL_USE_MONGO_RAG", "0")
     monkeypatch.setattr(
         "agents.barsel_disambiguation_bank.load_barsel_taxonomy_items",
         lambda *a, **k: FIXTURE_ITEMS,
@@ -109,10 +111,19 @@ def test_build_questions_routes_to_barsel_by_default(monkeypatch):
 
 def test_build_questions_hsg_fallback_when_barsel_disabled(monkeypatch):
     monkeypatch.setenv("HITL_USE_BARSEL", "0")
+    monkeypatch.setenv("HITL_USE_MONGO_RAG", "0")
     rows = build_questions_for_causes([{"code": "B4.4", "cause_tr": "test"}])
     assert rows
     assert not any(r.get("barsel") for r in rows)
     assert any("risk değerlendirmesi" in r["soru"].lower() for r in rows)
+
+
+def test_mongo_only_skips_hsg_when_barsel_empty(monkeypatch):
+    monkeypatch.setenv("HITL_USE_MONGO_RAG", "1")
+    monkeypatch.setenv("MONGODB_URI", "mongodb://local/test")
+    monkeypatch.delenv("HITL_ALLOW_JSON_HSG_FALLBACK", raising=False)
+    rows = build_questions_for_causes([{"code": "B4.4", "cause_tr": "test"}])
+    assert rows == []
 
 
 def test_barsel_taxonomy_gap_no_hsg_links():
