@@ -12,6 +12,7 @@ This folder contains the project's spec-driven development artifacts.
 
 - `plan.md`: Product and architecture baseline derived from the current project state.
 - `roadmap.md`: Prioritized execution backlog derived from `TODO.md`.
+- `roadmap-ovh-mistral.md`: Separate roadmap for OVH-hosted private Mistral LLM (enterprise / data-sovereign); kept out of the main P0–P2 backlog.
 - `tech-stack.md`: Runtime, infrastructure, and component technology map.
 
 ## Workflow

@@ -17,6 +17,10 @@ class LocalizedContent(BaseModel):
     definition: str = Field(..., description="The definition in this language.")
     selection_criteria: Optional[str] = Field(None, description="Selection criteria in this language.")
     typical_examples: List[str] = Field(default_factory=list, description="Examples in this language.")
+    typical_problems: List[str] = Field(
+        default_factory=list,
+        description="Tipik Problemler / Yaygın Eksiklikler (BARSEL and extended taxonomies).",
+    )
 
 class ExclusionCondition(BaseModel):
     """
@@ -75,6 +79,19 @@ class Cause(BaseModel):
         description="Specific industries or contexts where this cause is common."
     )
 
+    section_ids: List[str] = Field(
+        default_factory=list,
+        description="Hierarchy of section ids, e.g. ['A', 'A1'] for BARSEL taxonomy.",
+    )
+    section_titles: List[str] = Field(
+        default_factory=list,
+        description="Human-readable section path aligned with section_ids.",
+    )
+    taxonomy_source: str = Field(
+        default="barsel",
+        description="Source taxonomy pack id (production: barsel).",
+    )
+
     def to_embedding_text(self) -> str:
         """
         Generates a single, coherent string of text for vector embedding.
@@ -96,6 +113,10 @@ class Cause(BaseModel):
                 text_parts.append(f"When to select: {tr_content.selection_criteria}")
             if tr_content.typical_examples:
                 text_parts.append(f"Typical examples include: {'; '.join(tr_content.typical_examples)}.")
+            if tr_content.typical_problems:
+                text_parts.append(
+                    f"Typical problems and common gaps: {'; '.join(tr_content.typical_problems)}."
+                )
         else:
             # Fallback to any available language (e.g., English)
             fallback_lang = next(iter(self.content))
@@ -106,12 +127,39 @@ class Cause(BaseModel):
                 text_parts.append(f"When to select: {fallback_content.selection_criteria}")
             if fallback_content.typical_examples:
                 text_parts.append(f"Typical examples include: {'; '.join(fallback_content.typical_examples)}.")
+            if fallback_content.typical_problems:
+                text_parts.append(
+                    f"Typical problems and common gaps: {'; '.join(fallback_content.typical_problems)}."
+                )
+
+        kw_tr = self.keywords.get("tr") or []
+        if kw_tr:
+            text_parts.append(f"Keywords: {', '.join(kw_tr[:24])}.")
         
         if self.exclusion_conditions:
             exclusions = [f"do not select if {ex.condition} (consider {ex.redirect_code} instead)" for ex in self.exclusion_conditions]
             text_parts.append("Exclusion criteria: " + ", ".join(exclusions) + ".")
             
         return ". ".join(text_parts)
+
+
+class TaxonomySection(BaseModel):
+    """Hierarchical section node (e.g. BARSEL A → A1)."""
+    id: str = Field(..., description="Section id, e.g. A, A1, D9.")
+    title: str = Field(..., description="Section heading text.")
+    parent_id: Optional[str] = Field(None, description="Parent section id, null for top level.")
+    level: int = Field(..., description="1 = major band (A/B/C/D), 2 = subgroup.")
+    band: str = Field(..., description="Top-level band letter: A, B, C, or D.")
+
+
+class TaxonomyMeta(BaseModel):
+    """Metadata for a taxonomy JSON pack."""
+    taxonomy_id: str = Field(default="barsel")
+    source_file: str = Field(default="")
+    version: str = Field(default="1.0")
+    primary_language: str = Field(default="tr")
+    cause_count: int = Field(default=0)
+
 
 class Taxonomy(BaseModel):
     """
@@ -120,5 +168,10 @@ class Taxonomy(BaseModel):
     This is the root model that will be used to store the entire parsed taxonomy
     in a single, structured JSON file.
     """
+    meta: Optional[TaxonomyMeta] = Field(None, description="Pack metadata (BARSEL and future sources).")
+    sections: List[TaxonomySection] = Field(
+        default_factory=list,
+        description="Section hierarchy for grouped retrieval and UI.",
+    )
     causes: List[Cause] = Field(..., description="A list of all causes in the taxonomy.")
 

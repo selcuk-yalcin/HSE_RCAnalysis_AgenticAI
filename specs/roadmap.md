@@ -340,10 +340,100 @@ Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
 - ✅ Controlled RAG prompt injection strategy. (DONE - Mongo context injection into `RootCauseAgentV3_1` incident summary path)
 - ✅ Vector RAG lazy import + soft degradation when optional deps missing (V3.1 can run without local torch/sentence-transformers; wired in `rag_pipeline/retrieval` + `RootCauseAgentV3_1`). (DONE)
 - ⚠️ Runtime prerequisite reminder: if `sentence_transformers` (and compatible `torch`) is missing on worker runtime, vector RAG stays disabled and system falls back to keyword/context-only path (`No module named 'sentence_transformers'`). (OPS NOTE)
-- ✅ Canonical root-cause labels: after 5-Why, map final C/D (and D-only meta-synthesis) to official HSG245 titles from `agents/knowledge.json` via `parse_hsg_taxonomy_items` / `infer_codes_from_text` (`_try_snap_to_taxonomy` in `rootcause_agent_v3_1.py`). (DONE)
+- ✅ Canonical root-cause labels: after 5-Why, map final C/D (and D-only meta-synthesis) to **BARSEL** official titles via `snap_to_barsel_taxonomy` / `barsel_taxonomy_multilingual.json` (`ROOTCAUSE_TAXONOMY_SOURCE=barsel`, default). HSG fallback: `ROOTCAUSE_TAXONOMY_SOURCE=hsg`.
 - Add normalized HGS taxonomy store in Mongo (`hgs_taxonomy.taxonomy_items`) for taxonomy-aware retrieval/questioning.
 
-### P1.6 ABS-Guided DSPy Training + Deep HITL
+### P1.20 BARSEL Taksonomi → RAG Knowledge Base (MongoDB)
+
+**Kaynak:** `rag_pipeline/data/processed/BARSEL_Taksonomi.docx`  
+**Hedef JSON:** `barsel_taxonomy_rag.jsonl` (RAG/Mongo) + `barsel_taxonomy_multilingual.json` (sections + causes)  
+**MongoDB:** `rca.taxonomy_barsel` — tek RAG vektör koleksiyonu (eski `taxonomy_multilingual.json` → `rca.taxonomy` yolu kaldırıldı)
+
+**Ürün ilkesi:** BARSEL taksonomisi **tek RAG knowledge base**. Kod eşleme ve vektör arama yalnızca BARSEL üzerinden. İki aşamalı eleme:
+
+| Aşama | Girdi | Alan | Amaç |
+|-------|-------|------|------|
+| **1 — Anahtar kelime elemesi** | Olay metni / form | `keywords.tr[]` | Geniş aday kümesini hızlı daralt (156 → ~10–20) |
+| **2 — Anlamsal eleme** | Kalan adaylar | `content.tr.definition` + `content.tr.typical_problems[]` (+ `selection_criteria`) | Vektör benzerliği / rerank ile nihai 3–5 kod |
+
+**JSON şema (cause — BARSEL uzantıları):**
+
+```json
+{
+  "meta": { "taxonomy_id": "barsel", "source_file": "BARSEL_Taksonomi.docx", "cause_count": 156 },
+  "sections": [{ "id": "A", "title": "A. İLK GÖRÜNÜR NEDENLER — DAVRANIŞLAR", "parent_id": null, "level": 1, "band": "A" }],
+  "causes": [{
+    "code": "A1.1",
+    "cause_type": "immediate_cause",
+    "taxonomy_source": "barsel",
+    "section_ids": ["A", "A1"],
+    "section_titles": ["A. İLK GÖRÜNÜR …", "A1. PROSEDÜR …"],
+    "content": { "tr": { "title": "…", "definition": "…", "typical_problems": ["…"], "selection_criteria": "…" } },
+    "keywords": { "tr": ["bilerek ihlal", "kural biliyordu"] }
+  }]
+}
+```
+
+#### Adım adım yapılacaklar
+
+| Adım | Durum | İş | Çıktı / dosya |
+|------|--------|-----|----------------|
+| **R1** | ✅ | BARSEL DOCX parser + JSON üretimi | `parse_barsel_taxonomy.py`, `barsel_taxonomy_multilingual.json`, `cause_models.py` genişletme |
+| **R2** | ⏳ | Parser kalite kontrolü: 156 kod, keywords/typical_problems doluluk, manuel spot-check (A1.1, D9.3) | QA checklist + düzeltme PR |
+| **R2b** | ✅ | JSONL normalize → `barsel_taxonomy_rag.jsonl` (`normalize_barsel_vectordb.py`, `barsel_rag_document.py`) | Temiz keyword/semantic/full_text alanları |
+| **R3** | ✅ | MongoDB import: `rca.taxonomy_barsel` | `build_mongodb_vector_store.py` |
+| **R4** | ✅ | Embedding + Atlas vector index | `setup_vector_search_index.py --collection taxonomy_barsel` |
+| **R5** | ✅ | **İki aşamalı retriever:** `keyword_filter()` → `semantic_rerank(definition + typical_problems)` | `barsel_taxonomy_retriever.py` |
+| **R6** | ✅ | HITL BARSEL: `typical_problems` + `selection_criteria` + keyword rotasyon | `hitl_question_service.py`, `barsel_taxonomy.py` |
+| **R7** | ✅ | Regresyon testleri: keyword eleme, semantic eleme, bölüm filtresi (A/B/C/D band) | `tests/test_barsel_taxonomy_retrieval.py` |
+
+**R5 retriever taslağı:**
+
+```mermaid
+flowchart LR
+  Q[Olay metni] --> K1[1. eleme: keywords.tr overlap]
+  K1 --> C1[Aday kodlar 10-20]
+  C1 --> K2[2. eleme: embedding definition + typical_problems]
+  K2 --> OUT[Top 3-5 BARSEL kodları]
+```
+
+**Acceptance:**
+
+- 156 BARSEL kodu JSON'da; her cause `section_ids` + `keywords.tr` + `typical_problems` içerir (boş oran < %5).
+- Mongo `taxonomy_barsel` import idempotent; vektör arama çalışır.
+- İki aşamalı retriever: olay metninde "toplu kural ihlali" → A1.2 aday kümesinde; tanım/problemler ile doğru sıralama.
+
+**İlgili dosyalar:** `rag_pipeline/parsing/parse_barsel_taxonomy.py`, `rag_pipeline/parsing/normalize_barsel_vectordb.py`, `rag_pipeline/indexing/barsel_rag_document.py`, `rag_pipeline/indexing/build_mongodb_vector_store.py`, `rag_pipeline/schemas/cause_models.py`, `rag_pipeline/retrieval/query_mongodb_vector_store.py`, `agents/rootcause_agent_v3_1.py`, `agents/hitl_question_service.py`, P1.5, P1.6.
+
+#### BARSEL dosya hiyerarşisi (RAG)
+
+| Dosya | Rol |
+|-------|-----|
+| `BARSEL_Taksonomi.docx` | Kaynak |
+| `barsel_taxonomy_vectordb.jsonl` | Ham export |
+| `barsel_taxonomy_rag.jsonl` | **RAG + Mongo import** (normalize edilmiş) |
+| `barsel_taxonomy_multilingual.json` | Yapılandırılmış paket (sections + causes) |
+| Mongo **`rca.taxonomy_barsel`** | Tek vektör koleksiyonu |
+
+> Eski `taxonomy_multilingual.json` → `rca.taxonomy` import yolu kaldırıldı.
+
+**Komutlar:**
+
+```bash
+python rag_pipeline/parsing/normalize_barsel_vectordb.py
+python rag_pipeline/indexing/build_mongodb_vector_store.py
+python rag_pipeline/retrieval/setup_vector_search_index.py --collection taxonomy_barsel
+export TAXONOMY_COLLECTION=taxonomy_barsel
+export BARSEL_TWO_STAGE_RAG=1
+export ROOTCAUSE_USE_VECTOR_RAG=1
+export ROOTCAUSE_USE_ABS_RAG=0
+export ROOTCAUSE_TAXONOMY_SOURCE=barsel
+export ROOTCAUSE_TAXONOMY_MODE=rag
+export ROOTCAUSE_TAXONOMY_RAG_K=8
+export HITL_USE_BARSEL=1
+```
+
+### P1.6 Barsel Guided DSPy Training + Deep HITL
 
 - Extend `agents/synetic_data_preperation/hse_synthetic_data.py` to produce
   ABS-aligned Why chains (causal-factor-first, management-system-gap-aware).
@@ -381,6 +471,7 @@ Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
 - Historical note: earlier drafts suggested `anthropic/claude-sonnet-4.5` for agentic + report; production split now uses Haiku (analysis) + Flash (report), after prior DeepSeek/Qwen default iterations.
 - Runtime fallback policy (still open):
   - primary model failure should degrade gracefully to a secondary profile.
+- Kurumsal / veri-sovereign LLM (OVH Mistral): **ayrı roadmap** — [`roadmap-ovh-mistral.md`](roadmap-ovh-mistral.md); ana backlog’a karıştırılmaz.
 
 ### P1.10 DeepWhy — Saved Reports Tab + Per-User Multi-Tenant Persistence
 
@@ -485,6 +576,267 @@ Her kullanıcı için token bakiyesi; LLM/pipeline tüketimi düşülür; bakiye
 
 **İlgili dosyalar (hedef):** `api/main.py`, `shared/` (yeni `token_account.py`), `tasks/pipeline_tasks.py`, `agents/model_constants.py`, `admin_pan` `hsg245Api.js`, Kinde `owner_user_id` header’ları.
 
+### P1.17 Çoklu Şirket (Tenant) Dağıtımı — Model Yapısını Değiştirmeden
+
+**Ürün ilkesi:** RCA motoru, HSG245 taksonomisi, agent pipeline (Part 1→4), rapor bölüm modeli (`report_layout_config`) ve HITL akışı **tek kod tabanında sabit** kalır. Yeni müşteri = yeni **tenant konfigürasyonu**, kod fork veya model değişikliği değil.
+
+**Ne değişmez (frozen core):**
+
+| Katman | Sabit kalır |
+|--------|-------------|
+| Agent pipeline | `overview → assessment → rootcause v3.1 → actionplan → report` |
+| Taksonomi / KB | HSG245 kodları, `knowledge_base`, Why-probe mantığı |
+| Rapor iskeleti | Bölüm sırası, DOCX/HTML parity, imzalı teslimat |
+| Token / kota modeli | `tenant_id` + `owner_user_id` ledger (P1.15) |
+| Veri sınırı | Mongo koleksiyonları tenant scope; çapraz tenant erişim yok |
+
+**Ne tenant bazında özelleşir (config overlay):**
+
+| Alan | Kaynak (hedef) | Örnek |
+|------|----------------|-------|
+| Kimlik | Kinde Organization → `tenant_id` | `acme-hse`, `infera-demo` |
+| Marka | `tenant_config.logo_url`, rapor layout | Logo, kapak şablonu, watermark |
+| Dil varsayılanı | `tenant_config.default_output_language` | `tr` / `en` |
+| Plan / kota | `tenant_config.plan_id` → token budget | Starter / Pro / Enterprise |
+| E-posta gönderen | `tenant_config.smtp_*` veya env fallback | `info@acme.com` |
+| Fiyatlandırma UI | Plan katalog (fiyat göster/gizle bayrağı) | Panelde $ yok, özellik listesi |
+| Şirket profili | `oracle_context` / gelecek `şirket_profili` | Sektör, ekipman, geçmiş RC |
+
+**Dağıtım modelleri (aynı binary, farklı ops):**
+
+```mermaid
+flowchart TB
+  subgraph core [Tek Infera Core — Railway]
+    API[FastAPI]
+    Worker[Celery Worker]
+    Mongo[(MongoDB rca)]
+    Redis[(Redis)]
+  end
+
+  subgraph t1 [Tenant A — Kinde org]
+    UA[Kullanıcılar A]
+    CA[cpanel veya acme.inferaworld.com]
+  end
+
+  subgraph t2 [Tenant B — Kinde org]
+    UB[Kullanıcılar B]
+    CB[b.inferaworld.com veya aynı panel + org switch]
+  end
+
+  UA --> CA --> API
+  UB --> CB --> API
+  API --> Mongo
+  Worker --> Mongo
+```
+
+1. **Shared SaaS (önerilen MVP):** Tek Railway projesi + tek Mongo cluster; `X-Tenant-ID` ile izolasyon. Yeni şirket = Kinde org + `tenant_config` kaydı.
+2. **White-label subdomain:** `acme.inferaworld.com` → aynı Vercel deploy; env `DEFAULT_TENANT_ID=acme` veya login org eşlemesi.
+3. **Dedicated deploy (enterprise):** Aynı Docker image; müşteriye özel Railway + Mongo + SMTP env — kod aynı, veri fiziksel ayrım.
+4. **Dedicated LLM (kurumsal):** OVH + Mistral — ayrı roadmap [`roadmap-ovh-mistral.md`](roadmap-ovh-mistral.md).
+
+**Yeni şirket onboarding checklist (ops — model dokunulmaz):**
+
+| Adım | Aksiyon |
+|------|---------|
+| 1 | Kinde’de Organization oluştur → `org_code` = `tenant_id` |
+| 2 | Mongo `tenant_config` (veya env) — plan, logo, varsayılan dil, SMTP override |
+| 3 | İlk admin kullanıcıyı org’a davet et |
+| 4 | Token hesabı seed (`user_token_accounts`) — plan kotası |
+| 5 | Panel giriş testi: form → HITL → rapor → e-posta teslimat |
+| 6 | (Opsiyonel) Müşteri domain / SMTP (`info@musteri.com`) |
+
+**Teknik borç / yapılacaklar (model değiştirmeden):**
+
+- ⏳ **`tenant_config` koleksiyonu:** logo, plan_id, smtp, default_language, feature_flags (`show_pricing`, `notify_email`).
+- ⏳ **P0.1 tamamlama:** tenant/user registry Redis + admin API (org provisioning).
+- ⏳ **SMTP tenant override:** Global Hostinger fallback; tenant `smtp_*` varsa onu kullan (`report_deliveries`).
+- ⏳ **Plan eşlemesi P1.15:** `plan_id` → aylık token/rapor kotası otomatik (env değil config).
+- ⏳ **Subdomain → tenant_id** resolver (Vercel + gateway).
+- ⏳ **Self-serve signup kapalı (v1):** Manuel onboarding; sonra Kinde org self-provision.
+
+**Güvenlik / uyumluluk (her tenant):**
+
+- Tüm read/write: `{ tenant_id, owner_user_id }` filtresi (mevcut `deepwhy_saved_items`, `report_deliveries`, `token_ledger`).
+- İmzalı rapor linkleri tenant + owner scope (P0.10).
+- Tenant admin rolü: kendi org kullanıcıları + kota; cross-tenant admin yalnızca platform ops.
+
+**Acceptance:**
+
+- İkinci bir şirket (tenant B) eklendiğinde agent kodu / prompt yapısı / rapor şablonu **değişmeden** çalışır.
+- Tenant A kullanıcısı tenant B verisini göremez (Mongo + API test).
+- Tenant B kendi logosu, SMTP göndereni ve plan kotası ile rapor + e-posta alır.
+- Yeni tenant onboarding ≤ 1 saat (Kinde + config + smoke test) — kod deploy gerektirmez.
+
+**İlgili dosyalar:** `shared/tenant_store.py`, `shared/plan_config.py`, `shared/report_layout_config.py`, `shared/owner_auth.py`, `admin_pan` Kinde callback, `api/main.py` tenant dependency, `specs/plan.md` (oracle_context / şirket profili).
+
+### P1.18 Güvenlik ve Uyumluluk (Security)
+
+HSE / RCA verisi **gizli iş verisi** (PII, kaza detayı, fotoğraf). Güvenlik hedefi: tenant izolasyonu, kimlik doğrulama, yetkilendirme, güvenli teslimat ve denetlenebilirlik — **agent/model yapısı değiştirilmeden**.
+
+#### Teknik önlemler (hedef mimari)
+
+Ürün ve müşteri taahhütlerinde referans alınacak dört temel teknik kontrol:
+
+| Önlem | Hedef | Mevcut durum | Yapılacak |
+|-------|-------|--------------|-----------|
+| **Veri şifreleme** | Müşteri verisi **at-rest AES-256**, **in-transit TLS 1.3** | In-transit: HTTPS (Railway/Vercel) + SMTP STARTTLS (~TLS 1.2+). At-rest: Mongo Atlas / Redis sağlayıcı varsayılan disk şifrelemesi; uygulama katmanında field-level encryption yok | ⏳ Atlas encryption-at-rest doğrulama + dokümantasyon; ⏳ TLS 1.3 minimum policy (Railway/Vercel + SMTP); ⏳ tenant SMTP / hassas alanlar için AES-256 field encryption (P1) |
+| **Veri izolasyonu** | Her müşterinin verisi **ayrı namespace / tenant** | Mongo/Redis sorguları `tenant_id`; Kinde org → tenant; vektör/RAG namespace planı P1.5 | ⏳ JWT ile header spoof kapatma (P0); ⏳ `tenant_config` + dedicated deploy seçeneği (P1.17); ⏳ cross-tenant regresyon testleri |
+| **Otomatik silme** | Rapor üretildikten sonra **ham veri X gün** içinde silinsin | Yok — incident, HITL, ek dosya ve rapor artefaktları süresiz kalır | ⏳ `tenant_config.retention_days_raw` (varsayılan **X** gün — ürün kararı, örn. 30/90); ⏳ Celery `purge_expired_incident_data` job; ⏳ finalize sonrası ham `how_happened` / geçici upload TTL; ⏳ rapor + audit kayıtları ayrı retention policy |
+| **Log yönetimi** | **Kimin, ne zaman, hangi veriye** eriştiği kayıt altında | Kısmi: `token_ledger`, `report_deliveries`; tam erişim audit yok | ⏳ `audit_log` koleksiyonu `{tenant_id, actor_user_id, action, resource_type, resource_id, ip, user_agent, ts}`; ⏳ rapor görüntüleme / indirme / silme / e-posta teslimat zorunlu log; ⏳ admin read-only audit UI; ⏳ retention + export (KVKK/GDPR) |
+
+**Otomatik silme — kapsam ayrımı (hedef):**
+
+| Veri sınıfı | Örnek | Retention (hedef) |
+|-------------|-------|-------------------|
+| Ham olay girdisi | Form metni, HITL cevap ham dump, geçici upload | **X gün** rapor `final` olduktan sonra sil |
+| Üretilmiş rapor | HTML/DOCX, karar ağacı, kütüphane kaydı | Tenant policy (örn. 1–7 yıl veya süresiz) |
+| Denetim / faturalama | `audit_log`, `token_ledger`, `report_deliveries` | Policy'den bağımsız; silme/export API ile yönetilir |
+
+**X gün:** Tenant bazında yapılandırılabilir; platform varsayılanı onboarding sırasında belirlenir (ör. `RETENTION_DAYS_RAW=90` env fallback → `tenant_config` override).
+
+#### Mevcut yapı — ne kadar çözüyor?
+
+| Alan | Durum | Mevcut mekanizma | Kapsam (~) |
+|------|--------|------------------|------------|
+| **Veri izolasyonu (tenant)** | ⚠️ Kısmi | Mongo sorguları `tenant_id`; incident Redis key prefix; `deepwhy_saved_items`, `token_ledger`, `report_deliveries` tenant filtreli | **~70%** — sorgular doğru; header spoof riski var |
+| **Kullanıcı izolasyonu** | ⚠️ Kısmi | `owner_user_id` kütüphane / teslimat / token; Kinde → `X-User-ID` frontend | **~65%** — API JWT doğrulamaz; header güvenilir kabul edilir |
+| **Kimlik doğrulama (authN)** | ⚠️ Kısmi | Panel: Kinde login; API: `X-User-ID` / `X-User-Email` header (`shared/owner_auth.py`) | **~40%** — Railway API doğrudan çağrılırsa sahte header mümkün |
+| **Yetkilendirme (authZ / RBAC)** | ⏳ Eksik | Token kota (402); admin top-up endpoint var; rol modeli yok | **~25%** |
+| **Rapor indirme linkleri** | ✅ İyi | HMAC imzalı token + TTL + `tenant_id` + `owner_user_id` (`shared/signed_links.py`) | **~85%** — production `SECRET_KEY` zorunlu olmalı |
+| **E-posta teslimatı** | ✅ İyi | Idempotent delivery; alıcı oturum e-postası; SMTP env (gitignore) | **~75%** — tenant SMTP override + audit genişletilecek |
+| **Abuse / kota** | ⚠️ Kısmi | Token ledger + enforcement; idempotency key | **~60%** — rate limit / IP throttle yok |
+| **Transport (TLS)** | ⚠️ Kısmi | HTTPS (Railway/Vercel); SMTP STARTTLS — hedef **TLS 1.3** minimum | **~85%** — sağlayıcı TLS sürümü doğrulanmalı |
+| **Şifreleme at-rest** | ⚠️ Kısmi | Mongo Atlas / Redis sağlayıcı disk şifrelemesi; uygulama AES-256 field encryption yok | **~60%** — hedef AES-256 at-rest dokümante + tenant secret encryption |
+| **Sır yönetimi** | ⚠️ Kısmi | Env tabanlı (`MONGODB_URI`, `SMTP_*`, `OPENROUTER_*`); `.env.smtp` gitignore | **~70%** — secret rotation runbook, vault yok |
+| **Otomatik silme (retention)** | ⏳ Eksik | Ham veri TTL yok; rapor sonrası purge job planlanmadı | **~5%** |
+| **CORS / gateway** | ⚠️ Risk | FastAPI CORS whitelist; Vercel gateway `Access-Control-Allow-Origin: *` | **~50%** — gateway her origin'e açık |
+| **Ops endpoint'ler** | ⚠️ Risk | `GET /api/v1/library/status` auth yok (Mongo ping + doc count) | **~30%** — bilgi sızıntısı |
+| **Denetim izi (audit / log yönetimi)** | ⏳ Eksik | `token_ledger`, `report_deliveries` kısmi log; kim-ne-zaman-hangi veri tam izi yok | **~35%** |
+| **LLM veri egresyonu (3. taraf API)** | ⚠️ Risk | Tüm analiz/rapor OpenRouter üzerinden (Haiku/Flash); prompt müşteri verisi içerir | **~30%** — kurumsal taahhüt için [`roadmap-ovh-mistral.md`](roadmap-ovh-mistral.md) |
+| **Ek dosya / multimodal** | ⏳ Planlı | P1.x attachment — tip/boyut taraması yok | **~10%** |
+
+**Genel değerlendirme:** Mevcut yapı **veri modeli ve uygulama katmanında** tenant/user ayrımını iyi tasarlamış; **production güvenliği** asıl olarak **API'ye kimlik doğrulamasız erişim** (header trust) ve **eksik RBAC/rate limit** nedeniyle tamamlanmamış. Panel + gateway üzerinden normal kullanımda risk düşük; **doğrudan Railway URL** bilinirse orta-yüksek risk.
+
+**Rapor sızıntısı / çalınma — mevcut durum yeterli mi?**
+
+Kısa cevap: **Panel + gateway normal kullanımında** raporlar tenant/kullanıcıya kilitli — ancak **“çalınmaz / başka yere gitmez” garantisi için henüz yeterli değil** (JWT doğrulama + egress politikası eksik).
+
+| Bugün korunan | Mekanizma | Yeterlilik |
+|---------------|-----------|------------|
+| Şirket A ≠ Şirket B raporu | `tenant_id` Mongo/Redis filtreleri | ✅ Model doğru |
+| Kullanıcı oturumu | Kinde + panel | ✅ UI |
+| İndirme linkleri | HMAC + TTL + tenant + owner scope | ✅ İyi |
+| Aktarım | HTTPS / SMTP TLS | ✅ |
+| Kota / abuse | Token ledger (402) | ⚠️ Kısmi |
+
+| Ana risk | Etki |
+|----------|------|
+| API header trust (JWT yok) | Railway URL bilinirse sahte `X-User-ID` / `X-Tenant-ID` ile yetkisiz erişim teorisi |
+| E-posta teslimatı | Rapor bilinçli olarak kullanıcı kişisel mailine + HTML eki gider (dışarı çıkış) |
+| İmzalı link TTL (24s) | Linki alan süre içinde indirebilir |
+| RBAC yok | Tenant içinde herkes tüm raporları görebilir |
+| Audit sınırlı | Kim indirdi / mail aldı tam izlenemez |
+
+**Senaryoya göre yeterlilik:**
+
+| Senaryo | Yeter mi? |
+|---------|-----------|
+| 2–5 müşteri, sadece panel, Railway URL gizli | Kabul edilebilir MVP — ideal değil |
+| Kurumsal müşteri, KVKK/ISG gizliliği, “rapor dışarı çıkmaz” taahhüdü | **Yeterli değil** — P0 güvenlik şart |
+| API doğrudan fuzz / Railway URL sızdı | **Yeterli değil** |
+| Mail kapalı, rapor sadece panelden | Risk belirgin düşer |
+
+**Rapor dışarı çıkış (egress) politikası — yapılacak:**
+
+- ⏳ **Tenant config:** `allow_report_email` (varsayılan tenant kararı); `allowed_recipient_domains` (örn. yalnızca `@musteri.com`).
+- ⏳ **Ek vs link:** `email_attach_html` bayrağı — kurumsal tenant’ta yalnızca imzalı link, ek kapalı.
+- ⏳ **Link TTL tenant override:** varsayılan 24s → 1–4 saat (P0.10).
+- ⏳ **Filigran / iz:** raporda tenant + kullanıcı + tarih watermark (iz sürme, P0.9 genişletme).
+- ⏳ **Panel-only mod:** `delivery_channel=none` — rapor yalnızca kütüphanede; indirme audit log zorunlu.
+
+**Pratik yol haritası:**
+
+| Aşama | Aksiyon |
+|-------|---------|
+| **Şimdi (ops)** | Mongo Atlas IP allowlist; güçlü `SECRET_KEY`; SMTP/repo’da secret yok; isteğe bağlı mail kapalı |
+| **Sonraki sprint (kod)** | Kinde JWT doğrulama + header spoof kapatma; `tests/test_tenant_isolation.py` |
+| **Kurumsal (P1–P2)** | RBAC, audit log, rate limit, dedicated deploy, pen test; LLM: [`roadmap-ovh-mistral.md`](roadmap-ovh-mistral.md) |
+
+**Müşteriye anlatım (hedef mesaj):**
+
+> Raporlar tenant ve kullanıcı bazında izole edilir; veri aktarımında TLS (hedef 1.3), depolamada AES-256 at-rest; ham olay verisi rapor sonrası yapılandırılabilir süre (X gün) içinde otomatik silinir; erişimler audit log’a yazılır. İndirme linkleri imzalı ve sürelidir. Production’da JWT doğrulama, tam log yönetimi ve isteğe bağlı e-posta/kurumsal alan adı politikası devreye alınır.
+
+```mermaid
+flowchart LR
+  subgraph guvenli [Güvenli yol — bugün]
+    U[Kullanıcı] --> K[Kinde login]
+    K --> P[cpanel.inferaworld.com]
+    P --> G[Vercel gateway]
+    G --> API[Railway API]
+  end
+
+  subgraph risk [Açık yol — bugün]
+    A[Saldırgan / script] --> API2[Railway API doğrudan]
+    API2 --> H[Sahte X-Tenant-ID / X-User-ID]
+  end
+```
+
+#### Yapılacaklar (öncelik sırası)
+
+**P0 — Production öncesi (kritik):**
+
+- ⏳ **JWT doğrulama (Kinde):** Railway API'de `Authorization: Bearer` token validate; header'ları token claim'lerinden türet (`tenant_id`, `sub`, `email`). Gateway'de opsiyonel ikinci doğrulama.
+- ⏳ **Sahte header kapatma:** `X-User-ID` / `X-Tenant-ID` yalnızca gateway internal secret veya imzalı proxy header ile kabul; doğrudan public API'de reddet.
+- ⏳ **`SECRET_KEY` / `REPORT_LINK_SIGNING_SECRET` zorunlu:** Default `dev-report-link-secret` production'da startup fail; key rotation runbook.
+- ⏳ **`/api/v1/library/status` ve benzeri ops route'ları:** API key veya internal network; public'ten kaldır veya auth ekle.
+- ⏳ **CORS sıkılaştırma:** Gateway `Allow-Origin: *` → `cpanel.inferaworld.com` + bilinen tenant subdomain'leri.
+
+**P1 — Tenant SaaS (P1.17 ile birlikte):**
+
+- ⏳ **RBAC:** `tenant_users` — `admin | analyst | viewer`; pipeline başlatma, rapor silme, top-up ayrımı (P0.1 ile hizalı).
+- ⏳ **Tenant API key lifecycle:** `TENANT_API_KEYS_JSON` → DB + rotate + revoke; key başına scope.
+- ⏳ **Rate limiting:** IP + `owner_user_id` — pipeline/start, report/html, HITL (Redis sliding window).
+- ⏳ **Audit log koleksiyonu (log yönetimi):** `{tenant_id, actor_user_id, action, resource_type, resource_id, ip, user_agent, ts}` — rapor görüntüleme, indirme, silme, incident okuma, email sent/failed; admin read-only timeline.
+- ⏳ **Rapor egress policy (tenant_config):** `allow_report_email`, `allowed_recipient_domains`, `email_attach_html`, `delivery_channel`.
+- ⏳ **SMTP / tenant secrets:** Tenant SMTP şifreleri encrypt-at-rest AES-256 (KMS veya Mongo field encryption); env'de düz metin tenant secret yok.
+- ⏳ **Veri izolasyonu sertleştirme:** Tüm koleksiyonlarda zorunlu `tenant_id` index + compound unique; cross-tenant query attempt alert.
+
+**P2 — Uyumluluk ve sertleştirme:**
+
+- ⏳ **Otomatik silme (ham veri):** `tenant_config.retention_days_raw` (X gün); Celery purge job — rapor `final` + X gün sonra ham form/HITL dump / geçici upload sil; üretilmiş rapor ayrı retention.
+- ⏳ **Veri saklama / silme (genel):** Tenant policy — incident + rapor TTL, GDPR/KVKK export + delete API.
+- ⏳ **Şifreleme doğrulama:** Mongo Atlas AES-256 at-rest + TLS 1.3 minimum runbook; yıllık sağlayıcı compliance kontrolü.
+- ⏳ **Ek dosya güvenliği:** MIME whitelist, max size, antivirus scan (ClamAV veya cloud AV), tenant-scoped object storage.
+- ⏳ **Prompt / log redaction:** LLM loglarında PII maskeleme; OpenRouter metadata minimizasyonu; OVH Mistral path: [`roadmap-ovh-mistral.md`](roadmap-ovh-mistral.md) M2.
+- ⏳ **Penetrasyon testi:** Yıllık veya major release öncesi; tenant crossover test senaryoları.
+- ⏳ **Observability (P2.4):** Sentry/structured logs; güvenlik olayı alertleri (failed auth spike, cross-tenant query attempt).
+
+#### Hızlı kazanımlar (model değiştirmeden, düşük efor)
+
+| Aksiyon | Etki |
+|---------|------|
+| Railway'de güçlü `SECRET_KEY` + rotate | İmzalı link tahmin/brute force riski ↓ |
+| `owner_user_id=anonymous` ile billable route'ları reddet | Anonim abuse ↓ |
+| Production'da `TOKEN_ENFORCEMENT=1` | Kaynak tüketimi abuse ↓ |
+| SMTP şifresini yalnızca Railway secret (repo/commit yok) | Credential leak ↓ |
+| Mongo IP allowlist (Atlas) + TLS | DB exposure ↓ |
+| Tenant `allow_report_email=0` (panel-only) | Kişisel maile rapor sızıntısı ↓ |
+
+#### Acceptance
+
+- Doğrudan Railway API'ye sahte `X-User-ID` ile başka kullanıcının raporu **okunamaz / indirilemez** (401/403).
+- Tenant A token'ı ile tenant B incident'ine erişim **403** (otomatik test).
+- İmzalı rapor linki süresi dolunca ve yanlış tenant payload'ta **403**.
+- `library/status` public internetten Mongo metadata **sızdırmaz**.
+- Güvenlik regresyon testleri CI'da: `tests/test_signed_links.py` + yeni `tests/test_tenant_isolation.py`.
+- Tenant `allowed_recipient_domains` dışı e-posta adresine rapor teslimatı **reddedilir**.
+- Kurumsal tenant’ta `email_attach_html=false` iken mailde yalnızca link; HTML ek **gönderilmez**.
+- Rapor finalize + **X gün** sonra ham incident/HITL verisi purge job ile **silinmiş**; üretilmiş rapor tenant retention policy’ye göre korunur.
+- Her rapor indirme / görüntüleme olayı `audit_log`’da **actor + timestamp + resource** ile sorgulanabilir.
+- Müşteri verisi depolama ve aktarım dokümantasyonu **AES-256 at-rest + TLS 1.3** hedefini yansıtır (sağlayıcı kanıtı arşivlenir).
+
+**İlgili dosyalar:** `shared/owner_auth.py`, `shared/tenant_auth.py`, `shared/signed_links.py`, `shared/token_account.py`, `shared/report_deliveries.py`, `api/main.py`, `admin_pan/Admin/api/hsg245.js`, P0.1, P1.17.
+
 ### P1.12 Admin shell — default home (cpanel)
 
 - ✅ Post-login and `/` redirect to **`/dashboard`** (admin panel), not legislation chatbot (`config/appHome.js`, Kinde callback, routes). (DONE)
@@ -510,6 +862,29 @@ Her kullanıcı için token bakiyesi; LLM/pipeline tüketimi düşülür; bakiye
 ### P2.4 Observability
 
 - Structured logging, latency/token metrics, Sentry/Highlight.
+
+---
+
+## Ayrı Roadmap — OVH Mistral (Private LLM)
+
+**Bu başlık ana ürün backlog'undan bilinçli olarak ayrıdır.** Shared SaaS (OpenRouter, Railway, panel, HITL, rapor) ile kurumsal Mistral dağıtımı aynı sprint/planda karıştırılmaz.
+
+| | Ana roadmap (`roadmap.md`) | OVH Mistral roadmap |
+|---|---------------------------|---------------------|
+| **Odak** | Ürün özellikleri P0–P2 | Şirket içi güvenli LLM inference |
+| **LLM** | OpenRouter (Haiku + Flash) | OVH AI Deploy + Mistral |
+| **Durum** | Aktif geliştirme | ⏳ Planlama — implementasyon yok |
+| **Detay** | P1.9, P1.17, P1.18 | **[`specs/roadmap-ovh-mistral.md`](roadmap-ovh-mistral.md)** |
+
+**Özet:** Kurumsal tenant’lar için EU-hosted, tenant-scoped Mistral endpoint; agent pipeline değişmeden yalnızca `llm_backend=ovh_mistral` provider katmanı.
+
+**Fazlar (özet):** M0 POC → M1 provider abstraction → M2 egress guard + ops → M3 kurumsal onboarding.
+
+**GPU alternatifleri (POC / maliyet):** RunPod, Vast.ai, Lambda Labs, Brev.dev — kısa karşılaştırma [`roadmap-ovh-mistral.md`](roadmap-ovh-mistral.md) *Alternatif GPU platformları* bölümünde.
+
+**Ne zaman ana roadmap’e dokunulur:** Yalnızca cross-ref (P1.9 model notu, P1.17 dedicated deploy, P1.18 LLM egress satırı). Mistral görevleri **`roadmap-ovh-mistral.md`** içinde takip edilir.
+
+---
 
 ## Continuous
 

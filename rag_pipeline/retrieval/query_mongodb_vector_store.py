@@ -38,13 +38,20 @@ class MongoVectorRetriever:
     MongoDB'deki vektör embedding'lerini kullanarak benzerlik araması yapar.
     """
     
-    def __init__(self, model_name: str = 'paraphrase-multilingual-MiniLM-L12-v2'):
+    def __init__(
+        self,
+        model_name: str = "paraphrase-multilingual-MiniLM-L12-v2",
+        collection_name: Optional[str] = None,
+    ):
         """
         Retriever'ı başlatır.
-        
+
         Args:
-            model_name: SentenceTransformer modeli adı (multilingual desteği için)
+            model_name: SentenceTransformer modeli adı
+            collection_name: Mongo koleksiyonu (varsayılan env TAXONOMY_COLLECTION veya taxonomy)
         """
+        self.model_name = model_name
+        self.collection_name = collection_name or os.getenv("TAXONOMY_COLLECTION") or "taxonomy_barsel"
         self.model = None
         self.client = None
         self.db = None
@@ -61,7 +68,6 @@ class MongoVectorRetriever:
                 f"Torch/sentence-transformers kurulumunu kontrol edin. Detay: {e}"
             )
             return
-        # MongoDB'ye bağlan
         self._connect_to_db()
     
     def _connect_to_db(self):
@@ -74,9 +80,9 @@ class MongoVectorRetriever:
             self.client = MongoClient(mongo_uri, server_api=ServerApi('1'))
             self.client.admin.command('ping')
             self.db = self.client.rca
-            self.collection = self.db.taxonomy
+            self.collection = self.db[self.collection_name]
             self.connected = True
-            print("✓ MongoDB bağlantısı başarılı!")
+            print(f"✓ MongoDB rca.{self.collection_name}")
         except Exception as e:
             print(f"❌ MongoDB bağlantısı başarısız: {e}")
             self.connected = False

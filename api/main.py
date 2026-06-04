@@ -1521,7 +1521,11 @@ async def health_check():
             "ping_ok": (await asyncio.to_thread(token_account.ping_store))[0],
             "ping_error": (await asyncio.to_thread(token_account.ping_store))[1] or None,
         },
-        "rag": {"enabled": _env_bool("ROOTCAUSE_USE_RAG", True)},
+        "rag": {
+            "enabled": _env_bool("ROOTCAUSE_USE_RAG", True),
+            "abs_guidance": _env_bool("ROOTCAUSE_USE_ABS_RAG", False),
+            "vector_barsel": _env_bool("ROOTCAUSE_USE_VECTOR_RAG", True),
+        },
         "pipeline_executor": "celery" if _use_celery_pipeline() else "inprocess",
         "api_key_configured": bool(api_key),
         "api_key_source": "OPENROUTER_API_KEY" if os.getenv("OPENROUTER_API_KEY") else "OPENAI_API_KEY" if os.getenv("OPENAI_API_KEY") else "none",
@@ -1764,7 +1768,10 @@ async def _enqueue_report_delivery_email(
 ) -> None:
     """Queue completion email when report artifacts are ready (idempotent)."""
     email = (recipient_email or "").strip()
+    if (not email or "@" not in email) and "@" in (owner_user_id or ""):
+        email = owner_user_id.strip()
     if not email or "@" not in email:
+        print(f"⚠️  Report delivery skipped: no recipient email for {incident_id}")
         return
     lang = (output_language or "").strip()
     if not lang:

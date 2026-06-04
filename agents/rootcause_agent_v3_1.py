@@ -195,6 +195,18 @@ def _hsg_knowledge_json_path() -> str:
     return str(Path(__file__).resolve().parent / "knowledge.json")
 
 
+def _taxonomy_category_text(category: str) -> str:
+    """Statik/kısa band metni (olay bağlamı yok — BranchCritic init)."""
+    try:
+        from agents.barsel_taxonomy import get_taxonomy_category_text
+
+        return get_taxonomy_category_text(category)
+    except ImportError:
+        from .barsel_taxonomy import get_taxonomy_category_text
+
+        return get_taxonomy_category_text(category)
+
+
 def _load_taxonomy_indexes() -> None:
     global _CD_TAXONOMY_LIST, _D_TAXONOMY_LIST, _TAXO_INDEX_LOADED
     if _TAXO_INDEX_LOADED:
@@ -233,9 +245,21 @@ def _try_snap_to_taxonomy(
     family: str = "cd",
 ) -> Optional[Dict[str, str]]:
     """
-    Kök neden metnini LLM cümlesinden almayıp HSG245 taksonomisindeki resmi başlığa hizala.
-    family: 'cd' = C ve D; 'd' = yalnız D (üst seviye meta nedenler için).
+    Kök neden metnini resmi BARSEL başlığına hizala (varsayılan).
+    ROOTCAUSE_TAXONOMY_SOURCE=hsg ile eski knowledge.json fallback.
     """
+    try:
+        from agents.barsel_taxonomy import barsel_taxonomy_enabled, snap_to_barsel_taxonomy
+    except ImportError:
+        from .barsel_taxonomy import barsel_taxonomy_enabled, snap_to_barsel_taxonomy
+
+    if barsel_taxonomy_enabled():
+        snapped = snap_to_barsel_taxonomy(
+            code, model_answer, base_explanation, family=family
+        )
+        if snapped:
+            return snapped
+
     _load_taxonomy_indexes()
     items = _CD_TAXONOMY_LIST if family not in ("d", "D") else _D_TAXONOMY_LIST
     if not items:
@@ -412,19 +436,18 @@ class WhyQuestion(dspy.Signature):
 
 
 class WhyAnswer(dspy.Signature):
-    """5-Why sorusuna cevap ver - HSG245 kodla"""
+    """5-Why sorusuna cevap ver — BARSEL taksonomi kodu"""
     question = dspy.InputField(desc="Why sorusu")
     incident_context = dspy.InputField(desc="Olay bağlamı")
-    taxonomy_codes = dspy.InputField(desc="İlgili HSG245 kategori kodları")
+    taxonomy_codes = dspy.InputField(desc="İlgili BARSEL C/D kategori kodları")
     
     answer = dspy.OutputField(
         desc="Cevap açıklaması - rapordaki somut olgulara dayalı; olay-özel gerekçe. "
              "Kök neden başlığı ayrıca resmi taksonomiden uygulanır; burada yine de C/D maddesini gerekçelendiren "
-             "kısa açıklama ver. Metinde HSG kodu veya parantez içi kod yazma."
+             "kısa açıklama ver. Metinde kod veya parantez içi kod yazma."
     )
     hsg245_code = dspy.OutputField(
-        desc="taxonomy_codes bölümünde listelenen geçerli bir HSG245 kodu; uydurma yok, tam yazım. "
-             "Why-4/5'te: yalnız Cx.x veya Dx.x (C ve D listesindeki gibi, ör. C3.2, D2.1)."
+        desc="taxonomy_codes listesindeki geçerli BARSEL kodu (Cx.x veya Dx.x); uydurma yok."
     )
     evidence = dspy.OutputField(
         desc="Olay raporundan bu cevabı destekleyen somut kanıt"
@@ -454,7 +477,7 @@ class ImmediateCauseIdentifier(dspy.Signature):
 class RootCauseValidator(dspy.Signature):
     """Root cause'un C/D kategorisinde olduğunu doğrula"""
     cause = dspy.InputField(desc="Önerilen kök neden")
-    code = dspy.InputField(desc="HSG245 kodu")
+    code = dspy.InputField(desc="BARSEL kodu")
     
     is_valid = dspy.OutputField(desc="C veya D kategorisinde mi? (true/false)")
     category = dspy.OutputField(desc="Kategori: KİŞİSEL veya ORGANİZASYONEL")
@@ -1141,7 +1164,7 @@ class RootCauseAgentV3_1:
             try:
                 self.branch_critic = BranchCriticAgent(
                     taxonomy_cd_text=(
-                        get_category_text("C") + "\n" + get_category_text("D")
+                        _taxonomy_category_text("C") + "\n" + _taxonomy_category_text("D")
                     ),
                     jaccard_threshold=critic_jaccard_threshold,
                     use_llm_critic=True,
@@ -1151,8 +1174,8 @@ class RootCauseAgentV3_1:
                 print(f"⚠️  BranchCritic init başarısız: {e}")
                 self.branch_critic = None
 
-        # RAG: (1) keyword: _build_rag_context_block — abs_guidance_chunks + taxonomy_items
-        # (2) vektör: RAGAnalyzer + MongoVectorRetriever — _vector_rag_excerpt (ROOTCAUSE_USE_VECTOR_RAG=1)
+        # RAG: (1) keyword: _build_rag_context_block — BARSEL taxonomy (ABS opsiyonel)
+        # (2) iki aşamalı: RAGAnalyzer + BarselTaxonomyRetriever — _vector_rag_excerpt (ROOTCAUSE_USE_VECTOR_RAG=1)
         self.use_rag = use_rag
         self.rag_analyzer = None
         if use_rag and RAG_AVAILABLE:
@@ -1169,6 +1192,64 @@ class RootCauseAgentV3_1:
                 "✅ Root Cause Agent V3.1 başlatıldı "
                 f"(DSPy powered, {rag_state}, BranchCritic: {critic_state})"
             )
+
+        self._barsel_r: Any = None
+        self._barsel_r_loaded = False
+
+    def _barsel_retriever(self) -> Any:
+        """Mongo taxonomy_barsel retriever — RAGAnalyzer veya lazy init."""
+        if self._barsel_r_loaded:
+            return self._barsel_r
+        self._barsel_r_loaded = True
+        r = None
+        ra = getattr(self, "rag_analyzer", None)
+        if ra is not None:
+            r = getattr(ra, "retriever", None)
+            if r is not None and getattr(r, "connected", False):
+                self._barsel_r = r
+                return r
+        if not self.use_rag:
+            self._barsel_r = None
+            return None
+        uri = (os.getenv("MONGODB_URI") or "").strip()
+        if not uri:
+            self._barsel_r = None
+            return None
+        try:
+            from rag_pipeline.retrieval.barsel_taxonomy_retriever import BarselTaxonomyRetriever
+
+            r = BarselTaxonomyRetriever()
+            self._barsel_r = r if getattr(r, "connected", False) else None
+        except Exception as exc:  # noqa: BLE001
+            print(f"⚠️  BARSEL retriever lazy init failed: {exc}")
+            self._barsel_r = None
+        return self._barsel_r
+
+    def _incident_taxonomy_prompt(self, category: str, query: str) -> str:
+        """Olay metnine göre Mongo RAG veya statik fallback taksonomi listesi."""
+        try:
+            from agents.barsel_taxonomy import get_incident_taxonomy_prompt
+        except ImportError:
+            from .barsel_taxonomy import get_incident_taxonomy_prompt
+
+        text = get_incident_taxonomy_prompt(
+            category,
+            query,
+            self._barsel_retriever(),
+        )
+        if text:
+            return text
+        return _taxonomy_category_text(category)
+
+    @staticmethod
+    def _branch_taxonomy_query(incident_summary: str, immediate_cause: Dict) -> str:
+        parts = [
+            (incident_summary or "")[:3500],
+            str(immediate_cause.get("code") or ""),
+            str(immediate_cause.get("cause_tr") or ""),
+            str(immediate_cause.get("standard_title_tr") or ""),
+        ]
+        return "\n".join(p for p in parts if p.strip())
 
     def _mongo_keyword_context(
         self,
@@ -1204,22 +1285,55 @@ class RootCauseAgentV3_1:
                 client.close()
         return out
 
+    def _barsel_taxonomy_context(self, incident_summary: str, limit: int = 3) -> List[str]:
+        """BARSEL iki aşamalı retriever ile kısa taksonomi satırları."""
+        if not self.rag_analyzer:
+            return []
+        r = getattr(self.rag_analyzer, "retriever", None)
+        if r is None or not getattr(r, "connected", False):
+            return []
+        try:
+            hits = r.retrieve((incident_summary or "")[:4000], k=limit, min_score=0.01)
+        except Exception as e:  # noqa: BLE001
+            print(f"⚠️  BARSEL taxonomy context failed: {e}")
+            return []
+        rows: List[str] = []
+        for h in hits:
+            tr = (h.get("content") or {}).get("tr") or {}
+            title = tr.get("title") or h.get("code") or ""
+            defn = (tr.get("definition") or "")[:180]
+            probs = tr.get("typical_problems") or []
+            if not probs:
+                probs = tr.get("typical_examples") or []
+            prob = (probs[0] or "")[:120] if probs else ""
+            row = f"{h.get('code')} | {title} | {defn}"
+            if prob:
+                row += f" | Tipik: {prob}"
+            rows.append(row.strip(" |"))
+        return rows
+
+    def _abs_rag_enabled(self) -> bool:
+        """Mongo abs_guidance_chunks keyword RAG — varsayılan kapalı (ROOTCAUSE_USE_ABS_RAG=1 ile açılır)."""
+        return (os.getenv("ROOTCAUSE_USE_ABS_RAG") or "0").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        )
+
     def _build_rag_context_block(self, incident_summary: str) -> str:
-        """Olay metnine Mongo tabanlı ABS + taksonomi bağlamı (ROOTCAUSE_USE_RAG, MONGODB_URI)."""
+        """Olay metnine Mongo tabanlı taksonomi (+ opsiyonel ABS) bağlamı."""
         if not self.use_rag:
             return ""
-        abs_rows = self._mongo_keyword_context(
-            incident_summary,
-            "abs_guidance_chunks",
-            fields=("section_hint", "block_type", "text"),
-            limit=3,
-        )
-        tax_rows = self._mongo_keyword_context(
-            incident_summary,
-            "taxonomy_items",
-            fields=("code", "title", "description"),
-            limit=3,
-        )
+        abs_rows: List[str] = []
+        if self._abs_rag_enabled():
+            abs_rows = self._mongo_keyword_context(
+                incident_summary,
+                "abs_guidance_chunks",
+                fields=("section_hint", "block_type", "text"),
+                limit=3,
+            )
+        tax_rows = self._barsel_taxonomy_context(incident_summary, limit=3)
         lines: List[str] = []
         if abs_rows:
             lines.append("[RAG ABS CONTEXT]")
@@ -1262,7 +1376,7 @@ class RootCauseAgentV3_1:
         kb = (ctx.get("knowledge_base_excerpt") or "").strip()
         if not kb:
             return ""
-        return f"[RAG VECTOR / TAXONOMY RETRIEVAL]\n{kb[:5000]}"
+        return f"[RAG BARSEL / TWO-STAGE RETRIEVAL]\n{kb[:5000]}"
     
     # ─────────────────────────────────────────────────────────────────────────
     # MAIN ENTRY POINT
@@ -1490,7 +1604,11 @@ class RootCauseAgentV3_1:
         rag_block = self._build_rag_context_block(incident_summary)
         if rag_block:
             incident_summary = f"{incident_summary}\n\n{rag_block}"
-            print("🔍 RAG context injected from Mongo (ABS + taxonomy)")
+            parts = []
+            if self._abs_rag_enabled():
+                parts.append("ABS")
+            parts.append("BARSEL taxonomy")
+            print(f"🔍 RAG context injected from Mongo ({' + '.join(parts)})")
 
         vblock = self._vector_rag_excerpt(incident_summary)
         if vblock:
@@ -1522,7 +1640,7 @@ class RootCauseAgentV3_1:
             "incident_summary": incident_summary,
             "analysis_branches": [],
             "final_root_causes": [],
-            "analysis_method": "HSG245 Hierarchical 5-Why (DSPy V3.1)",
+            "analysis_method": "BARSEL Hierarchical 5-Why (DSPy V3.1)",
             "chain_quality_scores": []
         }
         
@@ -1534,11 +1652,16 @@ class RootCauseAgentV3_1:
         
         immediate_causes_result = self.immediate_cause_finder(
             incident_summary=incident_summary,
-            category_a=get_category_text('A'),
-            category_b=get_category_text('B')
+            category_a=self._incident_taxonomy_prompt("A", incident_summary),
+            category_b=self._incident_taxonomy_prompt("B", incident_summary),
         )
         
         immediate_causes = immediate_causes_result["causes"]
+        try:
+            from agents.barsel_taxonomy import snap_immediate_cause_to_barsel
+        except ImportError:
+            from .barsel_taxonomy import snap_immediate_cause_to_barsel
+        immediate_causes = [snap_immediate_cause_to_barsel(c) for c in immediate_causes]
         before_dedupe = len(immediate_causes)
         immediate_causes = _dedupe_similar_immediate_causes(immediate_causes)
         if before_dedupe > len(immediate_causes):
@@ -1594,11 +1717,12 @@ class RootCauseAgentV3_1:
             )
             
             # DSPy 5-Why chain
+            branch_query = self._branch_taxonomy_query(incident_summary, immediate_cause)
             chain_result = self.why_chain(
                 incident_summary=incident_summary,
                 immediate_cause=immediate_cause,
-                taxonomy_c=get_category_text('C'),
-                taxonomy_d=get_category_text('D'),
+                taxonomy_c=self._incident_taxonomy_prompt("C", branch_query),
+                taxonomy_d=self._incident_taxonomy_prompt("D", branch_query),
                 previous_why_answers=all_previous_why_answers,
                 probe_answers_by_level=probe_by_branch_and_level.get(idx, {}),
             )

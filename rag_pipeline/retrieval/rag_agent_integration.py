@@ -33,8 +33,27 @@ sys.path.insert(0, str(project_root))
 load_dotenv()
 
 
+def _lazy_retriever_class():
+    """BARSEL iki aşamalı retriever (varsayılan) veya legacy MongoVectorRetriever."""
+    use_barsel = (os.getenv("BARSEL_TWO_STAGE_RAG") or "1").strip().lower() not in (
+        "0",
+        "false",
+        "no",
+        "off",
+    )
+    collection = os.getenv("TAXONOMY_COLLECTION", "taxonomy_barsel")
+    if use_barsel or collection == "taxonomy_barsel":
+        from rag_pipeline.retrieval.barsel_taxonomy_retriever import BarselTaxonomyRetriever
+
+        return BarselTaxonomyRetriever
+    from rag_pipeline.retrieval.query_mongodb_vector_store import MongoVectorRetriever
+
+    return MongoVectorRetriever
+
+
 def _lazy_mongo_vector_retriever_class():
     from rag_pipeline.retrieval.query_mongodb_vector_store import MongoVectorRetriever
+
     return MongoVectorRetriever
 
 
@@ -55,13 +74,14 @@ class RAGAnalyzer:
             self.retriever = retriever
         else:
             try:
-                MVR = _lazy_mongo_vector_retriever_class()
-                self.retriever = MVR()
+                RetrieverCls = _lazy_retriever_class()
+                self.retriever = RetrieverCls()
                 if self.retriever and getattr(self.retriever, "connected", False):
-                    print("✓ RAG Analyzer başlatıldı (Mongo vector + embedding).")
+                    cls_name = RetrieverCls.__name__
+                    print(f"✓ RAG Analyzer başlatıldı ({cls_name}).")
                 else:
                     print(
-                        "⚠️  RAG Analyzer: vektör arama devre dışı (ST/Mongo yok); "
+                        "⚠️  RAG Analyzer: retriever devre dışı (Mongo/koleksiyon yok); "
                         "keyword RAG ve analiz devam eder."
                     )
             except Exception as e:
@@ -193,9 +213,14 @@ class RAGAnalyzer:
                     lines.append(f"      Tanım: {definition}")
                 
                 examples = lang_content.get('typical_examples', [])
-                if examples:
+                problems = lang_content.get('typical_problems', [])
+                if problems:
+                    lines.append(f"      Tipik problemler:")
+                    for prob in problems[:2]:
+                        lines.append(f"        • {prob}")
+                elif examples:
                     lines.append(f"      Örnekler:")
-                    for example in examples[:2]:  # İlk 2 örneği göster
+                    for example in examples[:2]:
                         lines.append(f"        • {example}")
                     if len(examples) > 2:
                         lines.append(f"        • ... ve {len(examples) - 2} daha")

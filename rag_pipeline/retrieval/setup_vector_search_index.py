@@ -2,125 +2,128 @@
 MongoDB Atlas Vector Search Index Oluşturma
 ============================================
 
-Bu script, taxonomy koleksiyonunda vektör arama için bir Atlas Search index'i oluşturur.
-Bu index, cosine similarity kullanarak hızlı benzerlik aramaları sağlar.
-
 Kullanım:
     python rag_pipeline/retrieval/setup_vector_search_index.py
+    python rag_pipeline/retrieval/setup_vector_search_index.py --collection taxonomy_barsel
+
+Önkoşul: koleksiyonda `embedding` alanı dolu dokümanlar (build_mongodb_vector_store.py).
+Not: Mevcut retriever client-side cosine kullanır; Atlas index opsiyonel hızlandırma.
 """
 
+from __future__ import annotations
+
+import argparse
+import os
 import sys
 from pathlib import Path
-import os
+
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from pymongo.operations import SearchIndexModel
 from pymongo.server_api import ServerApi
 
-# Proje kök dizinini Python path'e ekle
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(project_root))
 
-# Ortam değişkenlerini yükle
-load_dotenv()
+load_dotenv(project_root / ".env")
+
+DEFAULT_COLLECTION = "taxonomy_barsel"
+INDEX_NAME_SUFFIX = "_vector_search"
+EMBEDDING_DIM = 384
 
 
-def create_vector_search_index():
-    """MongoDB Atlas Search index'ini oluşturur."""
-    mongo_uri = os.getenv("MONGODB_URI")
-    if not mongo_uri:
-        raise ValueError("MONGODB_URI ortam değişkeni bulunamadı.")
-    
-    print("=" * 70)
-    print("🔍 MongoDB Atlas Vector Search Index Oluşturucu")
-    print("=" * 70)
-    print("\n🗄️ MongoDB'ye bağlanılıyor...")
-    
-    client = MongoClient(mongo_uri, server_api=ServerApi('1'))
-    
-    try:
-        # Ping ile bağlantıyı test et
-        client.admin.command('ping')
-        print("✓ MongoDB bağlantısı başarılı!")
-    except Exception as e:
-        print(f"❌ MongoDB bağlantısı başarısız: {e}")
-        raise
-    
-    db = client.rca
-    collection = db.taxonomy
-    
-    # Vector Search Index tanımı
-    index_definition = {
+def _index_definition() -> dict:
+    return {
         "fields": [
             {
                 "type": "vector",
                 "path": "embedding",
                 "similarity": "cosine",
-                "dimensions": 384  # paraphrase-multilingual-MiniLM-L12-v2 boyutu
+                "numDimensions": EMBEDDING_DIM,
             },
-            {
-                "type": "filter",
-                "path": "code"
-            },
-            {
-                "type": "filter",
-                "path": "cause_type"
-            },
-            {
-                "type": "filter",
-                "path": "content"
-            }
+            {"type": "filter", "path": "code"},
+            {"type": "filter", "path": "cause_type"},
+            {"type": "filter", "path": "taxonomy_source"},
+            {"type": "filter", "path": "section_ids"},
         ]
     }
-    
-    index_name = "taxonomy_vector_search"
-    
-    try:
-        print(f"\n📝 Vector Search index tanımı oluşturuluyor: '{index_name}'")
-        print("   - Field: embedding (vector, cosine similarity, 384 dimensions)")
-        print("   - Filter fields: code, cause_type, content")
-        
-        # Mevcut index'i kontrol et
-        try:
-            existing_indexes = list(collection.list_search_indexes())
-            index_exists = any(idx.get('name') == index_name for idx in existing_indexes)
-        except Exception:
-            index_exists = False
-        
-        if index_exists:
-            print(f"\n⚠️ Index '{index_name}' zaten mevcut.")
-            print("   MongoDB Atlas konsolunda durumunu izleyebilirsiniz.")
-        else:
-            print(f"\n➕ Yeni index '{index_name}' oluşturuluyor...")
-            # Raw MongoDB command ile search index oluştur
-            command = {
-                "createSearchIndex": {
-                    "definition": index_definition,
-                    "name": index_name,
-                    "type": "vectorSearch"
-                }
-            }
-            db.command(command, collection_name="taxonomy")
-            print(f"✓ Index '{index_name}' başarıyla oluşturuldu.")
-        
-        print("\n" + "=" * 70)
-        print("🎉 Vector Search index kurulumu tamamlandı!")
-        print("=" * 70)
-        print("\n💡 İpucu: Index senkronizasyonu birkaç dakika sürebilir.")
-        print("   MongoDB Atlas konsolunda durumunu izleyebilirsiniz.")
-        
-    except Exception as e:
-        print(f"\n❌ Index oluşturma hatası: {e}")
-        print("\n💡 Eğer 'Search index not supported' hatası alıyorsanız:")
-        print("   - Cluster'ınızın M10 veya daha üstü olduğundan emin olun.")
-        print("   - MongoDB Atlas konsolunda 'Atlas Search' sekmesine gidin.")
-        print("   - Index'i manuel olarak oluşturabilirsiniz.")
-        import traceback
-        traceback.print_exc()
-        raise
-    finally:
+
+
+def create_vector_search_index(collection_name: str = DEFAULT_COLLECTION) -> None:
+    mongo_uri = os.getenv("MONGODB_URI")
+    if not mongo_uri:
+        raise ValueError("MONGODB_URI ortam değişkeni bulunamadı.")
+
+    print("=" * 70)
+    print(f"🔍 Atlas Vector Search — rca.{collection_name}")
+    print("=" * 70)
+
+    client = MongoClient(mongo_uri, server_api=ServerApi("1"))
+    client.admin.command("ping")
+    print("✓ MongoDB bağlantısı başarılı!")
+
+    db = client.rca
+    collection = db[collection_name]
+    doc_count = collection.count_documents({})
+    with_emb = collection.count_documents({"embedding": {"$exists": True, "$ne": []}})
+    print(f"✓ Doküman: {doc_count} (embedding'li: {with_emb})")
+
+    if with_emb == 0:
+        print(
+            "\n⚠️  Koleksiyonda embedding yok. Önce:\n"
+            "   python rag_pipeline/indexing/build_mongodb_vector_store.py --backend hash"
+        )
         client.close()
-        print("\n🔌 MongoDB bağlantısı kapatıldı.")
+        return
+
+    index_name = f"{collection_name}{INDEX_NAME_SUFFIX}"
+    definition = _index_definition()
+
+    existing = []
+    try:
+        existing = list(collection.list_search_indexes())
+    except Exception as exc:
+        print(f"\n⚠️  list_search_indexes desteklenmiyor: {exc}")
+        _print_manual_atlas_ui(collection_name, index_name, definition)
+        client.close()
+        return
+
+    if any(idx.get("name") == index_name for idx in existing):
+        print(f"\n⚠️  Index '{index_name}' zaten mevcut.")
+        for idx in existing:
+            if idx.get("name") == index_name:
+                print(f"   status={idx.get('status')} queryable={idx.get('queryable')}")
+    else:
+        print(f"\n➕ Index oluşturuluyor: {index_name}")
+        model = SearchIndexModel(
+            definition=definition,
+            name=index_name,
+            type="vectorSearch",
+        )
+        result = collection.create_search_index(model)
+        print(f"✓ create_search_index → {result}")
+        print("   Senkronizasyon birkaç dakika sürebilir (Atlas UI → Search Indexes).")
+
+    print("\n" + "=" * 70)
+    print("🎉 Vector Search index isteği tamamlandı")
+    print("=" * 70)
+    client.close()
+
+
+def _print_manual_atlas_ui(collection_name: str, index_name: str, definition: dict) -> None:
+    import json
+
+    print("\n📋 Atlas UI ile manuel oluşturma:")
+    print(f"   Database: rca | Collection: {collection_name} | Index name: {index_name}")
+    print("   Atlas → Browse Collections → Search Indexes → Create Search Index → JSON Editor")
+    print(json.dumps(definition, indent=2))
 
 
 if __name__ == "__main__":
-    create_vector_search_index()
+    p = argparse.ArgumentParser()
+    p.add_argument(
+        "--collection",
+        default=os.getenv("TAXONOMY_COLLECTION", DEFAULT_COLLECTION),
+    )
+    args = p.parse_args()
+    create_vector_search_index(args.collection)

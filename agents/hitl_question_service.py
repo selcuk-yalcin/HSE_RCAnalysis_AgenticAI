@@ -1,6 +1,6 @@
 """
 Dinamik HITL soru üretimi: disambiguation bankası + HybridInputProcessor + QuestionEngine
-(knowledge_base taxonomy şablonları). Sabit frontend listesi yok.
++ BARSEL taksonomi (`typical_problems`, `selection_criteria`, keyword rotasyon).
 """
 
 from __future__ import annotations
@@ -13,6 +13,14 @@ from typing import Any
 from openai import OpenAI
 
 from agents.hitl_disambiguation_bank import build_questions_for_causes
+from agents.barsel_taxonomy import (
+    BarselTaxonomyItem,
+    find_contrast_code,
+    infer_barsel_codes_from_text,
+    load_barsel_taxonomy_items,
+    pick_typical_problems_for_hitl,
+    split_selection_criteria,
+)
 from agents.hgs_taxonomy import parse_hsg_taxonomy_items, infer_codes_from_text
 from agents.model_constants import resolve_openrouter_chat_model
 from shared.hitl_i18n import (
@@ -98,6 +106,20 @@ try:
     _TAXONOMY_ITEMS = parse_hsg_taxonomy_items("agents/knowledge.json")
 except Exception:
     _TAXONOMY_ITEMS = []
+
+_USE_BARSEL_HITL = (os.getenv("HITL_USE_BARSEL") or "1").strip().lower() not in (
+    "0",
+    "false",
+    "no",
+    "off",
+)
+try:
+    _BARSEL_ITEMS: list[BarselTaxonomyItem] = (
+        load_barsel_taxonomy_items() if _USE_BARSEL_HITL else []
+    )
+except Exception:
+    _BARSEL_ITEMS = []
+_BARSEL_BY_CODE: dict[str, BarselTaxonomyItem] = {i.code: i for i in _BARSEL_ITEMS}
 
 _HITL_LLM_ENABLED = (os.getenv("HITL_USE_LLM") or "1").strip().lower() in ("1", "true", "yes", "on")
 
@@ -374,13 +396,18 @@ def _immediate_causes_from_payload(
             if ln.strip()
         ][:6]
         for ln in lines:
-            for c in infer_codes_from_text(ln, _TAXONOMY_ITEMS, top_k=2):
-                if c not in codes:
-                    codes.append(c)
+            if _USE_BARSEL_HITL and _BARSEL_ITEMS:
+                for c in infer_barsel_codes_from_text(ln, _BARSEL_ITEMS, top_k=2):
+                    if c not in codes:
+                        codes.append(c)
+            else:
+                for c in infer_codes_from_text(ln, _TAXONOMY_ITEMS, top_k=2):
+                    if c not in codes:
+                        codes.append(c)
     return [{"code": c, "cause_tr": c} for c in codes[:5]]
 
 
-def _build_deep_questions_from_taxonomy(code: str, why_level: int) -> list[dict]:
+def _build_deep_questions_from_hsg_taxonomy(code: str, why_level: int) -> list[dict]:
     if not code or not _TAXONOMY_ITEMS:
         return []
     item = next((x for x in _TAXONOMY_ITEMS if x.code == code), None)
@@ -388,7 +415,6 @@ def _build_deep_questions_from_taxonomy(code: str, why_level: int) -> list[dict]
         return []
 
     out: list[dict] = []
-    # Prefer "choose_if" lines as targeted disambiguation probes.
     for idx, choose in enumerate(item.choose_if[:2], start=1):
         q = f"{item.code} ({item.title}) icin: {choose} Bu olayda sahaya ne kadar uyuyordu?"
         out.append(
@@ -403,7 +429,6 @@ def _build_deep_questions_from_taxonomy(code: str, why_level: int) -> list[dict]
                 "why_level": why_level,
             }
         )
-    # One deepening question from "not this if" to reduce wrong mapping.
     if item.not_this_if:
         nt = item.not_this_if[0]
         q = f"Bu durum `{item.code}` yerine `{nt}` olabilir mi? Ayirmamiza yardim edecek kanit var mi?"
@@ -420,6 +445,96 @@ def _build_deep_questions_from_taxonomy(code: str, why_level: int) -> list[dict]
             }
         )
     return out
+
+
+def _build_deep_questions_from_barsel_taxonomy(
+    code: str,
+    why_level: int,
+    incident_context: str = "",
+) -> list[dict]:
+    item = _BARSEL_BY_CODE.get((code or "").strip().upper())
+    if item is None:
+        return []
+
+    out: list[dict] = []
+    problems = pick_typical_problems_for_hitl(
+        item,
+        incident_context,
+        why_level,
+        max_problems=2,
+    )
+    for idx, problem in enumerate(problems, start=1):
+        q = (
+            f"[{item.code} — {item.title}] Bu olayda şu durum geçerli miydi: "
+            f"{problem}"
+        )
+        out.append(
+            {
+                "id": _stable_id("bx-p", code, str(why_level), str(idx), q),
+                "source": "why_probe_barsel_taxonomy",
+                "code": item.code,
+                "cause_desc": item.title,
+                "hsg245": item.code,
+                "soru": q,
+                "yönler": {"probe_type": "typical_problem"},
+                "why_level": why_level,
+            }
+        )
+
+    for idx, clause in enumerate(
+        split_selection_criteria(item.selection_criteria, max_clauses=1),
+        start=1,
+    ):
+        q = (
+            f"{item.code} ({item.title}) için seçim ölçütü: {clause}. "
+            f"Bu olayda ne kadar karşılanıyordu?"
+        )
+        out.append(
+            {
+                "id": _stable_id("bx-s", code, str(why_level), str(idx), q),
+                "source": "why_probe_barsel_taxonomy",
+                "code": item.code,
+                "cause_desc": item.title,
+                "hsg245": item.code,
+                "soru": q,
+                "yönler": {"probe_type": "selection_criteria"},
+                "why_level": why_level,
+            }
+        )
+
+    contrast = find_contrast_code(item, _BARSEL_ITEMS)
+    if contrast:
+        q = (
+            f"Bu olay `{item.code}` ({item.title}) mi yoksa "
+            f"`{contrast.code}` ({contrast.title}) mi? "
+            f"Ayırmamıza yardımcı somut kanıt var mı?"
+        )
+        out.append(
+            {
+                "id": _stable_id("bx-c", code, str(why_level), q),
+                "source": "why_probe_barsel_taxonomy",
+                "code": item.code,
+                "cause_desc": item.title,
+                "hsg245": item.code,
+                "soru": q,
+                "yönler": {"probe_type": "contrast", "contrast_code": contrast.code},
+                "why_level": why_level,
+            }
+        )
+    return out
+
+
+def _build_deep_questions_from_taxonomy(
+    code: str,
+    why_level: int,
+    incident_context: str = "",
+) -> list[dict]:
+    code = (code or "").strip().upper()
+    if not code:
+        return []
+    if _USE_BARSEL_HITL and _BARSEL_BY_CODE.get(code):
+        return _build_deep_questions_from_barsel_taxonomy(code, why_level, incident_context)
+    return _build_deep_questions_from_hsg_taxonomy(code, why_level)
 
 
 def _filter_questions(
@@ -529,10 +644,25 @@ def _extract_json_array(text: str) -> list[dict[str, Any]]:
 
 
 def _taxonomy_prompt_context(focus_codes: list[str], max_items: int = 4) -> str:
-    if not focus_codes or not _TAXONOMY_ITEMS:
+    if not focus_codes:
         return ""
     rows: list[str] = []
     for code in focus_codes[:max_items]:
+        code = (code or "").strip().upper()
+        if not code:
+            continue
+        barsel = _BARSEL_BY_CODE.get(code) if _USE_BARSEL_HITL else None
+        if barsel:
+            kw = ", ".join(barsel.keywords[:8])
+            probs = "; ".join(barsel.typical_problems[:3])
+            sel = (barsel.selection_criteria or "")[:220]
+            rows.append(
+                f"- {barsel.code} | {barsel.title} | keywords: {kw} | "
+                f"selection_criteria: {sel} | typical_problems: {probs}"
+            )
+            continue
+        if not _TAXONOMY_ITEMS:
+            continue
         item = next((x for x in _TAXONOMY_ITEMS if x.code == code), None)
         if not item:
             continue
@@ -742,6 +872,15 @@ def build_hitl_question_pool(
         _register_question(soru, seen_q_fp, seen_q_tokens)
         pool.append(row)
 
+    incident_ctx = full_text
+    for code in focus_codes[:3]:
+        for row in _build_deep_questions_from_taxonomy(code, 1, incident_context=incident_ctx):
+            soru = str(row.get("soru") or "").strip()
+            if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
+                continue
+            _register_question(soru, seen_q_fp, seen_q_tokens)
+            pool.append(row)
+
     llm_rows = _llm_question_candidates(
         how_happened=how_happened or "",
         root_cause_initial=root_cause_initial or "",
@@ -898,8 +1037,16 @@ def build_why_probe_question_pool(
         pool.append(row)
 
     # 2) Code-grounded deep questions directly from taxonomy item.
+    incident_ctx = "\n".join(
+        [
+            how_happened or "",
+            root_cause_initial or "",
+            current_why_question or "",
+            previous_why_answer or "",
+        ]
+    )
     for code in focus_codes:
-        for row in _build_deep_questions_from_taxonomy(code, why_level):
+        for row in _build_deep_questions_from_taxonomy(code, why_level, incident_context=incident_ctx):
             soru = str(row.get("soru") or "").strip()
             if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
                 continue
