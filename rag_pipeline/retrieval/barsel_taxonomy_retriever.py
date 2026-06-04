@@ -2,13 +2,15 @@
 BARSEL iki aşamalı taksonomi retriever (R5).
 
 1. eleme: keywords.tr overlap → aday daraltma (~156 → top_k_keyword)
-2. eleme: definition + typical_problems embedding benzerliği → final_k
+2. eleme: Mongo `embedding` (import backend ile) veya on-the-fly embed → final_k
 
-Torch gerekmez (hash embedding fallback). Mongo: rca.taxonomy_barsel
+Production: TAXONOMY_EMBEDDING_BACKEND=sentence_transformers + Mongo ST import.
+Yerel dev (bozuk torch): TAXONOMY_EMBEDDING_BACKEND=hash + hash import.
 """
 
 from __future__ import annotations
 
+import logging
 import math
 import os
 import re
@@ -20,9 +22,16 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
 from rag_pipeline.indexing.barsel_rag_document import parse_keywords
-from rag_pipeline.indexing.taxonomy_embeddings import embed_texts
+from rag_pipeline.indexing.taxonomy_embeddings import (
+    embed_texts,
+    probe_effective_backend,
+    resolve_embedding_backend,
+    validate_embedding_alignment,
+)
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_COLLECTION = "taxonomy_barsel"
 _TOKEN_RE = re.compile(r"[\w\u00c0-\u024f]+", re.UNICODE)
@@ -85,24 +94,33 @@ class BarselTaxonomyRetriever:
         collection_name: Optional[str] = None,
         mongo_uri: Optional[str] = None,
         documents: Optional[List[Dict[str, Any]]] = None,
-        embedding_backend: str = "auto",
+        embedding_backend: Optional[str] = None,
         keyword_weight: float = 0.35,
         semantic_weight: float = 0.65,
+        strict_embedding_alignment: bool = False,
     ):
         self.collection_name = collection_name or os.getenv(
             "TAXONOMY_COLLECTION", DEFAULT_COLLECTION
         )
         self.mongo_uri = mongo_uri or os.getenv("MONGODB_URI")
-        self.embedding_backend = embedding_backend
+        resolved = resolve_embedding_backend(embedding_backend)
+        self.embedding_backend = probe_effective_backend(resolved)  # type: ignore[arg-type]
+        self._configured_backend = resolved
+        self.strict_embedding_alignment = strict_embedding_alignment or (
+            os.getenv("TAXONOMY_EMBEDDING_STRICT", "").strip().lower() in ("1", "true", "yes")
+        )
         self.keyword_weight = keyword_weight
         self.semantic_weight = semantic_weight
         self.client: Optional[MongoClient] = None
         self.collection = None
         self._docs: List[Dict[str, Any]] = list(documents or [])
         self.connected = False
+        self._stored_embedding_meta: Optional[Dict[str, Any]] = None
 
         if documents is not None:
             self.connected = bool(self._docs)
+            self._stored_embedding_meta = self._sample_embedding_meta()
+            self._check_embedding_alignment()
         elif self.mongo_uri:
             self._connect_and_load()
 
@@ -122,10 +140,46 @@ class BarselTaxonomyRetriever:
                     "retrieval": 1,
                     "exclusion_conditions": 1,
                     "section_ids": 1,
+                    "embedding": 1,
+                    "embedding_meta": 1,
                 },
             )
         )
         self.connected = bool(self._docs)
+        self._stored_embedding_meta = self._sample_embedding_meta()
+        self._check_embedding_alignment()
+
+    def _sample_embedding_meta(self) -> Optional[Dict[str, Any]]:
+        for doc in self._docs:
+            meta = doc.get("embedding_meta")
+            if isinstance(meta, dict) and meta.get("backend"):
+                return meta
+        return None
+
+    def _check_embedding_alignment(self) -> None:
+        ok, msg = validate_embedding_alignment(
+            self._stored_embedding_meta,
+            self.embedding_backend,
+            strict=self.strict_embedding_alignment,
+        )
+        if ok:
+            if self._stored_embedding_meta:
+                logger.info(
+                    "BARSEL embedding OK: Mongo=%s, query=%s",
+                    self._stored_embedding_meta.get("backend"),
+                    self.embedding_backend,
+                )
+            return
+        if self.strict_embedding_alignment:
+            raise RuntimeError(msg)
+        logger.warning(msg)
+
+    @staticmethod
+    def _doc_embedding(doc: Dict[str, Any]) -> Optional[List[float]]:
+        emb = doc.get("embedding")
+        if isinstance(emb, list) and emb:
+            return emb
+        return None
 
     def close(self) -> None:
         if self.client:
@@ -228,10 +282,23 @@ class BarselTaxonomyRetriever:
         if not candidates:
             return []
 
-        texts = [self._semantic_source(doc) for doc, _ in candidates]
-        q_vecs, _ = embed_texts([query], backend=self.embedding_backend)  # type: ignore[arg-type]
-        d_vecs, _ = embed_texts(texts, backend=self.embedding_backend)  # type: ignore[arg-type]
+        stored_vecs = [self._doc_embedding(doc) for doc, _ in candidates]
+        use_stored = all(v is not None for v in stored_vecs)
+
+        q_vecs, _ = embed_texts(
+            [query],
+            backend=self._configured_backend,  # type: ignore[arg-type]
+        )
         q_vec = q_vecs[0] if q_vecs else []
+
+        if use_stored:
+            d_vecs = stored_vecs  # type: ignore[assignment]
+        else:
+            texts = [self._semantic_source(doc) for doc, _ in candidates]
+            d_vecs, _ = embed_texts(
+                texts,
+                backend=self._configured_backend,  # type: ignore[arg-type]
+            )
 
         hits: List[BarselHit] = []
         for i, (doc, kw_score) in enumerate(candidates):

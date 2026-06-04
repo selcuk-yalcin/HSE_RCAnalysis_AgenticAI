@@ -79,7 +79,11 @@ class BarselRagDocument(BaseModel):
     content: Dict[str, BarselContentTr]
     retrieval: BarselRetrievalTexts
 
-    def to_mongo_document(self, embedding: Optional[List[float]] = None) -> Dict[str, Any]:
+    def to_mongo_document(
+        self,
+        embedding: Optional[List[float]] = None,
+        embedding_meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """MongoDB `rca.taxonomy_barsel` şeması — mevcut retriever ile uyumlu content alanı."""
         tr = self.content.get("tr")
         if not tr:
@@ -118,6 +122,8 @@ class BarselRagDocument(BaseModel):
         }
         if embedding is not None:
             doc["embedding"] = embedding
+        if embedding_meta is not None:
+            doc["embedding_meta"] = embedding_meta
         return doc
 
     def embedding_text(self) -> str:

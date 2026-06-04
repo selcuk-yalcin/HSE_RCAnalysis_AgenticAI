@@ -33,7 +33,9 @@ from rag_pipeline.indexing.barsel_rag_document import (  # noqa: E402
 from rag_pipeline.indexing.taxonomy_embeddings import (  # noqa: E402
     DEFAULT_DIM,
     DEFAULT_MODEL,
+    build_embedding_meta,
     embed_texts,
+    resolve_embedding_backend,
 )
 
 load_dotenv()
@@ -116,6 +118,11 @@ class MongoVectorStoreBuilder:
             dimensions=DEFAULT_DIM,
         )
         self.last_backend_used = backend_used
+        emb_meta = build_embedding_meta(
+            backend_used,
+            model_name=self.model_name,
+            dimensions=DEFAULT_DIM,
+        )
         if backend_used == "sentence_transformers":
             print(f"🤖 Embedding: {self.model_name} (sentence_transformers)")
         elif backend_used == "hash":
@@ -126,7 +133,12 @@ class MongoVectorStoreBuilder:
         documents_to_upload = []
         for i, rag_doc in enumerate(self.barsel_docs):
             emb = embeddings[i] if embeddings else None
-            documents_to_upload.append(rag_doc.to_mongo_document(embedding=emb))
+            documents_to_upload.append(
+                rag_doc.to_mongo_document(
+                    embedding=emb,
+                    embedding_meta=emb_meta if emb is not None else None,
+                )
+            )
 
         print(f"⬆️ {len(documents_to_upload)} belge yükleniyor...")
         self.collection.insert_many(documents_to_upload)
@@ -168,8 +180,8 @@ def main() -> None:
     parser.add_argument(
         "--backend",
         choices=("auto", "sentence_transformers", "hash", "none"),
-        default=os.getenv("TAXONOMY_EMBEDDING_BACKEND", "auto"),
-        help="auto: ST dene, olmazsa hash | hash: torch gerekmez | none: embedding yok",
+        default=resolve_embedding_backend(),
+        help="Production: sentence_transformers | Yerel dev: hash | auto: ST dene, olmazsa hash",
     )
     args = parser.parse_args()
 

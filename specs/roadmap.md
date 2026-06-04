@@ -424,9 +424,12 @@ flowchart LR
 
 ```bash
 python rag_pipeline/parsing/normalize_barsel_vectordb.py
-python rag_pipeline/indexing/build_mongodb_vector_store.py
+# Production import (Railway / ST mevcut):
+TAXONOMY_EMBEDDING_BACKEND=sentence_transformers python rag_pipeline/indexing/build_mongodb_vector_store.py
 python rag_pipeline/retrieval/setup_vector_search_index.py --collection taxonomy_barsel
+python rag_pipeline/retrieval/verify_taxonomy_embeddings.py
 export TAXONOMY_COLLECTION=taxonomy_barsel
+export TAXONOMY_EMBEDDING_BACKEND=sentence_transformers
 export BARSEL_TWO_STAGE_RAG=1
 export ROOTCAUSE_USE_VECTOR_RAG=1
 export ROOTCAUSE_USE_ABS_RAG=0
@@ -435,6 +438,8 @@ export ROOTCAUSE_TAXONOMY_MODE=rag
 export ROOTCAUSE_TAXONOMY_RAG_K=8
 export HITL_USE_BARSEL=1
 ```
+
+**Embedding uyumu (kritik):** Mongo `rca.taxonomy_barsel` vektörleri import sırasında hangi backend ile üretildiyse query tarafı aynı backend'i kullanmalı. Retriever Mongo'daki `embedding` alanını aday skorlamada kullanır; yalnızca sorgu metni embed edilir. Yerel bozuk torch → `TAXONOMY_EMBEDDING_BACKEND=hash` + hash ile yeniden import. Production Railway worker → `sentence-transformers` (`requirements-railway.txt`) + `TAXONOMY_EMBEDDING_BACKEND=sentence_transformers`. Doğrulama: `verify_taxonomy_embeddings.py`.
 
 ### P1.6 Barsel Guided DSPy Training + Deep HITL
 
