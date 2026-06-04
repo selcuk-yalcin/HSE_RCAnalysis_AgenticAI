@@ -468,6 +468,147 @@ def keyword_overlap_score(text_a: str, text_b: str) -> float:
     return len(a.intersection(b)) / len(a.union(b))
 
 
+def hitl_mongo_rag_enabled() -> bool:
+    """HITL sorularında Mongo taxonomy_barsel retriever (varsayılan açık)."""
+    if (os.getenv("HITL_USE_MONGO_RAG") or "1").strip().lower() in (
+        "0",
+        "false",
+        "no",
+        "off",
+    ):
+        return False
+    if not barsel_taxonomy_enabled():
+        return False
+    return bool((os.getenv("MONGODB_URI") or "").strip())
+
+
+def _hitl_rag_k() -> int:
+    try:
+        return max(3, min(12, int(os.getenv("HITL_RAG_K") or "6")))
+    except ValueError:
+        return 6
+
+
+def barsel_item_from_retriever_hit(hit: Dict[str, Any]) -> BarselTaxonomyItem:
+    """Mongo retriever hit → HITL BarselTaxonomyItem."""
+    code = str(hit.get("code") or "").strip().upper()
+    tr = (hit.get("content") or {}).get("tr") or {}
+    raw_kw = hit.get("keywords")
+    keywords: List[str] = []
+    if isinstance(raw_kw, list):
+        for entry in raw_kw:
+            keywords.extend(parse_keywords(str(entry)))
+    else:
+        kw_tr = (hit.get("keywords") or {}).get("tr") or []
+        if isinstance(kw_tr, list):
+            for entry in kw_tr:
+                keywords.extend(parse_keywords(str(entry)))
+    keywords = list(dict.fromkeys(k for k in keywords if k))
+    probs = tr.get("typical_problems") or []
+    if not isinstance(probs, list):
+        probs = []
+    rel = hit.get("related_codes") or []
+    return BarselTaxonomyItem(
+        code=code,
+        title=str(tr.get("title") or code),
+        definition=str(tr.get("definition") or ""),
+        selection_criteria=str(tr.get("selection_criteria") or "").strip(),
+        typical_problems=[str(p).strip() for p in probs if str(p).strip()],
+        keywords=keywords,
+        section_ids=[str(s) for s in (hit.get("section_ids") or [])],
+        related_codes=[str(c).upper() for c in rel if c],
+        cause_type=str(hit.get("cause_type") or ""),
+    )
+
+
+def merge_barsel_items(
+    primary: BarselTaxonomyItem,
+    secondary: BarselTaxonomyItem,
+) -> BarselTaxonomyItem:
+    """Mongo (primary) + statik JSON — daha zengin alanları birleştir."""
+    keywords = list(dict.fromkeys(primary.keywords + secondary.keywords))
+    probs = list(dict.fromkeys(primary.typical_problems + secondary.typical_problems))
+    return BarselTaxonomyItem(
+        code=primary.code or secondary.code,
+        title=primary.title or secondary.title,
+        definition=primary.definition or secondary.definition,
+        selection_criteria=primary.selection_criteria or secondary.selection_criteria,
+        typical_problems=probs,
+        keywords=keywords,
+        section_ids=primary.section_ids or secondary.section_ids,
+        related_codes=primary.related_codes or secondary.related_codes,
+        cause_type=primary.cause_type or secondary.cause_type,
+    )
+
+
+def build_hitl_taxonomy_index(
+    incident_context: str,
+    focus_codes: Optional[List[str]] = None,
+    *,
+    static_by_code: Optional[Dict[str, BarselTaxonomyItem]] = None,
+    retriever: Any = None,
+) -> tuple[List[BarselTaxonomyItem], Dict[str, BarselTaxonomyItem]]:
+    """
+    HITL için taksonomi indeksi: Mongo RAG (olay metni) + agent kodları + statik JSON.
+    """
+    static = static_by_code or {}
+    by_code: Dict[str, BarselTaxonomyItem] = dict(static)
+
+    query = (incident_context or "").strip()
+    if hitl_mongo_rag_enabled() and retriever is not None and getattr(retriever, "connected", False):
+        if query:
+            try:
+                hits = retriever.retrieve(
+                    query[:4000],
+                    k=_hitl_rag_k(),
+                    min_score=0.02,
+                    keyword_pool=max(20, _hitl_rag_k() * 3),
+                )
+            except Exception:
+                hits = []
+            for hit in hits:
+                item = barsel_item_from_retriever_hit(hit)
+                if not item.code:
+                    continue
+                prev = by_code.get(item.code)
+                by_code[item.code] = merge_barsel_items(item, prev) if prev else item
+
+    for raw in focus_codes or []:
+        code = extract_taxonomy_code(str(raw or "")) or str(raw or "").strip().upper()
+        if code and code not in by_code and code in static:
+            by_code[code] = static[code]
+
+    if query and len(by_code) < 3:
+        pool = list(by_code.values()) or list(static.values())
+        for code in infer_barsel_codes_from_text(query, pool, top_k=3):
+            if code not in by_code and code in static:
+                by_code[code] = static[code]
+
+    return list(by_code.values()), by_code
+
+
+def pick_keywords_for_hitl(
+    item: BarselTaxonomyItem,
+    incident_text: str,
+    *,
+    slot_index: int = 0,
+    max_keywords: int = 2,
+) -> List[str]:
+    """Mongo keywords.tr — olay metnine göre sırala, slot ile çeşitlendir."""
+    kws = [k.strip() for k in item.keywords if len(k.strip()) >= 3]
+    if not kws:
+        return []
+    incident = incident_text or ""
+
+    def rank_key(kw: str) -> tuple[float, str]:
+        return (keyword_overlap_score(incident, kw), kw)
+
+    ranked = sorted(kws, key=rank_key, reverse=True)
+    start = max(0, slot_index) % len(ranked)
+    rotated = ranked[start:] + ranked[:start]
+    return rotated[:max_keywords]
+
+
 def pick_typical_problems_for_hitl(
     item: BarselTaxonomyItem,
     incident_text: str,

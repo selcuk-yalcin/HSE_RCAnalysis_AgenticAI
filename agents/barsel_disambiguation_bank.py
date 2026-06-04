@@ -15,8 +15,15 @@ from agents.barsel_taxonomy import (
     extract_taxonomy_code,
     find_contrast_code,
     load_barsel_taxonomy_items,
+    pick_keywords_for_hitl,
     pick_typical_problems_for_hitl,
     split_selection_criteria,
+)
+
+_KEYWORD_QUESTION_TEMPLATES = (
+    "Bu olayda «{kw}» ifadesi gerçekten geçerli miydi?",
+    "Tanık veya kayıtlarda «{kw}» ile örtüşen bir durum var mıydı?",
+    "«{kw}» bu olayı açıklamak için doğru bir çerçeve mi?",
 )
 from agents.hitl_disambiguation_bank import GENEL_DISAMBIGUATION, HSG245_DISAMBIGUATION
 
@@ -258,11 +265,17 @@ def get_barsel_code_specific_questions(
     incident_context: str = "",
     max_per_code: int = 3,
     max_total: int = 6,
+    barsel_items: list[BarselTaxonomyItem] | None = None,
+    barsel_by_code: dict[str, BarselTaxonomyItem] | None = None,
 ) -> list[dict[str, Any]]:
-    items = load_barsel_taxonomy_items()
-    if not items:
-        return []
-    by_code = {i.code.upper(): i for i in items if i.code}
+    if barsel_by_code is not None:
+        by_code = {k.upper(): v for k, v in barsel_by_code.items() if v.code}
+        items = barsel_items if barsel_items is not None else list(by_code.values())
+    else:
+        items = load_barsel_taxonomy_items()
+        if not items:
+            return []
+        by_code = {i.code.upper(): i for i in items if i.code}
 
     out: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -327,6 +340,20 @@ def _questions_from_barsel_item(
                 "yönler": {"probe_type": "selection_criteria"},
             }
         )
+    slot = len(out)
+    for kw in pick_keywords_for_hitl(
+        item, incident_context, slot_index=slot, max_keywords=2
+    ):
+        tpl = _KEYWORD_QUESTION_TEMPLATES[slot % len(_KEYWORD_QUESTION_TEMPLATES)]
+        out.append(
+            {
+                "soru": tpl.format(kw=kw),
+                "hsg245": item.title,
+                "yönler": {"probe_type": "keyword_rag", "keyword": kw},
+            }
+        )
+        slot += 1
+
     contrast = find_contrast_code(item, all_items)
     if contrast:
         out.append(
@@ -375,11 +402,18 @@ def get_barsel_disambiguation_questions(
 def build_barsel_questions_for_causes(
     immediate_causes: list[dict],
     incident_context: str = "",
+    *,
+    barsel_items: list[BarselTaxonomyItem] | None = None,
+    barsel_by_code: dict[str, BarselTaxonomyItem] | None = None,
 ) -> list[dict[str, Any]]:
-    items = load_barsel_taxonomy_items()
-    if not items:
-        return []
-    by_code = {i.code.upper(): i for i in items if i.code}
+    if barsel_by_code is not None:
+        by_code = {k.upper(): v for k, v in barsel_by_code.items() if v.code}
+        items = barsel_items if barsel_items is not None else list(by_code.values())
+    else:
+        items = load_barsel_taxonomy_items()
+        if not items:
+            return []
+        by_code = {i.code.upper(): i for i in items if i.code}
     questions: list[dict[str, Any]] = []
     seen: set[str] = set()
 

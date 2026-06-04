@@ -303,6 +303,9 @@ def _build_hsg_questions_for_causes(immediate_causes: list[dict]) -> list[dict]:
 def build_questions_for_causes(
     immediate_causes: list[dict],
     incident_context: str = "",
+    *,
+    barsel_items: list | None = None,
+    barsel_by_code: dict | None = None,
 ) -> list[dict]:
     """
     Agent'ın bulduğu immediate causes için disambiguation sorularını derle.
@@ -314,6 +317,8 @@ def build_questions_for_causes(
         rows = build_barsel_questions_for_causes(
             immediate_causes,
             incident_context=incident_context,
+            barsel_items=barsel_items,
+            barsel_by_code=barsel_by_code,
         )
         if rows:
             return rows

@@ -8,7 +8,7 @@ from agents.barsel_disambiguation_bank import (
     get_barsel_code_specific_questions,
     get_barsel_disambiguation_questions,
 )
-from agents.barsel_taxonomy import BarselTaxonomyItem
+from agents.barsel_taxonomy import BarselTaxonomyItem, pick_keywords_for_hitl
 from agents.hitl_disambiguation_bank import build_questions_for_causes
 
 FIXTURE_ITEMS = [
@@ -31,6 +31,37 @@ FIXTURE_ITEMS = [
         section_ids=["B", "B4"],
     ),
 ]
+
+
+def test_keyword_questions_from_mongo_style_keywords():
+    item = BarselTaxonomyItem(
+        code="A1.1",
+        title="Bireysel Kural İhlali",
+        keywords=["bilerek ihlal", "eğitimli personelin kural dışı davranışı", "kasıtlı sapma"],
+        section_ids=["A", "A1"],
+    )
+    qs = get_barsel_disambiguation_questions(
+        "A1.1",
+        items=[item],
+        by_code={"A1.1": item},
+        incident_context="personel bilerek kural dışı davrandı",
+    )
+    kw_qs = [q for q in qs if q.get("yönler", {}).get("probe_type") == "keyword_rag"]
+    assert kw_qs
+    assert any("bilerek ihlal" in q["soru"] for q in kw_qs)
+    assert all("Deliberate" not in q["soru"] for q in qs)
+
+
+def test_pick_keywords_prefers_incident_overlap():
+    item = BarselTaxonomyItem(
+        code="A1.1",
+        title="Test",
+        keywords=["bilerek ihlal", "kasıtlı sapma", "eğitim"],
+    )
+    picked = pick_keywords_for_hitl(
+        item, "bilerek ihlal yapıldı", slot_index=0, max_keywords=1
+    )
+    assert picked[0] == "bilerek ihlal"
 
 
 def test_get_barsel_disambiguation_from_typical_problems():
