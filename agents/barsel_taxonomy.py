@@ -140,6 +140,37 @@ def _ensure_index() -> None:
         )
 
 
+def normalize_taxonomy_title(title: str) -> str:
+    """BARSEL tr.title öneklerini (—, tire) temizle."""
+    t = re.sub(r"\s+", " ", str(title or "").strip())
+    t = re.sub(r"^[—–\-]+\s*", "", t)
+    return t.strip()
+
+
+def official_title_tr_for_code(code: str) -> str:
+    """Rapor/HITL için resmi Türkçe yaprak başlık (barsel_taxonomy_multilingual.json)."""
+    key = (code or "").strip().upper()
+    if not key:
+        return ""
+    _ensure_index()
+    item = _BY_CODE.get(key)
+    if not item:
+        return ""
+    return normalize_taxonomy_title(item.title)
+
+
+def section_titles_tr_for_code(code: str) -> List[str]:
+    """Üst bölüm başlıkları (ör. D4. RİSK VE İŞ KONTROL SİSTEMLERİ)."""
+    key = (code or "").strip().upper()
+    if not key:
+        return []
+    _ensure_index()
+    item = _BY_CODE.get(key)
+    if not item or not item.section_titles:
+        return []
+    return [normalize_taxonomy_title(t) for t in item.section_titles if str(t).strip()]
+
+
 def extract_taxonomy_code(raw: Optional[str]) -> str:
     if not raw or not str(raw).strip():
         return ""
@@ -384,6 +415,7 @@ def snap_to_barsel_taxonomy(
         explanation_tr = sanitize_report_text(narrative)
     return {
         "code": item.code,
+        "standard_title_tr": official_title_tr_for_code(item.code) or normalize_taxonomy_title(item.title),
         "cause_tr": cause_tr,
         "category_type": _category_type_label(item.code),
         "explanation_tr": explanation_tr,

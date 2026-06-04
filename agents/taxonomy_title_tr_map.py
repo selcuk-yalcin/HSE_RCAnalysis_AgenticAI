@@ -99,7 +99,22 @@ CODE_TITLE_TR: dict[str, str] = {
 
 
 def title_tr_for_code(code: str, fallback_en: str = "") -> str:
+    """
+    Resmi Türkçe yaprak başlık.
+    Öncelik: BARSEL taksonomi JSON → CODE_TITLE_TR (legacy) → fallback_en.
+    """
     key = (code or "").strip().upper()
+    if not key:
+        return (fallback_en or "").strip()
+    try:
+        from agents.barsel_taxonomy import barsel_taxonomy_enabled, official_title_tr_for_code
+    except ImportError:
+        from .barsel_taxonomy import barsel_taxonomy_enabled, official_title_tr_for_code
+
+    if barsel_taxonomy_enabled():
+        official = official_title_tr_for_code(key)
+        if official:
+            return official
     if key in CODE_TITLE_TR:
         return CODE_TITLE_TR[key]
     return (fallback_en or "").strip()

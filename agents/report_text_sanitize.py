@@ -171,7 +171,7 @@ def strip_hse_codes(text: str) -> str:
 
 def taxonomy_display_title(code: str = "", title_en: str = "", cause_tr: str = "") -> str:
     """
-    Kök neden kutusu için Türkçe başlık: önce kod haritası, sonra temizlenmiş cause_tr, son çare İngilizce başlık.
+    Kök neden kutusu için Türkçe başlık: önce BARSEL/resmi kod haritası, sonra temizlenmiş cause_tr.
     """
     code_key = (code or "").strip().upper()
     mapped = title_tr_for_code(code_key, "")

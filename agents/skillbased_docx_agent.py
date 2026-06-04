@@ -1295,11 +1295,18 @@ class SkillBasedDocxAgent:
                 a = strip_hse_codes(str(w.get("answer_tr") or w.get("answer") or ""))
                 why_chain.append({"number": w.get("level", w_i), "question": q, "answer": a})
 
+            root_code = str(root.get("code") or "").strip().upper()
             root_title = taxonomy_display_title(
-                str(root.get("code") or ""),
-                str(root.get("title") or root.get("cause") or ""),
+                root_code,
+                str(root.get("standard_title_tr") or root.get("title") or root.get("cause") or ""),
                 str(root.get("cause_tr") or root.get("cause") or f"Kök Neden {idx}"),
             )
+            try:
+                from agents.barsel_taxonomy import section_titles_tr_for_code
+            except ImportError:
+                from .barsel_taxonomy import section_titles_tr_for_code
+            section_trail = section_titles_tr_for_code(root_code)
+            root_section = section_trail[-1] if section_trail else ""
             root_detail = sanitize_report_text(
                 str(root.get("explanation_tr") or root.get("explanation") or root_title)
             )
@@ -1311,6 +1318,7 @@ class SkillBasedDocxAgent:
                     "direct_cause": strip_hse_codes(str(immediate.get("cause_tr") or immediate.get("cause") or "")),
                     "why_chain": why_chain,
                     "root_cause_title": root_title,
+                    "root_cause_section": root_section,
                     "root_cause_detail": root_detail,
                     "organizational_factors": [],
                 }
@@ -1318,6 +1326,7 @@ class SkillBasedDocxAgent:
             root_causes.append(
                 {
                     "title": root_title,
+                    "section": root_section,
                     "category": str(root.get("category_type") or root.get("category") or ""),
                     "contributing_organizations": "",
                     "detailed_description": root_detail,
@@ -1328,11 +1337,23 @@ class SkillBasedDocxAgent:
         # analysis_branches yoksa part3.root_causes listesinden üret
         if not root_causes:
             for idx, rc in enumerate(part3.get("root_causes", [])[:8], start=1):
-                title = strip_hse_codes(str(rc.get("description") or rc.get("cause_tr") or rc.get("title") or f"Kök Neden {idx}"))
-                detail = strip_hse_codes(str(rc.get("explanation") or rc.get("detailed_description") or title))
+                rc_code = str(rc.get("code") or "").strip().upper()
+                title = taxonomy_display_title(
+                    rc_code,
+                    str(rc.get("standard_title_tr") or rc.get("title") or ""),
+                    str(rc.get("description") or rc.get("cause_tr") or rc.get("title") or f"Kök Neden {idx}"),
+                )
+                detail = strip_hse_codes(str(rc.get("explanation") or rc.get("explanation_tr") or rc.get("detailed_description") or title))
+                try:
+                    from agents.barsel_taxonomy import section_titles_tr_for_code
+                except ImportError:
+                    from .barsel_taxonomy import section_titles_tr_for_code
+                section_trail = section_titles_tr_for_code(rc_code)
+                root_section = section_trail[-1] if section_trail else ""
                 root_causes.append(
                     {
                         "title": title,
+                        "section": root_section,
                         "category": str(rc.get("category") or rc.get("category_type") or ""),
                         "contributing_organizations": "",
                         "detailed_description": detail,
@@ -1347,6 +1368,7 @@ class SkillBasedDocxAgent:
                         "direct_cause": title,
                         "why_chain": [],
                         "root_cause_title": title,
+                        "root_cause_section": root_section,
                         "root_cause_detail": detail,
                         "organizational_factors": [],
                     }
@@ -3298,11 +3320,18 @@ class SkillBasedDocxAgent:
             color = colors[(bn - 1) % len(colors)]
             
             root_cause_title = strip_hse_codes(str(branch.get('root_cause_title', '') or ''))
+            root_cause_section = strip_hse_codes(str(branch.get('root_cause_section', '') or ''))
+            section_line = (
+                f'<p class="root-cause-section-trail" contenteditable="true">{root_cause_section}</p>'
+                if root_cause_section
+                else ""
+            )
             
             html += f"""
             </div>
             
             <div class="subsection-header">{3+bn}.3 {_L('subsection_root_cause')} ({root_cause_title})</div>
+            {section_line}
             <div class="colored-box box-{color}">
                 <div class="box-header" contenteditable="true">{_L('root_cause_prefix')} {bn}: {root_cause_title}</div>
                 <div class="box-content" contenteditable="true">{strip_hse_codes(str(branch.get('root_cause_detail', '') or ''))}</div>

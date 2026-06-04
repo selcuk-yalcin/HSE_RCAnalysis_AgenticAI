@@ -298,8 +298,14 @@ def _try_snap_to_taxonomy(
     explanation_tr = sanitize_report_text((base_explanation or "").strip())
     if not explanation_tr:
         explanation_tr = sanitize_report_text(narrative)
+    try:
+        from agents.barsel_taxonomy import official_title_tr_for_code
+    except ImportError:
+        from .barsel_taxonomy import official_title_tr_for_code
+
     return {
         "code": item.code,
+        "standard_title_tr": official_title_tr_for_code(item.code) or (item.title or "").strip(),
         "cause_tr": cause_tr,
         "category_type": category_type,
         "explanation_tr": explanation_tr,

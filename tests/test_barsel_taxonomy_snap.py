@@ -4,9 +4,11 @@ from agents.barsel_taxonomy import (
     get_barsel_category_prompt,
     get_incident_taxonomy_prompt,
     get_taxonomy_category_text,
+    official_title_tr_for_code,
     snap_immediate_cause_to_barsel,
     snap_to_barsel_taxonomy,
 )
+from agents.taxonomy_title_tr_map import title_tr_for_code
 
 
 def test_barsel_category_prompt_has_ab_codes():
@@ -33,6 +35,14 @@ def test_snap_root_cause_to_barsel_title():
     assert snapped["code"].startswith("D")
     assert snapped["category_type"] == "ORGANİZASYONEL"
     assert snapped["cause_tr"]
+
+
+def test_official_title_d44_matches_barsel_table():
+    title = title_tr_for_code("D4.4")
+    assert "İş İzin" in title
+    assert "PTW" not in title or "İzin" in title
+    assert title == official_title_tr_for_code("D4.4")
+    assert "İş İzni Sistemi (PTW) Başarısızlığı" != title
 
 
 def test_snap_immediate_cause_ab():
