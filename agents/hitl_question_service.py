@@ -106,7 +106,28 @@ _KNOWN_FIELD_GUARD_PATTERNS = {
     "permit_known": (r"i[sş]\s+izni", r"\bptw\b", r"permit"),
     "weather_known": (r"hava\s+ko[şs]ullar", r"ya[ğg]mur|r[üu]zgar|s[ıi]cak"),
     "lighting_known": (r"ayd[ıi]nlatma",),
+    "witness_known": (
+        r"g[öo]rg[üu]\s+tan[ıi]k",
+        r"tan[ıi]klar\s+olay",
+        r"tan[ıi]k.*nas[ıi]l\s+anlatt",
+        r"olay\s+s[ıi]ras[ıi]nda\s+ba[sş]ka\s+kimler",
+        r"tan[ıi]k\s+beyan",
+    ),
 }
+
+_WITNESS_CONTEXT_MARKERS = (
+    "taniklar:",
+    "tanıklar:",
+    "witnesses:",
+    "tanik beyan",
+    "gorgu tanik",
+    "görgü tanık",
+    "witness statement",
+)
+
+
+def _incident_has_witness_context(context_low: str) -> bool:
+    return any(m in context_low for m in _WITNESS_CONTEXT_MARKERS)
 
 try:
     _TAXONOMY_ITEMS = parse_hsg_taxonomy_items("agents/knowledge.json")
@@ -652,6 +673,13 @@ def _filter_questions(
                     break
             if skip:
                 break
+        if not skip and (
+            "witness_known" in known or _incident_has_witness_context(context_low)
+        ):
+            for patt in _KNOWN_FIELD_GUARD_PATTERNS.get("witness_known", ()):
+                if re.search(patt, low, flags=re.IGNORECASE):
+                    skip = True
+                    break
         if not skip:
             out.append(q)
     return out

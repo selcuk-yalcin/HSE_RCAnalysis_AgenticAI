@@ -43,6 +43,7 @@ except ImportError:
 
 try:
     from agents.report_text_sanitize import (
+        format_report_html_rich,
         sanitize_report_text,
         set_report_text_policy,
         short_incident_summary,
@@ -58,6 +59,7 @@ try:
     )
 except ImportError:
     from .report_text_sanitize import (
+        format_report_html_rich,
         sanitize_report_text,
         set_report_text_policy,
         short_incident_summary,
@@ -380,6 +382,7 @@ KURALLAR:
 - executive_summary: where_happened ve who_affected alanlarını her zaman boş string "" bırak; yer ve kişi bilgisini yalnızca what_happened içinde anlat.
 - Olay özeti yalnızca cover.incident_summary_short içinde olmalı (2-3 cümle). incident_details.event_table içine "Özet" veya uzun anlatım EKLEME.
 - why_chain: NEDEN 1, doğrudan nedeni tek cümleyle sor (ör. doğrudan neden "keskin talaşa temas" ise soru "Neden keskin talaş yüzeyine doğrudan temas oluştu?" gibi); olay özetini baştan sona tekrarlayan uzun soru yazma. NEDEN 2–5: Bir önceki yanıtın ana noktasını konu alan kısa "Neden ...?" zinciri kur.
+- Kök neden ve açıklama metinlerinde markdown kullanma: ** veya __ ile kalın vurgu yazma; düz Türkçe paragraf veya "1. Başlık:" gibi numaralı madde kullan.
 - SADECE JSON döndür, başka hiçbir şey yazma
 """
 
@@ -2076,7 +2079,19 @@ class SkillBasedDocxAgent:
         .box-content {{
             background: #F5F5F5;
             padding: 20px;
-            white-space: pre-wrap;
+            line-height: 1.75;
+        }}
+        .box-content strong {{
+            color: #1B3A5C;
+            font-weight: 700;
+        }}
+        .box-content .rc-point {{
+            margin: 0.65em 0;
+            padding: 0.35em 0 0.35em 0.85em;
+            border-left: 3px solid #2E6DA4;
+        }}
+        .box-content .report-para {{
+            margin: 0.5em 0;
         }}
         
         .box-red .box-header {{ background: #C0392B; }}
@@ -3312,7 +3327,7 @@ class SkillBasedDocxAgent:
                 <div class="why-item">
                     <div class="why-number">{_L('why_prefix')} {wn}</div>
                     <div class="why-question" contenteditable="true">{qtxt}</div>
-                    <div class="why-answer" contenteditable="true">→ {atxt}</div>
+                    <div class="why-answer" contenteditable="true">→ {format_report_html_rich(atxt)}</div>
                 </div>
 """
             
@@ -3334,7 +3349,7 @@ class SkillBasedDocxAgent:
             {section_line}
             <div class="colored-box box-{color}">
                 <div class="box-header" contenteditable="true">{_L('root_cause_prefix')} {bn}: {root_cause_title}</div>
-                <div class="box-content" contenteditable="true">{strip_hse_codes(str(branch.get('root_cause_detail', '') or ''))}</div>
+                <div class="box-content" contenteditable="true">{format_report_html_rich(str(branch.get('root_cause_detail', '') or ''))}</div>
             </div>
 """
             

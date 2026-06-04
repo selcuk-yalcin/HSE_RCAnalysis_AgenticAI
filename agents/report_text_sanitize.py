@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html as html_module
 import re
 
 def _load_title_tr_for_code():
@@ -127,6 +128,74 @@ _RE_LEADING_EN_TITLE = re.compile(
     r"\s*[-–—:]\s*",
     re.IGNORECASE,
 )
+_RE_MD_BOLD = re.compile(r"\*\*([^*]+?)\*\*")
+_RE_MD_BOLD_UL = re.compile(r"__([^_]+?)__")
+_RE_MD_NUMBERED_POINT = re.compile(
+    r"^\s*(?:<strong>)?(\d+)\.\s*(.+?)(?:</strong>)?\s*:?\s*$",
+    re.IGNORECASE,
+)
+
+
+def strip_markdown_emphasis(text: str) -> str:
+    """Rapor düz metninde ** / __ vurgu işaretlerini kaldırır (içerik kalır)."""
+    if not text or not isinstance(text, str):
+        return text
+    s = str(text)
+    s = _RE_MD_BOLD_UL.sub(r"\1", s)
+    s = _RE_MD_BOLD.sub(r"\1", s)
+    s = re.sub(r"\*+", "", s)
+    s = re.sub(r"_+", "", s)
+    return s.strip()
+
+
+def _format_report_text_core(text: str, *, show_technical_codes: bool) -> str:
+    """Kod/emoji temizliği; markdown vurgu işaretleri korunur (HTML için)."""
+    if not text or not isinstance(text, str):
+        return ""
+    if show_technical_codes:
+        return strip_emojis(text).strip()
+    return strip_hse_codes(text)
+
+
+def _html_emphasis_segments(text: str) -> str:
+    """Düz metindeki ** / __ vurgularını kaçışlı HTML <strong> yapar."""
+    s = _RE_MD_BOLD_UL.sub(r"**\1**", text or "")
+    parts = re.split(r"\*\*([^*]+?)\*\*", s)
+    chunks: list[str] = []
+    for i, part in enumerate(parts):
+        if not part:
+            continue
+        esc = html_module.escape(part, quote=False)
+        if i % 2 == 1:
+            chunks.append(f"<strong>{esc}</strong>")
+        else:
+            chunks.append(esc)
+    merged = "".join(chunks)
+    return re.sub(r"\*+", "", merged)
+
+
+def format_report_html_rich(text: str, *, show_technical_codes: bool | None = None) -> str:
+    """
+    Rapor HTML alanları: sanitize + **kalın** → <strong>, numaralı maddeler vurgulu paragraf.
+    Ham ** karakterleri çıktıda kalmaz.
+    """
+    if not text or not isinstance(text, str):
+        return ""
+    show = _report_text_show_codes if show_technical_codes is None else show_technical_codes
+    base = _format_report_text_core(text, show_technical_codes=show)
+    lines = [ln.strip() for ln in base.split("\n") if ln.strip()]
+    if not lines:
+        return ""
+
+    blocks: list[str] = []
+    for ln in lines:
+        rich = _html_emphasis_segments(ln)
+        plain_probe = re.sub(r"<[^>]+>", "", rich)
+        if _RE_MD_NUMBERED_POINT.match(plain_probe) or re.match(r"^\d+\.\s", plain_probe):
+            blocks.append(f'<p class="rc-point">{rich}</p>')
+        else:
+            blocks.append(f'<p class="report-para">{rich}</p>')
+    return "\n".join(blocks)
 
 
 def strip_emojis(text: str) -> str:
@@ -222,11 +291,9 @@ def format_report_text(text: str, *, show_technical_codes: bool | None = None) -
     show = _report_text_show_codes if show_technical_codes is None else show_technical_codes
     if not text or not isinstance(text, str):
         return text
-    if show:
-        return strip_emojis(text).strip()
-    return strip_hse_codes(text)
+    return strip_markdown_emphasis(_format_report_text_core(text, show_technical_codes=show))
 
 
 def sanitize_report_text(text: str) -> str:
-    """Tam rapor metni temizliği (kod + emoji + HSG etiketi + EN gürültü)."""
+    """Tam rapor metni temizliği (kod + emoji + HSG etiketi + EN gürültü + markdown)."""
     return format_report_text(text)

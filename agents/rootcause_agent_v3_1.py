@@ -450,7 +450,7 @@ class WhyAnswer(dspy.Signature):
     answer = dspy.OutputField(
         desc="Cevap açıklaması - rapordaki somut olgulara dayalı; olay-özel gerekçe. "
              "Kök neden başlığı ayrıca resmi taksonomiden uygulanır; burada yine de C/D maddesini gerekçelendiren "
-             "kısa açıklama ver. Metinde kod veya parantez içi kod yazma."
+             "kısa açıklama ver. Metinde kod veya parantez içi kod yazma. Markdown veya ** kalın vurgu kullanma."
     )
     hsg245_code = dspy.OutputField(
         desc="taxonomy_codes listesindeki geçerli BARSEL kodu (Cx.x veya Dx.x); uydurma yok."
