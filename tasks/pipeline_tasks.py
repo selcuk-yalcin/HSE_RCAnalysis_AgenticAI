@@ -75,9 +75,10 @@ def run_pipeline_task(
 
     try:
         from agents.rootcause_agent_v3_1 import RootCauseAgentV3_1
+        from agents.rca_cost_profile import root_cause_agent_kwargs
 
         use_rag = (os.getenv("ROOTCAUSE_USE_RAG") or "1").strip().lower() in ("1", "true", "yes", "on")
-        rootcause_agent = RootCauseAgentV3_1(use_rag=use_rag)
+        rootcause_agent = RootCauseAgentV3_1(**root_cause_agent_kwargs(use_rag))
     except Exception:  # noqa: BLE001
         use_rag = (os.getenv("ROOTCAUSE_USE_RAG") or "1").strip().lower() in ("1", "true", "yes", "on")
         rootcause_agent = RootCauseAgentV2(use_rag=use_rag)

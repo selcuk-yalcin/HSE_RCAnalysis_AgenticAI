@@ -126,6 +126,18 @@ _BARSEL_BY_CODE: dict[str, BarselTaxonomyItem] = {i.code: i for i in _BARSEL_ITE
 
 _HITL_LLM_ENABLED = (os.getenv("HITL_USE_LLM") or "1").strip().lower() in ("1", "true", "yes", "on")
 
+
+def _hitl_llm_enabled() -> bool:
+    try:
+        from agents.rca_cost_profile import get_rca_cost_profile, hitl_llm_enabled_override
+
+        override = hitl_llm_enabled_override()
+        if override is not None:
+            return override
+        return get_rca_cost_profile().hitl_use_llm
+    except Exception:
+        return _HITL_LLM_ENABLED
+
 # "free_text" = cevap Evet/Hayır/Bilinmiyor olamaz (sebep, seçenek, açıklama beklenir).
 # "choice" = arayüzde sabit/LLM listesi; çoklu veya tek seçim (PPE, ekipman).
 
@@ -686,7 +698,7 @@ def _llm_question_candidates(
     max_questions: int = 6,
     output_language: str = "tr",
 ) -> list[dict[str, Any]]:
-    if not _HITL_LLM_ENABLED:
+    if not _hitl_llm_enabled():
         return []
     api_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
     if not api_key:

@@ -190,8 +190,12 @@ def _init_root_cause_agent(use_rag: bool) -> Tuple[object, str]:
         return agent, f"v2 (v3.1 import failed: {err})"
 
     try:
-        agent = _RootCauseV3_1(use_rag=use_rag)
-        return agent, "v3.1"
+        from agents.rca_cost_profile import get_rca_cost_profile, root_cause_agent_kwargs
+
+        kwargs = root_cause_agent_kwargs(use_rag)
+        agent = _RootCauseV3_1(**kwargs)
+        prof = get_rca_cost_profile()
+        return agent, f"v3.1 ({prof.name})"
     except Exception as e:
         print(f"⚠️  V3.1 başlatılamadı, V2 kullanılıyor: {e}")
         traceback.print_exc()

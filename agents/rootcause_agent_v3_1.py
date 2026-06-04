@@ -674,9 +674,10 @@ class ImmediateCauseFinder(dspy.Module):
 class SemanticAnswerVerifier(dspy.Module):
     """Cevapların semantik olarak farklı olmasını sağla"""
     
-    def __init__(self):
+    def __init__(self, *, use_chain_of_thought: bool = True):
         super().__init__()
-        self.diversifier = dspy.ChainOfThought(AnswerDiversifier)
+        _predict = dspy.ChainOfThought if use_chain_of_thought else dspy.Predict
+        self.diversifier = _predict(AnswerDiversifier)
 
     @staticmethod
     def _normalize_text(text: str) -> str:
@@ -847,13 +848,18 @@ def _pairwise_similarity_stats(causes: List[Dict]) -> Tuple[float, float]:
 class WhyChain(dspy.Module):
     """DSPy ile 5-Why zinciri - type-safe continuity"""
     
-    def __init__(self, enable_diversity_check: bool = True):
+    def __init__(
+        self,
+        enable_diversity_check: bool = True,
+        *,
+        use_chain_of_thought: bool = True,
+    ):
         super().__init__()
-        
-        self.why_question = dspy.ChainOfThought(WhyQuestion)
-        self.why_answer = dspy.ChainOfThought(WhyAnswer)
-        self.validator = dspy.ChainOfThought(RootCauseValidator)
-        self.diversity_checker = SemanticAnswerVerifier()
+        _predict = dspy.ChainOfThought if use_chain_of_thought else dspy.Predict
+        self.why_question = _predict(WhyQuestion)
+        self.why_answer = _predict(WhyAnswer)
+        self.validator = _predict(RootCauseValidator)
+        self.diversity_checker = SemanticAnswerVerifier(use_chain_of_thought=use_chain_of_thought)
         self.enable_diversity = enable_diversity_check
 
     @staticmethod
@@ -1121,6 +1127,9 @@ class RootCauseAgentV3_1:
         enable_branch_critic: bool = True,
         critic_jaccard_threshold: float = 0.35,
         critic_max_regenerations: int = 3,
+        *,
+        use_chain_of_thought: bool = True,
+        max_branch_cap: int = 0,
     ):
         """
         Args:
@@ -1129,7 +1138,11 @@ class RootCauseAgentV3_1:
             enable_branch_critic: Dallar arası critic + regenerate katmanı
             critic_jaccard_threshold: Dallar arası benzerlik eşiği (0..1, düşük=hassas)
             critic_max_regenerations: Tek koşuda en fazla yeniden üretim sayısı
+            use_chain_of_thought: False → dspy.Predict (daha az OpenRouter isteği)
+            max_branch_cap: >0 ise dal sayısı üst sınırı (maliyet profili)
         """
+        self.max_branch_cap = max(0, int(max_branch_cap or 0))
+        self.cost_profile_cot = use_chain_of_thought
         
         # OpenAI/OpenRouter setup (OpenRouter OpenAI-compatible /chat/completions)
         api_key = _resolve_openrouter_api_key()
@@ -1154,7 +1167,10 @@ class RootCauseAgentV3_1:
         
         # DSPy modules
         self.immediate_cause_finder = ImmediateCauseFinder()
-        self.why_chain = WhyChain(enable_diversity_check=enable_diversity_check)
+        self.why_chain = WhyChain(
+            enable_diversity_check=enable_diversity_check,
+            use_chain_of_thought=use_chain_of_thought,
+        )
         self.meta_synthesizer = MetaRootCauseSynthesizer()
 
         # Branch critic (dallar arası tekrar engelleme)
@@ -1399,8 +1415,12 @@ class RootCauseAgentV3_1:
         else:
             cap = min(base, n)
         effective = min(base, cap, n)
+        if self.max_branch_cap > 0:
+            effective = min(effective, self.max_branch_cap)
         print(
-            f"🎚️  Dal hedefi: ciddiyet={base}, benzerlik ort={avg_sim:.2f} max={max_sim:.2f} → {effective} dal"
+            f"🎚️  Dal hedefi: ciddiyet={base}, benzerlik ort={avg_sim:.2f} max={max_sim:.2f} "
+            f"→ {effective} dal"
+            + (f" (cap={self.max_branch_cap})" if self.max_branch_cap else "")
         )
         return effective
 
