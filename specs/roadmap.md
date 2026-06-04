@@ -386,6 +386,9 @@ Architecture reference: `specs/plan.md` → *Multimodal enrichment pipeline*.
 | **R5** | ✅ | **İki aşamalı retriever:** `keyword_filter()` → `semantic_rerank(definition + typical_problems)` | `barsel_taxonomy_retriever.py` |
 | **R6** | ✅ | HITL BARSEL: `typical_problems` + `selection_criteria` + keyword rotasyon | `hitl_question_service.py`, `barsel_taxonomy.py` |
 | **R7** | ✅ | Regresyon testleri: keyword eleme, semantic eleme, bölüm filtresi (A/B/C/D band) | `tests/test_barsel_taxonomy_retrieval.py` |
+| **R8** | ✅ | Gold eval set + retrieval skor (`eval_barsel_rca.py`, `barsel_rca_gold.jsonl`) | `agents/training/eval_barsel_rca.py` |
+| **R9** | ⏳ | BARSEL sentetik dataset (iyi/kötü + kodlar) | `hse_synthetic_data.py` |
+| **R10** | ⏳ | MIPROv2 compile + A/B + promote | `optimize_rca.py` |
 
 **R5 retriever taslağı:**
 
