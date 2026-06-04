@@ -185,7 +185,15 @@ def enqueue_report_ready_email(
 
         send_report_delivery_email.delay(delivery_key)
     except Exception:
-        # Synchronous fallback for dev without worker
+        pass
+
+    # Idempotent immediate send on API (worker may lag or lack artifact filesystem).
+    sync_send = (os.getenv("REPORT_DELIVERY_SYNC_SEND") or "1").strip().lower() not in (
+        "0",
+        "false",
+        "no",
+    )
+    if sync_send:
         process_delivery(delivery_key)
 
     return _public_doc(doc)
@@ -213,29 +221,39 @@ def _load_report_html_bytes(doc: dict) -> tuple[bytes, str]:
     max_bytes = int((os.getenv("REPORT_EMAIL_MAX_ATTACHMENT_BYTES") or "8388608").strip() or "8388608")
 
     html_path = (doc.get("html_path") or "").strip()
-    if html_path:
-        path = Path(html_path)
-        if path.is_file():
-            raw = path.read_bytes()
-            if len(raw) <= max_bytes:
-                return raw, filename
-
-    library_item_id = (doc.get("library_item_id") or doc.get("report_id") or "").strip()
     tenant_id = doc.get("tenant_id") or ""
     owner_user_id = doc.get("owner_user_id") or ""
-    if library_item_id and tenant_id and owner_user_id:
+    library_item_id = (doc.get("library_item_id") or doc.get("report_id") or "").strip()
+
+    # Prefer Mongo (worker has no access to API-local artifact paths).
+    if tenant_id and owner_user_id:
         try:
             from shared import saved_reports_store
 
-            html = saved_reports_store.get_artifact_html(
-                tenant_id, owner_user_id, library_item_id, "report"
+            html = saved_reports_store.get_report_html_by_incident(
+                tenant_id, owner_user_id, incident_id
             )
+            if not html and library_item_id:
+                html = saved_reports_store.get_artifact_html(
+                    tenant_id, owner_user_id, library_item_id, "report"
+                )
+            if not html and library_item_id and not library_item_id.startswith("report-"):
+                html = saved_reports_store.get_artifact_html(
+                    tenant_id, owner_user_id, f"report-{library_item_id}", "report"
+                )
             if html:
                 raw = html.encode("utf-8")
                 if len(raw) <= max_bytes:
                     return raw, filename
         except Exception:
             pass
+
+    if html_path:
+        path = Path(html_path)
+        if path.is_file():
+            raw = path.read_bytes()
+            if len(raw) <= max_bytes:
+                return raw, filename
 
     return b"", filename
 

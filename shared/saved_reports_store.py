@@ -159,6 +159,28 @@ def get_artifact_html(
     return doc.get("report_html") or ""
 
 
+def get_report_html_by_incident(
+    tenant_id: str,
+    owner_user_id: str,
+    incident_id: str,
+) -> Optional[str]:
+    """Load stored report HTML by incident id (library item id = report-{incident_id})."""
+    iid = (incident_id or "").strip()
+    if not iid:
+        return None
+    html = get_artifact_html(tenant_id, owner_user_id, f"report-{iid}", "report")
+    if html:
+        return html
+    col = _get_collection()
+    doc = col.find_one(
+        {"tenant_id": tenant_id, "owner_user_id": owner_user_id, "incident_id": iid},
+        projection={"report_html": 1},
+    )
+    if doc and doc.get("report_html"):
+        return doc.get("report_html") or ""
+    return None
+
+
 def delete_item(tenant_id: str, owner_user_id: str, item_id: str) -> bool:
     col = _get_collection()
     res = col.delete_one({"_id": item_id, "tenant_id": tenant_id, "owner_user_id": owner_user_id})

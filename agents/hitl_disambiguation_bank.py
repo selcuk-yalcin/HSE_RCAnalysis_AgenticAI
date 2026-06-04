@@ -1,9 +1,12 @@
 """
 HSG245 disambiguation soru bankası (gradio_chat_5why_v2 ile aynı veri).
 Gradio bağımlılığı yok — API ve ajanlar tarafından import edilir.
+
+HITL_USE_BARSEL=1 (varsayılan) iken BARSEL bankası önceliklidir; boş kalırsa HSG fallback.
 """
 from __future__ import annotations
 
+import os
 from typing import Any
 
 HSG245_DISAMBIGUATION: dict[str, list[dict]] = {
@@ -259,10 +262,18 @@ def get_disambiguation_questions(cause_code: str) -> list[dict]:
     return GENEL_DISAMBIGUATION
 
 
-def build_questions_for_causes(immediate_causes: list[dict]) -> list[dict]:
+def _hitl_use_barsel_disambiguation() -> bool:
+    return (os.getenv("HITL_USE_BARSEL") or "1").strip().lower() not in (
+        "0",
+        "false",
+        "no",
+        "off",
+    )
+
+
+def _build_hsg_questions_for_causes(immediate_causes: list[dict]) -> list[dict]:
     """
-    Agent'ın bulduğu immediate causes için disambiguation sorularını derle.
-    Her cause için max 3 soru alır, toplam 6-8 soruda tutmaya çalışır.
+    HSG245 bankası — HITL_USE_BARSEL=0 veya BARSEL boş dönerse kullanılır.
     """
     questions: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -287,5 +298,25 @@ def build_questions_for_causes(immediate_causes: list[dict]) -> list[dict]:
                 )
 
     return questions[:8]
+
+
+def build_questions_for_causes(
+    immediate_causes: list[dict],
+    incident_context: str = "",
+) -> list[dict]:
+    """
+    Agent'ın bulduğu immediate causes için disambiguation sorularını derle.
+    Her cause için max 3 soru alır, toplam 6-8 soruda tutmaya çalışır.
+    """
+    if _hitl_use_barsel_disambiguation():
+        from agents.barsel_disambiguation_bank import build_barsel_questions_for_causes
+
+        rows = build_barsel_questions_for_causes(
+            immediate_causes,
+            incident_context=incident_context,
+        )
+        if rows:
+            return rows
+    return _build_hsg_questions_for_causes(immediate_causes)
 
 

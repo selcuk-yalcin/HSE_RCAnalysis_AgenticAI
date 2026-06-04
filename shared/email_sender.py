@@ -15,6 +15,14 @@ from typing import List, Optional, Tuple
 AttachmentTuple = Tuple[str, bytes, str]  # filename, payload, mime_type
 
 
+def _clean_env(value: str) -> str:
+    """Strip whitespace and optional surrounding quotes from env vars."""
+    v = (value or "").strip()
+    if len(v) >= 2 and v[0] == v[-1] and v[0] in ('"', "'"):
+        v = v[1:-1].strip()
+    return v
+
+
 def smtp_configured() -> bool:
     host = (os.getenv("SMTP_HOST") or "").strip()
     return bool(host)
@@ -22,7 +30,7 @@ def smtp_configured() -> bool:
 
 def get_smtp_public_config() -> dict[str, str | bool]:
     """Non-secret SMTP summary for ops UI / dashboard."""
-    from_addr = (os.getenv("SMTP_FROM") or os.getenv("SMTP_USER") or "noreply@inferaworld.com").strip()
+    from_addr = _clean_env(os.getenv("SMTP_FROM") or os.getenv("SMTP_USER") or "noreply@inferaworld.com")
     return {
         "configured": smtp_configured(),
         "from_address": from_addr,
@@ -52,9 +60,9 @@ def send_email(
 
     host = os.getenv("SMTP_HOST", "").strip()
     port = int((os.getenv("SMTP_PORT") or "587").strip() or "587")
-    user = (os.getenv("SMTP_USER") or "").strip()
-    password = (os.getenv("SMTP_PASSWORD") or "").strip()
-    from_addr = (os.getenv("SMTP_FROM") or user or "noreply@inferaworld.com").strip()
+    user = _clean_env(os.getenv("SMTP_USER") or "")
+    password = _clean_env(os.getenv("SMTP_PASSWORD") or "")
+    from_addr = _clean_env(os.getenv("SMTP_FROM") or user or "noreply@inferaworld.com")
     use_tls = (os.getenv("SMTP_USE_TLS") or "1").strip().lower() not in ("0", "false", "no")
 
     plain = text_body or html_body

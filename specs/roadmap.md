@@ -32,7 +32,7 @@ Kod: `agents/rca_cost_profile.py`, `agents/rootcause_agent_v3_1.py`, `tasks/pipe
 | Adım | Durum | İş |
 |------|--------|-----|
 | **R2** | ⏳ | Parser QA: 156 kod, keywords/typical_problems doluluk |
-| **R6b** | ⏳ | HITL: `hitl_disambiguation_bank` + `QuestionEngine` taxonomy_gap → BARSEL |
+| **R6b** | ✅ | HITL tam BARSEL: disambiguation, taxonomy_gap, why-probe code-specific (`HITL_USE_BARSEL=1`) |
 | **R9** | ⏳ | BARSEL sentetik dataset (iyi/kötü) |
 | **R10** | ⏳ | MIPROv2 + A/B + promote |
 | **OPS-E4/E5** | ⏳ | Railway explicit env doğrulama |
@@ -58,7 +58,6 @@ ROOTCAUSE_COST_PROFILE=balanced
 
 ### HITL (P0.2 kalan)
 - ⏳ HITL log persist (training)
-- ⏳ BARSEL disambiguation bank migrasyonu (R6b)
 
 ### Ürün
 - ⏳ Dal kurulum ekranı (P1.12) — kullanıcı onayı → pipeline

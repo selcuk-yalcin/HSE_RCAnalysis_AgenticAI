@@ -594,6 +594,29 @@ def _filter_questions(
 
 
 def _taxonomy_gap_questions(full_text: str, max_categories: int = 4, per_cat: int = 2) -> list[dict]:
+    if _USE_BARSEL_HITL:
+        from agents.barsel_disambiguation_bank import build_barsel_taxonomy_gap_questions
+
+        barsel_rows = build_barsel_taxonomy_gap_questions(
+            full_text,
+            max_categories=max_categories,
+            per_cat=per_cat,
+        )
+        if barsel_rows:
+            out: list[dict] = []
+            for i, row in enumerate(barsel_rows):
+                qtext = str(row.get("soru") or "").strip()
+                if not qtext:
+                    continue
+                cat = row.get("category") or "gap"
+                out.append(
+                    {
+                        "id": _stable_id("kb-b", cat, str(i), qtext),
+                        **row,
+                    }
+                )
+            return out
+
     # Local imports: hitl_test modülleri repo kökünden import edilir (api/main sys.path).
     from hitl_test.hybrid_input_processor import HybridInputProcessor
     from hitl_test.question_engine import QuestionEngine
@@ -850,7 +873,10 @@ def build_hitl_question_pool(
     """
     causes = _immediate_causes_from_payload(immediate_causes, root_cause_initial or "")
     focus_codes = [str((c or {}).get("code") or "").strip().upper() for c in causes if (c or {}).get("code")]
-    disamb_raw = build_questions_for_causes(causes)
+    full_text = "\n\n".join(
+        s for s in (how_happened or "", root_cause_initial or "") if s.strip()
+    )
+    disamb_raw = build_questions_for_causes(causes, incident_context=full_text)
     pool: list[dict[str, Any]] = []
     seen_q_fp: set[str] = set()
     seen_q_tokens: list[set[str]] = []
@@ -865,7 +891,7 @@ def build_hitl_question_pool(
         pool.append(
             {
                 "id": qid,
-                "source": "disambiguation",
+                "source": "disambiguation_barsel" if row.get("barsel") else "disambiguation",
                 "code": code,
                 "cause_desc": row.get("cause_desc", code),
                 "hsg245": row.get("hsg245", ""),
@@ -874,9 +900,6 @@ def build_hitl_question_pool(
             }
         )
 
-    full_text = "\n\n".join(
-        s for s in (how_happened or "", root_cause_initial or "") if s.strip()
-    )
     for row in _taxonomy_gap_questions(full_text):
         soru = str(row.get("soru") or "").strip()
         if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
@@ -1015,12 +1038,11 @@ def build_why_probe_question_pool(
     Why zinciri içinde ara netleştirme soruları üretir.
 
     Sıra:
-      1) Immediate code için disambiguation
-      2) Code-specific taxonomy soruları
-      3) Eksik bilgi kategorileri (HybridInputProcessor + QuestionEngine)
+      1) LLM aday soruları (profil izin verirse)
+      2) Code-specific taxonomy soruları (BARSEL veya HSG)
+      3) Disambiguation
+      4) Kod-spesifik tamamlayıcı why-probe (BARSEL veya QuestionEngine)
     """
-    from hitl_test.question_engine import QuestionEngine
-
     focus_codes: list[str] = []
     if immediate_code:
         focus_codes.append(immediate_code.upper())
@@ -1072,7 +1094,7 @@ def build_why_probe_question_pool(
     # 3) Disambiguation (hedef immediate code)
     if focus_codes:
         causes = [{"code": c, "cause_tr": c} for c in focus_codes]
-        for row in build_questions_for_causes(causes)[:4]:
+        for row in build_questions_for_causes(causes, incident_context=incident_ctx)[:4]:
             soru = str(row.get("soru") or "").strip()
             if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
                 continue
@@ -1081,7 +1103,11 @@ def build_why_probe_question_pool(
             pool.append(
                 {
                     "id": qid,
-                    "source": "why_probe_disambiguation",
+                    "source": (
+                        "why_probe_disambiguation_barsel"
+                        if row.get("barsel")
+                        else "why_probe_disambiguation"
+                    ),
                     "code": row.get("code", ""),
                     "cause_desc": row.get("cause_desc", ""),
                     "hsg245": row.get("hsg245", ""),
@@ -1091,11 +1117,34 @@ def build_why_probe_question_pool(
                 }
             )
 
-    # 4) Code-specific questions (knowledge_base bağlı template'ler)
-    qe = QuestionEngine()
-    for i, row in enumerate(qe.get_code_specific_questions(focus_codes)[:6]):
-        soru = str(row.get("question") or "").strip()
-        code = row.get("hsg245_code", "")
+    # 4) Code-specific questions (BARSEL veya HSG knowledge_base)
+    if _USE_BARSEL_HITL:
+        from agents.barsel_disambiguation_bank import get_barsel_code_specific_questions
+
+        code_specific_rows = get_barsel_code_specific_questions(
+            focus_codes,
+            why_level=why_level,
+            incident_context=incident_ctx,
+            max_total=6,
+        )
+    else:
+        from hitl_test.question_engine import QuestionEngine
+
+        qe = QuestionEngine()
+        code_specific_rows = [
+            {
+                "code": row.get("hsg245_code", ""),
+                "question": row.get("question", ""),
+                "code_description": row.get("code_description", ""),
+                "hsg245": row.get("hsg245_code", ""),
+                "barsel": False,
+            }
+            for row in qe.get_code_specific_questions(focus_codes)
+        ]
+
+    for i, row in enumerate(code_specific_rows[:6]):
+        soru = str(row.get("question") or row.get("soru") or "").strip()
+        code = str(row.get("code") or row.get("hsg245_code") or "")
         if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
             continue
         _register_question(soru, seen_q_fp, seen_q_tokens)
@@ -1103,12 +1152,16 @@ def build_why_probe_question_pool(
         pool.append(
             {
                 "id": qid,
-                "source": "why_probe_code_specific",
+                "source": (
+                    "why_probe_code_specific_barsel"
+                    if row.get("barsel")
+                    else "why_probe_code_specific"
+                ),
                 "code": code,
                 "cause_desc": row.get("code_description", ""),
-                "hsg245": code,
+                "hsg245": row.get("hsg245", code),
                 "soru": soru,
-                "yönler": {},
+                "yönler": row.get("yönler") or {},
                 "why_level": why_level,
             }
         )
