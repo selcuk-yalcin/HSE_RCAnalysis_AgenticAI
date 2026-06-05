@@ -164,6 +164,43 @@ except ImportError:
         from agents.branch_critic import BranchCriticAgent
 
 try:
+    from .why_chain_quality import (
+        WHY_QUESTION_MAX_WORDS,
+        answer_repeats_previous,
+        branch_diversity_angle,
+        build_why1_question,
+        demote_solution_to_cause,
+        derive_root_cause_from_why5,
+        enforce_short_why_question,
+        format_barsel_why_answer,
+        is_solution_language,
+        pick_non_forbidden_code,
+        question_repeats_answer,
+        resolve_why_taxonomy_code,
+        score_chain_quality,
+        single_mechanism_text,
+        word_count,
+    )
+except ImportError:
+    from agents.why_chain_quality import (
+        WHY_QUESTION_MAX_WORDS,
+        answer_repeats_previous,
+        branch_diversity_angle,
+        build_why1_question,
+        demote_solution_to_cause,
+        derive_root_cause_from_why5,
+        enforce_short_why_question,
+        format_barsel_why_answer,
+        is_solution_language,
+        pick_non_forbidden_code,
+        question_repeats_answer,
+        resolve_why_taxonomy_code,
+        score_chain_quality,
+        single_mechanism_text,
+        word_count,
+    )
+
+try:
     from .report_text_sanitize import strip_hse_codes
 except ImportError:
     try:
@@ -405,19 +442,16 @@ def _resolve_openrouter_api_key() -> str:
 
 
 def _why1_question_seed(incident_summary: str, immediate_cause: Dict) -> str:
-    """Why-1 için LLM girdisi: zincir doğrudan neden cümlesinden başlasın; olay özetini tekrarlatma."""
-    cause_tr = (immediate_cause.get("cause_tr") or "").strip()
-    title = (immediate_cause.get("standard_title_tr") or "").strip()
-    direct_short = cause_tr or title
+    """Why-2+ için LLM girdisi (Why-1 şablonla üretilir)."""
+    direct_short = (immediate_cause.get("cause_tr") or immediate_cause.get("standard_title_tr") or "").strip()
     return (
-        "GÖREV — Why-1 (ilk 'Neden?'):\n"
-        "İlk soru KISA olmalı ve doğrudan nedeni hedeflemeli. Olay özetinin tamamını veya senaryoyu "
-        "baştan anlatan uzun soru yazma.\n"
-        "Biçim: 'Neden [doğrudan neden / birincil zararlı mekanizma kısa ifade]?' gibi — ör. doğrudan neden "
-        "keskin talaşa temas ise soru 'Neden keskin talaş yüzeyine doğrudan temas oluştu?' yönünde olabilir.\n"
-        "Sonraki Why seviyelerinde her soru, bir önceki cevabın ana noktasından türetilir (zincir kopmasın).\n\n"
-        f"KISA DOĞRUDAN NEDEN (bu dal):\n{direct_short}\n\n"
-        f"BAĞLAM (gerekirse tek cümleyle):\n{incident_summary[:1200]}"
+        "GÖREV — Why-2+:\n"
+        f"Önceki cevabın ALT nedenini sor. Tek cümle, en fazla {WHY_QUESTION_MAX_WORDS} kelime. "
+        "Önceki cevabı tekrar etme; bir seviye derinleş.\n"
+        "Yüzeysel eylem değil mekanizma/organizasyonel boşluk hedefle.\n"
+        "Çözüm önerisi sorma (eğitim verilmeli değil; eğitim verilmemişti).\n\n"
+        f"DOĞRUDAN NEDEN (bu dal):\n{direct_short}\n\n"
+        f"BAĞLAM:\n{incident_summary[:800]}"
     )
 
 
@@ -435,9 +469,10 @@ class WhyQuestion(dspy.Signature):
     chain_level = dspy.InputField(desc="Zincir seviyesi (Why-1 ... Why-5)")
 
     question = dspy.OutputField(
-        desc="Why-1: Tek cümlelik soru; doğrudan neden / birincil mekanizmayı sor (olay özetini tekrar etme). "
-             "Why-2+: Bir önceki cevabın özünü konu alan kısa 'Neden ...?' (önceki cevabı tekrarlayan giriş cümlesi yazma). "
-             "Metinde HSG kodu veya (D4.1) gibi parantezli kod kullanma."
+        desc="ZORUNLU: Tek Türkçe cümle, soru işareti ile biten, EN FAZLA 15-20 kelime. "
+             "Why-2+: Bir önceki cevabın ALT nedeni; aynı cümleyi tekrarlama. "
+             "Birincil zararlı mekanizma (ör. çalışırken müdahale, akıma kapılma); yüzeysel eylem (el sıkışma) değil. "
+             "Olay özetini anlatma. Kod yazma."
     )
 
 
@@ -448,12 +483,12 @@ class WhyAnswer(dspy.Signature):
     taxonomy_codes = dspy.InputField(desc="İlgili BARSEL C/D kategori kodları")
     
     answer = dspy.OutputField(
-        desc="Cevap açıklaması - rapordaki somut olgulara dayalı; olay-özel gerekçe. "
-             "Kök neden başlığı ayrıca resmi taksonomiden uygulanır; burada yine de C/D maddesini gerekçelendiren "
-             "kısa açıklama ver. Metinde kod veya parantez içi kod yazma. Markdown veya ** kalın vurgu kullanma."
+        desc="TEK mekanizma/olgu; geçmiş zaman (verilmemişti, yapılmamıştı). "
+             "ÇÖZÜM YASAK: verilmeli/yapılmalı/önerilir kullanma. "
+             "Kısa gerekçe (1-2 cümle); kodu ayrı alana yaz."
     )
     hsg245_code = dspy.OutputField(
-        desc="taxonomy_codes listesindeki geçerli BARSEL kodu (Cx.x veya Dx.x); uydurma yok."
+        desc="taxonomy_codes içinden TEK geçerli BARSEL kodu (C veya D, örn. D4.3, D1.4). Uydurma yok."
     )
     evidence = dspy.OutputField(
         desc="Olay raporundan bu cevabı destekleyen somut kanıt"
@@ -571,12 +606,13 @@ class ImmediateCauseFinder(dspy.Module):
                 cat = code[0] if code[0] in ("A", "B") else ""
             else:
                 cat = ""
+            cause_tr = single_mechanism_text(str(c.get("cause_tr", "")).strip())
             norm.append(
                 {
                     "code": code,
                     "standard_title_tr": str(c.get("standard_title_tr", "")).strip(),
                     "category_type": cat,
-                    "cause_tr": str(c.get("cause_tr", "")).strip(),
+                    "cause_tr": cause_tr,
                     "evidence_tr": str(c.get("evidence_tr", "")).strip(),
                 }
             )
@@ -899,6 +935,8 @@ class WhyChain(dspy.Module):
         taxonomy_d: str,
         previous_why_answers: List[str] = None,
         probe_answers_by_level: Optional[Dict[int, List[Dict]]] = None,
+        forbidden_root_codes: Optional[List[str]] = None,
+        branch_angle: str = "",
     ) -> Dict:
         """
         Tam 5-Why zinciri
@@ -916,74 +954,99 @@ class WhyChain(dspy.Module):
         """
         if previous_why_answers is None:
             previous_why_answers = []
-        
+        forbidden_root_codes = forbidden_root_codes or []
+        taxonomy_cd_blob = (taxonomy_c or "") + "\n" + (taxonomy_d or "")
+
         chain = []
         current_answer_raw = immediate_cause.get("cause_tr", "")
-        current_code = immediate_cause.get("code", "")
         previous_question_raw = ""
         all_answers_in_chain = []
-        
-        # Why 1-5 zinciri
+
         for level in range(1, 6):
-            # Why-1: A/B cümlesini "önceki cevap" sanma — birincil mekanizmaya (akıma kapılma vb.) sabitle
             if level == 1:
-                previous_for_question = _why1_question_seed(incident_summary, immediate_cause)
-                level_label = "Why-1 — BİRİNCİL zararlı mekanizma (ör. elektrik: akıma kapılma/temas)"
+                question_raw = build_why1_question(immediate_cause)
             else:
                 previous_for_question = (
-                    f"Önceki Why sorusu:\n{previous_question_raw}\n\n"
-                    f"Önceki Why cevabı:\n{current_answer_raw}\n\n"
-                    "GÖREV: Bu cevabı açıklayan bir alt-seviye neden sorusu üret. "
-                    "Aynı seviyede tekrar etme; daha derine in."
+                    f"Önceki soru: {previous_question_raw}\n"
+                    f"Önceki cevap: {current_answer_raw}\n\n"
+                    f"{_why1_question_seed(incident_summary, immediate_cause)}"
                 )
-                level_label = f"Why-{level}"
+                if branch_angle:
+                    previous_for_question += f"\n\nDAL ODAĞI: {branch_angle}"
+                level_label = f"Why-{level} — alt neden (max {WHY_QUESTION_MAX_WORDS} kelime)"
+                question_result = self.why_question(
+                    incident_summary=incident_summary,
+                    previous_answer=previous_for_question,
+                    chain_level=level_label,
+                )
+                question_raw = enforce_short_why_question((question_result.question or "").strip())
+                if question_repeats_answer(current_answer_raw, question_raw):
+                    question_result = self.why_question(
+                        incident_summary=incident_summary,
+                        previous_answer=previous_for_question
+                        + "\n\nUYARI: Önceki cevabı TEKRARLAMA; bir alt organizasyonel/teknik nedeni sor.",
+                        chain_level=level_label,
+                    )
+                    question_raw = enforce_short_why_question((question_result.question or "").strip())
 
-            # 1. SORU OLUŞTUR (Why-1: mekanizma odaklı tohum; Why-2+: önceki cevaptan türet)
-            question_result = self.why_question(
-                incident_summary=incident_summary,
-                previous_answer=previous_for_question,
-                chain_level=level_label
-            )
-            question = question_result.question
-            
-            # 2. CEVAP OLUŞTUR
-            taxonomy = taxonomy_c if level >= 4 else ""
-            taxonomy = (taxonomy + "\n" + taxonomy_d) if level >= 5 else taxonomy
+            question_display = strip_hse_codes(question_raw)
+
+            taxonomy = taxonomy_c if level >= 3 else ""
+            if level >= 4:
+                taxonomy = (taxonomy + "\n" + taxonomy_d).strip()
+            if forbidden_root_codes and level >= 4:
+                taxonomy += (
+                    "\n\nYASAK KÖK KODLAR (bu dallarda kullanma): "
+                    + ", ".join(forbidden_root_codes)
+                )
 
             incident_ctx = incident_summary
             probe_ctx = self._probe_context_for_level(level, probe_answers_by_level)
             if level == 1:
                 incident_ctx = (
-                    "Why-1 cevabı, sorulan birincil zararlı mekanizmaya (ör. akıma kapılma, canlı devreye "
-                    "temas) doğrudan yanıt vermelidir; genel prosedür özeti değil.\n\n" + incident_summary
+                    "Why-1: TEK birincil zararlı mekanizma (çalışırken müdahale, temas, sıkışma vb.). "
+                    "Birden fazla neden listeleme. Geçmiş olgu dili.\n\n" + incident_summary
                 )
+            else:
+                incident_ctx = (
+                    f"Why-{level}: Bir önceki cevabın ALT nedeni. Çözüm önerisi yazma.\n\n" + incident_ctx
+                )
+            if branch_angle and level >= 3:
+                incident_ctx += f"\n\nDAL ODAĞI: {branch_angle}"
             if probe_ctx:
-                incident_ctx = incident_ctx + "\n\n" + probe_ctx
+                incident_ctx += "\n\n" + probe_ctx
 
             answer_result = self.why_answer(
-                question=question,
+                question=question_raw,
                 incident_context=incident_ctx,
-                taxonomy_codes=taxonomy
+                taxonomy_codes=taxonomy,
             )
-            answer_raw = (answer_result.answer or "").strip()
-            code = str(getattr(answer_result, "hsg245_code", "") or "").strip().upper()
-            question_raw = (question or "").strip()
-            question_display = strip_hse_codes(question_raw)
-            answer_display = strip_hse_codes(answer_raw)
-            
-            # 3. SEMANTİK FARKLILIĞA KARŞI KONTROL (V3.1 FEATURE)
+            answer_raw = demote_solution_to_cause((answer_result.answer or "").strip())
+            if is_solution_language(answer_raw):
+                answer_raw = demote_solution_to_cause(
+                    answer_raw + " (olayda bu uygulama eksikti)"
+                )
+            code = pick_non_forbidden_code(
+                str(getattr(answer_result, "hsg245_code", "") or ""),
+                answer_raw,
+                taxonomy_cd_blob,
+                forbidden_root_codes if level >= 5 else [],
+            )
+            if not code:
+                code = resolve_why_taxonomy_code("", answer_raw, taxonomy_cd_blob)
+
             if self.enable_diversity and level >= 2:
                 combined_prev = previous_why_answers + all_answers_in_chain
-                
-                diverse_check = self.diversity_checker(
-                    question=question_raw,
-                    previous_answers=combined_prev
-                )
-                
-                if diverse_check:
-                    # Diversified version mevcutsa kullan
-                    answer_raw = diverse_check
-                    answer_display = strip_hse_codes(answer_raw)
+                prev_in_chain = chain[-1]["answer_tr"] if chain else ""
+                if prev_in_chain and answer_repeats_previous(prev_in_chain, answer_raw):
+                    diverse_check = self.diversity_checker(
+                        question=question_raw,
+                        previous_answers=combined_prev + [prev_in_chain],
+                    )
+                    if diverse_check:
+                        answer_raw = demote_solution_to_cause(diverse_check)
+
+            answer_display = format_barsel_why_answer(code, strip_hse_codes(answer_raw))
 
             step_payload = {
                 "level": level,
@@ -995,70 +1058,46 @@ class WhyChain(dspy.Module):
                 step_data = _validate_model_dict(WhyStepModel, step_payload)
             except ValidationError:
                 step_data = step_payload
-            
+
             chain.append(step_data)
-            
             all_answers_in_chain.append(answer_raw)
             current_answer_raw = answer_raw
             previous_question_raw = question_raw
-            current_code = code
-        
-        # 4. ROOT CAUSE DOĞRULAMA (C/D kategorisinde olmalı)
-        final_answer = chain[-1]["answer_tr"]
-        final_code = chain[-1]["code"]
-        
+
         validation = self.validator(
-            cause=final_answer,
-            code=final_code
-        )
-        base_explanation = f"5-Why zincirinin açıklaması: {final_answer}"
-        snapped = _try_snap_to_taxonomy(
-            final_code,
-            final_answer,
-            base_explanation,
-            family="cd",
+            cause=chain[-1]["answer_tr"],
+            code=chain[-1]["code"],
         )
         conf = _safe_float(getattr(validation, "confidence", None), default=0.8)
-        if snapped:
-            root_cause_payload = {
-                "code": snapped["code"],
-                "cause_tr": snapped["cause_tr"],
-                "category_type": snapped["category_type"],
-                "explanation_tr": snapped["explanation_tr"],
-                "confidence": conf,
-            }
+        root_cause_data = derive_root_cause_from_why5(
+            chain[-1],
+            snap_fn=lambda c, a, e, **kw: _try_snap_to_taxonomy(
+                c, a, e, family=kw.get("family", "cd")
+            ),
+        )
+        root_cause_data["confidence"] = conf
+        if not root_cause_data.get("category_type"):
+            root_cause_data["category_type"] = getattr(validation, "category", None) or "ORGANİZASYONEL"
+
+        final_code = root_cause_data.get("code")
+        if final_code:
             chain = list(chain)
-            chain[-1] = {**chain[-1], "code": snapped["code"]}
-        else:
-            try:
-                from agents.report_text_sanitize import sanitize_report_text, taxonomy_display_title
-            except ImportError:
-                from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
-            root_cause_payload = {
-                "code": final_code,
-                "cause_tr": taxonomy_display_title(final_code, "", sanitize_report_text(final_answer)),
-                "category_type": validation.category,
-                "explanation_tr": sanitize_report_text(base_explanation),
-                "confidence": conf,
-            }
+            chain[-1] = {**chain[-1], "code": final_code}
+
         try:
-            root_cause_data = _validate_model_dict(RootCauseModel, root_cause_payload)
+            root_cause_data = _validate_model_dict(RootCauseModel, root_cause_data)
         except ValidationError:
-            root_cause_data = root_cause_payload
-        
+            pass
+
         return {
             "whys": chain,
             "root_cause": root_cause_data,
-            "chain_quality": self._calculate_chain_quality(chain)
+            "chain_quality": score_chain_quality(chain),
         }
-    
+
     def _calculate_chain_quality(self, chain: List[Dict]) -> float:
-        """Zincir kalitesi: 0-1 (1 = mükemmel tutarlılık)"""
-        if len(chain) < 5:
-            return 0.7  # Eksik zincir
-        
-        # Tüm soruların cevaplardan türetildiğini varsay (DSPy sağlıyor)
-        return 0.95
+        """Geriye dönük uyumluluk."""
+        return score_chain_quality(chain)
 
 
 class MetaRootCauseSynthesizer(dspy.Module):
@@ -1430,7 +1469,7 @@ class RootCauseAgentV3_1:
         )
         return effective
 
-    def _collapse_redundant_branches(self, rca_data: Dict, threshold: float = 0.72) -> None:
+    def _collapse_redundant_branches(self, rca_data: Dict, threshold: float = 0.68) -> None:
         """Kök neden metinleri çok benzer dalları tekilleştir."""
         branches = rca_data.get("analysis_branches") or []
         if len(branches) < 2:
@@ -1741,21 +1780,37 @@ class RootCauseAgentV3_1:
                 f"{immediate_cause.get('cause_tr', '')}",
                 progress=branch_pct,
             )
-            
-            # DSPy 5-Why chain
+
             branch_query = self._branch_taxonomy_query(incident_summary, immediate_cause)
-            chain_result = self.why_chain(
-                incident_summary=incident_summary,
-                immediate_cause=immediate_cause,
-                taxonomy_c=self._incident_taxonomy_prompt("C", branch_query),
-                taxonomy_d=self._incident_taxonomy_prompt("D", branch_query),
-                previous_why_answers=all_previous_why_answers,
-                probe_answers_by_level=probe_by_branch_and_level.get(idx, {}),
-            )
-            
+            branch_angle = branch_diversity_angle(idx, branch_total)
+            chain_result = None
+            for attempt in range(2):
+                chain_result = self.why_chain(
+                    incident_summary=incident_summary,
+                    immediate_cause=immediate_cause,
+                    taxonomy_c=self._incident_taxonomy_prompt("C", branch_query),
+                    taxonomy_d=self._incident_taxonomy_prompt("D", branch_query),
+                    previous_why_answers=all_previous_why_answers,
+                    probe_answers_by_level=probe_by_branch_and_level.get(idx, {}),
+                    forbidden_root_codes=used_root_codes,
+                    branch_angle=branch_angle,
+                )
+                root_code_try = (chain_result.get("root_cause") or {}).get("code")
+                if (
+                    attempt == 0
+                    and root_code_try
+                    and root_code_try in used_root_codes
+                ):
+                    print(
+                        f"  🔁 Dal {idx}: kök kod {root_code_try} tekrar — "
+                        f"farklı boyut için yeniden ({branch_angle})"
+                    )
+                    continue
+                break
+
             root_cause = chain_result.get("root_cause", {})
             root_code = root_cause.get("code")
-            
+
             if root_code:
                 used_root_codes.append(root_code)
             

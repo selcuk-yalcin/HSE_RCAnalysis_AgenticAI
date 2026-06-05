@@ -119,10 +119,13 @@ class BranchRegenerator(dspy.Signature):
 
     new_why_chain = dspy.OutputField(
         desc="JSON: 5 elemanlı liste, her biri "
-             "{level:int, question_tr, answer_tr, code}"
+             "{level:int, question_tr, answer_tr, code}. "
+             "Sorular tek cümle max 20 kelime. "
+             "Cevaplar: KOD — Resmi başlık: geçmiş olgu (verilmemişti); çözüm dili yasak."
     )
     new_root_cause = dspy.OutputField(
-        desc="JSON: {code, cause_tr, category_type, explanation_tr, confidence}"
+        desc="JSON: {code, cause_tr, category_type, explanation_tr, confidence}. "
+             "cause_tr Why-5 kodunun resmi BARSEL başlığı; explanation_tr Why-5 cevabından."
     )
 
 
