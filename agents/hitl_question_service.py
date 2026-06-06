@@ -16,13 +16,19 @@ from agents.hitl_disambiguation_bank import build_questions_for_causes
 from agents.barsel_taxonomy import (
     BarselTaxonomyItem,
     build_hitl_taxonomy_index,
+    codes_for_why_level,
     find_contrast_code,
+    get_barsel_category_prompt,
     hitl_mongo_only_sources,
     hitl_mongo_rag_enabled,
     infer_barsel_codes_from_text,
+    item_from_mongo_hit,
     load_barsel_taxonomy_items,
     pick_typical_problems_for_hitl,
+    retrieve_immediate_bands_prompt,
+    snap_immediate_cause_to_barsel,
     split_selection_criteria,
+    taxonomy_item_for_code,
 )
 from agents.hgs_taxonomy import parse_hsg_taxonomy_items, infer_codes_from_text
 from agents.model_constants import resolve_openrouter_chat_model
@@ -1154,6 +1160,246 @@ def next_hitl_questions(
     }
 
 
+def build_interim_why_question(
+    why_level: int,
+    immediate_code: str,
+    *,
+    cause_tr: str = "",
+    previous_why_answer: str = "",
+    current_why_question: str = "",
+) -> str:
+    """HITL panelinde gösterilecek Why-N sorusu."""
+    if why_level <= 1:
+        try:
+            from agents.why_chain_quality import build_why1_question
+        except ImportError:
+            from .why_chain_quality import build_why1_question
+
+        imm = {
+            "code": (immediate_code or "").strip().upper(),
+            "cause_tr": (cause_tr or "").strip() or (immediate_code or ""),
+        }
+        return build_why1_question(imm)
+    if (current_why_question or "").strip():
+        return str(current_why_question).strip()
+    prev = (previous_why_answer or "").strip()
+    if prev:
+        short = prev.split("—")[-1].split(":")[-1].strip()
+        short = short[:140].rstrip(".")
+        if short:
+            return f"Neden {short}?"
+    return f"Why-{why_level}"
+
+
+def _llm_probe_from_typical_problems(
+    *,
+    code: str,
+    title: str,
+    definition: str,
+    typical_problems: list[str],
+    incident_context: str,
+    why_level: int,
+    output_language: str = "tr",
+    max_questions: int = 2,
+) -> list[dict[str, Any]]:
+    """Mongo typical_problems → bağlama uygun 1-2 HITL netleştirme sorusu."""
+    if not typical_problems or not _hitl_llm_enabled():
+        return []
+    api_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
+    if not api_key:
+        return []
+    lang = normalize_hitl_lang(output_language)
+    lang_rule = (
+        "Sorular Türkçe, question_tr alanında."
+        if lang == "tr"
+        else "Questions in English only, question_en field."
+    )
+    prob_block = "\n".join(f"- {p}" for p in typical_problems[:5])
+    prompt = f"""
+Sen HSE RCA HITL asistanısın. BARSEL typical_problems satırlarını olaya özgü EVET/HAYIR sorularına çevir.
+
+Kod: {code} — {title}
+Tanım (kısa): {(definition or '')[:400]}
+Why seviyesi: {why_level}
+
+Olay bağlamı:
+{incident_context[:2500]}
+
+Typical problems (MongoDB):
+{prob_block}
+
+Kurallar:
+- En fazla {max_questions} soru; her biri tek cümle, soru işareti ile bitsin.
+- typical_problems cümlesini kopyalama; olaya uyarlayarak sor.
+- answer_format: yes_no (Evet/Hayır/Bilinmiyor yeterli).
+- {lang_rule}
+- JSON array: [{{"question_tr":"...","question_en":"...","code":"{code}","answer_format":"yes_no"}}]
+""".strip()
+    try:
+        model = resolve_openrouter_chat_model()
+        if not model.startswith("openrouter/"):
+            model = f"openrouter/{model}"
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key,
+            timeout=12.0,
+        )
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.15,
+            max_tokens=700,
+        )
+        content = (resp.choices[0].message.content or "").strip()
+        items = _extract_json_array(content)
+        out: list[dict[str, Any]] = []
+        for i, it in enumerate(items[:max_questions], start=1):
+            q_tr = str(it.get("question_tr") or "").strip()
+            q_en = str(it.get("question_en") or "").strip()
+            q = q_en if lang == "en" else (q_tr or q_en)
+            if not q:
+                continue
+            out.append(
+                {
+                    "id": _stable_id("tp-llm", code, str(why_level), str(i), q),
+                    "source": "why_probe_typical_problems_llm",
+                    "code": code,
+                    "cause_desc": title,
+                    "hsg245": code,
+                    "soru": q_tr or q,
+                    "soru_en": q_en,
+                    "yönler": {"probe_type": "typical_problem"},
+                    "why_level": why_level,
+                    "response_mode": "yes_no_unknown",
+                }
+            )
+        return out
+    except Exception:
+        return []
+
+
+def identify_immediate_causes_for_hitl(
+    how_happened: str,
+    root_cause_initial: str = "",
+    *,
+    output_language: str = "tr",
+    max_causes: int = 4,
+) -> list[dict[str, Any]]:
+    """
+    ADIM 1: Mongo taxonomy_barsel (A/B immediate) + LLM veya RAG fallback.
+    Çıktı: [{code, cause_tr, evidence_tr, standard_title_tr, category_type}]
+    """
+    incident = "\n\n".join(s for s in (how_happened or "", root_cause_initial or "") if s.strip())
+    retriever = _hitl_barsel_retriever()
+    taxonomy_ab = (
+        retrieve_immediate_bands_prompt(incident, retriever)
+        or get_barsel_category_prompt("AB", include_definition=True, max_codes=14)
+    )
+
+    causes: list[dict[str, Any]] = []
+
+    if _hitl_llm_enabled() and taxonomy_ab and incident:
+        api_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
+        if api_key:
+            lang = normalize_hitl_lang(output_language)
+            lang_rule = "Türkçe JSON" if lang == "tr" else "English JSON"
+            prompt = f"""
+Sen İSG kök neden uzmanısın. Olay metninden 2–{max_causes} AYIRT EDİCİ doğrudan neden seç.
+
+Olay:
+{incident[:4000]}
+
+BARSEL A/B taksonomi (Mongo — immediate):
+{taxonomy_ab[:6000]}
+
+Kurallar:
+- Sadece A veya B bandı kodları.
+- Birincil mekanizma (düşme, temas, sıkışma vb.) öncelikli.
+- {lang_rule}: [{{"code":"A2.1","standard_title_tr":"...","category_type":"A","cause_tr":"...","evidence_tr":"..."}}]
+- Markdown yok; sadece JSON array.
+""".strip()
+            try:
+                model = resolve_openrouter_chat_model()
+                if not model.startswith("openrouter/"):
+                    model = f"openrouter/{model}"
+                client = OpenAI(
+                    base_url="https://openrouter.ai/api/v1",
+                    api_key=api_key,
+                    timeout=18.0,
+                )
+                resp = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.2,
+                    max_tokens=1200,
+                )
+                content = (resp.choices[0].message.content or "").strip()
+                for row in _extract_json_array(content)[:max_causes]:
+                    if isinstance(row, dict) and row.get("code"):
+                        causes.append(snap_immediate_cause_to_barsel(row))
+            except Exception:
+                causes = []
+
+    if not causes and retriever is not None and getattr(retriever, "connected", False):
+        seen: set[str] = set()
+        for band in ("A", "B"):
+            hits = retriever.retrieve(
+                incident[:4000],
+                k=2,
+                band=band,
+                cause_type_filter="immediate_cause",
+                min_score=0.02,
+            )
+            for h in hits:
+                item = item_from_mongo_hit(h)
+                if item.code in seen:
+                    continue
+                seen.add(item.code)
+                prob = (item.typical_problems[0] if item.typical_problems else item.definition)[:160]
+                causes.append(
+                    snap_immediate_cause_to_barsel(
+                        {
+                            "code": item.code,
+                            "standard_title_tr": item.title,
+                            "category_type": band,
+                            "cause_tr": item.title,
+                            "evidence_tr": prob or item.title,
+                        }
+                    )
+                )
+
+    if not causes:
+        causes = _immediate_causes_from_payload(None, root_cause_initial or "")
+
+    return [snap_immediate_cause_to_barsel(c) for c in causes[:max_causes] if isinstance(c, dict)]
+
+
+def next_immediate_causes_identify(
+    how_happened: str,
+    root_cause_initial: str = "",
+    output_language: str = "tr",
+) -> dict[str, Any]:
+    """API: Mongo A/B immediate cause listesi + ilk dal Why-1."""
+    causes = identify_immediate_causes_for_hitl(
+        how_happened,
+        root_cause_initial,
+        output_language=output_language,
+    )
+    why1 = ""
+    if causes:
+        why1 = build_interim_why_question(
+            1,
+            str(causes[0].get("code") or ""),
+            cause_tr=str(causes[0].get("cause_tr") or ""),
+        )
+    return {
+        "immediate_causes": causes,
+        "why_display": why1,
+        "done": len(causes) == 0,
+        "output_language": normalize_hitl_lang(output_language),
+    }
+
+
 def build_why_probe_question_pool(
     how_happened: str,
     root_cause_initial: str,
@@ -1165,22 +1411,13 @@ def build_why_probe_question_pool(
     output_language: str = "tr",
 ) -> list[dict[str, Any]]:
     """
-    Why zinciri içinde ara netleştirme soruları üretir.
+    Why seviyesi HITL probe havuzu.
 
     Sıra:
-      1) LLM aday soruları (profil izin verirse)
-      2) Code-specific taxonomy soruları (BARSEL veya HSG)
-      3) Disambiguation
-      4) Kod-spesifik tamamlayıcı why-probe (BARSEL veya QuestionEngine)
+      1) Seviye bandına göre Mongo kodları (Why-1/2 A/B, Why-3/4 C, Why-5 D)
+      2) typical_problems → LLM netleştirme (1-2 soru)
+      3) typical_problems şablon fallback
     """
-    focus_codes: list[str] = []
-    if immediate_code:
-        focus_codes.append(immediate_code.upper())
-    for code in extract_hs_codes("\n".join([root_cause_initial or "", current_why_question or ""])):
-        if code not in focus_codes:
-            focus_codes.append(code)
-    focus_codes = focus_codes[:3]
-
     incident_ctx = "\n".join(
         [
             how_happened or "",
@@ -1189,142 +1426,70 @@ def build_why_probe_question_pool(
             previous_why_answer or "",
         ]
     )
-    barsel_items, barsel_by_code = _hitl_taxonomy_index(incident_ctx, focus_codes)
-    deep_codes = list(focus_codes)
-    if barsel_by_code and incident_ctx:
-        rag_extra = [c for c in barsel_by_code if c not in deep_codes][: max(0, 3 - len(deep_codes))]
-        deep_codes = (deep_codes + rag_extra)[:3]
+    retriever = _hitl_barsel_retriever()
+    deep_codes = codes_for_why_level(
+        why_level,
+        immediate_code,
+        incident_ctx,
+        retriever,
+        max_codes=3,
+    )
+    barsel_items, barsel_by_code = _hitl_taxonomy_index(incident_ctx, deep_codes)
 
     pool: list[dict[str, Any]] = []
     seen_q_fp: set[str] = set()
     seen_q_tokens: list[set[str]] = []
 
-    # 1) Code-grounded deep questions directly from taxonomy item.
-    llm_rows = _llm_question_candidates(
-        how_happened=how_happened or "",
-        root_cause_initial=root_cause_initial or "",
-        focus_codes=deep_codes or focus_codes,
-        why_level=why_level,
-        current_why_question=current_why_question or "",
-        previous_why_answer=previous_why_answer or "",
-        known_fields=known_fields or [],
-        max_questions=6,
-        output_language=output_language,
-    )
-    for row in llm_rows:
-        soru = str(row.get("soru") or "").strip()
-        if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
-            continue
-        _register_question(soru, seen_q_fp, seen_q_tokens)
-        pool.append(row)
-
-    # 2) Code-grounded deep questions directly from taxonomy item.
     for code in deep_codes:
-        for row in _build_deep_questions_from_taxonomy(
+        item = taxonomy_item_for_code(
             code,
-            why_level,
-            incident_context=incident_ctx,
             barsel_by_code=barsel_by_code or None,
-            barsel_items=barsel_items or None,
-        ):
+            retriever=retriever,
+        )
+        if item is None:
+            continue
+        problems = pick_typical_problems_for_hitl(
+            item,
+            incident_ctx,
+            why_level,
+            max_problems=3,
+        )
+        llm_rows = _llm_probe_from_typical_problems(
+            code=item.code,
+            title=item.title,
+            definition=item.definition,
+            typical_problems=problems,
+            incident_context=incident_ctx,
+            why_level=why_level,
+            output_language=output_language,
+            max_questions=2,
+        )
+        for row in llm_rows:
             soru = str(row.get("soru") or "").strip()
             if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
                 continue
             _register_question(soru, seen_q_fp, seen_q_tokens)
             pool.append(row)
 
-    # 3) Disambiguation (hedef immediate code)
-    if deep_codes:
-        causes = [{"code": c, "cause_tr": c} for c in deep_codes]
-        for row in build_questions_for_causes(
-            causes,
-            incident_context=incident_ctx,
-            barsel_items=barsel_items or None,
-            barsel_by_code=barsel_by_code or None,
-        )[:4]:
-            soru = str(row.get("soru") or "").strip()
-            if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
-                continue
-            _register_question(soru, seen_q_fp, seen_q_tokens)
-            qid = _stable_id("wp-d", str(why_level), row.get("code", ""), soru)
-            pool.append(
-                {
-                    "id": qid,
-                    "source": (
-                        "why_probe_disambiguation_barsel"
-                        if row.get("barsel")
-                        else "why_probe_disambiguation"
-                    ),
-                    "code": row.get("code", ""),
-                    "cause_desc": row.get("cause_desc", ""),
-                    "hsg245": row.get("hsg245", ""),
-                    "soru": soru,
-                    "yönler": row.get("yönler") or {},
-                    "why_level": why_level,
-                }
-            )
+        if len([r for r in pool if r.get("code") == code]) < 2:
+            for row in _build_deep_questions_from_barsel_taxonomy(
+                code,
+                why_level,
+                incident_context=incident_ctx,
+                barsel_by_code=barsel_by_code or None,
+                barsel_items=barsel_items or None,
+            ):
+                if str(row.get("yönler", {}).get("probe_type")) != "typical_problem":
+                    continue
+                soru = str(row.get("soru") or "").strip()
+                if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
+                    continue
+                _register_question(soru, seen_q_fp, seen_q_tokens)
+                pool.append(row)
+                if len([r for r in pool if r.get("code") == code]) >= 2:
+                    break
 
-    # 4) Code-specific questions (BARSEL veya HSG knowledge_base)
-    if _USE_BARSEL_HITL:
-        from agents.barsel_disambiguation_bank import get_barsel_code_specific_questions
-
-        code_specific_rows = get_barsel_code_specific_questions(
-            deep_codes or focus_codes,
-            why_level=why_level,
-            incident_context=incident_ctx,
-            max_total=6,
-            barsel_items=barsel_items or None,
-            barsel_by_code=barsel_by_code or None,
-        )
-    else:
-        from hitl_test.question_engine import QuestionEngine
-
-        qe = QuestionEngine()
-        code_specific_rows = [
-            {
-                "code": row.get("hsg245_code", ""),
-                "question": row.get("question", ""),
-                "code_description": row.get("code_description", ""),
-                "hsg245": row.get("hsg245_code", ""),
-                "barsel": False,
-            }
-            for row in qe.get_code_specific_questions(focus_codes)
-        ]
-
-    for i, row in enumerate(code_specific_rows[:6]):
-        soru = str(row.get("question") or row.get("soru") or "").strip()
-        code = str(row.get("code") or row.get("hsg245_code") or "")
-        if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
-            continue
-        _register_question(soru, seen_q_fp, seen_q_tokens)
-        qid = _stable_id("wp-c", str(why_level), code, str(i), soru)
-        pool.append(
-            {
-                "id": qid,
-                "source": (
-                    "why_probe_code_specific_barsel"
-                    if row.get("barsel")
-                    else "why_probe_code_specific"
-                ),
-                "code": code,
-                "cause_desc": row.get("code_description", ""),
-                "hsg245": row.get("hsg245", code),
-                "soru": soru,
-                "yönler": row.get("yönler") or {},
-                "why_level": why_level,
-            }
-        )
-
-    incident_ctx = "\n".join(
-        [
-            how_happened or "",
-            root_cause_initial or "",
-            current_why_question or "",
-            previous_why_answer or "",
-            " ".join(focus_codes),
-        ]
-    )
-    return _filter_questions(pool[:14], known_fields=known_fields, incident_context=incident_ctx)
+    return _filter_questions(pool[:8], known_fields=known_fields, incident_context=incident_ctx)
 
 
 def next_why_probe_questions(
@@ -1338,17 +1503,36 @@ def next_why_probe_questions(
     batch_size: int = 1,
     known_fields: list[str] | None = None,
     output_language: str = "tr",
+    immediate_cause_tr: str = "",
 ) -> dict[str, Any]:
     """
     Why-level ara sorular: her seviyede daha net sebep ayrımı için döngüsel API.
     """
     answered = set(answered_ids or [])
+    incident_ctx = "\n".join(
+        [how_happened or "", root_cause_initial or "", current_why_question or "", previous_why_answer or ""]
+    )
+    retriever = _hitl_barsel_retriever()
+    target_codes = codes_for_why_level(
+        why_level,
+        immediate_code,
+        incident_ctx,
+        retriever,
+        max_codes=3,
+    )
+    why_display = build_interim_why_question(
+        why_level,
+        immediate_code,
+        cause_tr=immediate_cause_tr,
+        previous_why_answer=previous_why_answer,
+        current_why_question=current_why_question,
+    )
     pool = build_why_probe_question_pool(
         how_happened=how_happened,
         root_cause_initial=root_cause_initial,
         immediate_code=immediate_code,
         why_level=why_level,
-        current_why_question=current_why_question,
+        current_why_question=current_why_question or why_display,
         previous_why_answer=previous_why_answer,
         known_fields=known_fields,
         output_language=output_language,
@@ -1358,6 +1542,10 @@ def next_why_probe_questions(
 
     return {
         "questions": [_shape_question(q, output_language) for q in batch],
+        "why_display": why_display,
+        "target_codes": target_codes,
+        "why_level": why_level,
+        "immediate_code": (immediate_code or "").strip().upper(),
         "total_pool": len(pool),
         "remaining_after_batch": max(0, len(pending) - len(batch)),
         "done": len(pending) == 0,

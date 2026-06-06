@@ -1016,18 +1016,68 @@ class WhyChain(dspy.Module):
             if probe_ctx:
                 incident_ctx += "\n\n" + probe_ctx
 
-            answer_result = self.why_answer(
-                question=question_raw,
-                incident_context=incident_ctx,
-                taxonomy_codes=taxonomy,
-            )
-            answer_raw = demote_solution_to_cause((answer_result.answer or "").strip())
+            answer_raw = ""
+            definition_code = ""
+            for prow in (probe_answers_by_level or {}).get(level) or []:
+                ans_text = str(
+                    (prow or {}).get("answer")
+                    or (prow or {}).get("label")
+                    or (prow or {}).get("value")
+                    or ""
+                )
+                try:
+                    from agents.barsel_taxonomy import (
+                        build_definition_based_why_answer,
+                        probe_answer_affirms_fit,
+                        taxonomy_item_for_code,
+                    )
+                except ImportError:
+                    from .barsel_taxonomy import (
+                        build_definition_based_why_answer,
+                        probe_answer_affirms_fit,
+                        taxonomy_item_for_code,
+                    )
+                if not probe_answer_affirms_fit(ans_text):
+                    continue
+                pcode = str(
+                    (prow or {}).get("hsg_hint")
+                    or (prow or {}).get("immediate_code")
+                    or (prow or {}).get("code")
+                    or ""
+                ).strip().upper()
+                if not pcode:
+                    pcode = str(code or "").strip().upper()
+                item = taxonomy_item_for_code(pcode, retriever=None)
+                if item is None:
+                    continue
+                def_ans = build_definition_based_why_answer(
+                    item,
+                    question=question_raw,
+                    incident_hint=incident_summary[:400],
+                )
+                if def_ans:
+                    answer_raw = def_ans
+                    definition_code = item.code
+                    break
+
+            if not answer_raw:
+                answer_result = self.why_answer(
+                    question=question_raw,
+                    incident_context=incident_ctx,
+                    taxonomy_codes=taxonomy,
+                )
+                answer_raw = demote_solution_to_cause((answer_result.answer or "").strip())
+            else:
+                answer_result = None
             if is_solution_language(answer_raw):
                 answer_raw = demote_solution_to_cause(
                     answer_raw + " (olayda bu uygulama eksikti)"
                 )
+            llm_code = ""
+            if answer_result is not None:
+                llm_code = str(getattr(answer_result, "hsg245_code", "") or "")
             code = pick_non_forbidden_code(
-                str(getattr(answer_result, "hsg245_code", "") or ""),
+                definition_code or llm_code,
                 answer_raw,
                 taxonomy_cd_blob,
                 forbidden_root_codes if level >= 5 else [],
@@ -1069,11 +1119,30 @@ class WhyChain(dspy.Module):
             code=chain[-1]["code"],
         )
         conf = _safe_float(getattr(validation, "confidence", None), default=0.8)
+        affirmed_probs: List[str] = []
+        for prow in (probe_answers_by_level or {}).get(5) or []:
+            ans_text = str(
+                (prow or {}).get("answer")
+                or (prow or {}).get("label")
+                or (prow or {}).get("value")
+                or ""
+            )
+            try:
+                from agents.barsel_taxonomy import probe_answer_affirms_fit
+            except ImportError:
+                from .barsel_taxonomy import probe_answer_affirms_fit
+            if probe_answer_affirms_fit(ans_text):
+                qtxt = str((prow or {}).get("question") or "").strip()
+                if qtxt:
+                    affirmed_probs.append(qtxt)
+
         root_cause_data = derive_root_cause_from_why5(
             chain[-1],
             snap_fn=lambda c, a, e, **kw: _try_snap_to_taxonomy(
                 c, a, e, family=kw.get("family", "cd")
             ),
+            incident_hint=incident_summary[:500],
+            affirmed_typical_problems=affirmed_probs or None,
         )
         root_cause_data["confidence"] = conf
         if not root_cause_data.get("category_type"):

@@ -1299,29 +1299,54 @@ class SkillBasedDocxAgent:
                 why_chain.append({"number": w.get("level", w_i), "question": q, "answer": a})
 
             root_code = str(root.get("code") or "").strip().upper()
-            root_title = taxonomy_display_title(
-                root_code,
-                str(root.get("standard_title_tr") or root.get("title") or root.get("cause") or ""),
-                str(root.get("cause_tr") or root.get("cause") or f"Kök Neden {idx}"),
-            )
             try:
-                from agents.barsel_taxonomy import section_titles_tr_for_code
+                from agents.barsel_taxonomy import (
+                    critical_factor_title_for_code,
+                    enrich_root_cause_from_taxonomy,
+                    root_cause_leaf_title_for_code,
+                    section_titles_tr_for_code,
+                )
             except ImportError:
-                from .barsel_taxonomy import section_titles_tr_for_code
-            section_trail = section_titles_tr_for_code(root_code)
-            root_section = section_trail[-1] if section_trail else ""
-            root_detail = sanitize_report_text(
-                str(root.get("explanation_tr") or root.get("explanation") or root_title)
+                from .barsel_taxonomy import (
+                    critical_factor_title_for_code,
+                    enrich_root_cause_from_taxonomy,
+                    root_cause_leaf_title_for_code,
+                    section_titles_tr_for_code,
+                )
+            root_enriched = enrich_root_cause_from_taxonomy(
+                root,
+                incident_hint=str(immediate.get("evidence_tr") or incident_summary[:400]),
             )
+            root_code = str(root_enriched.get("code") or root_code).strip().upper()
+            cf_title = (
+                str(root_enriched.get("critical_factor_title") or "").strip()
+                or critical_factor_title_for_code(root_code)
+            )
+            root_title = (
+                root_cause_leaf_title_for_code(root_code)
+                or taxonomy_display_title(
+                    root_code,
+                    str(root_enriched.get("standard_title_tr") or ""),
+                    str(root_enriched.get("cause_tr") or ""),
+                )
+            )
+            section_trail = section_titles_tr_for_code(root_code)
+            root_section = cf_title or (section_trail[-1] if section_trail else "")
+            root_detail = sanitize_report_text(
+                str(root_enriched.get("explanation_tr") or root_enriched.get("explanation") or root_title)
+            )
+            branch_title = f"KRİTİK FAKTÖR {idx}"
+            if cf_title:
+                branch_title = f"KRİTİK FAKTÖR {idx} - {strip_hse_codes(cf_title)}"
             branches.append(
                 {
                     "branch_number": br.get("branch_number", idx),
-                    "branch_title": f"KRİTİK FAKTÖR {idx}",
+                    "branch_title": branch_title,
                     "initial_condition": strip_hse_codes(str(immediate.get("evidence_tr") or incident_summary[:500])),
                     "direct_cause": strip_hse_codes(str(immediate.get("cause_tr") or immediate.get("cause") or "")),
                     "why_chain": why_chain,
-                    "root_cause_title": root_title,
-                    "root_cause_section": root_section,
+                    "root_cause_title": strip_hse_codes(root_title),
+                    "root_cause_section": strip_hse_codes(root_section),
                     "root_cause_detail": root_detail,
                     "organizational_factors": [],
                 }
@@ -1341,22 +1366,40 @@ class SkillBasedDocxAgent:
         if not root_causes:
             for idx, rc in enumerate(part3.get("root_causes", [])[:8], start=1):
                 rc_code = str(rc.get("code") or "").strip().upper()
-                title = taxonomy_display_title(
-                    rc_code,
-                    str(rc.get("standard_title_tr") or rc.get("title") or ""),
-                    str(rc.get("description") or rc.get("cause_tr") or rc.get("title") or f"Kök Neden {idx}"),
-                )
-                detail = strip_hse_codes(str(rc.get("explanation") or rc.get("explanation_tr") or rc.get("detailed_description") or title))
                 try:
-                    from agents.barsel_taxonomy import section_titles_tr_for_code
+                    from agents.barsel_taxonomy import (
+                        critical_factor_title_for_code,
+                        enrich_root_cause_from_taxonomy,
+                        root_cause_leaf_title_for_code,
+                    )
                 except ImportError:
-                    from .barsel_taxonomy import section_titles_tr_for_code
-                section_trail = section_titles_tr_for_code(rc_code)
-                root_section = section_trail[-1] if section_trail else ""
+                    from .barsel_taxonomy import (
+                        critical_factor_title_for_code,
+                        enrich_root_cause_from_taxonomy,
+                        root_cause_leaf_title_for_code,
+                    )
+                rc_enriched = enrich_root_cause_from_taxonomy(rc)
+                rc_code = str(rc_enriched.get("code") or rc_code).strip().upper()
+                cf_title = (
+                    str(rc_enriched.get("critical_factor_title") or "").strip()
+                    or critical_factor_title_for_code(rc_code)
+                )
+                title = root_cause_leaf_title_for_code(rc_code) or taxonomy_display_title(
+                    rc_code,
+                    str(rc_enriched.get("standard_title_tr") or ""),
+                    str(rc_enriched.get("cause_tr") or ""),
+                )
+                detail = strip_hse_codes(
+                    str(rc_enriched.get("explanation_tr") or rc_enriched.get("explanation") or title)
+                )
+                root_section = cf_title or ""
+                branch_title = f"KRİTİK FAKTÖR {idx}"
+                if cf_title:
+                    branch_title = f"KRİTİK FAKTÖR {idx} - {strip_hse_codes(cf_title)}"
                 root_causes.append(
                     {
-                        "title": title,
-                        "section": root_section,
+                        "title": strip_hse_codes(title),
+                        "section": strip_hse_codes(root_section),
                         "category": str(rc.get("category") or rc.get("category_type") or ""),
                         "contributing_organizations": "",
                         "detailed_description": detail,
@@ -1366,7 +1409,7 @@ class SkillBasedDocxAgent:
                 branches.append(
                     {
                         "branch_number": idx,
-                        "branch_title": f"KRİTİK FAKTÖR {idx}",
+                        "branch_title": branch_title,
                         "initial_condition": strip_hse_codes(incident_summary[:500]),
                         "direct_cause": title,
                         "why_chain": [],

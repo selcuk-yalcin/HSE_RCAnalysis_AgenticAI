@@ -37,6 +37,7 @@ class BarselTaxonomyItem:
     typical_problems: List[str] = field(default_factory=list)
     keywords: List[str] = field(default_factory=list)
     section_ids: List[str] = field(default_factory=list)
+    section_titles: List[str] = field(default_factory=list)
     related_codes: List[str] = field(default_factory=list)
     cause_type: str = ""
 
@@ -90,6 +91,9 @@ def load_barsel_taxonomy_items(
                 typical_problems=[str(p).strip() for p in probs if str(p).strip()],
                 keywords=keywords,
                 section_ids=[str(s) for s in (raw.get("section_ids") or [])],
+                section_titles=[
+                    str(t).strip() for t in (raw.get("section_titles") or []) if str(t).strip()
+                ],
                 related_codes=[str(c).upper() for c in (raw.get("related_codes") or []) if c],
                 cause_type=str(raw.get("cause_type") or ""),
             )
@@ -160,15 +164,126 @@ def official_title_tr_for_code(code: str) -> str:
 
 
 def section_titles_tr_for_code(code: str) -> List[str]:
-    """Üst bölüm başlıkları (ör. D4. RİSK VE İŞ KONTROL SİSTEMLERİ)."""
+    """Üst bölüm başlıkları (ör. D8. SATIN ALMA, MALZEME TAŞIMA...)."""
     key = (code or "").strip().upper()
     if not key:
         return []
     _ensure_index()
     item = _BY_CODE.get(key)
-    if not item or not item.section_titles:
-        return []
-    return [normalize_taxonomy_title(t) for t in item.section_titles if str(t).strip()]
+    if item and item.section_titles:
+        return [normalize_taxonomy_title(t) for t in item.section_titles if str(t).strip()]
+    gid = group_id_from_code(key)
+    if gid:
+        parent = _BY_CODE.get(gid)
+        if parent and parent.section_titles:
+            return [normalize_taxonomy_title(t) for t in parent.section_titles if str(t).strip()]
+    return []
+
+
+def group_id_from_code(code: str) -> str:
+    """D8.4 → D8, C3.2 → C3."""
+    m = re.match(r"^([CD]\d+)", (code or "").strip().upper())
+    return m.group(1) if m else ""
+
+
+def _strip_group_code_prefix(section_title: str, code: str) -> str:
+    """'D8. SATIN ALMA...' → 'SATIN ALMA...' (rapor başlığı)."""
+    t = normalize_taxonomy_title(section_title)
+    gid = group_id_from_code(code)
+    if gid:
+        t = re.sub(rf"^{re.escape(gid)}\.?\s*", "", t, flags=re.IGNORECASE).strip()
+    return t
+
+
+def critical_factor_title_for_code(code: str) -> str:
+    """
+    Kritik Faktör alt başlığı: C/D ana grup (section_titles son eleman).
+    Örn. D8.4 → 'SATIN ALMA, MALZEME TAŞIMA VE MALZEME KONTROLÜ'
+    """
+    key = (code or "").strip().upper()
+    if not key or key[0] not in ("C", "D"):
+        return ""
+    trail = section_titles_tr_for_code(key)
+    if len(trail) >= 2:
+        return _strip_group_code_prefix(trail[-1], key)
+    if trail:
+        return _strip_group_code_prefix(trail[0], key)
+    gid = group_id_from_code(key)
+    if gid:
+        _ensure_index()
+        parent = _BY_CODE.get(gid)
+        if parent:
+            return normalize_taxonomy_title(parent.title)
+    return ""
+
+
+def root_cause_leaf_title_for_code(code: str) -> str:
+    """Kök neden kutusu başlığı: yaprak kod title (kodsuz). Örn. D8.4 → Malzeme depolama yetersizliği."""
+    return official_title_tr_for_code(code) or ""
+
+
+def build_root_cause_explanation_from_taxonomy(
+    item: BarselTaxonomyItem,
+    *,
+    incident_hint: str = "",
+    affirmed_typical_problems: Optional[List[str]] = None,
+) -> str:
+    """definition + typical_problems ile kök neden açıklaması (rapor metni)."""
+    try:
+        from agents.why_chain_quality import demote_solution_to_cause
+    except ImportError:
+        from .why_chain_quality import demote_solution_to_cause
+
+    parts: List[str] = []
+    defn = demote_solution_to_cause((item.definition or "").strip())
+    if defn:
+        parts.append(defn)
+    probs = affirmed_typical_problems or item.typical_problems or []
+    for prob in probs[:2]:
+        p = demote_solution_to_cause(str(prob).strip())
+        if not p:
+            continue
+        if defn and p[:48] in defn:
+            continue
+        parts.append(p.rstrip("."))
+    if incident_hint and len(" ".join(parts)) < 120:
+        hint = demote_solution_to_cause(incident_hint[:280].strip())
+        if hint:
+            parts.append(f"Bu olay bağlamında: {hint}")
+    return " ".join(parts).strip()
+
+
+def enrich_root_cause_from_taxonomy(
+    root: Dict,
+    *,
+    incident_hint: str = "",
+    affirmed_typical_problems: Optional[List[str]] = None,
+) -> Dict:
+    """Kök neden dict'ini BARSEL definition/title ile hizala."""
+    if not isinstance(root, dict):
+        return root
+    code = extract_taxonomy_code(str(root.get("code") or "")) or str(root.get("code") or "").strip().upper()
+    if not code or code[0] not in ("C", "D"):
+        return root
+    _ensure_index()
+    item = _BY_CODE.get(code)
+    if not item:
+        return root
+    out = dict(root)
+    leaf = root_cause_leaf_title_for_code(code)
+    out["code"] = code
+    out["standard_title_tr"] = leaf
+    out["cause_tr"] = leaf
+    out["critical_factor_title"] = critical_factor_title_for_code(code)
+    out["category_type"] = _category_type_label(code)
+    narrative = str(root.get("explanation_tr") or root.get("cause_tr") or "").strip()
+    tax_expl = build_root_cause_explanation_from_taxonomy(
+        item,
+        incident_hint=incident_hint or narrative,
+        affirmed_typical_problems=affirmed_typical_problems,
+    )
+    out["explanation_tr"] = tax_expl or narrative
+    return out
 
 
 def extract_taxonomy_code(raw: Optional[str]) -> str:
@@ -256,6 +371,7 @@ def retrieve_band_taxonomy_prompt(
     retriever: Any,
     *,
     k: Optional[int] = None,
+    cause_type_filter: Optional[str] = None,
 ) -> str:
     """Mongo taxonomy_barsel — iki aşamalı retriever, band filtresi."""
     if retriever is None or not getattr(retriever, "connected", False):
@@ -274,6 +390,7 @@ def retrieve_band_taxonomy_prompt(
         (query or "")[:4000],
         k=top_k,
         band=band,
+        cause_type_filter=cause_type_filter,
         min_score=0.02,
         keyword_pool=max(20, top_k * 3),
     )
@@ -283,6 +400,180 @@ def retrieve_band_taxonomy_prompt(
         hits,
         f"BARSEL RAG (Mongo) — {labels[band]} — olayla en ilgili {len(hits)} kod:",
     )
+
+
+def why_level_target_bands(why_level: int) -> List[str]:
+    """Why-1/2 → A/B, Why-3/4 → C, Why-5 → D."""
+    w = max(1, int(why_level or 1))
+    if w <= 2:
+        return ["A", "B"]
+    if w <= 4:
+        return ["C"]
+    return ["D"]
+
+
+def item_from_mongo_hit(hit: Dict[str, Any]) -> BarselTaxonomyItem:
+    """Mongo taxonomy_barsel hit → BarselTaxonomyItem."""
+    tr = (hit.get("content") or {}).get("tr") or {}
+    kw_raw = hit.get("keywords") or []
+    keywords: List[str] = []
+    if isinstance(kw_raw, list):
+        for entry in kw_raw:
+            keywords.extend(parse_keywords(str(entry)))
+    keywords = list(dict.fromkeys(k for k in keywords if k))
+    probs = tr.get("typical_problems") or []
+    if not isinstance(probs, list):
+        probs = []
+    return BarselTaxonomyItem(
+        code=str(hit.get("code") or "").strip().upper(),
+        title=str(tr.get("title") or hit.get("code") or ""),
+        definition=str(tr.get("definition") or ""),
+        selection_criteria=str(tr.get("selection_criteria") or "").strip(),
+        typical_problems=[str(p).strip() for p in probs if str(p).strip()],
+        keywords=keywords,
+        section_ids=[str(s) for s in (hit.get("section_ids") or [])],
+        section_titles=[
+            str(t).strip() for t in (hit.get("section_titles") or []) if str(t).strip()
+        ],
+        cause_type=str(hit.get("cause_type") or ""),
+    )
+
+
+def retrieve_immediate_bands_prompt(
+    query: str,
+    retriever: Any,
+    *,
+    k_per_band: Optional[int] = None,
+) -> str:
+    """Mongo — cause_type immediate_cause, band A + B."""
+    if retriever is None or not getattr(retriever, "connected", False):
+        return ""
+    q = (query or "")[:4000]
+    if not q.strip():
+        return ""
+    per = k_per_band or max(3, _taxonomy_rag_k() // 2)
+    parts: List[str] = []
+    for band in ("A", "B"):
+        hits = retriever.retrieve(
+            q,
+            k=per,
+            band=band,
+            cause_type_filter="immediate_cause",
+            min_score=0.02,
+            keyword_pool=max(15, per * 3),
+        )
+        if hits:
+            parts.append(
+                format_retrieval_hits_prompt(
+                    hits,
+                    f"BARSEL RAG (Mongo) — {band} doğrudan neden — olayla en ilgili {len(hits)} kod:",
+                )
+            )
+    return "\n\n".join(parts).strip()
+
+
+def codes_for_why_level(
+    why_level: int,
+    immediate_code: str,
+    incident_text: str,
+    retriever: Any,
+    *,
+    max_codes: int = 3,
+) -> List[str]:
+    """Seviyeye göre Mongo RAG ile hedef BARSEL kodları."""
+    bands = why_level_target_bands(why_level)
+    codes: List[str] = []
+    imm = (immediate_code or "").strip().upper()
+    if why_level <= 2 and imm:
+        codes.append(imm)
+    q = (incident_text or "")[:4000]
+    if retriever is not None and getattr(retriever, "connected", False) and q.strip():
+        cause_filter = "immediate_cause" if why_level <= 2 else "root_cause"
+        per_band = max(1, (max_codes - len(codes)) // max(1, len(bands)) + 1)
+        for band in bands:
+            hits = retriever.retrieve(
+                q,
+                k=per_band,
+                band=band,
+                cause_type_filter=cause_filter,
+                min_score=0.02,
+                keyword_pool=max(12, per_band * 3),
+            )
+            for h in hits:
+                c = str(h.get("code") or "").strip().upper()
+                if c and c not in codes:
+                    codes.append(c)
+    if not codes and imm:
+        codes.append(imm)
+    _ensure_index()
+    if len(codes) < max_codes and q.strip():
+        for band in bands:
+            for item in _BAND.get(band, []):
+                if item.code not in codes:
+                    codes.append(item.code)
+                if len(codes) >= max_codes:
+                    break
+            if len(codes) >= max_codes:
+                break
+    return codes[:max_codes]
+
+
+def taxonomy_item_for_code(
+    code: str,
+    *,
+    barsel_by_code: Optional[Dict[str, BarselTaxonomyItem]] = None,
+    retriever: Any = None,
+) -> Optional[BarselTaxonomyItem]:
+    """JSON indeks veya Mongo bellek indeksinden tek kod."""
+    key = (code or "").strip().upper()
+    if not key:
+        return None
+    if barsel_by_code and key in barsel_by_code:
+        return barsel_by_code[key]
+    _ensure_index()
+    if key in _BY_CODE:
+        return _BY_CODE[key]
+    r = retriever
+    if r is not None and getattr(r, "connected", False):
+        for doc in getattr(r, "_docs", []) or []:
+            if str(doc.get("code") or "").strip().upper() == key:
+                return item_from_mongo_hit(doc)
+    return None
+
+
+def probe_answer_affirms_fit(answer_text: str) -> bool:
+    """HITL Evet/Hayır — kod uygunluğu onayı."""
+    a = (answer_text or "").strip().lower()
+    if not a:
+        return False
+    if a in ("yes", "evet", "true", "1"):
+        return True
+    if a in ("no", "hayır", "hayir", "false", "0", "unknown", "bilinmiyor", "skip", "geç", "gec"):
+        return False
+    return any(
+        tok in a
+        for tok in ("evet", "yes", "doğru", "dogru", "uygun", "geçerli", "gecerli")
+    ) and not any(tok in a for tok in ("hayır", "hayir", "no", "değil", "degil"))
+
+
+def build_definition_based_why_answer(
+    item: BarselTaxonomyItem,
+    *,
+    question: str = "",
+    incident_hint: str = "",
+) -> str:
+    """Probe onayı sonrası definition'dan geçmiş zamanlı Why cevabı."""
+    try:
+        from agents.why_chain_quality import demote_solution_to_cause, format_barsel_why_answer
+    except ImportError:
+        from .why_chain_quality import demote_solution_to_cause, format_barsel_why_answer
+
+    body = demote_solution_to_cause((item.definition or item.title or "").strip())
+    if incident_hint and len(body) < 40:
+        body = f"{body} Olay bağlamında: {incident_hint[:200]}".strip()
+    if not body:
+        return ""
+    return format_barsel_why_answer(item.code, body)
 
 
 def get_incident_taxonomy_prompt(
@@ -311,14 +602,26 @@ def get_incident_taxonomy_prompt(
     cat = (category or "").upper()
     static_max = _static_max_codes()
 
+    immediate_only = (os.getenv("ROOTCAUSE_IMMEDIATE_MONGO_FILTER") or "1").strip().lower() in (
+        "1", "true", "yes", "on",
+    )
+    imm_filter = "immediate_cause" if immediate_only else None
+
     if use_rag and retriever is not None:
         if cat in ("A", "B", "C", "D"):
-            rag_text = retrieve_band_taxonomy_prompt(query, cat, retriever)
+            cf = imm_filter if cat in ("A", "B") else None
+            rag_text = retrieve_band_taxonomy_prompt(
+                query, cat, retriever, cause_type_filter=cf
+            )
             if rag_text:
                 return rag_text
         elif cat == "AB":
-            a = retrieve_band_taxonomy_prompt(query, "A", retriever)
-            b = retrieve_band_taxonomy_prompt(query, "B", retriever)
+            a = retrieve_band_taxonomy_prompt(
+                query, "A", retriever, cause_type_filter=imm_filter
+            )
+            b = retrieve_band_taxonomy_prompt(
+                query, "B", retriever, cause_type_filter=imm_filter
+            )
             parts = [p for p in (a, b) if p]
             if parts:
                 return "\n\n".join(parts)
@@ -405,21 +708,23 @@ def snap_to_barsel_taxonomy(
     except ImportError:
         from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
 
-    cause_tr = taxonomy_display_title(
-        item.code,
-        item.title,
-        sanitize_report_text(narrative),
+    leaf = root_cause_leaf_title_for_code(item.code) or normalize_taxonomy_title(item.title)
+    explanation_tr = build_root_cause_explanation_from_taxonomy(
+        item,
+        incident_hint=sanitize_report_text((base_explanation or narrative or "").strip()),
     )
-    explanation_tr = sanitize_report_text((base_explanation or "").strip())
     if not explanation_tr:
-        explanation_tr = sanitize_report_text(narrative)
-    return {
-        "code": item.code,
-        "standard_title_tr": official_title_tr_for_code(item.code) or normalize_taxonomy_title(item.title),
-        "cause_tr": cause_tr,
-        "category_type": _category_type_label(item.code),
-        "explanation_tr": explanation_tr,
-    }
+        explanation_tr = sanitize_report_text((base_explanation or narrative or "").strip())
+    return enrich_root_cause_from_taxonomy(
+        {
+            "code": item.code,
+            "standard_title_tr": leaf,
+            "cause_tr": leaf,
+            "category_type": _category_type_label(item.code),
+            "explanation_tr": explanation_tr,
+        },
+        incident_hint=narrative,
+    )
 
 
 def snap_immediate_cause_to_barsel(cause: Dict) -> Dict:

@@ -194,9 +194,11 @@ def derive_root_cause_from_why5(
     why5: Dict,
     *,
     snap_fn,
+    incident_hint: str = "",
+    affirmed_typical_problems: Optional[List[str]] = None,
 ) -> Dict:
     """
-    Kök neden başlığı Why-5 kodundan; açıklama Why-5 cevabının gövdesinden türetilir.
+    Kök neden: yaprak C/D kodu title + definition/typical_problems açıklaması.
     """
     code = extract_taxonomy_code(why5.get("code")) or str(why5.get("code") or "").strip().upper()
     raw_answer = strip_barsel_answer_prefix(str(why5.get("answer_tr") or ""))
@@ -206,14 +208,7 @@ def derive_root_cause_from_why5(
         if snap_fn
         else None
     )
-    if snapped:
-        snapped["cause_tr"] = title or snapped.get("cause_tr") or raw_answer[:120]
-        snapped["explanation_tr"] = raw_answer
-        if code:
-            snapped["code"] = code
-            snapped["standard_title_tr"] = title or snapped.get("standard_title_tr", "")
-        return snapped
-    return {
+    base = snapped or {
         "code": code,
         "standard_title_tr": title,
         "cause_tr": title or raw_answer[:120],
@@ -221,6 +216,19 @@ def derive_root_cause_from_why5(
         "explanation_tr": raw_answer,
         "confidence": 0.75,
     }
+    try:
+        from agents.barsel_taxonomy import enrich_root_cause_from_taxonomy
+    except ImportError:
+        from .barsel_taxonomy import enrich_root_cause_from_taxonomy
+
+    enriched = enrich_root_cause_from_taxonomy(
+        base,
+        incident_hint=incident_hint or raw_answer,
+        affirmed_typical_problems=affirmed_typical_problems,
+    )
+    if "confidence" not in enriched and "confidence" in base:
+        enriched["confidence"] = base["confidence"]
+    return enriched
 
 
 def score_chain_quality(chain: List[Dict]) -> float:

@@ -32,7 +32,11 @@ from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.actionplan_agent import ActionPlanAgent
 from agents.skillbased_docx_agent import SkillBasedDocxAgent
-from agents.hitl_question_service import next_hitl_questions, next_why_probe_questions
+from agents.hitl_question_service import (
+    next_hitl_questions,
+    next_immediate_causes_identify,
+    next_why_probe_questions,
+)
 from agents.model_constants import (
     resolve_openrouter_chat_model,
     resolve_openrouter_dspy_model,
@@ -1128,7 +1132,22 @@ async def hitl_dynamic_questions(
         module="hitl",
     )
     try:
-        if (body.mode or "").lower() == "why_probe" or body.why_level > 0:
+        mode = (body.mode or "").lower()
+        if mode == "immediate_identify":
+            payload = next_immediate_causes_identify(
+                how_happened=body.how_happened or "",
+                root_cause_initial=body.root_cause_initial or "",
+                output_language=output_language,
+            )
+        elif mode == "why_probe" or body.why_level > 0:
+            imm_tr = ""
+            if body.immediate_causes:
+                for c in body.immediate_causes:
+                    if isinstance(c, dict) and str(c.get("code") or "").upper() == (
+                        body.immediate_code or ""
+                    ).strip().upper():
+                        imm_tr = str(c.get("cause_tr") or "")
+                        break
             payload = next_why_probe_questions(
                 how_happened=body.how_happened or "",
                 root_cause_initial=body.root_cause_initial or "",
@@ -1140,6 +1159,7 @@ async def hitl_dynamic_questions(
                 batch_size=bs,
                 known_fields=body.known_fields or [],
                 output_language=output_language,
+                immediate_cause_tr=imm_tr,
             )
         else:
             payload = next_hitl_questions(
