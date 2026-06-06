@@ -1,11 +1,33 @@
-"""Resmi taksonomi kodları için Türkçe kök neden başlıkları (rapor/decision tree gösterimi).
+"""Resmi taksonomi kodları için Türkçe başlıklar (rapor / decision tree).
 
-Kaynak: BARSEL C/D bant yaprak kodları (barsel_taxonomy_multilingual.json ile hizalı).
-Kod öneki ve sayfa numarası yok — yalnızca tablodaki tam Türkçe ad.
+- GROUP_TITLE_TR: C1, D4 … ana grup → Kritik Faktör başlığı (kodsuz)
+- CODE_TITLE_TR: C1.1, D4.3 … yaprak → Kök neden başlığı (kodsuz)
+
+Kaynak: BARSEL C/D tablosu (barsel_taxonomy_multilingual.json ile hizalı).
 """
 
 from __future__ import annotations
 
+import re
+
+# Ana grup — Kritik Faktör (KRİTİK FAKTÖR N - …)
+GROUP_TITLE_TR: dict[str, str] = {
+    "C1": "Fiziksel Kapasite ve Sağlık",
+    "C2": "Bilişsel ve Zihinsel Yeterlilik / Yetenek",
+    "C3": "BECERİ DÜZEYİ, YETKİNLİK, YETERLİLİK VE DAVRANIŞSAL ŞARTLANMA",
+    "D1": "Liderlik, gözetim ve güvenlik kültürü",
+    "D2": "İletişim ve Bilgi Yönetimi",
+    "D3": "Eğitim, yetkinlik ve işgücü yönetimi",
+    "D4": "RİSK VE İŞ KONTROL SİSTEMLERİ",
+    "D5": "Mühendislik / Tasarım ve Teknik Sistemler",
+    "D6": "Bakım, varlık bütünlüğü ve güvenilirlik",
+    "D7": "Yüklenici ve Tedarik Zinciri Yönetimi",
+    "D8": "SATIN ALMA, MALZEME TAŞIMA VE MALZEME KONTROLÜ",
+    "D9": "Standartlar / Pratikler / Prosedürler (SPP)",
+    "D10": "Acil durum hazırlığı",
+}
+
+# Yaprak kod — Kök neden kutusu
 CODE_TITLE_TR: dict[str, str] = {
     # C — Kişisel faktörler
     "C1.1": "Duyusal Bozukluklar (Görme, İşitme, Diğer Duyular)",
@@ -104,10 +126,30 @@ CODE_TITLE_TR: dict[str, str] = {
 }
 
 
+def _group_id_from_code(code: str) -> str:
+    """D4.3 → D4, D10.2 → D10, D4 → D4."""
+    key = (code or "").strip().upper()
+    if not key:
+        return ""
+    if re.match(r"^[CD]\d+$", key):
+        return key
+    m = re.match(r"^([CD]\d+)\.", key)
+    return m.group(1) if m else ""
+
+
+def group_title_tr_for_code(code: str) -> str:
+    """
+    Ana grup başlığı (Kritik Faktör): C1, D4, D8 …
+    Yaprak kod (D4.3) veya grup kodu (D4) kabul eder.
+    """
+    gid = _group_id_from_code(code)
+    return GROUP_TITLE_TR.get(gid, "")
+
+
 def title_tr_for_code(code: str, fallback_en: str = "") -> str:
     """
-    Resmi Türkçe yaprak başlık.
-    Öncelik: BARSEL taksonomi JSON → CODE_TITLE_TR (legacy) → fallback_en.
+    Yaprak kök neden başlığı (C1.1, D4.3 …).
+    Öncelik: BARSEL JSON → CODE_TITLE_TR → fallback_en.
     """
     key = (code or "").strip().upper()
     if not key:

@@ -59,10 +59,17 @@ def test_critical_factor_and_root_titles_for_d84():
 
 def test_critical_factor_group_titles_from_section_trail():
     from agents.barsel_taxonomy import critical_factor_title_for_code
+    from agents.taxonomy_title_tr_map import group_title_tr_for_code, title_tr_for_code
 
     assert critical_factor_title_for_code("D8.4") == "SATIN ALMA, MALZEME TAŞIMA VE MALZEME KONTROLÜ"
     assert critical_factor_title_for_code("D9.1") == "Standartlar / Pratikler / Prosedürler (SPP)"
     assert critical_factor_title_for_code("D5.2") == "Mühendislik / Tasarım ve Teknik Sistemler"
+    assert critical_factor_title_for_code("D2.1") == "İletişim ve Bilgi Yönetimi"
+    assert critical_factor_title_for_code("D4.3") == "RİSK VE İŞ KONTROL SİSTEMLERİ"
+    assert group_title_tr_for_code("C1") == "Fiziksel Kapasite ve Sağlık"
+    assert group_title_tr_for_code("D3.2") == "Eğitim, yetkinlik ve işgücü yönetimi"
+    assert "Değişim Yönetimi (MoC)" not in title_tr_for_code("D4.3")
+    assert "Atlanması" in title_tr_for_code("D4.3")
 
 
 def test_resolve_root_code_from_why_chain():

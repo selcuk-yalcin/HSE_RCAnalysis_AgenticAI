@@ -197,13 +197,22 @@ def _strip_group_code_prefix(section_title: str, code: str) -> str:
 
 def critical_factor_title_for_code(code: str) -> str:
     """
-    Kritik Faktör alt başlığı: C/D ana grup (section_titles son eleman).
+    Kritik Faktör başlığı: C1 / D4 / D8 ana grup (kodsuz).
     Örn. D8.4 → 'SATIN ALMA, MALZEME TAŞIMA VE MALZEME KONTROLÜ'
-    Örn. D9.1 → 'Standartlar / Pratikler / Prosedürler (SPP)'
+    Örn. D4.3 → 'RİSK VE İŞ KONTROL SİSTEMLERİ'
     """
     key = (code or "").strip().upper()
     if not key or key[0] not in ("C", "D"):
         return ""
+    try:
+        from agents.taxonomy_title_tr_map import group_title_tr_for_code
+    except ImportError:
+        from .taxonomy_title_tr_map import group_title_tr_for_code
+
+    mapped = group_title_tr_for_code(key)
+    if mapped:
+        return mapped
+
     trail = section_titles_tr_for_code(key)
     if len(trail) >= 2:
         return _strip_group_code_prefix(trail[-1], key)
