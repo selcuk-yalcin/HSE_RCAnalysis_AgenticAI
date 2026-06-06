@@ -18,7 +18,7 @@ FIXTURE = BarselTaxonomyItem(
 
 def test_probe_question_template_tr():
     q = probe_question_for_type("typical_problem", "tr")
-    assert "aşağıda belirtilen" in q.lower()
+    assert "yukarıda özetlenen" in q.lower() or "aşağıda belirtilen" in q.lower()
     assert "bu durum" not in q.lower()
 
 
@@ -38,7 +38,7 @@ def test_deep_question_splits_context(monkeypatch):
     prob_rows = [r for r in rows if r.get("yönler", {}).get("probe_type") == "typical_problem"]
     assert prob_rows
     row = prob_rows[0]
-    assert "aşağıda belirtilen" in row["soru"].lower()
+    assert "yukarıda özetlenen" in row["soru"].lower()
     assert "bariyer" in row["probe_context"]
     assert "bariyer" not in row["soru"]
 
@@ -59,4 +59,27 @@ def test_shape_question_exposes_probe_context():
     )
     assert shaped["probe_context"] == FIXTURE.typical_problems[0]
     assert shaped["helper_hint"] == FIXTURE.typical_problems[0]
-    assert "aşağıda belirtilen" in shaped["question_tr"].lower()
+    assert "yukarıda özetlenen" in shaped["question_tr"].lower()
+    assert shaped.get("probe_context_label")
+
+
+def test_shape_question_splits_legacy_embedded_probe():
+    legacy = (
+        "Bu olayda şu durum geçerli miydi: "
+        "Dar yerleşim nedeniyle bariyer kullanılamaz hale gelir?"
+    )
+    shaped = _shape_question(
+        {
+            "id": "legacy",
+            "source": "why_probe_barsel_taxonomy",
+            "code": "B2.5",
+            "cause_desc": "SIKIŞIK DÜZEN",
+            "hsg245": "B2.5",
+            "soru": legacy,
+            "yönler": {"probe_type": "typical_problem"},
+        },
+        "tr",
+    )
+    assert "bariyer" in shaped["probe_context"]
+    assert "bariyer" not in shaped["question_tr"]
+    assert "yukarıda özetlenen" in shaped["question_tr"].lower()

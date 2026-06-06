@@ -64,18 +64,53 @@ def hitl_ui_label(lang: str, key: str) -> str:
 
 _PROBE_QUESTIONS: Dict[str, Dict[str, str]] = {
     "tr": {
-        "typical_problem": "Aşağıda belirtilen koşul veya durum bu olayda geçerli miydi?",
-        "selection_criteria": "Aşağıda belirtilen seçim koşulu bu olayda ne ölçüde geçerliydi?",
-        "keyword": "Aşağıda belirtilen ifade veya koşul bu olayda geçerli miydi?",
-        "disambiguation_clause": "Aşağıda belirtilen ayırıcı koşul bu olayda geçerli miydi?",
+        "typical_problem": "Yukarıda özetlenen koşul bu olayda geçerli miydi?",
+        "selection_criteria": "Yukarıda özetlenen seçim koşulu bu olayda ne ölçüde geçerliydi?",
+        "keyword": "Yukarıda özetlenen ifade veya koşul bu olayda geçerli miydi?",
+        "disambiguation_clause": "Yukarıda özetlenen ayırıcı koşul bu olayda geçerli miydi?",
     },
     "en": {
-        "typical_problem": "Did the condition or situation described below apply in this incident?",
-        "selection_criteria": "To what extent did the selection criterion described below apply in this incident?",
-        "keyword": "Did the term or condition described below apply in this incident?",
-        "disambiguation_clause": "Did the distinguishing criterion described below apply in this incident?",
+        "typical_problem": "Did the condition summarized above apply in this incident?",
+        "selection_criteria": "To what extent did the selection criterion summarized above apply?",
+        "keyword": "Did the term or condition summarized above apply in this incident?",
+        "disambiguation_clause": "Did the distinguishing criterion summarized above apply?",
     },
 }
+
+_PROBE_LABELS: Dict[str, Dict[str, str]] = {
+    "tr": {
+        "category": "İlgili neden alanı",
+        "condition": "İncelenen koşul / durum",
+    },
+    "en": {
+        "category": "Related cause area",
+        "condition": "Condition under review",
+    },
+}
+
+
+def probe_context_label(lang: str, key: str = "condition") -> str:
+    code = normalize_hitl_lang(lang)
+    bucket = _PROBE_LABELS.get(code) or _PROBE_LABELS["en"]
+    return bucket.get(key) or bucket["condition"]
+
+
+def extract_probe_context_from_question(text: str) -> str:
+    """Eski gömülü soru metninden typical_problem / koşul cümlesini ayırır."""
+    raw = (text or "").strip()
+    if not raw:
+        return ""
+    patterns = (
+        r"(?i)geçerli\s+miydi:\s*(.+?)\s*\??\s*$",
+        r"(?i)geçerli\s+ydi:\s*(.+?)\s*\??\s*$",
+        r"(?i)şu durum geçerli miydi:\s*(.+?)\s*\??\s*$",
+        r"(?i)described below apply.*?:\s*(.+?)\s*\??\s*$",
+    )
+    for pat in patterns:
+        m = re.search(pat, raw)
+        if m:
+            return m.group(1).strip().rstrip("?").strip()
+    return ""
 
 
 def probe_question_for_type(probe_type: str, lang: str = "tr") -> str:

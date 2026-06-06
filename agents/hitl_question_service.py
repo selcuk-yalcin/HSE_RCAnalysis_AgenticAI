@@ -33,10 +33,12 @@ from agents.barsel_taxonomy import (
 from agents.hgs_taxonomy import parse_hsg_taxonomy_items, infer_codes_from_text
 from agents.model_constants import resolve_openrouter_chat_model
 from shared.hitl_i18n import (
+    extract_probe_context_from_question,
     has_turkish_chars,
     hitl_ui_label,
     normalize_hitl_lang,
     pick_choice_options,
+    probe_context_label,
     probe_question_for_type,
     question_batch_has_language_drift,
     response_guidance,
@@ -365,7 +367,7 @@ def _infer_response_mode(soru: str, lang: str = "tr") -> str:
     ):
         return "free_text"
     if re.search(
-        r"geçerli\s+miydi|geçerli\s+mi\b|geçerli\s+ydi|aşağıda\s+belirtilen",
+        r"geçerli\s+miydi|geçerli\s+mi\b|geçerli\s+ydi|aşağıda\s+belirtilen|yukarıda\s+özetlenen",
         low,
     ):
         return "yes_no_unknown"
@@ -574,7 +576,7 @@ def _build_deep_questions_from_barsel_taxonomy(
                 "source": "why_probe_barsel_taxonomy",
                 "code": item.code,
                 "cause_desc": item.title,
-                "hsg245": item.code,
+                "hsg245": item.title,
                 "soru": q_tr,
                 "soru_en": q_en,
                 "probe_context": problem,
@@ -595,7 +597,7 @@ def _build_deep_questions_from_barsel_taxonomy(
                 "source": "why_probe_barsel_taxonomy",
                 "code": item.code,
                 "cause_desc": item.title,
-                "hsg245": item.code,
+                "hsg245": item.title,
                 "soru": q_tr,
                 "soru_en": q_en,
                 "probe_context": clause,
@@ -1024,17 +1026,20 @@ def build_hitl_question_pool(
         _register_question(soru, seen_q_fp, seen_q_tokens)
         code = row.get("code", "")
         qid = _stable_id("d", code, soru)
-        pool.append(
-            {
-                "id": qid,
-                "source": "disambiguation_barsel" if row.get("barsel") else "disambiguation",
-                "code": code,
-                "cause_desc": row.get("cause_desc", code),
-                "hsg245": row.get("hsg245", ""),
-                "soru": soru,
-                "yönler": row.get("yönler") or {},
-            }
-        )
+        entry: dict[str, Any] = {
+            "id": qid,
+            "source": "disambiguation_barsel" if row.get("barsel") else "disambiguation",
+            "code": code,
+            "cause_desc": row.get("cause_desc", code),
+            "hsg245": row.get("hsg245", ""),
+            "soru": soru,
+            "yönler": row.get("yönler") or {},
+        }
+        if row.get("soru_en"):
+            entry["soru_en"] = row["soru_en"]
+        if row.get("probe_context"):
+            entry["probe_context"] = row["probe_context"]
+        pool.append(entry)
 
     for row in _taxonomy_gap_questions(full_text):
         soru = str(row.get("soru") or "").strip()
@@ -1096,11 +1101,33 @@ def _fallback_pool_row(q: dict, lang: str) -> dict:
     return out
 
 
+def _resolve_probe_context(q: dict, soru: str, lang: str) -> tuple[str, str, str]:
+    """probe_context + kısa soru kalıbına normalize et."""
+    probe_type = str((q.get("yönler") or {}).get("probe_type") or "typical_problem")
+    probe_ctx = str(q.get("probe_context") or "").strip()
+    embedded = extract_probe_context_from_question(soru)
+    if not probe_ctx:
+        probe_ctx = embedded
+    short_tr = probe_question_for_type(probe_type, "tr")
+    short_en = probe_question_for_type(probe_type, "en")
+    soru_en = str(q.get("soru_en") or q.get("question_en") or "").strip()
+    if probe_ctx and (embedded or probe_ctx in soru):
+        soru = short_tr
+        if not soru_en:
+            soru_en = short_en
+    return probe_ctx, soru, soru_en
+
+
 def _shape_question(q: dict, output_language: str = "tr", *, _retried: bool = False) -> dict[str, Any]:
     lang = normalize_hitl_lang(output_language)
     source = str(q.get("source", "disambiguation") or "disambiguation")
-    soru = str(q.get("soru", "") or q.get("question_tr", "") or "").strip()
+    soru = str(
+        q.get("soru", "") or q.get("question_tr", "") or q.get("question", "") or ""
+    ).strip()
     soru_en = str(q.get("soru_en", "") or q.get("question_en", "") or "").strip()
+    probe_context, soru, soru_en_resolved = _resolve_probe_context(q, soru, lang)
+    if soru_en_resolved:
+        soru_en = soru_en_resolved
     question_tr, question_en = shape_bilingual_question_fields(soru, soru_en, lang, source=source)
     if not show_taxonomy_codes_in_hitl():
         question_tr = strip_taxonomy_codes_for_display(question_tr)
@@ -1110,7 +1137,6 @@ def _shape_question(q: dict, output_language: str = "tr", *, _retried: bool = Fa
     tr_opts, en_opts = pick_choice_options({**q, **u}, lang)
     mode = u.get("response_mode", "yes_no_unknown")
     hint_raw = str(q.get("hsg245") or "")
-    probe_context = str(q.get("probe_context") or "").strip()
     shaped: dict[str, Any] = {
         "id": q["id"],
         "source": source,
@@ -1131,6 +1157,8 @@ def _shape_question(q: dict, output_language: str = "tr", *, _retried: bool = Fa
     }
     if probe_context:
         shaped["probe_context"] = probe_context
+        shaped["probe_context_label"] = probe_context_label(lang, "condition")
+        shaped["category_label"] = probe_context_label(lang, "category")
     if q.get("why_level") is not None:
         shaped["why_level"] = q.get("why_level")
     if question_batch_has_language_drift([shaped], lang) and not _retried:
