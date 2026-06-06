@@ -363,6 +363,8 @@ def _infer_response_mode(soru: str, lang: str = "tr") -> str:
         r"(?i)(mı|mi|mu|mü).*(mı|mi|mu|mü)|,\s*[^,]{2, 80}(mı|mi|mu|mü)", t
     ):
         return "free_text"
+    if re.search(r"geçerli\s+miydi|geçerli\s+mi\b|geçerli\s+ydi", low):
+        return "yes_no_unknown"
     if " veya " in low and "?" in t and len(t) > 40:
         return "free_text"
     if re.search(r"\b(or|versus|rather than)\b", low) and "?" in t and len(t) > 35:
