@@ -210,6 +210,32 @@ def strip_hsg_labels(text: str) -> str:
     return _RE_HSG_WORDS.sub("", text)
 
 
+_RE_ROOT_CAUSE_LABEL_PREFIX = re.compile(
+    r"^(?:KÖK\s*NEDEN|Kök\s*Neden|ROOT\s*CAUSE)\s*(?:\d+\s*)?[:\-–]\s*",
+    re.IGNORECASE,
+)
+
+
+def strip_root_cause_label_prefix(title: str, branch_number: int | None = None) -> str:
+    """'Kök Neden 1: …' / 'KÖK NEDEN 1: …' öneklerini kaldırır (şablonda tekrar eklenmesin)."""
+    s = strip_hse_codes(str(title or "")).strip()
+    if not s:
+        return ""
+    for _ in range(3):
+        m = _RE_ROOT_CAUSE_LABEL_PREFIX.match(s)
+        if not m:
+            break
+        s = s[m.end() :].strip()
+    if branch_number is not None:
+        s = re.sub(
+            rf"^{int(branch_number)}\s*[:\-–]\s*",
+            "",
+            s,
+            flags=re.IGNORECASE,
+        ).strip() or s
+    return s
+
+
 def strip_hse_codes(text: str) -> str:
     """Metindeki sınıflandırma kodlarını ve kod satırlarını kaldırır."""
     if not text or not isinstance(text, str):

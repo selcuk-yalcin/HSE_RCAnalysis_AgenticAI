@@ -67,7 +67,7 @@ CODE_TITLE_TR: dict[str, str] = {
     "D2.4": "Vardiyalar Arası İletişim (Handover) Yetersizliği",
     "D2.5": "İletişim Gerçekleşmedi veya Hedefe Ulaşmadı",
     "D2.6": "Yanlış veya Eksik Bilgi İletilmesi",
-    "D2.7": "Bilginin Alıcı Tarafından Yanlış Anlaşılması",
+    "D2.7": "B`ilgYinin Alıcı Tarafından Yanlış Anlaşılması",
     "D2.8": "Teknik Dokümantasyon Güncelliğinin Yönetilmemesi",
     "D3.1": "Eğitimin sağlanmaması / verilmemesi",
     "D3.2": "Eğitim tasarımının ve içeriğinin etkisiz olması",
@@ -149,11 +149,13 @@ def group_title_tr_for_code(code: str) -> str:
 def title_tr_for_code(code: str, fallback_en: str = "") -> str:
     """
     Yaprak kök neden başlığı (C1.1, D4.3 …).
-    Öncelik: BARSEL JSON → CODE_TITLE_TR → fallback_en.
+    Öncelik: CODE_TITLE_TR (resmi tablo) → BARSEL JSON → fallback_en.
     """
     key = (code or "").strip().upper()
     if not key:
         return (fallback_en or "").strip()
+    if key in CODE_TITLE_TR:
+        return CODE_TITLE_TR[key]
     try:
         from agents.barsel_taxonomy import barsel_taxonomy_enabled, official_title_tr_for_code
     except ImportError:
@@ -163,6 +165,4 @@ def title_tr_for_code(code: str, fallback_en: str = "") -> str:
         official = official_title_tr_for_code(key)
         if official:
             return official
-    if key in CODE_TITLE_TR:
-        return CODE_TITLE_TR[key]
     return (fallback_en or "").strip()

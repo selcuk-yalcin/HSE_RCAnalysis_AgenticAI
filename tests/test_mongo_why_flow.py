@@ -95,6 +95,27 @@ def test_resolve_root_code_from_why_chain():
     assert "Mühendislik / Tasarım" in branches[0]["branch_title"]
 
 
+def test_d14_official_title_uses_full_phrase_not_short_label():
+    from agents.barsel_taxonomy import root_cause_leaf_title_for_code
+
+    leaf = root_cause_leaf_title_for_code("D1.4")
+    assert "üretim baskısının güvenliğin önüne geçmesi" in leaf.lower()
+    assert leaf.lower() != "üretim baskısı"
+
+
+def test_strip_root_cause_label_prefix():
+    from agents.report_text_sanitize import strip_root_cause_label_prefix
+
+    assert (
+        strip_root_cause_label_prefix("Kök Neden 1: YETERSİZ BECERİ UYGULAMASI", 1)
+        == "YETERSİZ BECERİ UYGULAMASI"
+    )
+    assert (
+        strip_root_cause_label_prefix("KÖK NEDEN 2: Üretim baskısının güvenliğin önüne geçmesi", 2)
+        == "Üretim baskısının güvenliğin önüne geçmesi"
+    )
+
+
 def test_d52_official_titles_match_barsel_table():
     from agents.barsel_taxonomy import (
         apply_official_taxonomy_titles_to_report_branches,

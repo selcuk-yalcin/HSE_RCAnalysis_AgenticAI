@@ -152,10 +152,16 @@ def normalize_taxonomy_title(title: str) -> str:
 
 
 def official_title_tr_for_code(code: str) -> str:
-    """Rapor/HITL için resmi Türkçe yaprak başlık (barsel_taxonomy_multilingual.json)."""
+    """Rapor/HITL için resmi Türkçe yaprak başlık (CODE_TITLE_TR → barsel JSON)."""
     key = (code or "").strip().upper()
     if not key:
         return ""
+    try:
+        from agents.taxonomy_title_tr_map import CODE_TITLE_TR
+    except ImportError:
+        from .taxonomy_title_tr_map import CODE_TITLE_TR
+    if key in CODE_TITLE_TR:
+        return CODE_TITLE_TR[key]
     _ensure_index()
     item = _BY_CODE.get(key)
     if not item:
@@ -305,7 +311,7 @@ def apply_official_taxonomy_titles_to_report_branches(
                 br["root_cause_title"] = leaf
             if cf:
                 br["branch_title"] = f"KRİTİK FAKTÖR {bn} - {cf}"
-                br["root_cause_section"] = cf
+            br["root_cause_section"] = ""
         out.append(br)
     return out
 

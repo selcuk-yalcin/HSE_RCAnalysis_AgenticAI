@@ -527,6 +527,34 @@ def _register_question(text: str, seen_fingerprints: set[str], seen_token_sets: 
     seen_token_sets.append(_tokenize_question(text))
 
 
+def _probe_dedup_key(row: dict) -> str:
+    """Şablon soru metni aynı olsa bile code + probe_context ile ayır."""
+    code = str(row.get("code") or "").strip().upper()
+    probe_ctx = str(row.get("probe_context") or "").strip()
+    if probe_ctx:
+        return f"{code}|{_question_fingerprint(probe_ctx)}"
+    soru = str(row.get("soru") or row.get("question_tr") or "").strip()
+    return f"{code}|{_question_fingerprint(soru)}"
+
+
+def _should_skip_probe_row(row: dict, seen_probe_keys: set[str]) -> bool:
+    """
+    typical_problem şablonu ('Yukarıda özetlenen koşul…') tüm satırlarda aynıdır;
+    yinelenmeyi probe_context + kod ile kontrol et.
+    """
+    probe_ctx = str(row.get("probe_context") or "").strip()
+    if probe_ctx:
+        key = _probe_dedup_key(row)
+        if not key or key == "|":
+            return True
+        if key in seen_probe_keys:
+            return True
+        seen_probe_keys.add(key)
+        return False
+    soru = str(row.get("soru") or row.get("question_tr") or "").strip()
+    return not soru
+
+
 def _immediate_causes_from_payload(
     immediate_causes: list[dict] | None,
     how_happened: str = "",
@@ -625,7 +653,7 @@ def _build_deep_questions_from_barsel_taxonomy(
         q_en = probe_question_for_type("typical_problem", "en")
         out.append(
             {
-                "id": _stable_id("bx-p", code, str(why_level), str(idx), q_tr),
+                "id": _stable_id("bx-p", code, str(why_level), str(idx), problem[:96]),
                 "source": "why_probe_barsel_taxonomy",
                 "code": item.code,
                 "cause_desc": item.title,
@@ -646,7 +674,7 @@ def _build_deep_questions_from_barsel_taxonomy(
         q_en = probe_question_for_type("selection_criteria", "en")
         out.append(
             {
-                "id": _stable_id("bx-s", code, str(why_level), str(idx), q_tr),
+                "id": _stable_id("bx-s", code, str(why_level), str(idx), clause[:96]),
                 "source": "why_probe_barsel_taxonomy",
                 "code": item.code,
                 "cause_desc": item.title,
@@ -1542,6 +1570,7 @@ def build_why_probe_question_pool(
     barsel_items, barsel_by_code = _hitl_taxonomy_index(incident_ctx, deep_codes)
 
     pool: list[dict[str, Any]] = []
+    seen_probe_keys: set[str] = set()
     seen_q_fp: set[str] = set()
     seen_q_tokens: list[set[str]] = []
 
@@ -1560,11 +1589,12 @@ def build_why_probe_question_pool(
             barsel_by_code=barsel_by_code or None,
             barsel_items=barsel_items or None,
         ):
-            if str(row.get("yönler", {}).get("probe_type")) != "typical_problem":
+            probe_type = str(row.get("yönler", {}).get("probe_type") or "")
+            if probe_type not in ("typical_problem", "selection_criteria"):
+                continue
+            if _should_skip_probe_row(row, seen_probe_keys):
                 continue
             soru = str(row.get("soru") or "").strip()
-            if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
-                continue
             _register_question(soru, seen_q_fp, seen_q_tokens)
             pool.append(row)
             if len([r for r in pool if r.get("code") == code]) >= 2:
@@ -1588,13 +1618,15 @@ def build_why_probe_question_pool(
                 max_questions=1,
             )
             for row in llm_rows:
+                if _should_skip_probe_row(row, seen_probe_keys):
+                    continue
                 soru = str(row.get("soru") or "").strip()
-                if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
+                if not soru:
                     continue
                 _register_question(soru, seen_q_fp, seen_q_tokens)
                 pool.append(row)
 
-    return _filter_questions(pool[:8], known_fields=known_fields, incident_context=incident_ctx)
+    return _filter_questions(pool[:10], known_fields=known_fields, incident_context=incident_ctx)
 
 
 def next_why_probe_questions(

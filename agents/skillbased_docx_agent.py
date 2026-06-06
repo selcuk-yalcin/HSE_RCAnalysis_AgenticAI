@@ -47,6 +47,7 @@ try:
         sanitize_report_text,
         set_report_text_policy,
         short_incident_summary,
+        strip_root_cause_label_prefix,
         taxonomy_display_title,
     )
     from shared.report_layout_config import resolve_report_layout
@@ -63,6 +64,7 @@ except ImportError:
         sanitize_report_text,
         set_report_text_policy,
         short_incident_summary,
+        strip_root_cause_label_prefix,
         taxonomy_display_title,
     )
     from shared.report_layout_config import resolve_report_layout
@@ -753,7 +755,11 @@ def _build_branches(doc, branches: list):
                     run.bold = (j == 0)
         doc.add_paragraph()
         _add_subsection_header(doc, f"{3+bn}.3 {_L('subsection_root_cause')}")
-        rc_title = f"{_L('root_cause_prefix')} {bn}: {strip_hse_codes(str(branch.get('root_cause_title','') or ''))}"
+        rc_label = strip_root_cause_label_prefix(
+            str(branch.get("root_cause_title", "") or ""),
+            branch_number=bn,
+        )
+        rc_title = f"{_L('root_cause_prefix')} {bn}: {rc_label}"
         rc_content = strip_hse_codes(str(branch.get('root_cause_detail','') or ''))
         _add_colored_box(doc, rc_title, rc_content, color)
         org_factors = branch.get("organizational_factors", [])
@@ -1356,7 +1362,7 @@ class SkillBasedDocxAgent:
             root_title = root_cause_leaf_title_for_code(root_code) or str(
                 root_enriched.get("standard_title_tr") or ""
             ).strip()
-            root_section = cf_title
+            root_section = ""
             root_detail = sanitize_report_text(
                 str(root_enriched.get("explanation_tr") or root_enriched.get("explanation") or root_title)
             )
@@ -1416,7 +1422,7 @@ class SkillBasedDocxAgent:
                 detail = strip_hse_codes(
                     str(rc_enriched.get("explanation_tr") or rc_enriched.get("explanation") or title)
                 )
-                root_section = cf_title or ""
+                root_section = ""
                 branch_title = f"KRİTİK FAKTÖR {idx}"
                 if cf_title:
                     branch_title = f"KRİTİK FAKTÖR {idx} - {strip_hse_codes(cf_title)}"
@@ -3403,19 +3409,15 @@ class SkillBasedDocxAgent:
             colors = ['red', 'orange', 'green', 'blue']
             color = colors[(bn - 1) % len(colors)]
             
-            root_cause_title = strip_hse_codes(str(branch.get('root_cause_title', '') or ''))
-            root_cause_section = strip_hse_codes(str(branch.get('root_cause_section', '') or ''))
-            section_line = (
-                f'<p class="root-cause-section-trail" contenteditable="true">{root_cause_section}</p>'
-                if root_cause_section
-                else ""
+            root_cause_title = strip_root_cause_label_prefix(
+                str(branch.get("root_cause_title", "") or ""),
+                branch_number=bn,
             )
             
             html += f"""
             </div>
             
-            <div class="subsection-header">{3+bn}.3 {_L('subsection_root_cause')} ({root_cause_title})</div>
-            {section_line}
+            <div class="subsection-header">{3+bn}.3 {_L('subsection_root_cause')}</div>
             <div class="colored-box box-{color}">
                 <div class="box-header" contenteditable="true">{_L('root_cause_prefix')} {bn}: {root_cause_title}</div>
                 <div class="box-content" contenteditable="true">{format_report_html_rich(str(branch.get('root_cause_detail', '') or ''))}</div>
@@ -3501,7 +3503,7 @@ class SkillBasedDocxAgent:
         for i, rc in enumerate(root_causes):
             html += f"""
             <div class="root-cause-box root-cause-{i+1}">
-                <div class="root-cause-header" contenteditable="true">{_L('root_cause_prefix')} {i+1}: {strip_hse_codes(str(rc.get('title', '') or ''))}</div>
+                <div class="root-cause-header" contenteditable="true">{_L('root_cause_prefix')} {i+1}: {strip_root_cause_label_prefix(str(rc.get('title', '') or ''), branch_number=i + 1)}</div>
                 <div class="root-cause-content">
                     <table style="margin-bottom: 20px;">
                         <tr>
