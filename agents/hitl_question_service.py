@@ -21,10 +21,13 @@ from agents.barsel_taxonomy import (
     get_barsel_category_prompt,
     hitl_mongo_only_sources,
     hitl_mongo_rag_enabled,
+    hitl_probe_min_relevance,
     infer_barsel_codes_from_text,
     item_from_mongo_hit,
+    item_relevance_score,
     load_barsel_taxonomy_items,
     pick_typical_problems_for_hitl,
+    probe_context_relevance,
     retrieve_immediate_bands_prompt,
     snap_immediate_cause_to_barsel,
     split_selection_criteria,
@@ -209,11 +212,43 @@ def _hitl_llm_enabled() -> bool:
 
 
 def _hitl_llm_probe_enabled() -> bool:
-    """Why-probe LLM (yavaş); varsayılan kapalı — şablon sorular yeterli."""
+    """Tam LLM probe satırı üretimi (yavaş); varsayılan kapalı."""
     raw = (os.getenv("HITL_LLM_PROBE") or "0").strip().lower()
     if raw in ("0", "false", "no", "off"):
         return False
     return _hitl_llm_enabled()
+
+
+def _hitl_llm_probe_context_enabled() -> bool:
+    """probe_context olaya özelleştirme — varsayılan açık (LLM varsa)."""
+    raw = (os.getenv("HITL_LLM_PROBE_CONTEXT") or os.getenv("HITL_LLM_PROBE") or "1").strip().lower()
+    if raw in ("0", "false", "no", "off"):
+        return False
+    return _hitl_llm_enabled()
+
+
+def _hitl_max_probe_answers() -> int:
+    raw = (os.getenv("HITL_MAX_PROBE_ANSWERS") or "12").strip()
+    try:
+        return max(3, min(24, int(raw)))
+    except ValueError:
+        return 12
+
+
+def _hitl_max_probes_per_branch() -> int:
+    raw = (os.getenv("HITL_MAX_PROBES_PER_BRANCH") or "3").strip()
+    try:
+        return max(1, min(6, int(raw)))
+    except ValueError:
+        return 3
+
+
+def _hitl_max_pool_per_branch() -> int:
+    raw = (os.getenv("HITL_MAX_POOL_PER_BRANCH") or "4").strip()
+    try:
+        return max(2, min(8, int(raw)))
+    except ValueError:
+        return 4
 
 
 def _stable_narrative_fingerprint(how_happened: str, root_cause_initial: str) -> str:
@@ -646,7 +681,7 @@ def _build_deep_questions_from_barsel_taxonomy(
         item,
         incident_context,
         why_level,
-        max_problems=2,
+        max_problems=1,
     )
     for idx, problem in enumerate(problems, start=1):
         q_tr = probe_question_for_type("typical_problem", "tr")
@@ -670,6 +705,8 @@ def _build_deep_questions_from_barsel_taxonomy(
         split_selection_criteria(item.selection_criteria, max_clauses=1),
         start=1,
     ):
+        if probe_context_relevance(clause, item, incident_context) < hitl_probe_min_relevance():
+            continue
         q_tr = probe_question_for_type("selection_criteria", "tr")
         q_en = probe_question_for_type("selection_criteria", "en")
         out.append(
@@ -687,8 +724,8 @@ def _build_deep_questions_from_barsel_taxonomy(
             }
         )
 
-    contrast = find_contrast_code(item, items)
-    if contrast:
+    contrast = find_contrast_code(item, items) if why_level <= 1 else None
+    if contrast and item_relevance_score(item, incident_context) >= hitl_probe_min_relevance():
         q = (
             f"Bu olay «{item.title}» kapsamında mı, yoksa "
             f"«{contrast.title}» kapsamında mı değerlendirilmeli? "
@@ -1312,6 +1349,99 @@ def build_interim_why_question(
     return f"Why-{why_level}"
 
 
+def _incident_specific_probe_context(
+    *,
+    code: str,
+    title: str,
+    template_context: str,
+    incident_context: str,
+    output_language: str = "tr",
+) -> str:
+    """typical_problem şablonunu olay metnine göre 1 cümlelik koşula çevir."""
+    template = (template_context or "").strip()
+    incident = (incident_context or "").strip()
+    if not template or not incident:
+        return template
+    if not _hitl_llm_probe_context_enabled():
+        return template
+    api_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
+    if not api_key:
+        return template
+    lang = normalize_hitl_lang(output_language)
+    lang_rule = (
+        "Yanıt tek Türkçe cümle olsun."
+        if lang == "tr"
+        else "Single English sentence only."
+    )
+    prompt = f"""
+BARSEL kodu: {code} — {title}
+Genel koşul şablonu: {template[:500]}
+
+Olay:
+{incident[:2200]}
+
+Görev: Şablonu bu olaya özgü, somut ve kısa TEK bir koşul cümlesine çevir.
+- Petrol/maden/kontrol odası gibi olayda geçmeyen sektör örneklerini kullanma.
+- Olaydaki kişi, ekipman, lokasyon ve eylemleri kullan (varsa).
+- Evet/Hayır ile cevaplanabilir olmalı.
+- {lang_rule}
+- Sadece cümleyi yaz; JSON veya açıklama ekleme.
+""".strip()
+    try:
+        model = resolve_openrouter_chat_model()
+        if not model.startswith("openrouter/"):
+            model = f"openrouter/{model}"
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key,
+            timeout=10.0,
+        )
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.15,
+            max_tokens=180,
+        )
+        out = (resp.choices[0].message.content or "").strip()
+        out = re.sub(r"^[\"'`]+|[\"'`]+$", "", out)
+        if len(out) >= 18:
+            return out
+    except Exception:  # noqa: BLE001
+        pass
+    return template
+
+
+def _apply_incident_probe_context(
+    row: dict[str, Any],
+    item: BarselTaxonomyItem | None,
+    incident_context: str,
+    output_language: str,
+) -> dict[str, Any] | None:
+    """Önce LLM ile olaya özelleştir, sonra relevance eşiğini uygula."""
+    if not isinstance(row, dict):
+        return None
+    out = dict(row)
+    ctx = str(out.get("probe_context") or "").strip()
+    if ctx and item and _hitl_llm_probe_context_enabled():
+        tailored = _incident_specific_probe_context(
+            code=str(out.get("code") or item.code),
+            title=str(out.get("cause_desc") or item.title),
+            template_context=ctx,
+            incident_context=incident_context,
+            output_language=output_language,
+        )
+        if tailored:
+            out["probe_context"] = tailored
+            ctx = tailored
+    if item:
+        if ctx:
+            if probe_context_relevance(ctx, item, incident_context) < hitl_probe_min_relevance():
+                return None
+        elif item_relevance_score(item, incident_context) < hitl_probe_min_relevance():
+            return None
+    return out
+
+
 def _llm_probe_from_typical_problems(
     *,
     code: str,
@@ -1565,7 +1695,7 @@ def build_why_probe_question_pool(
         immediate_code,
         incident_ctx,
         retriever,
-        max_codes=3,
+        max_codes=2,
     )
     barsel_items, barsel_by_code = _hitl_taxonomy_index(incident_ctx, deep_codes)
 
@@ -1573,6 +1703,7 @@ def build_why_probe_question_pool(
     seen_probe_keys: set[str] = set()
     seen_q_fp: set[str] = set()
     seen_q_tokens: list[set[str]] = []
+    pool_cap = _hitl_max_pool_per_branch()
 
     for code in deep_codes:
         item = taxonomy_item_for_code(
@@ -1581,6 +1712,10 @@ def build_why_probe_question_pool(
             retriever=retriever,
         )
         if item is None:
+            continue
+        if item_relevance_score(item, incident_ctx) < hitl_probe_min_relevance() and code != (
+            immediate_code or ""
+        ).strip().upper():
             continue
         for row in _build_deep_questions_from_barsel_taxonomy(
             code,
@@ -1594,18 +1729,26 @@ def build_why_probe_question_pool(
                 continue
             if _should_skip_probe_row(row, seen_probe_keys):
                 continue
-            soru = str(row.get("soru") or "").strip()
+            shaped = _apply_incident_probe_context(row, item, incident_ctx, output_language)
+            if not shaped:
+                continue
+            soru = str(shaped.get("soru") or "").strip()
             _register_question(soru, seen_q_fp, seen_q_tokens)
-            pool.append(row)
-            if len([r for r in pool if r.get("code") == code]) >= 2:
+            pool.append(shaped)
+            if len([r for r in pool if r.get("code") == code]) >= 1:
+                break
+            if len(pool) >= pool_cap:
                 break
 
-        if _hitl_llm_probe_enabled() and len([r for r in pool if r.get("code") == code]) < 2:
+        if len(pool) >= pool_cap:
+            break
+
+        if _hitl_llm_probe_enabled() and len([r for r in pool if r.get("code") == code]) < 1:
             problems = pick_typical_problems_for_hitl(
                 item,
                 incident_ctx,
                 why_level,
-                max_problems=2,
+                max_problems=1,
             )
             llm_rows = _llm_probe_from_typical_problems(
                 code=item.code,
@@ -1620,13 +1763,21 @@ def build_why_probe_question_pool(
             for row in llm_rows:
                 if _should_skip_probe_row(row, seen_probe_keys):
                     continue
-                soru = str(row.get("soru") or "").strip()
+                shaped = _apply_incident_probe_context(row, item, incident_ctx, output_language)
+                if not shaped:
+                    continue
+                soru = str(shaped.get("soru") or "").strip()
                 if not soru:
                     continue
                 _register_question(soru, seen_q_fp, seen_q_tokens)
-                pool.append(row)
+                pool.append(shaped)
+                if len(pool) >= pool_cap:
+                    break
 
-    return _filter_questions(pool[:10], known_fields=known_fields, incident_context=incident_ctx)
+        if len(pool) >= pool_cap:
+            break
+
+    return _filter_questions(pool[:pool_cap], known_fields=known_fields, incident_context=incident_ctx)
 
 
 def next_why_probe_questions(
@@ -1649,6 +1800,26 @@ def next_why_probe_questions(
     Why-level ara sorular: her seviyede daha net sebep ayrımı için döngüsel API.
     """
     answered = set(answered_ids or [])
+    max_branch = _hitl_max_probes_per_branch()
+    if len(answered) >= max_branch:
+        return {
+            "questions": [],
+            "why_display": build_interim_why_question(
+                why_level,
+                immediate_code,
+                cause_tr=immediate_cause_tr,
+                previous_why_answer=previous_why_answer,
+                current_why_question=current_why_question,
+            ),
+            "target_codes": [],
+            "why_level": why_level,
+            "immediate_code": (immediate_code or "").strip().upper(),
+            "total_pool": 0,
+            "remaining_after_batch": 0,
+            "done": True,
+            "probe_limit_reached": True,
+            "output_language": normalize_hitl_lang(output_language),
+        }
     incident_ctx = "\n".join(
         [how_happened or "", root_cause_initial or "", current_why_question or "", previous_why_answer or ""]
     )
@@ -1658,7 +1829,7 @@ def next_why_probe_questions(
         immediate_code,
         incident_ctx,
         retriever,
-        max_codes=3,
+        max_codes=2,
     )
     why_display = build_interim_why_question(
         why_level,

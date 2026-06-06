@@ -22,6 +22,34 @@ def test_codes_for_why_level_includes_immediate_on_early_levels():
     assert "B2.1" in codes
 
 
+def test_codes_for_why_level_stays_in_immediate_band_at_deep_levels():
+    """Why 3+ band rotasyonu yapmamalı — A4.1 dalında C kodu gelmemeli."""
+    warehouse = (
+        "depo sayımı forklift çalışma alanı güvenlik şeridi tablet dikkat dağınıklığı "
+        "palet streç denge kaybı"
+    )
+    codes = codes_for_why_level(3, "A4.1", warehouse, None, max_codes=3)
+    assert "A4.1" in codes
+    assert all(c.startswith("A") for c in codes)
+
+
+def test_pick_typical_problems_skips_irrelevant_templates():
+    from agents.barsel_taxonomy import BarselTaxonomyItem, pick_typical_problems_for_hitl
+
+    item = BarselTaxonomyItem(
+        code="C2.4",
+        title="Yetersiz Muhakeme",
+        typical_problems=[
+            "Normal dışı verileri ölçüm hatasıdır diyerek reddetme",
+        ],
+        keywords=["ölçüm hatası"],
+        section_ids=["C", "C2"],
+    )
+    warehouse = "depo forklift tablet güvenlik şeridi palet"
+    picked = pick_typical_problems_for_hitl(item, warehouse, why_level=1, max_problems=1)
+    assert picked == []
+
+
 def test_probe_answer_affirms_fit():
     assert probe_answer_affirms_fit("Evet")
     assert probe_answer_affirms_fit("yes")

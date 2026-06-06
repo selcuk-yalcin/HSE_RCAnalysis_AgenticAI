@@ -38,9 +38,13 @@ def test_split_selection_criteria():
 
 
 def test_pick_typical_problems_rotates_by_why_level():
-    incident = "eğitim kaydı var ama uygulama yok"
-    p1 = pick_typical_problems_for_hitl(FIXTURE_ITEMS[0], incident, why_level=1, max_problems=1)
-    p2 = pick_typical_problems_for_hitl(FIXTURE_ITEMS[0], incident, why_level=2, max_problems=1)
+    incident = "eğitim kaydı var ama uygulama yok kural ihlali"
+    p1 = pick_typical_problems_for_hitl(
+        FIXTURE_ITEMS[0], incident, why_level=1, max_problems=1, min_relevance=0.0,
+    )
+    p2 = pick_typical_problems_for_hitl(
+        FIXTURE_ITEMS[0], incident, why_level=2, max_problems=1, min_relevance=0.0,
+    )
     assert p1 and p2
     assert p1 != p2 or len(FIXTURE_ITEMS[0].typical_problems) == 1
 

@@ -87,7 +87,7 @@ def test_probe_dedup_allows_same_template_different_context():
     assert _probe_dedup_key(row_a) != _probe_dedup_key(row_b)
 
 
-def test_build_why_probe_pool_keeps_multiple_typical_problems(monkeypatch):
+def test_build_why_probe_pool_one_relevant_problem_per_code(monkeypatch):
     import agents.hitl_question_service as svc
 
     multi = BarselTaxonomyItem(
@@ -103,6 +103,7 @@ def test_build_why_probe_pool_keeps_multiple_typical_problems(monkeypatch):
     monkeypatch.setattr(svc, "_BARSEL_ITEMS", [multi])
     monkeypatch.setattr(svc, "_BARSEL_BY_CODE", {multi.code: multi})
     monkeypatch.setattr(svc, "_hitl_llm_probe_enabled", lambda: False)
+    monkeypatch.setattr(svc, "_hitl_llm_probe_context_enabled", lambda: False)
     monkeypatch.setattr(
         "agents.hitl_question_service.codes_for_why_level",
         lambda *_a, **_k: [multi.code],
@@ -125,11 +126,32 @@ def test_build_why_probe_pool_keeps_multiple_typical_problems(monkeypatch):
         for r in pool
         if r.get("yönler", {}).get("probe_type") == "typical_problem"
     ]
-    assert len(prob_rows) >= 2
-    templates = {r["soru"] for r in prob_rows}
-    contexts = {r["probe_context"] for r in prob_rows}
-    assert len(templates) == 1
-    assert len(contexts) >= 2
+    assert len(prob_rows) >= 1
+    assert any("kapasite" in r["probe_context"].lower() for r in prob_rows)
+
+
+def test_next_why_probe_stops_at_branch_limit(monkeypatch):
+    import agents.hitl_question_service as svc
+
+    monkeypatch.setattr(svc, "_hitl_max_probes_per_branch", lambda: 2)
+    monkeypatch.setattr(
+        svc,
+        "_cached_why_probe_pool",
+        lambda **_k: [
+            {"id": "a", "soru": "q1", "code": "A4.1", "yönler": {}},
+            {"id": "b", "soru": "q2", "code": "A4.1", "yönler": {}},
+            {"id": "c", "soru": "q3", "code": "A4.1", "yönler": {}},
+        ],
+    )
+    out = svc.next_why_probe_questions(
+        how_happened="depo forklift",
+        root_cause_initial="",
+        answered_ids=["a", "b"],
+        immediate_code="A4.1",
+        why_level=1,
+    )
+    assert out["done"] is True
+    assert out.get("probe_limit_reached")
 
 
 def test_shape_question_splits_legacy_embedded_probe():

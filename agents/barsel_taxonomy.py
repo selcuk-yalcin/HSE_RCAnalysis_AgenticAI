@@ -526,13 +526,51 @@ def retrieve_band_taxonomy_prompt(
 
 
 def why_level_target_bands(why_level: int) -> List[str]:
-    """Why-1/2 → A/B, Why-3/4 → C, Why-5 → D."""
+    """RCA derinliği için band haritası (HITL probe artık band rotasyonu yapmaz)."""
     w = max(1, int(why_level or 1))
     if w <= 2:
         return ["A", "B"]
     if w <= 4:
         return ["C"]
     return ["D"]
+
+
+def hitl_probe_min_relevance() -> float:
+    raw = (os.getenv("HITL_PROBE_MIN_RELEVANCE") or "0.06").strip()
+    try:
+        return max(0.0, min(1.0, float(raw)))
+    except ValueError:
+        return 0.06
+
+
+def hitl_rag_min_score() -> float:
+    raw = (os.getenv("HITL_RAG_MIN_SCORE") or "0.08").strip()
+    try:
+        return max(0.02, min(0.5, float(raw)))
+    except ValueError:
+        return 0.08
+
+
+def item_relevance_score(item: BarselTaxonomyItem, incident_text: str) -> float:
+    """Olay metni ↔ taksonomi öğesi benzerlik skoru."""
+    incident = incident_text or ""
+    base = keyword_overlap_score(incident, item.to_search_text())
+    kw = keyword_overlap_score(incident, " ".join(item.keywords))
+    return base + 0.35 * kw
+
+
+def probe_context_relevance(
+    probe_context: str,
+    item: BarselTaxonomyItem,
+    incident_text: str,
+) -> float:
+    """typical_problem / selection_criteria cümlesinin olayla örtüşmesi."""
+    ctx = (probe_context or "").strip()
+    if not ctx:
+        return 0.0
+    ctx_score = keyword_overlap_score(incident_text or "", ctx)
+    item_score = item_relevance_score(item, incident_text)
+    return max(ctx_score, item_score * 0.45)
 
 
 def item_from_mongo_hit(hit: Dict[str, Any]) -> BarselTaxonomyItem:
@@ -601,43 +639,66 @@ def codes_for_why_level(
     incident_text: str,
     retriever: Any,
     *,
-    max_codes: int = 3,
+    max_codes: int = 2,
 ) -> List[str]:
-    """Seviyeye göre Mongo RAG ile hedef BARSEL kodları."""
-    bands = why_level_target_bands(why_level)
-    codes: List[str] = []
+    """
+    HITL dal-içi probe kodları.
+
+    immediate_code bandında kalır; Why seviyesi A→C→D band rotasyonu yapmaz.
+    """
+    del why_level  # dal içi scope — seviye band değiştirmez
     imm = (immediate_code or "").strip().upper()
-    if why_level <= 2 and imm:
-        codes.append(imm)
+    if not imm:
+        return []
+    codes: List[str] = [imm]
+    band = imm[0] if imm and imm[0] in "ABCD" else ""
     q = (incident_text or "")[:4000]
-    if retriever is not None and getattr(retriever, "connected", False) and q.strip():
-        cause_filter = "immediate_cause" if why_level <= 2 else "root_cause"
-        per_band = max(1, (max_codes - len(codes)) // max(1, len(bands)) + 1)
-        for band in bands:
-            hits = retriever.retrieve(
-                q,
-                k=per_band,
-                band=band,
-                cause_type_filter=cause_filter,
-                min_score=0.02,
-                keyword_pool=max(12, per_band * 3),
-            )
-            for h in hits:
-                c = str(h.get("code") or "").strip().upper()
-                if c and c not in codes:
-                    codes.append(c)
-    if not codes and imm:
-        codes.append(imm)
+    min_rel = hitl_probe_min_relevance()
+
     _ensure_index()
-    if len(codes) < max_codes and q.strip():
-        for band in bands:
-            for item in _BAND.get(band, []):
-                if item.code not in codes:
-                    codes.append(item.code)
-                if len(codes) >= max_codes:
-                    break
+    item = _BY_CODE.get(imm)
+    if item:
+        for rc in (item.related_codes or [])[:1]:
+            rel = str(rc).strip().upper()
+            if rel and rel not in codes and rel[0] == band:
+                rel_item = _BY_CODE.get(rel)
+                if rel_item and item_relevance_score(rel_item, q) >= min_rel:
+                    codes.append(rel)
+
+    if retriever is not None and getattr(retriever, "connected", False) and q.strip() and band:
+        cause_filter = "immediate_cause" if band in ("A", "B") else "root_cause"
+        hits = retriever.retrieve(
+            q,
+            k=max(1, max_codes),
+            band=band,
+            cause_type_filter=cause_filter,
+            min_score=hitl_rag_min_score(),
+            keyword_pool=12,
+        )
+        for h in hits:
+            c = str(h.get("code") or "").strip().upper()
+            if c and c not in codes and c.startswith(band):
+                codes.append(c)
+
+    if item and len(codes) < max_codes:
+        section = item.section_ids[-1] if item.section_ids else group_id_from_code(imm)
+        scored: List[tuple[float, str]] = []
+        for sib in _BAND.get(band, []):
+            if sib.code in codes:
+                continue
+            if section and not (
+                section in sib.section_ids or sib.code.startswith(f"{section}.")
+            ):
+                continue
+            score = item_relevance_score(sib, q)
+            if score >= min_rel:
+                scored.append((score, sib.code))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        for _, code in scored:
+            codes.append(code)
             if len(codes) >= max_codes:
                 break
+
     return codes[:max_codes]
 
 
@@ -1121,7 +1182,8 @@ def pick_typical_problems_for_hitl(
     incident_text: str,
     why_level: int,
     *,
-    max_problems: int = 2,
+    max_problems: int = 1,
+    min_relevance: float | None = None,
 ) -> List[str]:
     probs = [p for p in item.typical_problems if p.strip()]
     if not probs:
@@ -1129,21 +1191,21 @@ def pick_typical_problems_for_hitl(
             first = re.split(r"[.!?]\s+", item.definition.strip(), maxsplit=1)[0].strip()
             if len(first) >= 20:
                 probs = [first]
-        if not probs and item.keywords:
-            kw = ", ".join(item.keywords[:3])
-            probs = [f"Olayda «{kw}» gibi ifadeler geçiyor muydu?"]
     if not probs:
         return []
     incident = incident_text or ""
+    threshold = hitl_probe_min_relevance() if min_relevance is None else min_relevance
 
     def rank_key(problem: str) -> tuple[float, str]:
-        overlap = keyword_overlap_score(incident, problem)
-        kw_overlap = keyword_overlap_score(incident, " ".join(item.keywords))
-        return (overlap + 0.35 * kw_overlap, problem)
+        score = probe_context_relevance(problem, item, incident)
+        return (score, problem)
 
     ranked = sorted(probs, key=rank_key, reverse=True)
-    start = (max(1, why_level) - 1) % len(ranked)
-    rotated = ranked[start:] + ranked[:start]
+    filtered = [p for score, p in [(rank_key(x)[0], x) for x in ranked] if score >= threshold]
+    if not filtered:
+        return []
+    start = (max(1, why_level) - 1) % len(filtered)
+    rotated = filtered[start:] + filtered[:start]
     return rotated[:max_problems]
 
 

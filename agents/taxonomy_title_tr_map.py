@@ -67,7 +67,7 @@ CODE_TITLE_TR: dict[str, str] = {
     "D2.4": "Vardiyalar Arası İletişim (Handover) Yetersizliği",
     "D2.5": "İletişim Gerçekleşmedi veya Hedefe Ulaşmadı",
     "D2.6": "Yanlış veya Eksik Bilgi İletilmesi",
-    "D2.7": "B`ilgYinin Alıcı Tarafından Yanlış Anlaşılması",
+    "D2.7": "Bilginin Alıcı Tarafından Yanlış Anlaşılması",
     "D2.8": "Teknik Dokümantasyon Güncelliğinin Yönetilmemesi",
     "D3.1": "Eğitimin sağlanmaması / verilmemesi",
     "D3.2": "Eğitim tasarımının ve içeriğinin etkisiz olması",
