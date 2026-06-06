@@ -207,6 +207,63 @@ def _hitl_llm_enabled() -> bool:
     except Exception:
         return _HITL_LLM_ENABLED
 
+
+def _hitl_llm_probe_enabled() -> bool:
+    """Why-probe LLM (yavaş); varsayılan kapalı — şablon sorular yeterli."""
+    raw = (os.getenv("HITL_LLM_PROBE") or "0").strip().lower()
+    if raw in ("0", "false", "no", "off"):
+        return False
+    return _hitl_llm_enabled()
+
+
+def _stable_narrative_fingerprint(how_happened: str, root_cause_initial: str) -> str:
+    """HITL cevap eki cache'i kırmasın diye temel olay metni."""
+    base = re.split(r"---\s*HITL\s*---", how_happened or "", maxsplit=1)[0].strip()
+    blob = f"{base}\n{root_cause_initial or ''}".strip()[:12000]
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:20]
+
+
+def _why_pool_cache_ttl() -> int:
+    raw = (os.getenv("HITL_CACHE_TTL_SECONDS") or "900").strip()
+    try:
+        return max(60, int(raw))
+    except Exception:
+        return 900
+
+
+def _cached_why_probe_pool(
+    *,
+    tenant_id: str,
+    incident_id: str,
+    immediate_code: str,
+    why_level: int,
+    output_language: str,
+    how_happened: str,
+    root_cause_initial: str,
+    builder,
+) -> list[dict[str, Any]]:
+    if not (tenant_id and incident_id):
+        return builder()
+    try:
+        from shared.hybrid_cache import hybrid_get, hybrid_set
+    except Exception:
+        return builder()
+    key = {
+        "v": "why_pool_v2",
+        "incident_id": incident_id,
+        "immediate_code": (immediate_code or "").strip().upper(),
+        "why_level": max(1, int(why_level or 1)),
+        "lang": normalize_hitl_lang(output_language),
+        "narrative_fp": _stable_narrative_fingerprint(how_happened, root_cause_initial),
+    }
+    cached, _src = hybrid_get(tenant_id, "hitl_why_pool", key)
+    if cached and isinstance(cached.get("pool"), list) and cached["pool"]:
+        return list(cached["pool"])
+    pool = builder()
+    if pool:
+        hybrid_set(tenant_id, "hitl_why_pool", key, {"pool": pool}, _why_pool_cache_ttl())
+    return pool
+
 # "free_text" = cevap Evet/Hayır/Bilinmiyor olamaz (sebep, seçenek, açıklama beklenir).
 # "choice" = arayüzde sabit/LLM listesi; çoklu veya tek seçim (PPE, ekipman).
 
@@ -1244,7 +1301,7 @@ def _llm_probe_from_typical_problems(
     max_questions: int = 2,
 ) -> list[dict[str, Any]]:
     """Mongo typical_problems → bağlama uygun 1-2 HITL netleştirme sorusu."""
-    if not typical_problems or not _hitl_llm_enabled():
+    if not typical_problems or not _hitl_llm_probe_enabled():
         return []
     api_key = (os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
     if not api_key:
@@ -1284,13 +1341,13 @@ Kurallar:
         client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key,
-            timeout=12.0,
+            timeout=8.0,
         )
         resp = client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.15,
-            max_tokens=700,
+            max_tokens=500,
         )
         content = (resp.choices[0].message.content or "").strip()
         items = _extract_json_array(content)
@@ -1498,46 +1555,46 @@ def build_why_probe_question_pool(
         )
         if item is None:
             continue
-        problems = pick_typical_problems_for_hitl(
-            item,
-            incident_ctx,
+        for row in _build_deep_questions_from_barsel_taxonomy(
+            code,
             why_level,
-            max_problems=3,
-        )
-        llm_rows = _llm_probe_from_typical_problems(
-            code=item.code,
-            title=item.title,
-            definition=item.definition,
-            typical_problems=problems,
             incident_context=incident_ctx,
-            why_level=why_level,
-            output_language=output_language,
-            max_questions=2,
-        )
-        for row in llm_rows:
+            barsel_by_code=barsel_by_code or None,
+            barsel_items=barsel_items or None,
+        ):
+            if str(row.get("yönler", {}).get("probe_type")) != "typical_problem":
+                continue
             soru = str(row.get("soru") or "").strip()
             if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
                 continue
             _register_question(soru, seen_q_fp, seen_q_tokens)
             pool.append(row)
+            if len([r for r in pool if r.get("code") == code]) >= 2:
+                break
 
-        if len([r for r in pool if r.get("code") == code]) < 2:
-            for row in _build_deep_questions_from_barsel_taxonomy(
-                code,
+        if _hitl_llm_probe_enabled() and len([r for r in pool if r.get("code") == code]) < 2:
+            problems = pick_typical_problems_for_hitl(
+                item,
+                incident_ctx,
                 why_level,
+                max_problems=2,
+            )
+            llm_rows = _llm_probe_from_typical_problems(
+                code=item.code,
+                title=item.title,
+                definition=item.definition,
+                typical_problems=problems,
                 incident_context=incident_ctx,
-                barsel_by_code=barsel_by_code or None,
-                barsel_items=barsel_items or None,
-            ):
-                if str(row.get("yönler", {}).get("probe_type")) != "typical_problem":
-                    continue
+                why_level=why_level,
+                output_language=output_language,
+                max_questions=1,
+            )
+            for row in llm_rows:
                 soru = str(row.get("soru") or "").strip()
                 if not soru or _is_overlapping_question(soru, seen_q_fp, seen_q_tokens):
                     continue
                 _register_question(soru, seen_q_fp, seen_q_tokens)
                 pool.append(row)
-                if len([r for r in pool if r.get("code") == code]) >= 2:
-                    break
 
     return _filter_questions(pool[:8], known_fields=known_fields, incident_context=incident_ctx)
 
@@ -1554,6 +1611,9 @@ def next_why_probe_questions(
     known_fields: list[str] | None = None,
     output_language: str = "tr",
     immediate_cause_tr: str = "",
+    *,
+    tenant_id: str = "",
+    incident_id: str = "",
 ) -> dict[str, Any]:
     """
     Why-level ara sorular: her seviyede daha net sebep ayrımı için döngüsel API.
@@ -1577,15 +1637,24 @@ def next_why_probe_questions(
         previous_why_answer=previous_why_answer,
         current_why_question=current_why_question,
     )
-    pool = build_why_probe_question_pool(
-        how_happened=how_happened,
-        root_cause_initial=root_cause_initial,
+    pool = _cached_why_probe_pool(
+        tenant_id=tenant_id,
+        incident_id=incident_id,
         immediate_code=immediate_code,
         why_level=why_level,
-        current_why_question=current_why_question or why_display,
-        previous_why_answer=previous_why_answer,
-        known_fields=known_fields,
         output_language=output_language,
+        how_happened=how_happened,
+        root_cause_initial=root_cause_initial,
+        builder=lambda: build_why_probe_question_pool(
+            how_happened=how_happened,
+            root_cause_initial=root_cause_initial,
+            immediate_code=immediate_code,
+            why_level=why_level,
+            current_why_question=current_why_question or why_display,
+            previous_why_answer=previous_why_answer,
+            known_fields=known_fields,
+            output_language=output_language,
+        ),
     )
     pending = [q for q in pool if q.get("id") not in answered]
     batch = pending[: max(1, batch_size)]

@@ -1160,6 +1160,8 @@ async def hitl_dynamic_questions(
                 known_fields=body.known_fields or [],
                 output_language=output_language,
                 immediate_cause_tr=imm_tr,
+                tenant_id=tenant_id,
+                incident_id=incident_id,
             )
         else:
             payload = next_hitl_questions(
