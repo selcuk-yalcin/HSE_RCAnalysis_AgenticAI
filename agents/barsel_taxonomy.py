@@ -199,6 +199,7 @@ def critical_factor_title_for_code(code: str) -> str:
     """
     Kritik Faktör alt başlığı: C/D ana grup (section_titles son eleman).
     Örn. D8.4 → 'SATIN ALMA, MALZEME TAŞIMA VE MALZEME KONTROLÜ'
+    Örn. D9.1 → 'Standartlar / Pratikler / Prosedürler (SPP)'
     """
     key = (code or "").strip().upper()
     if not key or key[0] not in ("C", "D"):
@@ -217,9 +218,116 @@ def critical_factor_title_for_code(code: str) -> str:
     return ""
 
 
+def resolve_root_cause_code_from_branch(branch: Optional[Dict[str, Any]]) -> str:
+    """analysis_branches / rapor dalından C/D kök neden kodu çıkar."""
+    if not isinstance(branch, dict):
+        return ""
+    root = branch.get("root_cause") if isinstance(branch.get("root_cause"), dict) else {}
+    for src in (
+        str((root or {}).get("code") or ""),
+        str((root or {}).get("standard_title_tr") or ""),
+        str((root or {}).get("cause_tr") or ""),
+        str(branch.get("root_cause_title") or ""),
+    ):
+        code = extract_taxonomy_code(src)
+        if code and code[0] in ("C", "D"):
+            return code
+    why_chain = branch.get("why_chain") or branch.get("questions_and_answers") or []
+    if isinstance(why_chain, list):
+        for w in reversed(why_chain):
+            if not isinstance(w, dict):
+                continue
+            for field in ("code", "answer_tr", "answer", "question_tr", "question"):
+                code = extract_taxonomy_code(str(w.get(field) or ""))
+                if code and code[0] in ("C", "D"):
+                    return code
+    return ""
+
+
+def _raw_branch_lookup(
+    raw_branches: List[Dict[str, Any]],
+    branch_number: Any,
+    index: int,
+) -> Dict[str, Any]:
+    """branch_number ile ham RCA dalını eşleştir (LLM sıra kaymasına dayanıklı)."""
+    if not raw_branches:
+        return {}
+    by_num: Dict[Any, Dict[str, Any]] = {}
+    for i, rb in enumerate(raw_branches):
+        if not isinstance(rb, dict):
+            continue
+        bn = rb.get("branch_number") or (i + 1)
+        by_num[bn] = rb
+        by_num[i + 1] = rb
+    if branch_number in by_num:
+        return by_num[branch_number]
+    if index < len(raw_branches) and isinstance(raw_branches[index], dict):
+        return raw_branches[index]
+    return {}
+
+
 def root_cause_leaf_title_for_code(code: str) -> str:
     """Kök neden kutusu başlığı: yaprak kod title (kodsuz). Örn. D8.4 → Malzeme depolama yetersizliği."""
     return official_title_tr_for_code(code) or ""
+
+
+def apply_official_taxonomy_titles_to_report_branches(
+    branches: List[Dict[str, Any]],
+    raw_branches: Optional[List[Dict[str, Any]]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Rapor dallarında kritik faktör + kök neden başlıklarını BARSEL JSON'dan zorla.
+    LLM veya legacy CODE_TITLE_TR kısaltmaları yerine tablodaki tam Türkçe isim (kodsuz).
+    """
+    raw_branches = raw_branches or []
+    out: List[Dict[str, Any]] = []
+    for i, branch in enumerate(branches or []):
+        if not isinstance(branch, dict):
+            out.append(branch)
+            continue
+        br = dict(branch)
+        bn = br.get("branch_number") or (i + 1)
+        raw = _raw_branch_lookup(raw_branches, bn, i)
+        code = resolve_root_cause_code_from_branch(raw) or resolve_root_cause_code_from_branch(br)
+        if code and code[0] in ("C", "D"):
+            leaf = root_cause_leaf_title_for_code(code)
+            cf = critical_factor_title_for_code(code)
+            if leaf:
+                br["root_cause_title"] = leaf
+            if cf:
+                br["branch_title"] = f"KRİTİK FAKTÖR {bn} - {cf}"
+                br["root_cause_section"] = cf
+        out.append(br)
+    return out
+
+
+def apply_official_taxonomy_titles_to_root_causes(
+    root_causes: List[Dict[str, Any]],
+    raw_branches: Optional[List[Dict[str, Any]]] = None,
+) -> List[Dict[str, Any]]:
+    """Özet kök neden listesinde title/section alanlarını BARSEL ile hizala."""
+    raw_branches = raw_branches or []
+    out: List[Dict[str, Any]] = []
+    for i, rc in enumerate(root_causes or []):
+        if not isinstance(rc, dict):
+            out.append(rc)
+            continue
+        row = dict(rc)
+        bn = row.get("branch_number") or (i + 1)
+        raw = _raw_branch_lookup(raw_branches, bn, i)
+        code = (
+            resolve_root_cause_code_from_branch(raw)
+            or extract_taxonomy_code(str(row.get("code") or ""))
+        )
+        if code and code[0] in ("C", "D"):
+            leaf = root_cause_leaf_title_for_code(code)
+            cf = critical_factor_title_for_code(code)
+            if leaf:
+                row["title"] = leaf
+            if cf:
+                row["section"] = cf
+        out.append(row)
+    return out
 
 
 def build_root_cause_explanation_from_taxonomy(

@@ -529,35 +529,31 @@ def _register_question(text: str, seen_fingerprints: set[str], seen_token_sets: 
 
 def _immediate_causes_from_payload(
     immediate_causes: list[dict] | None,
-    root_cause_initial: str,
+    how_happened: str = "",
     *,
     barsel_items: list[BarselTaxonomyItem] | None = None,
+    max_codes: int = 5,
 ) -> list[dict]:
+    """Probe havuzu için kod listesi — yalnızca API çıktısı veya olay metni."""
     if immediate_causes:
         return [c for c in immediate_causes if isinstance(c, dict)]
     pool = barsel_items if barsel_items is not None else _BARSEL_ITEMS
-    codes = extract_hs_codes(root_cause_initial or "")
-    if not codes:
-        # fallback: derive candidate codes from first immediate-cause lines
-        lines = [
-            re.sub(r"^\s*\d+[\.)-]?\s*", "", ln).strip()
-            for ln in str(root_cause_initial or "").splitlines()
-            if ln.strip()
-        ][:6]
-        for ln in lines:
-            if _USE_BARSEL_HITL and pool:
-                for c in infer_barsel_codes_from_text(ln, pool, top_k=2):
-                    if c not in codes:
-                        codes.append(c)
-            else:
-                for c in infer_codes_from_text(ln, _TAXONOMY_ITEMS, top_k=2):
-                    if c not in codes:
-                        codes.append(c)
-    if not codes and pool and root_cause_initial:
-        for c in infer_barsel_codes_from_text(root_cause_initial, pool, top_k=3):
+    text = (how_happened or "").strip()
+    if not text:
+        return []
+    codes: list[str] = []
+    if _USE_BARSEL_HITL and pool:
+        for c in infer_barsel_codes_from_text(text, pool, top_k=max_codes):
             if c not in codes:
                 codes.append(c)
-    return [{"code": c, "cause_tr": c} for c in codes[:5]]
+    elif _TAXONOMY_ITEMS:
+        for c in infer_codes_from_text(text, _TAXONOMY_ITEMS, top_k=max_codes):
+            if c not in codes:
+                codes.append(c)
+    return [
+        {"code": c, "cause_tr": c, "identify_source": "narrative_infer"}
+        for c in codes[:max_codes]
+    ]
 
 
 def _build_deep_questions_from_hsg_taxonomy(code: str, why_level: int) -> list[dict]:
@@ -1043,9 +1039,8 @@ def build_hitl_question_pool(
     """
     API + Gradio için tek havuz: önce immediate cause disambiguation, sonra eksik kategori soruları.
     """
-    full_text = "\n\n".join(
-        s for s in (how_happened or "", root_cause_initial or "") if s.strip()
-    )
+    # Olay metni — formdaki «kök neden (ilk)» listesi probe bağlamına eklenmez (jenerik şablon riski).
+    full_text = (how_happened or "").strip()
     pre_codes = [
         str((c or {}).get("code") or "").strip().upper()
         for c in (immediate_causes or [])
@@ -1054,7 +1049,7 @@ def build_hitl_question_pool(
     static_pool = [] if hitl_mongo_only_sources() else _BARSEL_ITEMS
     causes = _immediate_causes_from_payload(
         immediate_causes,
-        root_cause_initial or "",
+        how_happened or "",
         barsel_items=static_pool or None,
     )
     focus_codes = [str((c or {}).get("code") or "").strip().upper() for c in causes if (c or {}).get("code")]
@@ -1062,7 +1057,7 @@ def build_hitl_question_pool(
     if not focus_codes and barsel_items:
         causes = _immediate_causes_from_payload(
             None,
-            root_cause_initial or "",
+            how_happened or "",
             barsel_items=barsel_items,
         )
         focus_codes = [str((c or {}).get("code") or "").strip().upper() for c in causes if (c or {}).get("code")]
@@ -1396,7 +1391,8 @@ def identify_immediate_causes_for_hitl(
     ADIM 1: Mongo taxonomy_barsel (A/B immediate) + LLM veya RAG fallback.
     Çıktı: [{code, cause_tr, evidence_tr, standard_title_tr, category_type}]
     """
-    incident = "\n\n".join(s for s in (how_happened or "", root_cause_initial or "") if s.strip())
+    # Yalnızca olay anlatımı — root_cause_initial form şablonu tanımlamaya dahil edilmez.
+    incident = (how_happened or "").strip()
     retriever = _hitl_barsel_retriever()
     taxonomy_ab = (
         retrieve_immediate_bands_prompt(incident, retriever)
@@ -1443,6 +1439,7 @@ Kurallar:
                 content = (resp.choices[0].message.content or "").strip()
                 for row in _extract_json_array(content)[:max_causes]:
                     if isinstance(row, dict) and row.get("code"):
+                        row["identify_source"] = "llm"
                         causes.append(snap_immediate_cause_to_barsel(row))
             except Exception:
                 causes = []
@@ -1471,12 +1468,13 @@ Kurallar:
                             "category_type": band,
                             "cause_tr": item.title,
                             "evidence_tr": prob or item.title,
+                            "identify_source": "mongo_rag",
                         }
                     )
                 )
 
     if not causes:
-        causes = _immediate_causes_from_payload(None, root_cause_initial or "")
+        causes = _immediate_causes_from_payload(None, how_happened or "")
 
     return [snap_immediate_cause_to_barsel(c) for c in causes[:max_causes] if isinstance(c, dict)]
 

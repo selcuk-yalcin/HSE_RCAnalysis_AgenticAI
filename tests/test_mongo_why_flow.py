@@ -57,6 +57,60 @@ def test_critical_factor_and_root_titles_for_d84():
     assert len(str(enriched.get("explanation_tr") or "")) > 80
 
 
+def test_critical_factor_group_titles_from_section_trail():
+    from agents.barsel_taxonomy import critical_factor_title_for_code
+
+    assert critical_factor_title_for_code("D8.4") == "SATIN ALMA, MALZEME TAŞIMA VE MALZEME KONTROLÜ"
+    assert critical_factor_title_for_code("D9.1") == "Standartlar / Pratikler / Prosedürler (SPP)"
+    assert critical_factor_title_for_code("D5.2") == "Mühendislik / Tasarım ve Teknik Sistemler"
+
+
+def test_resolve_root_code_from_why_chain():
+    from agents.barsel_taxonomy import (
+        apply_official_taxonomy_titles_to_report_branches,
+        resolve_root_cause_code_from_branch,
+    )
+
+    raw = {
+        "branch_number": 4,
+        "root_cause": {"cause_tr": "tasarım girdileri hatalı"},
+        "why_chain": [
+            {"question": "Neden?", "answer": "Eksik kapak", "code": "B2.1"},
+            {"question": "Neden 2?", "answer": "FMEA yapılmadı (D5.2)", "code": "D5.2"},
+        ],
+    }
+    assert resolve_root_cause_code_from_branch(raw) == "D5.2"
+    branches = apply_official_taxonomy_titles_to_report_branches(
+        [{"branch_number": 4, "branch_title": "KRİTİK FAKTÖR 4 - TEKNİK/EKİPMAN NEDEN"}],
+        [raw],
+    )
+    assert "TEKNİK/EKİPMAN" not in branches[0]["branch_title"]
+    assert "Mühendislik / Tasarım" in branches[0]["branch_title"]
+
+
+def test_d52_official_titles_match_barsel_table():
+    from agents.barsel_taxonomy import (
+        apply_official_taxonomy_titles_to_report_branches,
+        critical_factor_title_for_code,
+        root_cause_leaf_title_for_code,
+    )
+
+    leaf = root_cause_leaf_title_for_code("D5.2")
+    assert "standartlar" in leaf.lower() or "şartname" in leaf.lower()
+    assert "Tasarım Girdileri Hatalı" != leaf
+    cf = critical_factor_title_for_code("D5.2")
+    assert "Mühendislik" in cf or "Tasarım" in cf
+    assert not cf.upper().startswith("D5")
+
+    branches = apply_official_taxonomy_titles_to_report_branches(
+        [{"branch_number": 4, "root_cause_title": "Tasarım Girdileri Hatalı", "branch_title": "KRİTİK FAKTÖR 4 - TEKNİK/EKİPMAN"}],
+        [{"root_cause": {"code": "D5.2"}}],
+    )
+    assert branches[0]["root_cause_title"] == leaf
+    assert "TEKNİK/EKİPMAN" not in branches[0]["branch_title"]
+    assert cf in branches[0]["branch_title"]
+
+
 def test_build_definition_based_why_answer():
     from agents.barsel_taxonomy import BarselTaxonomyItem
 

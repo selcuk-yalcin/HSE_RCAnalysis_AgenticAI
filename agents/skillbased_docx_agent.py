@@ -260,7 +260,7 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
   "branches": [
     {
       "branch_number": 1,
-      "branch_title": "KRİTİK FAKTÖR 1 - KOŞULSAL NEDEN",
+      "branch_title": "KRİTİK FAKTÖR 1 - Mühendislik / Tasarım ve Teknik Sistemler",
       "initial_condition": "Bu faktörün başlangıç koşulu - 1 paragraf",
       "direct_cause": "Doğrudan nedenin kısa açıklaması",
       "why_chain": [
@@ -1252,6 +1252,35 @@ class SkillBasedDocxAgent:
                 merged[key] = self._merge_with_fallback_content(cur_val, fb_val)
         return merged
 
+    def _enforce_taxonomy_titles(self, content: Dict, raw_data: Dict) -> Dict:
+        """LLM kısaltmalarını ezip BARSEL tablo başlıklarını (kodsuz) rapora yazar."""
+        if not isinstance(content, dict):
+            return content
+        try:
+            from agents.barsel_taxonomy import (
+                apply_official_taxonomy_titles_to_report_branches,
+                apply_official_taxonomy_titles_to_root_causes,
+            )
+        except ImportError:
+            from .barsel_taxonomy import (
+                apply_official_taxonomy_titles_to_report_branches,
+                apply_official_taxonomy_titles_to_root_causes,
+            )
+        part3 = raw_data.get("part3_rca") or {}
+        raw_branches = part3.get("analysis_branches") or part3.get("branches") or []
+        out = copy.deepcopy(content)
+        if out.get("branches"):
+            out["branches"] = apply_official_taxonomy_titles_to_report_branches(
+                out["branches"],
+                raw_branches,
+            )
+        if out.get("root_causes"):
+            out["root_causes"] = apply_official_taxonomy_titles_to_root_causes(
+                out["root_causes"],
+                raw_branches,
+            )
+        return out
+
     def _build_deterministic_fallback_content(self, raw_data: Dict, lang: Optional[Dict] = None) -> Dict:
         """LLM başarısız olsa bile boş olmayan rapor iskeleti üret."""
         lang = lang or {"code": "tr"}
@@ -1303,35 +1332,31 @@ class SkillBasedDocxAgent:
                 from agents.barsel_taxonomy import (
                     critical_factor_title_for_code,
                     enrich_root_cause_from_taxonomy,
+                    extract_taxonomy_code,
+                    resolve_root_cause_code_from_branch,
                     root_cause_leaf_title_for_code,
-                    section_titles_tr_for_code,
                 )
             except ImportError:
                 from .barsel_taxonomy import (
                     critical_factor_title_for_code,
                     enrich_root_cause_from_taxonomy,
+                    extract_taxonomy_code,
+                    resolve_root_cause_code_from_branch,
                     root_cause_leaf_title_for_code,
-                    section_titles_tr_for_code,
                 )
             root_enriched = enrich_root_cause_from_taxonomy(
                 root,
                 incident_hint=str(immediate.get("evidence_tr") or incident_summary[:400]),
             )
-            root_code = str(root_enriched.get("code") or root_code).strip().upper()
-            cf_title = (
-                str(root_enriched.get("critical_factor_title") or "").strip()
-                or critical_factor_title_for_code(root_code)
+            root_code = (
+                resolve_root_cause_code_from_branch(br)
+                or extract_taxonomy_code(str(root_enriched.get("code") or root_code or ""))
             )
-            root_title = (
-                root_cause_leaf_title_for_code(root_code)
-                or taxonomy_display_title(
-                    root_code,
-                    str(root_enriched.get("standard_title_tr") or ""),
-                    str(root_enriched.get("cause_tr") or ""),
-                )
-            )
-            section_trail = section_titles_tr_for_code(root_code)
-            root_section = cf_title or (section_trail[-1] if section_trail else "")
+            cf_title = critical_factor_title_for_code(root_code)
+            root_title = root_cause_leaf_title_for_code(root_code) or str(
+                root_enriched.get("standard_title_tr") or ""
+            ).strip()
+            root_section = cf_title
             root_detail = sanitize_report_text(
                 str(root_enriched.get("explanation_tr") or root_enriched.get("explanation") or root_title)
             )
@@ -1370,25 +1395,24 @@ class SkillBasedDocxAgent:
                     from agents.barsel_taxonomy import (
                         critical_factor_title_for_code,
                         enrich_root_cause_from_taxonomy,
+                        extract_taxonomy_code,
                         root_cause_leaf_title_for_code,
                     )
                 except ImportError:
                     from .barsel_taxonomy import (
                         critical_factor_title_for_code,
                         enrich_root_cause_from_taxonomy,
+                        extract_taxonomy_code,
                         root_cause_leaf_title_for_code,
                     )
                 rc_enriched = enrich_root_cause_from_taxonomy(rc)
-                rc_code = str(rc_enriched.get("code") or rc_code).strip().upper()
-                cf_title = (
-                    str(rc_enriched.get("critical_factor_title") or "").strip()
-                    or critical_factor_title_for_code(rc_code)
+                rc_code = extract_taxonomy_code(
+                    str(rc_enriched.get("code") or rc_code or "")
                 )
-                title = root_cause_leaf_title_for_code(rc_code) or taxonomy_display_title(
-                    rc_code,
-                    str(rc_enriched.get("standard_title_tr") or ""),
-                    str(rc_enriched.get("cause_tr") or ""),
-                )
+                cf_title = critical_factor_title_for_code(rc_code)
+                title = root_cause_leaf_title_for_code(rc_code) or str(
+                    rc_enriched.get("standard_title_tr") or ""
+                ).strip()
                 detail = strip_hse_codes(
                     str(rc_enriched.get("explanation_tr") or rc_enriched.get("explanation") or title)
                 )
@@ -1614,7 +1638,8 @@ class SkillBasedDocxAgent:
         # 1) İlk deneme
         parsed = _request_and_parse(base_payload, "attempt-1")
         if parsed:
-            return self._merge_with_fallback_content(parsed, deterministic_fallback)
+            merged = self._merge_with_fallback_content(parsed, deterministic_fallback)
+            return self._enforce_taxonomy_titles(merged, raw_data)
 
         # 2) Parse/format bozuksa, daha katı prompt ve düşük temperature ile bir kez yeniden dene
         retry_payload = copy.deepcopy(base_payload)
@@ -1632,10 +1657,11 @@ class SkillBasedDocxAgent:
         print("  🔁 İlk deneme parse edilemedi, katı JSON modunda ikinci deneme yapılıyor...")
         parsed_retry = _request_and_parse(retry_payload, "attempt-2")
         if parsed_retry:
-            return self._merge_with_fallback_content(parsed_retry, deterministic_fallback)
+            merged = self._merge_with_fallback_content(parsed_retry, deterministic_fallback)
+            return self._enforce_taxonomy_titles(merged, raw_data)
 
         print("  ⚠️  Tüm denemeler başarısız, deterministic fallback rapora düşülüyor (boş rapor engellendi).")
-        return deterministic_fallback
+        return self._enforce_taxonomy_titles(deterministic_fallback, raw_data)
 
     def _parse_json_response(self, text: str) -> Optional[Dict]:
         last_error: Optional[Exception] = None

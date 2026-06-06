@@ -240,9 +240,19 @@ def strip_hse_codes(text: str) -> str:
 
 def taxonomy_display_title(code: str = "", title_en: str = "", cause_tr: str = "") -> str:
     """
-    Kök neden kutusu için Türkçe başlık: önce BARSEL/resmi kod haritası, sonra temizlenmiş cause_tr.
+    Kök neden kutusu için Türkçe başlık: BARSEL JSON tam yaprak adı (kodsuz, kısaltmasız).
     """
     code_key = (code or "").strip().upper()
+    try:
+        from agents.barsel_taxonomy import barsel_taxonomy_enabled, official_title_tr_for_code
+    except ImportError:
+        from .barsel_taxonomy import barsel_taxonomy_enabled, official_title_tr_for_code
+
+    if code_key and barsel_taxonomy_enabled():
+        official = official_title_tr_for_code(code_key)
+        if official:
+            return strip_hse_codes(official)
+
     mapped = title_tr_for_code(code_key, "")
     if mapped:
         return strip_hse_codes(mapped)

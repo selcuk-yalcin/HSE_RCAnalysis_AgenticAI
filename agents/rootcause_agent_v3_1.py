@@ -327,7 +327,13 @@ def _try_snap_to_taxonomy(
     except ImportError:
         from .report_text_sanitize import sanitize_report_text, taxonomy_display_title
 
-    cause_tr = taxonomy_display_title(
+    try:
+        from agents.barsel_taxonomy import official_title_tr_for_code, root_cause_leaf_title_for_code
+    except ImportError:
+        from .barsel_taxonomy import official_title_tr_for_code, root_cause_leaf_title_for_code
+
+    leaf = root_cause_leaf_title_for_code(item.code) or official_title_tr_for_code(item.code) or (item.title or "").strip()
+    cause_tr = leaf or taxonomy_display_title(
         item.code,
         (item.title or "").strip(),
         sanitize_report_text(narrative),
@@ -335,14 +341,10 @@ def _try_snap_to_taxonomy(
     explanation_tr = sanitize_report_text((base_explanation or "").strip())
     if not explanation_tr:
         explanation_tr = sanitize_report_text(narrative)
-    try:
-        from agents.barsel_taxonomy import official_title_tr_for_code
-    except ImportError:
-        from .barsel_taxonomy import official_title_tr_for_code
 
     return {
         "code": item.code,
-        "standard_title_tr": official_title_tr_for_code(item.code) or (item.title or "").strip(),
+        "standard_title_tr": leaf,
         "cause_tr": cause_tr,
         "category_type": category_type,
         "explanation_tr": explanation_tr,
