@@ -23,11 +23,12 @@ from agents.barsel_taxonomy import (
 )
 
 _KEYWORD_QUESTION_TEMPLATES = (
-    "Bu olayda «{kw}» ifadesi gerçekten geçerli miydi?",
+    "keyword",
     "Tanık veya kayıtlarda «{kw}» ile örtüşen bir durum var mıydı?",
     "«{kw}» bu olayı açıklamak için doğru bir çerçeve mi?",
 )
 from agents.hitl_disambiguation_bank import GENEL_DISAMBIGUATION, HSG245_DISAMBIGUATION
+from shared.hitl_i18n import probe_question_for_type
 
 # Eksik kategori soruları — QuestionEngine metinleri, HSG kod bağlantısı yok
 BARSEL_TAXONOMY_GAP_TEMPLATES: dict[str, dict[str, Any]] = {
@@ -171,7 +172,9 @@ def _code_specific_probes_for_item(
         for clause in rotated[1:2]:
             out.append(
                 {
-                    "question": f"«{item.title}» için şu ayırıcı koşul geçerli miydi: {clause}?",
+                    "question": probe_question_for_type("disambiguation_clause", "tr"),
+                    "question_en": probe_question_for_type("disambiguation_clause", "en"),
+                    "probe_context": clause,
                     "code": item.code,
                     "code_description": item.title,
                     "hsg245": item.title,
@@ -248,7 +251,9 @@ def _code_specific_probes_for_item(
     for prob in probs:
         out.append(
             {
-                "question": f"«{item.title}» bağlamında şu durum geçerli miydi: {prob}?",
+                "question": probe_question_for_type("typical_problem", "tr"),
+                "question_en": probe_question_for_type("typical_problem", "en"),
+                "probe_context": prob,
                 "code": item.code,
                 "code_description": item.title,
                 "hsg245": item.title,
@@ -329,7 +334,10 @@ def _questions_from_barsel_item(
     ):
         out.append(
             {
-                "soru": f"Bu olayda şu durum geçerli miydi: {prob}?",
+                "soru": probe_question_for_type("typical_problem", "tr"),
+                "soru_en": probe_question_for_type("typical_problem", "en"),
+                "probe_context": prob,
+                "cause_desc": item.title,
                 "hsg245": item.title,
                 "yönler": {"probe_type": "typical_problem"},
             }
@@ -337,7 +345,10 @@ def _questions_from_barsel_item(
     for clause in split_selection_criteria(item.selection_criteria, max_clauses=1):
         out.append(
             {
-                "soru": f"Bu olayda şu koşul ne ölçüde geçerliydi: {clause}?",
+                "soru": probe_question_for_type("selection_criteria", "tr"),
+                "soru_en": probe_question_for_type("selection_criteria", "en"),
+                "probe_context": clause,
+                "cause_desc": item.title,
                 "hsg245": item.title,
                 "yönler": {"probe_type": "selection_criteria"},
             }
@@ -347,13 +358,25 @@ def _questions_from_barsel_item(
         item, incident_context, slot_index=slot, max_keywords=2
     ):
         tpl = _KEYWORD_QUESTION_TEMPLATES[slot % len(_KEYWORD_QUESTION_TEMPLATES)]
-        out.append(
-            {
-                "soru": tpl.format(kw=kw),
+        if tpl == "keyword":
+            soru = probe_question_for_type("keyword", "tr")
+            soru_en = probe_question_for_type("keyword", "en")
+            row = {
+                "soru": soru,
+                "soru_en": soru_en,
+                "probe_context": kw,
+                "cause_desc": item.title,
                 "hsg245": item.title,
                 "yönler": {"probe_type": "keyword_rag", "keyword": kw},
             }
-        )
+        else:
+            row = {
+                "soru": tpl.format(kw=kw),
+                "cause_desc": item.title,
+                "hsg245": item.title,
+                "yönler": {"probe_type": "keyword_rag", "keyword": kw},
+            }
+        out.append(row)
         slot += 1
 
     contrast = find_contrast_code(item, all_items)
@@ -446,16 +469,19 @@ def build_barsel_questions_for_causes(
             if soru in seen:
                 continue
             seen.add(soru)
-            questions.append(
-                {
-                    "code": code,
-                    "cause_desc": cause_desc,
-                    "soru": soru,
-                    "hsg245": q.get("hsg245", ""),
-                    "yönler": q.get("yönler") or {},
-                    "barsel": True,
-                }
-            )
+            row = {
+                "code": code,
+                "cause_desc": q.get("cause_desc") or cause_desc,
+                "soru": soru,
+                "hsg245": q.get("hsg245", ""),
+                "yönler": q.get("yönler") or {},
+                "barsel": True,
+            }
+            if q.get("soru_en"):
+                row["soru_en"] = q["soru_en"]
+            if q.get("probe_context"):
+                row["probe_context"] = q["probe_context"]
+            questions.append(row)
     return questions[:8]
 
 

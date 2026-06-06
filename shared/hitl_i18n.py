@@ -62,6 +62,30 @@ def hitl_ui_label(lang: str, key: str) -> str:
     return bucket.get(key) or _UI["en"].get(key, key)
 
 
+_PROBE_QUESTIONS: Dict[str, Dict[str, str]] = {
+    "tr": {
+        "typical_problem": "Aşağıda belirtilen koşul veya durum bu olayda geçerli miydi?",
+        "selection_criteria": "Aşağıda belirtilen seçim koşulu bu olayda ne ölçüde geçerliydi?",
+        "keyword": "Aşağıda belirtilen ifade veya koşul bu olayda geçerli miydi?",
+        "disambiguation_clause": "Aşağıda belirtilen ayırıcı koşul bu olayda geçerli miydi?",
+    },
+    "en": {
+        "typical_problem": "Did the condition or situation described below apply in this incident?",
+        "selection_criteria": "To what extent did the selection criterion described below apply in this incident?",
+        "keyword": "Did the term or condition described below apply in this incident?",
+        "disambiguation_clause": "Did the distinguishing criterion described below apply in this incident?",
+    },
+}
+
+
+def probe_question_for_type(probe_type: str, lang: str = "tr") -> str:
+    """HITL probe kalıbı — bağlam metni ayrı `probe_context` alanında gösterilir."""
+    code = normalize_hitl_lang(lang)
+    bucket = _PROBE_QUESTIONS.get(code) or _PROBE_QUESTIONS["en"]
+    key = (probe_type or "typical_problem").strip().lower()
+    return bucket.get(key) or bucket["typical_problem"]
+
+
 def response_guidance(response_mode: str, lang: str) -> str:
     mode = (response_mode or "").strip().lower()
     if mode == "free_text":

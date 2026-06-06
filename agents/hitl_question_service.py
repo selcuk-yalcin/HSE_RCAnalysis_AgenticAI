@@ -37,6 +37,7 @@ from shared.hitl_i18n import (
     hitl_ui_label,
     normalize_hitl_lang,
     pick_choice_options,
+    probe_question_for_type,
     question_batch_has_language_drift,
     response_guidance,
     safe_fallback_question,
@@ -363,7 +364,10 @@ def _infer_response_mode(soru: str, lang: str = "tr") -> str:
         r"(?i)(mı|mi|mu|mü).*(mı|mi|mu|mü)|,\s*[^,]{2, 80}(mı|mi|mu|mü)", t
     ):
         return "free_text"
-    if re.search(r"geçerli\s+miydi|geçerli\s+mi\b|geçerli\s+ydi", low):
+    if re.search(
+        r"geçerli\s+miydi|geçerli\s+mi\b|geçerli\s+ydi|aşağıda\s+belirtilen",
+        low,
+    ):
         return "yes_no_unknown"
     if " veya " in low and "?" in t and len(t) > 40:
         return "free_text"
@@ -562,15 +566,18 @@ def _build_deep_questions_from_barsel_taxonomy(
         max_problems=2,
     )
     for idx, problem in enumerate(problems, start=1):
-        q = f"Bu olayda şu durum geçerli miydi: {problem}?"
+        q_tr = probe_question_for_type("typical_problem", "tr")
+        q_en = probe_question_for_type("typical_problem", "en")
         out.append(
             {
-                "id": _stable_id("bx-p", code, str(why_level), str(idx), q),
+                "id": _stable_id("bx-p", code, str(why_level), str(idx), q_tr),
                 "source": "why_probe_barsel_taxonomy",
                 "code": item.code,
                 "cause_desc": item.title,
                 "hsg245": item.code,
-                "soru": q,
+                "soru": q_tr,
+                "soru_en": q_en,
+                "probe_context": problem,
                 "yönler": {"probe_type": "typical_problem"},
                 "why_level": why_level,
             }
@@ -580,15 +587,18 @@ def _build_deep_questions_from_barsel_taxonomy(
         split_selection_criteria(item.selection_criteria, max_clauses=1),
         start=1,
     ):
-        q = f"Bu olayda şu koşul ne ölçüde geçerliydi: {clause}?"
+        q_tr = probe_question_for_type("selection_criteria", "tr")
+        q_en = probe_question_for_type("selection_criteria", "en")
         out.append(
             {
-                "id": _stable_id("bx-s", code, str(why_level), str(idx), q),
+                "id": _stable_id("bx-s", code, str(why_level), str(idx), q_tr),
                 "source": "why_probe_barsel_taxonomy",
                 "code": item.code,
                 "cause_desc": item.title,
                 "hsg245": item.code,
-                "soru": q,
+                "soru": q_tr,
+                "soru_en": q_en,
+                "probe_context": clause,
                 "yönler": {"probe_type": "selection_criteria"},
                 "why_level": why_level,
             }
@@ -1100,6 +1110,7 @@ def _shape_question(q: dict, output_language: str = "tr", *, _retried: bool = Fa
     tr_opts, en_opts = pick_choice_options({**q, **u}, lang)
     mode = u.get("response_mode", "yes_no_unknown")
     hint_raw = str(q.get("hsg245") or "")
+    probe_context = str(q.get("probe_context") or "").strip()
     shaped: dict[str, Any] = {
         "id": q["id"],
         "source": source,
@@ -1114,12 +1125,12 @@ def _shape_question(q: dict, output_language: str = "tr", *, _retried: bool = Fa
         "choice_options": tr_opts,
         "choice_options_en": en_opts,
         "choice_multi": bool(u.get("choice_multi", False)),
-        "helper_hint": hitl_ui_label(
-            lang,
-            "choice_other_hint" if mode == "choice" else "yes_no_hint",
-        ),
+        "helper_hint": probe_context
+        or hitl_ui_label(lang, "choice_other_hint" if mode == "choice" else "yes_no_hint"),
         "response_guidance": response_guidance(mode, lang),
     }
+    if probe_context:
+        shaped["probe_context"] = probe_context
     if q.get("why_level") is not None:
         shaped["why_level"] = q.get("why_level")
     if question_batch_has_language_drift([shaped], lang) and not _retried:
@@ -1231,11 +1242,12 @@ Typical problems (MongoDB):
 {prob_block}
 
 Kurallar:
-- En fazla {max_questions} soru; her biri tek cümle, soru işareti ile bitsin.
-- typical_problems cümlesini kopyalama; olaya uyarlayarak sor.
+- En fazla {max_questions} soru.
+- Soru metni kısa kalıp olsun: "Aşağıda belirtilen koşul veya durum bu olayda geçerli miydi?" (EN: "Did the condition described below apply in this incident?").
+- typical_problems cümlesini soruya gömmeyin; probe_context alanına yazın.
 - answer_format: yes_no (Evet/Hayır/Bilinmiyor yeterli).
 - {lang_rule}
-- JSON array: [{{"question_tr":"...","question_en":"...","code":"{code}","answer_format":"yes_no"}}]
+- JSON array: [{{"question_tr":"...","question_en":"...","probe_context":"typical_problem cümlesi","code":"{code}","answer_format":"yes_no"}}]
 """.strip()
     try:
         model = resolve_openrouter_chat_model()
@@ -1258,23 +1270,31 @@ Kurallar:
         for i, it in enumerate(items[:max_questions], start=1):
             q_tr = str(it.get("question_tr") or "").strip()
             q_en = str(it.get("question_en") or "").strip()
+            probe_ctx = str(it.get("probe_context") or "").strip()
+            if not probe_ctx and typical_problems:
+                probe_ctx = typical_problems[min(i - 1, len(typical_problems) - 1)]
+            if not q_tr:
+                q_tr = probe_question_for_type("typical_problem", "tr")
+            if not q_en:
+                q_en = probe_question_for_type("typical_problem", "en")
             q = q_en if lang == "en" else (q_tr or q_en)
             if not q:
                 continue
-            out.append(
-                {
-                    "id": _stable_id("tp-llm", code, str(why_level), str(i), q),
-                    "source": "why_probe_typical_problems_llm",
-                    "code": code,
-                    "cause_desc": title,
-                    "hsg245": code,
-                    "soru": q_tr or q,
-                    "soru_en": q_en,
-                    "yönler": {"probe_type": "typical_problem"},
-                    "why_level": why_level,
-                    "response_mode": "yes_no_unknown",
-                }
-            )
+            row: dict[str, Any] = {
+                "id": _stable_id("tp-llm", code, str(why_level), str(i), q),
+                "source": "why_probe_typical_problems_llm",
+                "code": code,
+                "cause_desc": title,
+                "hsg245": code,
+                "soru": q_tr or q,
+                "soru_en": q_en,
+                "yönler": {"probe_type": "typical_problem"},
+                "why_level": why_level,
+                "response_mode": "yes_no_unknown",
+            }
+            if probe_ctx:
+                row["probe_context"] = probe_ctx
+            out.append(row)
         return out
     except Exception:
         return []

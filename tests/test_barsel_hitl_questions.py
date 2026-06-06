@@ -64,7 +64,11 @@ def test_build_deep_questions_barsel_mode(monkeypatch):
         incident_context="çalışan kuralı biliyordu tek başına ihlal etti",
     )
     assert rows
-    assert any("Tipik problem" in r["soru"] or "geçerli miydi" in r["soru"] for r in rows)
+    assert any(
+        "aşağıda belirtilen" in r["soru"].lower() or "geçerli miydi" in r["soru"].lower()
+        for r in rows
+    )
+    assert any(r.get("probe_context") for r in rows)
     assert rows[0]["source"] == "why_probe_barsel_taxonomy"
 
 
