@@ -941,6 +941,8 @@ class WhyChain(dspy.Module):
         probe_answers_by_level: Optional[Dict[int, List[Dict]]] = None,
         forbidden_root_codes: Optional[List[str]] = None,
         branch_angle: str = "",
+        affirmed_root_codes: Optional[List[str]] = None,
+        affirmed_probe_texts: Optional[List[str]] = None,
     ) -> Dict:
         """
         Tam 5-Why zinciri
@@ -959,6 +961,8 @@ class WhyChain(dspy.Module):
         if previous_why_answers is None:
             previous_why_answers = []
         forbidden_root_codes = forbidden_root_codes or []
+        affirmed_root_codes = [str(c).strip().upper() for c in (affirmed_root_codes or []) if str(c).strip()]
+        affirmed_probe_texts = [t for t in (affirmed_probe_texts or []) if str(t).strip()]
         taxonomy_cd_blob = (taxonomy_c or "") + "\n" + (taxonomy_d or "")
 
         chain = []
@@ -1003,6 +1007,14 @@ class WhyChain(dspy.Module):
                     "\n\nYASAK KÖK KODLAR (bu dallarda kullanma): "
                     + ", ".join(forbidden_root_codes)
                 )
+            # P1.22-RC4: HITL'de kullanıcının "Evet" dediği aday kök kodlar — tercih sinyali.
+            if affirmed_root_codes and level >= 4:
+                allowed = [c for c in affirmed_root_codes if c not in forbidden_root_codes]
+                if allowed:
+                    taxonomy += (
+                        "\n\nTERCİH EDİLEN KÖK KODLAR (olaya uygunluğu kullanıcı tarafından onaylandı, "
+                        "uygunsa bunları seç): " + ", ".join(allowed)
+                    )
 
             incident_ctx = incident_summary
             probe_ctx = self._probe_context_for_level(level, probe_answers_by_level)
@@ -1071,6 +1083,33 @@ class WhyChain(dspy.Module):
                     taxonomy_codes=taxonomy,
                 )
                 answer_raw = demote_solution_to_cause((answer_result.answer or "").strip())
+                # P1.23-G1: W1 circularity guard — cevap doğrudan nedeni neredeyse aynen
+                # tekrar ediyorsa (Jaccard > 0.55) tek bir retry ile alt mekanizma iste.
+                if level == 1 and answer_raw:
+                    try:
+                        from agents.why_chain_quality import token_jaccard
+                    except ImportError:
+                        from .why_chain_quality import token_jaccard
+                    imm_text = str(
+                        immediate_cause.get("cause_tr")
+                        or immediate_cause.get("standard_title_tr")
+                        or ""
+                    ).strip()
+                    base_sim = token_jaccard(answer_raw, imm_text) if imm_text else 0.0
+                    if base_sim > 0.55:
+                        retry_result = self.why_answer(
+                            question=question_raw,
+                            incident_context=(
+                                incident_ctx
+                                + "\n\nUYARI: Yukarıdaki doğrudan nedeni TEKRARLAMA; "
+                                "onu doğuran bir ALT mekanizmayı veya öncülü açıkla."
+                            ),
+                            taxonomy_codes=taxonomy,
+                        )
+                        retry_ans = demote_solution_to_cause((retry_result.answer or "").strip())
+                        if retry_ans and token_jaccard(retry_ans, imm_text) < base_sim:
+                            answer_raw = retry_ans
+                            answer_result = retry_result
             else:
                 answer_result = None
             if is_solution_language(answer_raw):
@@ -1139,6 +1178,12 @@ class WhyChain(dspy.Module):
                 qtxt = str((prow or {}).get("question") or "").strip()
                 if qtxt:
                     affirmed_probs.append(qtxt)
+
+        # P1.22-RC4: kök neden aday probe'larından (C/D) onaylanan typical_problems metinleri.
+        for txt in affirmed_probe_texts:
+            t = str(txt).strip()
+            if t and t not in affirmed_probs:
+                affirmed_probs.append(t)
 
         root_cause_data = derive_root_cause_from_why5(
             chain[-1],
@@ -1243,7 +1288,7 @@ class RootCauseAgentV3_1:
         use_rag: bool = False,
         enable_diversity_check: bool = True,
         enable_branch_critic: bool = True,
-        critic_jaccard_threshold: float = 0.25,
+        critic_jaccard_threshold: float = 0.18,
         critic_max_regenerations: int = 3,
         *,
         use_chain_of_thought: bool = True,
@@ -1542,13 +1587,38 @@ class RootCauseAgentV3_1:
         )
         return effective
 
-    def _collapse_redundant_branches(self, rca_data: Dict, threshold: float = 0.68) -> None:
-        """Kök neden metinleri çok benzer dalları tekilleştir."""
+    @staticmethod
+    def _deep_chain_fingerprint(branch: Dict) -> str:
+        """P1.23-G3: Benzerlik için W3-W5 (derin) cevaplarını parmak izi yap."""
+        deep: List[str] = []
+        for w in (branch.get("why_chain") or []):
+            try:
+                lvl = int(w.get("level") or w.get("number") or 0)
+            except (TypeError, ValueError):
+                lvl = 0
+            if lvl >= 3:
+                deep.append(str(w.get("answer_tr") or w.get("answer") or ""))
+        if not deep:
+            deep = [
+                str(w.get("answer_tr") or w.get("answer") or "")
+                for w in (branch.get("why_chain") or [])
+            ]
+        return " ".join(deep).strip()
+
+    def _collapse_redundant_branches(
+        self,
+        rca_data: Dict,
+        threshold: float = 0.55,
+        *,
+        min_keep: int = 2,
+    ) -> None:
+        """Kök neden metinleri çok benzer dalları tekilleştir (min-dal floor korunur)."""
         branches = rca_data.get("analysis_branches") or []
         if len(branches) < 2:
             return
         kept: List[Dict] = []
         kept_roots: List[Dict] = []
+        dropped_branches: List[Dict] = []
         for branch in branches:
             root = branch.get("root_cause") or {}
             title = str(root.get("cause_tr") or root.get("title") or "").strip()
@@ -1560,12 +1630,8 @@ class RootCauseAgentV3_1:
                     redundant = True
                     break
                 prev_title = str(prev_r.get("cause_tr") or "").strip()
-                fp_a = " ".join(
-                    w.get("answer_tr", "") for w in (branch.get("why_chain") or [])
-                )
-                fp_b = " ".join(
-                    w.get("answer_tr", "") for w in (prev_b.get("why_chain") or [])
-                )
+                fp_a = self._deep_chain_fingerprint(branch)
+                fp_b = self._deep_chain_fingerprint(prev_b)
                 eff = effective_critic_jaccard_threshold(
                     code,
                     prev_code,
@@ -1582,6 +1648,16 @@ class RootCauseAgentV3_1:
             if not redundant:
                 kept.append(branch)
                 kept_roots.append(root)
+            else:
+                dropped_branches.append(branch)
+
+        # P1.23-G3: min-dal floor — aşırı collapse, raporu tek dala düşürmesin.
+        if len(kept) < min_keep and len(branches) >= min_keep:
+            for b in dropped_branches:
+                if len(kept) >= min_keep:
+                    break
+                kept.append(b)
+
         dropped = len(branches) - len(kept)
         if dropped > 0:
             print(f"🔗 Benzer kök neden: {dropped} dal birleştirildi → {len(kept)} dal")
@@ -1841,6 +1917,10 @@ class RootCauseAgentV3_1:
         used_root_codes: List[str] = []
         all_previous_why_answers: List[str] = []
         probe_by_branch_and_level: Dict[int, Dict[int, List[Dict]]] = {}
+        # P1.22-RC4: HITL kök neden aday probe cevapları → forbidden (Hayır) / affirmed (Evet)
+        forbidden_from_hitl: List[str] = []
+        affirmed_from_hitl: List[str] = []
+        affirmed_probe_texts: List[str] = []
 
         if investigation_data and isinstance(investigation_data, dict):
             raw_probe_answers = investigation_data.get("why_probe_answers") or []
@@ -1852,6 +1932,14 @@ class RootCauseAgentV3_1:
                 if b <= 0 or l <= 0:
                     continue
                 probe_by_branch_and_level.setdefault(b, {}).setdefault(l, []).append(item)
+
+            try:
+                from agents.barsel_taxonomy import derive_hitl_root_signals
+            except ImportError:
+                from .barsel_taxonomy import derive_hitl_root_signals
+            forbidden_from_hitl, affirmed_from_hitl, affirmed_probe_texts = derive_hitl_root_signals(
+                investigation_data.get("root_cause_probe_answers")
+            )
         
         branch_total = max(1, len(immediate_causes))
         for idx, immediate_cause in enumerate(immediate_causes, 1):
@@ -1863,7 +1951,9 @@ class RootCauseAgentV3_1:
             )
 
             branch_query = self._branch_taxonomy_query(incident_summary, immediate_cause)
-            branch_angle = branch_diversity_angle(idx, branch_total)
+            branch_angle = branch_diversity_angle(idx, branch_total, used_root_codes)
+            # used_root_codes (dallar arası tekrar) + HITL "Hayır" kodları birleşir.
+            branch_forbidden = list(dict.fromkeys(used_root_codes + forbidden_from_hitl))
             chain_result = None
             for attempt in range(2):
                 chain_result = self.why_chain(
@@ -1873,8 +1963,10 @@ class RootCauseAgentV3_1:
                     taxonomy_d=self._incident_taxonomy_prompt("D", branch_query),
                     previous_why_answers=all_previous_why_answers,
                     probe_answers_by_level=probe_by_branch_and_level.get(idx, {}),
-                    forbidden_root_codes=used_root_codes,
+                    forbidden_root_codes=branch_forbidden,
                     branch_angle=branch_angle,
+                    affirmed_root_codes=affirmed_from_hitl,
+                    affirmed_probe_texts=affirmed_probe_texts,
                 )
                 root_code_try = (chain_result.get("root_cause") or {}).get("code")
                 if (

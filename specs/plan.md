@@ -228,6 +228,11 @@ Sertifikalar → OCR         → sertifika_durumu{}
   asks C/D `typical_problems` yes/no probes (Mongo BARSEL); **No** excludes codes from 5-Why
   root selection; **Yes** affirms `typical_problems` in final root narrative — reduces generic
   D4.1 risk-assessment clustering. See [`roadmap.md`](roadmap.md) § P1.22.
+- **Planned (P1.23):** 5-Why chain integrity — root-cause label (`cause_tr`) is derived from the
+  chain's Why-5 answer (not the BARSEL official title, which stays in `standard_title_tr`); snap
+  override when Why-5↔root similarity is too low; Why-1 reframed to sub-mechanism to avoid
+  circularity; stricter cross-branch dedupe with a minimum-branch floor; chain audit persisted for
+  training. See [`roadmap.md`](roadmap.md) § P1.23.
 
 ## Smart Hybrid RCA (Planned — P1.14)
 

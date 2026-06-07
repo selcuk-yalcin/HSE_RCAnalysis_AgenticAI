@@ -70,13 +70,13 @@ ROOTCAUSE_COST_PROFILE=balanced
 
 | Adım | Durum | İş |
 |------|--------|-----|
-| **RC1** | ⏳ | `codes_for_why_level` / yeni `codes_for_root_probe`: olay metnine göre Mongo RAG ile **2–4 C/D aday kodu** (relevance eşiği; olayla alakasız kodları eleme) |
-| **RC2** | ⏳ | Her aday için `typical_problems` → mevcut probe şablonu (`probe_question_for_type`, `probe_context`); boşsa `definition` ilk cümle fallback |
-| **RC3** | ⏳ | HITL cevap semantiği: **Evet** → `affirmed_typical_problems` + dal bağlamı; **Hayır/Bilinmiyor** → `forbidden_root_codes` / RAG exclusion (dal ve global) |
-| **RC4** | ⏳ | `rootcause_agent_v3_1`: forbidden + affirmed sinyallerini 5-Why (Why-4/5) ve `derive_root_cause_from_why5` zincirine bağla; level-5-only kısıtını kaldır |
-| **RC5** | ⏳ | Frontend (`ChatInterface.jsx`): `why_probe` fazı — A/B immediate probe sonrası **root_probe** modu; cap (`MAX_ROOT_PROBE_ANSWERS`); Türkçe UI etiketleri |
-| **RC6** | ⏳ | Testler: depo/yaya–forklift senaryosunda D4.1 tekrarı azalır; D4.9/D5/D1 gibi spesifik kodlar mümkün; Hayır → kod dışlanır |
-| **RC7** | ⏳ | `ROOTCAUSE_COST_PROFILE=balanced` ile uyum: rule-based probe öncelikli; LLM probe context opsiyonel (`HITL_LLM_PROBE_CONTEXT`) |
+| **RC1** | 🔨 | `barsel_taxonomy.root_cause_candidate_codes(incident, immediate_code, retriever, max_codes=6, max_per_group=2)`: C+D'den relevance ile aday kodlar; **D-grup çeşitliliği** (aynı D4 grubundan ≤2), gruplara yayılım |
+| **RC2** | 🔨 | `hitl_question_service.next_root_cause_probe_questions(...)`: `build_why_probe_question_pool(candidate_codes=...)` ile her aday için `typical_problems` probe'u; şablon `probe_question_for_type('typical_problem')`; `definition` fallback |
+| **RC3** | 🔨 | Cevap semantiği: `probe_answer_affirms_fit` (Evet) → affirm; yeni `probe_answer_denies_fit` (kesin Hayır) → forbidden; belirsiz/"bilmiyorum" → etkisiz (yanlış dışlama önlenir) |
+| **RC4** | 🔨 | `rootcause_agent_v3_1.analyze_root_causes`: `root_cause_probe_answers` → `forbidden_from_hitl` (used_root_codes ile **birleşir**) + `affirmed_root_codes`/typical_problems; `identify_branch`'e affirmed bias (Why≥4 "TERCİH" hint + `derive_root_cause_from_why5` affirmed) |
+| **RC5** | ✅ | Frontend (`ChatInterface.jsx`): A/B immediate probe sonrası `rootcause_probe` fazı (`MAX_ROOT_PROBE_ANSWERS=6`); `hsg245Api.js`+proxy `hsg245.js` `root_cause_probe_answers`/`mode` iletir; Türkçe UI |
+| **RC6** | 🔨 | Testler: `root_cause_candidate_codes` C+D + grup çeşitliliği; "Hayır"→forbidden, "Evet"→affirmed, belirsiz→etkisiz |
+| **RC7** | ✅ | `balanced` uyum: rule-based probe öncelikli; LLM probe context opsiyonel (`HITL_LLM_PROBE_CONTEXT`, varsayılan kapalı) |
 
 **Kabul kriterleri:**
 - Aynı olayda 3+ dal sonrası kök neden başlıklarında **aynı D4.1/D4.2 teması** baskın olmamalı (branch critic + forbidden ile).
@@ -86,6 +86,39 @@ ROOTCAUSE_COST_PROFILE=balanced
 **Kod dokunuşu (planlı):** `agents/hitl_question_service.py`, `agents/barsel_taxonomy.py`, `agents/rootcause_agent_v3_1.py`, `admin_pan/Admin/src/rca-frontend/components/ChatInterface.jsx`, `api/main.py`, `tests/test_mongo_why_flow.py` (+ yeni root-probe testleri).
 
 **Env (değişiklik yok — mevcut):** `HITL_USE_BARSEL=1`, `TAXONOMY_COLLECTION=taxonomy_barsel`, `HITL_PROBE_MIN_RELEVANCE=0.03`
+
+---
+
+## P1.23 5-Why zincir kalitesi — kök neden / zincir tutarlılığı
+
+**Neden hiyerarşisi (gerçek kök):** Rapor sorunları birbirine bağlı —
+
+```
+_try_snap_to_taxonomy() → cause_tr'yi W5'ten koparıp BARSEL başlığıyla eziyor
+        ↓ Kök neden etiketi W5 ile uyuşmuyor (S2)
+        ↓ LLM W5'i "anlamsız" görüp sonraki dallarda aynı şeyi yazıyor (S3)
+        ↓ W1 zaten circularity içeriyorsa zincir başından kırık (S1)
+```
+
+**Değerlendirme (kod doğrulandı):** Görev 2 köktür → önce yapılır. Görev 4 mevcut "kod gösterme" tasarımıyla çelişir → opsiyonel/onaylı.
+
+| Görev | Durum | Değer | İş |
+|-------|--------|-------|-----|
+| **G2** | ✅ | Yüksek | `snap_to_barsel_taxonomy`: `cause_tr`'yi BARSEL başlığı yerine **W5 ilk cümlesinden** türet (`_chain_root_label_from_narrative`); BARSEL kodu+başlık `standard_title_tr`'de kalır; `enrich_root_cause_from_taxonomy` zincir etiketini ezmez. `derive_root_cause_from_why5`: W5↔resmi başlık Jaccard **< 0.08** (`SNAP_ROOT_AUDIT_MIN`) → `snap_overridden`+override (mevcut 0.12 snap-reject korunur) |
+| **G1** | ✅ | Orta-Yüksek | `build_why1_question`: "X neden oldu?" → "X hangi alt mekanizmayla gerçekleşti?". W1 cevabı `immediate_cause` ile Jaccard **> 0.55** ise tek retry (circularity engeli) |
+| **G3** | ✅ | Orta | `_collapse_redundant_branches` threshold 0.68→**0.55** + aynı BARSEL kodu reddi (mevcut); BranchCritic 0.25→**0.18**; collapse **W3-W5 derinliğine** bakar (`_deep_chain_fingerprint`); `branch_diversity_angle(used_codes=...)` D4 kullanıldıysa risk açısını atlar. **Min 2 dal floor** |
+| **G5** | ✅ | Orta | `shared/chain_audit_store.py` → her analizden sonra MongoDB `chain_audit` koleksiyonuna **snap audit + chain_quality skoru** yazar (best-effort; `CHAIN_AUDIT_ENABLED`, MONGODB_URI yoksa atlar) |
+| **G4** | ✅ (opt-out) | Düşük (çelişki) | HTML `.why-code` rozeti — **varsayılan KAPALI** (`REPORT_SHOW_WHY_CODES=0`). Mevcut `strip_hse_codes` tasarımı korunur; env=1 ile yapısal rozet eklenir (narrative'e kod gömülmez). Açılması için ürün onayı |
+
+**Kabul kriterleri:**
+- Kök neden etiketi (cause_tr) ilgili dalın W5 cevabıyla anlamsal olarak örtüşmeli (Jaccard ≥ 0.08).
+- 4 dallı analizde kök neden başlıkları **aynı D4.x temasında** toplanmamalı; en az 2 ayrık dal kalmalı.
+- W1 sorusu doğrudan nedeni tekrar etmemeli (circularity yok).
+- Snap override ve düşük chain_quality vakaları audit koleksiyonuna düşmeli.
+
+**Kod dokunuşu (planlı):** `agents/barsel_taxonomy.py`, `agents/why_chain_quality.py`, `agents/rootcause_agent_v3_1.py`, `agents/branch_critic.py`, `agents/skillbased_docx_agent.py`, `shared/` (yeni audit store), `tests/test_why_chain_quality.py` (+ yeni snap/dedupe testleri).
+
+**Sıra:** G2 → G1 → G3 → G5 → G4 (opsiyonel).
 
 ### Ürün
 - ⏳ Dal kurulum ekranı (P1.12) — kullanıcı onayı → pipeline

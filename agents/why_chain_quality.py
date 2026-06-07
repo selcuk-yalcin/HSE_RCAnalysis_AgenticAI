@@ -48,6 +48,10 @@ _RE_RISK_HAZOP_THEME = re.compile(
     re.IGNORECASE,
 )
 SNAP_ROOT_JACCARD_MIN = 0.12
+# P1.23-G2: W5 zinciri ↔ atanan BARSEL kodunun resmi başlığı arasında bu eşiğin
+# altında benzerlik varsa, kod zincirle alakasız sayılır → snap override edilir
+# (kök neden etiketi BARSEL başlığı yerine zincirden/W5'ten türetilir).
+SNAP_ROOT_AUDIT_MIN = 0.08
 D4_D5_RISK_CRITIC_JACCARD = 0.42
 _SOLUTION_REWRITES = (
     (re.compile(r"\b(eğitim|talimat|prosedür|kkd|izin)\s+verilmelidir\b", re.I), r"\1 verilmemişti"),
@@ -112,7 +116,12 @@ def single_mechanism_text(text: str, *, max_len: int = 160) -> str:
 
 
 def build_why1_question(immediate_cause: Dict) -> str:
-    """Birincil zararlı mekanizmaya tek odaklı Why-1."""
+    """
+    Birincil zararlı mekanizmaya tek odaklı Why-1.
+
+    P1.23-G1: Soru doğrudan nedeni TEKRAR ettirmek yerine onun bir ALT mekanizmasını
+    sorar; böylece zincir baştan circularity'e düşmez ("X neden oldu?" → cevap yine X).
+    """
     cause = (
         str(immediate_cause.get("cause_tr") or immediate_cause.get("standard_title_tr") or "")
         .strip()
@@ -122,10 +131,11 @@ def build_why1_question(immediate_cause: Dict) -> str:
         cause = cause.split(",")[0].strip()
     cause = re.sub(r"^(çünkü|neden)\s+", "", cause, flags=re.IGNORECASE).strip()
     if not cause:
-        return "Neden birincil zararlı mekanizma oluştu?"
+        return "Birincil zararlı mekanizma hangi alt nedenle gerçekleşti?"
+    cause = cause.rstrip(".?!").strip()
     if cause.lower().startswith("neden"):
         return enforce_short_why_question(cause)
-    return enforce_short_why_question(f"Neden {cause.rstrip('.')}?")
+    return enforce_short_why_question(f"{cause} hangi alt mekanizmayla gerçekleşti?")
 
 
 def _token_set(text: str) -> set:
@@ -278,14 +288,21 @@ def derive_root_cause_from_why5(
         if snap_fn
         else None
     )
+    audit_sim = 0.0
+    snap_overridden = False
     if snapped:
-        snap_label = str(
-            snapped.get("cause_tr") or snapped.get("standard_title_tr") or ""
-        ).strip()
+        # P1.23-G2 snap audit: atanan BARSEL kodunun RESMİ başlığı (standard_title_tr)
+        # zincirin Why-5 cevabıyla ne kadar örtüşüyor? cause_tr artık zincirden türediği
+        # için denetim resmi başlık üzerinden yapılır.
+        official_label = str(snapped.get("standard_title_tr") or "").strip()
         overlap_text = " ".join(
             x for x in (raw_answer, str(why5.get("question_tr") or "")) if x
         )
-        if snap_label and token_jaccard(overlap_text, snap_label) < SNAP_ROOT_JACCARD_MIN:
+        audit_sim = token_jaccard(overlap_text, official_label) if official_label else 0.0
+        snapped["snap_audit_jaccard"] = round(audit_sim, 3)
+        if official_label and audit_sim < SNAP_ROOT_AUDIT_MIN:
+            # Kod zincirle alakasız → override: kök neden etiketi tamamen zincirden gelir.
+            snap_overridden = True
             snapped = None
     if snapped:
         base = dict(snapped)
@@ -299,6 +316,8 @@ def derive_root_cause_from_why5(
             "explanation_tr": raw_answer,
             "confidence": 0.75,
             "snap_rejected": bool(snap_fn),
+            "snap_audit_jaccard": round(audit_sim, 3),
+            "snap_overridden": snap_overridden,
         }
     try:
         from agents.barsel_taxonomy import enrich_root_cause_from_taxonomy
@@ -336,8 +355,18 @@ def score_chain_quality(chain: List[Dict]) -> float:
     return max(0.35, min(0.98, score))
 
 
-def branch_diversity_angle(branch_index: int, total: int) -> str:
-    """Dallar farklı organizasyonel boyutlara yayılsın."""
+def branch_diversity_angle(
+    branch_index: int,
+    total: int,
+    used_codes: Optional[List[str]] = None,
+) -> str:
+    """
+    Dallar farklı organizasyonel boyutlara yayılsın.
+
+    P1.23-G3: D4 (risk değerlendirme / iş izni) kodu önceki dallarda zaten kullanıldıysa,
+    o açıyı atlayıp kullanılmamış bir D boyutunu (mühendislik, gözetim, kültür) önerir —
+    raporların hepsinin "risk değerlendirmesi eksikliği"ne toplanmasını azaltır.
+    """
     angles = [
         "C — kişisel yetkinlik / davranış / eğitim uygulaması (geçmiş olgu)",
         "D — yönetim ve gözetim sistemleri (geçmiş olgu)",
@@ -345,4 +374,14 @@ def branch_diversity_angle(branch_index: int, total: int) -> str:
         "D — risk değerlendirme ve iş izni sistemleri (geçmiş olgu)",
         "D — üretim baskısı ve güvenlik kültürü (geçmiş olgu)",
     ]
-    return angles[(branch_index - 1) % len(angles)]
+    idx = (branch_index - 1) % len(angles)
+    used = {(c or "").strip().upper() for c in (used_codes or []) if c}
+    if used:
+        d4_used = any(c.startswith("D4") for c in used)
+        for _ in range(len(angles)):
+            angle = angles[idx]
+            if d4_used and "risk değerlendirme" in angle.lower():
+                idx = (idx + 1) % len(angles)
+                continue
+            break
+    return angles[idx]

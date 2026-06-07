@@ -104,6 +104,7 @@ def run_pipeline_task(
         "safety_procedures": investigation_payload.get("safety_procedures", ""),
         "injuries": investigation_payload.get("injuries", ""),
         "why_probe_answers": investigation_payload.get("why_probe_answers", []) or [],
+        "root_cause_probe_answers": investigation_payload.get("root_cause_probe_answers", []) or [],
         "oracle_context": investigation_payload.get("oracle_context", ""),
         "output_language": investigation_payload.get("output_language", ""),
         "analysis_model_preset": investigation_payload.get("analysis_model_preset", ""),
@@ -124,6 +125,17 @@ def run_pipeline_task(
         **analyze_kwargs,
     )
     part3_data = _transform_v2_to_frontend(part3_raw)
+    try:
+        from shared.chain_audit_store import record_chain_audit
+
+        record_chain_audit(
+            tenant_id=tenant_id,
+            incident_id=incident_id,
+            part3=part3_data,
+            analysis_model_preset=investigation_payload.get("analysis_model_preset", "") or "",
+        )
+    except Exception:  # noqa: BLE001
+        pass
     progress.emit(
         "RCA tamamlandı, aksiyon planı hazırlanıyor",
         stage="investigate",

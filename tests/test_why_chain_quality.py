@@ -1,8 +1,10 @@
 """5-Why kalite kuralları birim testleri."""
 
 from agents.why_chain_quality import (
+    SNAP_ROOT_AUDIT_MIN,
     SNAP_ROOT_JACCARD_MIN,
     answer_repeats_previous,
+    branch_diversity_angle,
     build_why1_question,
     demote_solution_to_cause,
     derive_root_cause_from_why5,
@@ -29,6 +31,13 @@ def test_build_why1_single_mechanism():
     )
     assert word_count(q) <= 20
     assert "prosedür" not in q.lower() or "müdahale" in q.lower()
+
+
+def test_build_why1_asks_sub_mechanism_not_circular():
+    # P1.23-G1: Soru doğrudan nedeni "neden oldu" diye değil alt mekanizma olarak sormalı.
+    q = build_why1_question({"cause_tr": "keskin talaşa doğrudan temas"})
+    assert word_count(q) <= 20
+    assert "alt mekanizma" in q.lower()
 
 
 def test_format_barsel_why_answer_includes_code_and_title():
@@ -106,3 +115,57 @@ def test_pick_non_forbidden_code():
 def test_single_mechanism_text_truncates():
     s = single_mechanism_text("A; B ve C, D")
     assert ";" not in s
+
+
+def test_snap_audit_records_jaccard_and_overrides_unrelated_title():
+    # P1.23-G2: Atanan BARSEL resmi başlığı W5 ile alakasızsa (jaccard < 0.08) override.
+    why5 = {
+        "code": "D4.1",
+        "answer_tr": "Vana elle aşırı zorlanarak açıldı ve conta yırtıldı.",
+        "question_tr": "Neden conta hasarlandı?",
+    }
+
+    def unrelated_snap(*_a, **_k):
+        return {
+            "code": "D4.1",
+            "cause_tr": "Risk değerlendirme süreci eksikliği",
+            "standard_title_tr": "Risk değerlendirme süreci eksikliği",
+            "explanation_tr": "x",
+        }
+
+    out = derive_root_cause_from_why5(why5, snap_fn=unrelated_snap)
+    assert out.get("snap_overridden") is True
+    assert out.get("snap_rejected") is True
+    assert "snap_audit_jaccard" in out
+    assert out["snap_audit_jaccard"] < SNAP_ROOT_AUDIT_MIN
+    assert SNAP_ROOT_AUDIT_MIN == 0.08
+
+
+def test_snap_kept_when_official_title_overlaps_chain():
+    # Resmi başlık W5 ile örtüşürse snap korunur, override olmaz.
+    why5 = {
+        "code": "D4.1",
+        "answer_tr": "Risk değerlendirme süreci yapılmadığı için tehlike fark edilmedi.",
+        "question_tr": "Neden tehlike fark edilmedi?",
+    }
+
+    def overlapping_snap(*_a, **_k):
+        return {
+            "code": "D4.1",
+            "cause_tr": "Risk değerlendirme yapılmamış",
+            "standard_title_tr": "Risk değerlendirme süreci eksikliği",
+            "explanation_tr": "x",
+        }
+
+    out = derive_root_cause_from_why5(why5, snap_fn=overlapping_snap)
+    assert not out.get("snap_overridden")
+    assert out.get("snap_audit_jaccard", 0.0) >= SNAP_ROOT_AUDIT_MIN
+
+
+def test_branch_diversity_angle_skips_risk_when_d4_used():
+    # P1.23-G3: D4 zaten kullanıldıysa "risk değerlendirme" açısı önerilmez.
+    angle = branch_diversity_angle(4, 5, used_codes=["D4.1"])
+    assert "risk değerlendirme" not in angle.lower()
+    # used_codes verilmezse eski davranış (rotasyon) korunur.
+    plain = branch_diversity_angle(4, 5)
+    assert "risk değerlendirme" in plain.lower()

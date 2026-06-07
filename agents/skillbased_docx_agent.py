@@ -3480,15 +3480,26 @@ class SkillBasedDocxAgent:
 """
             
             why_chain = branch.get("why_chain", [])
+            # P1.23-G4: BARSEL kod rozeti — varsayılan KAPALI. Mevcut "kodları gizle"
+            # tasarımı korunur; yalnızca REPORT_SHOW_WHY_CODES=1 ile yapısal rozet eklenir.
+            show_why_codes = (
+                os.getenv("REPORT_SHOW_WHY_CODES", "0").strip().lower()
+                in ("1", "true", "yes", "on")
+            )
             for idx, why in enumerate(why_chain):
                 qtxt = strip_hse_codes(str(why.get('question', '') or why.get('question_tr', '') or ''))
                 atxt = strip_hse_codes(str(why.get('answer', '') or why.get('answer_tr', '') or ''))
                 wn = why.get('number') or why.get('level') or (idx + 1)
+                code_badge = ""
+                if show_why_codes:
+                    why_code = str(why.get('code', '') or why.get('hsg245_code', '') or '').strip().upper()
+                    if why_code:
+                        code_badge = f'<span class="why-code">{why_code}</span> '
                 html += f"""
                 <div class="why-item">
                     <div class="why-number">{_L('why_prefix')} {wn}</div>
                     <div class="why-question" contenteditable="true">{qtxt}</div>
-                    <div class="why-answer" contenteditable="true">→ {format_report_html_rich(atxt)}</div>
+                    <div class="why-answer" contenteditable="true">{code_badge}→ {format_report_html_rich(atxt)}</div>
                 </div>
 """
             

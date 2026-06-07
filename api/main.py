@@ -35,6 +35,7 @@ from agents.skillbased_docx_agent import SkillBasedDocxAgent
 from agents.hitl_question_service import (
     next_hitl_questions,
     next_immediate_causes_identify,
+    next_root_cause_probe_questions,
     next_why_probe_questions,
 )
 from agents.model_constants import (
@@ -622,6 +623,7 @@ class InvestigationData(BaseModel):
     safety_procedures: str = ""
     injuries: str = ""
     why_probe_answers: list[dict] | None = None
+    root_cause_probe_answers: list[dict] | None = None  # P1.22: C/D kök neden aday probe cevapları
     output_language: str = ""  # e.g. en, tr — passed to root cause agent
     oracle_context: str = ""  # optional; merged server-side from Oracle store when empty
     analysis_model_preset: str = ""  # optional: quality | economy (DeepWhy form tier)
@@ -637,6 +639,7 @@ class PipelineStartRequest(BaseModel):
     safety_procedures: str = ""
     injuries: str = ""
     why_probe_answers: list[dict] | None = None
+    root_cause_probe_answers: list[dict] | None = None  # P1.22
     output_language: str = ""
     analysis_model_preset: str = ""
 
@@ -948,6 +951,7 @@ async def _investigate_core(tenant_id: str, incident_id: str, investigation: Inv
                 "safety_procedures": investigation.safety_procedures,
                 "injuries": investigation.injuries,
                 "why_probe_answers": investigation.why_probe_answers or [],
+                "root_cause_probe_answers": investigation.root_cause_probe_answers or [],
                 "oracle_context": (inv_dump.get("oracle_context") or ""),
                 "output_language": (inv_dump.get("output_language") or ""),
             },
@@ -1189,6 +1193,18 @@ async def hitl_dynamic_questions(
                 how_happened=body.how_happened or "",
                 root_cause_initial=body.root_cause_initial or "",
                 output_language=output_language,
+            )
+        elif mode == "rootcause_probe":
+            payload = next_root_cause_probe_questions(
+                how_happened=body.how_happened or "",
+                root_cause_initial=body.root_cause_initial or "",
+                answered_ids=body.answered_ids or [],
+                immediate_code=body.immediate_code or "",
+                batch_size=bs,
+                known_fields=body.known_fields or [],
+                output_language=output_language,
+                tenant_id=tenant_id,
+                incident_id=incident_id,
             )
         elif mode == "why_probe" or body.why_level > 0:
             imm_tr = ""

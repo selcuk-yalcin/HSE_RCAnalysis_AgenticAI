@@ -404,8 +404,14 @@ def enrich_root_cause_from_taxonomy(
         out["standard_title_tr"] = direct or leaf
         out["cause_tr"] = direct or leaf
     else:
+        # P1.23-G2: BARSEL resmi başlığı standard_title_tr'de korunur; kullanıcıya
+        # gösterilen kök neden etiketi (cause_tr) zincirden (W5) gelmişse ezilmez.
         out["standard_title_tr"] = leaf
-        out["cause_tr"] = leaf
+        chain_label = str(root.get("cause_tr") or "").strip()
+        if chain_label and chain_label.casefold() != (leaf or "").casefold():
+            out["cause_tr"] = chain_label
+        else:
+            out["cause_tr"] = leaf
     out["critical_factor_title"] = critical_factor_title_for_code(code)
     out["category_type"] = _category_type_label(code)
     narrative = str(root.get("explanation_tr") or root.get("cause_tr") or "").strip()
@@ -715,6 +721,115 @@ def codes_for_why_level(
     return codes[:max_codes]
 
 
+def derive_hitl_root_signals(
+    root_cause_probe_answers: Optional[List[Dict]],
+) -> tuple[List[str], List[str], List[str]]:
+    """
+    P1.22-RC4: HITL kök neden aday probe cevaplarını motora forbidden/affirmed sinyaline çevirir.
+
+    Dönüş: (forbidden_codes, affirmed_codes, affirmed_texts)
+      - Kesin "Hayır" → forbidden (kök neden seçiminden dışlanır)
+      - "Evet" → affirmed (+ varsa typical_problem metni açıklamayı zenginleştirir)
+      - Belirsiz / "bilmiyorum" → etkisiz
+    """
+    forbidden: List[str] = []
+    affirmed: List[str] = []
+    affirmed_texts: List[str] = []
+    for item in root_cause_probe_answers or []:
+        if not isinstance(item, dict):
+            continue
+        rc_raw = str(item.get("code") or item.get("hsg_hint") or "").strip().upper()
+        m = re.search(r"[A-D]\d+\.\d+", rc_raw)
+        rc_code = m.group(0) if m else ""
+        if not rc_code:
+            continue
+        ans = str(item.get("answer") or item.get("value") or item.get("label") or "")
+        if probe_answer_denies_fit(ans):
+            if rc_code not in forbidden:
+                forbidden.append(rc_code)
+        elif probe_answer_affirms_fit(ans):
+            if rc_code not in affirmed:
+                affirmed.append(rc_code)
+            ctx = str(item.get("probe_context") or item.get("question") or "").strip()
+            if ctx:
+                affirmed_texts.append(ctx)
+    return forbidden, affirmed, affirmed_texts
+
+
+def root_cause_candidate_codes(
+    incident_text: str,
+    immediate_code: str = "",
+    retriever: Any = None,
+    *,
+    max_codes: int = 6,
+    max_per_group: int = 2,
+) -> List[str]:
+    """
+    P1.22-RC1: Kök neden aday kodları (HITL kök neden netleştirme probe'u için).
+
+    A/B doğrudan neden bandının aksine, C+D (organizasyonel/sistemik) bandından olay
+    metnine en alakalı kodları döndürür. D-grup çeşitliliği uygulanır (ör. aynı D4
+    grubundan en fazla `max_per_group` kod) → kök nedenlerin tek D4 temasına toplanması
+    engellenir; D6.7 gibi spesifik kodlar aday havuzuna girebilir.
+    """
+    _ensure_index()
+    q = (incident_text or "")[:4000]
+    if not q.strip():
+        return []
+    min_rel = hitl_probe_min_relevance()
+
+    pool: List[BarselTaxonomyItem] = list(_BAND.get("C", [])) + list(_BAND.get("D", []))
+    scored: List[tuple[float, str]] = []
+    for it in pool:
+        if not it.code:
+            continue
+        score = item_relevance_score(it, q)
+        if score >= min_rel:
+            scored.append((score, it.code.upper()))
+
+    # RAG retriever ile ek adaylar (varsa) — band C/D root_cause filtresi.
+    if retriever is not None and getattr(retriever, "connected", False):
+        for band in ("C", "D"):
+            try:
+                hits = retriever.retrieve(
+                    q,
+                    k=max(2, max_codes),
+                    band=band,
+                    cause_type_filter="root_cause",
+                    min_score=hitl_rag_min_score(),
+                    keyword_pool=12,
+                )
+            except Exception:  # noqa: BLE001
+                hits = []
+            for rank, h in enumerate(hits):
+                c = str(h.get("code") or "").strip().upper()
+                if c and (c.startswith("C") or c.startswith("D")):
+                    # retriever sıralamasına küçük bir taban skor ver
+                    scored.append((max(min_rel, 0.5 - rank * 0.05), c))
+
+    if not scored:
+        return []
+
+    # En iyi skoru koruyarak tekilleştir
+    best: Dict[str, float] = {}
+    for s, c in scored:
+        if c not in best or s > best[c]:
+            best[c] = s
+    ranked = sorted(best.items(), key=lambda kv: kv[1], reverse=True)
+
+    out: List[str] = []
+    group_counts: Dict[str, int] = {}
+    for code, _score in ranked:
+        grp = group_id_from_code(code) or code
+        if group_counts.get(grp, 0) >= max_per_group:
+            continue
+        out.append(code)
+        group_counts[grp] = group_counts.get(grp, 0) + 1
+        if len(out) >= max_codes:
+            break
+    return out
+
+
 def taxonomy_item_for_code(
     code: str,
     *,
@@ -751,6 +866,28 @@ def probe_answer_affirms_fit(answer_text: str) -> bool:
         tok in a
         for tok in ("evet", "yes", "doğru", "dogru", "uygun", "geçerli", "gecerli")
     ) and not any(tok in a for tok in ("hayır", "hayir", "no", "değil", "degil"))
+
+
+def probe_answer_denies_fit(answer_text: str) -> bool:
+    """
+    P1.22-RC3: Yalnızca KESİN "Hayır / uygun değil" cevabını dışlama sinyali sayar.
+
+    Belirsiz / "bilmiyorum" / boş cevaplar False döner → yanlış (haksız) kod dışlaması önlenir.
+    """
+    a = (answer_text or "").strip().lower()
+    if not a:
+        return False
+    if a in ("no", "hayır", "hayir", "false", "0"):
+        return True
+    if a in ("yes", "evet", "true", "1", "unknown", "bilinmiyor", "skip", "geç", "gec", "?"):
+        return False
+    # Belirsizlik kalıpları ("emin değilim", "bilmiyorum") dışlama SAYILMAZ.
+    if any(tok in a for tok in ("emin değil", "emin degil", "bilmiyor", "bilinmiyor", "belki", "olabilir")):
+        return False
+    # Açık olumsuzlama (uygun değil / geçerli değil / hayır) kesin Hayır sayılır.
+    if any(tok in a for tok in ("değil", "degil", "hayır", "hayir")):
+        return True
+    return False
 
 
 def build_definition_based_why_answer(
@@ -912,16 +1049,41 @@ def snap_to_barsel_taxonomy(
     )
     if not explanation_tr:
         explanation_tr = sanitize_report_text((base_explanation or narrative or "").strip())
+
+    # P1.23-G2: Kullanıcıya gösterilen kök neden etiketi (cause_tr) BARSEL resmi
+    # başlığı yerine zincirin Why-5 cevabından türetilir. BARSEL kodu + resmi başlık
+    # standard_title_tr alanında korunur (raporlama/standardizasyon için).
+    chain_label = _chain_root_label_from_narrative(narrative) or leaf
     return enrich_root_cause_from_taxonomy(
         {
             "code": item.code,
             "standard_title_tr": leaf,
-            "cause_tr": leaf,
+            "cause_tr": chain_label,
             "category_type": _category_type_label(item.code),
             "explanation_tr": explanation_tr,
         },
         incident_hint=narrative,
     )
+
+
+def _chain_root_label_from_narrative(narrative: str) -> str:
+    """Why-5 cevabından kısa, tek mekanizmalı kök neden etiketi çıkarır."""
+    text = (narrative or "").strip()
+    if not text:
+        return ""
+    try:
+        from agents.why_chain_quality import single_mechanism_text
+    except ImportError:
+        try:
+            from .why_chain_quality import single_mechanism_text
+        except ImportError:
+            single_mechanism_text = None
+    if single_mechanism_text is not None:
+        label = single_mechanism_text(text, max_len=120)
+        if label:
+            return label.strip()
+    first = re.split(r"[.!?]\s+", text, maxsplit=1)[0].strip()
+    return first[:120]
 
 
 def snap_immediate_cause_to_barsel(cause: Dict) -> Dict:

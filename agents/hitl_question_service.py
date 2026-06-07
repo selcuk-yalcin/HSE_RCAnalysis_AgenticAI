@@ -29,6 +29,7 @@ from agents.barsel_taxonomy import (
     pick_typical_problems_for_hitl,
     probe_context_relevance,
     retrieve_immediate_bands_prompt,
+    root_cause_candidate_codes,
     snap_immediate_cause_to_barsel,
     split_selection_criteria,
     taxonomy_item_for_code,
@@ -1740,12 +1741,14 @@ def build_why_probe_question_pool(
     previous_why_answer: str = "",
     known_fields: list[str] | None = None,
     output_language: str = "tr",
+    candidate_codes: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     """
     Why seviyesi HITL probe havuzu.
 
     Sıra:
-      1) Seviye bandına göre Mongo kodları (Why-1/2 A/B, Why-3/4 C, Why-5 D)
+      1) Kodlar: `candidate_codes` verilmişse onlar (P1.22 kök neden C/D probe'u),
+         yoksa `codes_for_why_level` (dal-içi immediate band).
       2) typical_problems → LLM netleştirme (1-2 soru)
       3) typical_problems şablon fallback
     """
@@ -1758,13 +1761,16 @@ def build_why_probe_question_pool(
         ]
     )
     retriever = _hitl_barsel_retriever()
-    deep_codes = codes_for_why_level(
-        why_level,
-        immediate_code,
-        incident_ctx,
-        retriever,
-        max_codes=2,
-    )
+    if candidate_codes is not None:
+        deep_codes = [str(c).strip().upper() for c in candidate_codes if str(c).strip()]
+    else:
+        deep_codes = codes_for_why_level(
+            why_level,
+            immediate_code,
+            incident_ctx,
+            retriever,
+            max_codes=2,
+        )
     barsel_items, barsel_by_code = _hitl_taxonomy_index(incident_ctx, deep_codes)
 
     pool: list[dict[str, Any]] = []
@@ -2000,4 +2006,94 @@ def next_why_probe_questions(
         "remaining_after_batch": max(0, len(pending) - len(batch)),
         "done": len(pending) == 0,
         "output_language": normalize_hitl_lang(output_language),
+    }
+
+
+def _hitl_max_root_cause_probes() -> int:
+    raw = (os.getenv("HITL_MAX_ROOT_CAUSE_PROBES") or "6").strip()
+    try:
+        return max(2, min(10, int(raw)))
+    except ValueError:
+        return 6
+
+
+def next_root_cause_probe_questions(
+    how_happened: str,
+    root_cause_initial: str,
+    answered_ids: list[str],
+    immediate_code: str = "",
+    batch_size: int = 1,
+    known_fields: list[str] | None = None,
+    output_language: str = "tr",
+    *,
+    tenant_id: str = "",
+    incident_id: str = "",
+) -> dict[str, Any]:
+    """
+    P1.22-RC2: Kök neden aday netleştirme (C/D typical_problems) probe döngüsü.
+
+    A/B doğrudan neden probe'larından farklı olarak C+D bandından olaya en alakalı
+    aday kodları seçer; her aday için tek bir "Bu koşul olayda geçerli miydi?" sorusu üretir.
+    Cevaplar motorda forbidden (Hayır) / affirmed (Evet) sinyaline dönüşür.
+    """
+    answered = set(answered_ids or [])
+    max_probes = _hitl_max_root_cause_probes()
+    lang = normalize_hitl_lang(output_language)
+    incident_ctx = "\n".join([how_happened or "", root_cause_initial or ""])
+    retriever = _hitl_barsel_retriever()
+    candidate_codes = root_cause_candidate_codes(
+        incident_ctx,
+        immediate_code,
+        retriever,
+        max_codes=max_probes,
+    )
+    if not candidate_codes:
+        return {
+            "questions": [],
+            "mode": "rootcause_probe",
+            "candidate_codes": [],
+            "total_pool": 0,
+            "remaining_after_batch": 0,
+            "done": True,
+            "output_language": lang,
+        }
+
+    pool = _cached_why_probe_pool(
+        tenant_id=tenant_id,
+        incident_id=incident_id,
+        immediate_code="ROOTCAUSE",
+        why_level=6,
+        output_language=output_language,
+        how_happened=how_happened,
+        root_cause_initial=root_cause_initial,
+        builder=lambda: _safe_build_why_probe_question_pool(
+            how_happened=how_happened,
+            root_cause_initial=root_cause_initial,
+            immediate_code="",
+            why_level=5,
+            output_language=output_language,
+            known_fields=known_fields,
+            candidate_codes=candidate_codes,
+        ),
+    )
+    pending = [q for q in pool if q.get("id") not in answered]
+    batch = pending[: max(1, batch_size)]
+
+    shaped_batch: list[dict[str, Any]] = []
+    for q in batch:
+        try:
+            shaped = _shape_question(q, output_language)
+            shaped["mode"] = "rootcause_probe"
+            shaped_batch.append(shaped)
+        except Exception:  # noqa: BLE001
+            continue
+
+    return {
+        "questions": shaped_batch,
+        "mode": "rootcause_probe",
+        "candidate_codes": candidate_codes,
+        "total_pool": len(pool),
+        "remaining_after_batch": max(0, len(pending) - len(batch)),
+        "done": len(pending) == 0,
+        "output_language": lang,
     }
