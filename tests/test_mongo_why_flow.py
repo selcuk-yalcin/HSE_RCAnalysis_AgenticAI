@@ -123,6 +123,23 @@ def test_resolve_root_code_from_why_chain():
     assert "Mühendislik / Tasarım" in branches[0]["branch_title"]
 
 
+def test_is_junk_typical_problem_filters_parse_artifacts():
+    from agents.barsel_taxonomy import is_junk_typical_problem, pick_typical_problems_for_hitl
+    from agents.barsel_taxonomy import BarselTaxonomyItem
+
+    assert is_junk_typical_problem("ler / Yaygın Eksiklikler")
+    assert is_junk_typical_problem("Tipik Problemler / Yaygın Eksiklikler")
+    item = BarselTaxonomyItem(
+        code="A4.6",
+        title="Otomatik/Rutin Eylemlerin Bilinçsiz Uygulanması",
+        definition="Kişi, alışkanlığa dayalı bir eylem sırasında bilinci tam devrede olmadan hareket etmiştir.",
+        typical_problems=["ler / Yaygın Eksiklikler"],
+    )
+    picked = pick_typical_problems_for_hitl(item, "rutin eylem alışkanlık", why_level=1, min_relevance=0.0)
+    assert picked
+    assert "ler /" not in picked[0].lower()
+
+
 def test_c32_title_case_not_all_caps():
     from agents.barsel_taxonomy import root_cause_leaf_title_for_code
 

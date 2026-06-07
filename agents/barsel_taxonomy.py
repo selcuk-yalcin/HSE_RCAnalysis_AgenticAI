@@ -594,12 +594,13 @@ def item_from_mongo_hit(hit: Dict[str, Any]) -> BarselTaxonomyItem:
     probs = tr.get("typical_problems") or []
     if not isinstance(probs, list):
         probs = []
+    clean_probs = [str(p).strip() for p in probs if str(p).strip() and not is_junk_typical_problem(p)]
     return BarselTaxonomyItem(
         code=str(hit.get("code") or "").strip().upper(),
         title=str(tr.get("title") or hit.get("code") or ""),
         definition=str(tr.get("definition") or ""),
         selection_criteria=str(tr.get("selection_criteria") or "").strip(),
-        typical_problems=[str(p).strip() for p in probs if str(p).strip()],
+        typical_problems=clean_probs,
         keywords=keywords,
         section_ids=[str(s) for s in (hit.get("section_ids") or [])],
         section_titles=[
@@ -676,14 +677,17 @@ def codes_for_why_level(
 
     if retriever is not None and getattr(retriever, "connected", False) and q.strip() and band:
         cause_filter = "immediate_cause" if band in ("A", "B") else "root_cause"
-        hits = retriever.retrieve(
-            q,
-            k=max(1, max_codes),
-            band=band,
-            cause_type_filter=cause_filter,
-            min_score=hitl_rag_min_score(),
-            keyword_pool=12,
-        )
+        try:
+            hits = retriever.retrieve(
+                q,
+                k=max(1, max_codes),
+                band=band,
+                cause_type_filter=cause_filter,
+                min_score=hitl_rag_min_score(),
+                keyword_pool=12,
+            )
+        except Exception:
+            hits = []
         for h in hits:
             c = str(h.get("code") or "").strip().upper()
             if c and c not in codes and c.startswith(band):
@@ -1186,6 +1190,13 @@ def pick_keywords_for_hitl(
     return rotated[:max_keywords]
 
 
+def is_junk_typical_problem(text: str) -> bool:
+    """DOCX/vectordb import artığı: 'ler / Yaygın Eksiklikler' vb."""
+    from rag_pipeline.indexing.barsel_rag_document import _is_junk_line
+
+    return _is_junk_line(str(text or "").strip())
+
+
 def pick_typical_problems_for_hitl(
     item: BarselTaxonomyItem,
     incident_text: str,
@@ -1194,7 +1205,7 @@ def pick_typical_problems_for_hitl(
     max_problems: int = 1,
     min_relevance: float | None = None,
 ) -> List[str]:
-    probs = [p for p in item.typical_problems if p.strip()]
+    probs = [p for p in item.typical_problems if p.strip() and not is_junk_typical_problem(p)]
     if not probs:
         if item.definition:
             first = re.split(r"[.!?]\s+", item.definition.strip(), maxsplit=1)[0].strip()

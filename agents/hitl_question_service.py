@@ -220,8 +220,8 @@ def _hitl_llm_probe_enabled() -> bool:
 
 
 def _hitl_llm_probe_context_enabled() -> bool:
-    """probe_context olaya özelleştirme — varsayılan açık (LLM varsa)."""
-    raw = (os.getenv("HITL_LLM_PROBE_CONTEXT") or os.getenv("HITL_LLM_PROBE") or "1").strip().lower()
+    """probe_context olaya özelleştirme — varsayılan kapalı (gateway timeout önlemi)."""
+    raw = (os.getenv("HITL_LLM_PROBE_CONTEXT") or os.getenv("HITL_LLM_PROBE") or "0").strip().lower()
     if raw in ("0", "false", "no", "off"):
         return False
     return _hitl_llm_enabled()
@@ -696,6 +696,7 @@ def _build_deep_questions_from_barsel_taxonomy(
                 "soru": q_tr,
                 "soru_en": q_en,
                 "probe_context": problem,
+                "definition": item.definition,
                 "yönler": {"probe_type": "typical_problem"},
                 "why_level": why_level,
             }
@@ -1232,6 +1233,10 @@ def _resolve_probe_context(q: dict, soru: str, lang: str) -> tuple[str, str, str
         soru = short_tr
         if not soru_en:
             soru_en = short_en
+    probe_ctx = _sanitize_probe_context(
+        probe_ctx,
+        definition=str(q.get("definition") or q.get("cause_desc") or ""),
+    )
     return probe_ctx, soru, soru_en
 
 
@@ -1254,8 +1259,9 @@ def _shape_question(q: dict, output_language: str = "tr", *, _retried: bool = Fa
     tr_opts, en_opts = pick_choice_options({**q, **u}, lang)
     mode = u.get("response_mode", "yes_no_unknown")
     hint_raw = str(q.get("hsg245") or "")
+    qid = str(q.get("id") or _stable_id("hitl-q", source, soru[:48], probe_context[:48]))
     shaped: dict[str, Any] = {
-        "id": q["id"],
+        "id": qid,
         "source": source,
         "hsg_hint": hint_raw if show_taxonomy_codes_in_hitl() else sanitize_hsg_hint_for_display(hint_raw),
         "code": q.get("code", ""),
@@ -1394,7 +1400,7 @@ Görev: Şablonu bu olaya özgü, somut ve kısa TEK bir koşul cümlesine çevi
         client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=api_key,
-            timeout=10.0,
+            timeout=5.0,
         )
         resp = client.chat.completions.create(
             model=model,
@@ -1409,6 +1415,20 @@ Görev: Şablonu bu olaya özgü, somut ve kısa TEK bir koşul cümlesine çevi
     except Exception:  # noqa: BLE001
         pass
     return template
+
+
+def _sanitize_probe_context(text: str, *, definition: str = "") -> str:
+    """Bozuk Mongo satırlarını filtrele; gerekirse tanım cümlesine düş."""
+    from agents.barsel_taxonomy import is_junk_typical_problem
+
+    ctx = str(text or "").strip()
+    if ctx and not is_junk_typical_problem(ctx):
+        return ctx
+    if definition:
+        first = re.split(r"[.!?]\s+", definition.strip(), maxsplit=1)[0].strip()
+        if len(first) >= 20 and not is_junk_typical_problem(first):
+            return first[:220]
+    return ""
 
 
 def _apply_incident_probe_context(
@@ -1463,6 +1483,7 @@ def _fallback_probe_row(
         probe_ctx = problems[0]
     elif item.definition:
         probe_ctx = re.split(r"[.!?]\s+", item.definition.strip(), maxsplit=1)[0].strip()[:220]
+    probe_ctx = _sanitize_probe_context(probe_ctx, definition=item.definition)
     if not probe_ctx:
         return None
     q_tr = probe_question_for_type("typical_problem", "tr")
@@ -1476,6 +1497,7 @@ def _fallback_probe_row(
         "soru": q_tr,
         "soru_en": q_en,
         "probe_context": probe_ctx,
+        "definition": item.definition,
         "yönler": {"probe_type": "typical_problem"},
         "why_level": why_level,
     }
@@ -1851,6 +1873,36 @@ def build_why_probe_question_pool(
     return _filter_questions(pool[:pool_cap], known_fields=known_fields, incident_context=incident_ctx)
 
 
+def _safe_build_why_probe_question_pool(**kwargs) -> list[dict[str, Any]]:
+    """HITL pool üretiminde yakalanmamış hata → boş havuz yerine çökme önlenir."""
+    try:
+        return build_why_probe_question_pool(**kwargs)
+    except Exception as exc:  # noqa: BLE001
+        import logging
+
+        logging.getLogger(__name__).warning(
+            "build_why_probe_question_pool failed: %s", exc, exc_info=True
+        )
+        imm = str(kwargs.get("immediate_code") or "").strip().upper()
+        if not imm:
+            return []
+        item = taxonomy_item_for_code(imm)
+        if not item:
+            return []
+        fb = _fallback_probe_row(
+            item,
+            int(kwargs.get("why_level") or 1),
+            "\n".join(
+                [
+                    str(kwargs.get("how_happened") or ""),
+                    str(kwargs.get("root_cause_initial") or ""),
+                ]
+            ),
+            str(kwargs.get("output_language") or "tr"),
+        )
+        return [fb] if fb else []
+
+
 def next_why_probe_questions(
     how_happened: str,
     root_cause_initial: str,
@@ -1917,7 +1969,7 @@ def next_why_probe_questions(
         output_language=output_language,
         how_happened=how_happened,
         root_cause_initial=root_cause_initial,
-        builder=lambda: build_why_probe_question_pool(
+        builder=lambda: _safe_build_why_probe_question_pool(
             how_happened=how_happened,
             root_cause_initial=root_cause_initial,
             immediate_code=immediate_code,
@@ -1931,8 +1983,15 @@ def next_why_probe_questions(
     pending = [q for q in pool if q.get("id") not in answered]
     batch = pending[: max(1, batch_size)]
 
+    shaped_batch: list[dict[str, Any]] = []
+    for q in batch:
+        try:
+            shaped_batch.append(_shape_question(q, output_language))
+        except Exception:  # noqa: BLE001
+            continue
+
     return {
-        "questions": [_shape_question(q, output_language) for q in batch],
+        "questions": shaped_batch,
         "why_display": why_display,
         "target_codes": target_codes,
         "why_level": why_level,

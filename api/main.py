@@ -1181,6 +1181,12 @@ async def hitl_dynamic_questions(
             _hitl_cache_ttl_seconds(),
         )
         return {"success": True, "data": payload, "cached": False, "cache_layer": "miss"}
+    except Exception as exc:  # noqa: BLE001
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"HITL question generation failed: {type(exc).__name__}: {exc}",
+        ) from exc
     finally:
         clear_usage_context()
 
