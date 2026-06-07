@@ -185,6 +185,29 @@ def _hitl_barsel_retriever() -> Any:
     return _HITL_RETRIEVER
 
 
+def warm_hitl_resources() -> dict[str, Any]:
+    """Cold-start ısıtma: Mongo retriever + embedding backend modelini önceden yükler.
+
+    İlk HITL isteğinin sentence_transformers model yükleme / Mongo bağlantı
+    gecikmesini (gateway 504 timeout kaynağı) ödememesi için startup'ta arka
+    planda çağrılır. En iyi çaba — hata durumunda sessizce geçer.
+    """
+    status: dict[str, Any] = {"retriever": False, "embedding": False}
+    try:
+        retriever = _hitl_barsel_retriever()
+        status["retriever"] = bool(retriever)
+        if retriever is not None:
+            try:
+                # Tek bir gerçek sorgu: embedding backend modelini sürece yükler.
+                retriever.retrieve("ısınma sorgusu ekipman bakım arıza", k=1)
+                status["embedding"] = True
+            except Exception:  # noqa: BLE001
+                status["embedding"] = False
+    except Exception:  # noqa: BLE001
+        pass
+    return status
+
+
 def _hitl_taxonomy_index(
     incident_context: str,
     focus_codes: list[str] | None = None,

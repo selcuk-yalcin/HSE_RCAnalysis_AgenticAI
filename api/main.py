@@ -4,7 +4,7 @@ Connects admin panel with AI agents
 """
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Depends, Query, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel
 import sys
 import os
@@ -37,6 +37,7 @@ from agents.hitl_question_service import (
     next_immediate_causes_identify,
     next_root_cause_probe_questions,
     next_why_probe_questions,
+    warm_hitl_resources,
 )
 from agents.model_constants import (
     resolve_openrouter_chat_model,
@@ -174,6 +175,19 @@ def _hitl_cache_ttl_seconds() -> int:
         return 900
 
 
+def _hitl_question_budget_seconds() -> float:
+    """HITL soru üretimi için sunucu tarafı süre bütçesi.
+
+    Gateway timeout'undan (≈60s) düşük tutulur; aşılırsa 504 yerine retriable
+    cevap döner ve arka plan görevi cache'i ısıtır.
+    """
+    raw = (os.getenv("HITL_QUESTION_BUDGET_SECONDS") or "40").strip()
+    try:
+        return max(5.0, float(raw))
+    except Exception:  # noqa: BLE001
+        return 40.0
+
+
 def _init_root_cause_agent(use_rag: bool) -> Tuple[object, str]:
     """
     Önce RootCauseAgentV3_1 (DSPy); import veya __init__ başarısızsa RootCauseAgentV2.
@@ -275,6 +289,20 @@ async def startup_event():
         )
     except Exception as texc:
         print(f"⚠️  Token accounts init: {texc}")
+
+    # HITL cold-start ısıtma: ilk soru isteğinin Mongo retriever + embedding
+    # model yükleme gecikmesini (gateway 504 kaynağı) ödememesi için arka planda.
+    async def _warm_hitl() -> None:
+        try:
+            status = await asyncio.to_thread(warm_hitl_resources)
+            print(
+                f"✅ HITL kaynakları ısıtıldı: retriever={status.get('retriever')} "
+                f"embedding={status.get('embedding')}"
+            )
+        except Exception as wexc:  # noqa: BLE001
+            print(f"⚠️  HITL ısıtma atlandı: {wexc}")
+
+    asyncio.create_task(_warm_hitl())
 
 
 def _incidents(tenant_id: str) -> dict:
@@ -1186,16 +1214,17 @@ async def hitl_dynamic_questions(
         owner_user_id=owner_user_id,
         module="hitl",
     )
-    try:
-        mode = (body.mode or "").lower()
+    mode = (body.mode or "").lower()
+
+    def _compute_payload() -> dict:
         if mode == "immediate_identify":
-            payload = next_immediate_causes_identify(
+            return next_immediate_causes_identify(
                 how_happened=body.how_happened or "",
                 root_cause_initial=body.root_cause_initial or "",
                 output_language=output_language,
             )
-        elif mode == "rootcause_probe":
-            payload = next_root_cause_probe_questions(
+        if mode == "rootcause_probe":
+            return next_root_cause_probe_questions(
                 how_happened=body.how_happened or "",
                 root_cause_initial=body.root_cause_initial or "",
                 answered_ids=body.answered_ids or [],
@@ -1206,7 +1235,7 @@ async def hitl_dynamic_questions(
                 tenant_id=tenant_id,
                 incident_id=incident_id,
             )
-        elif mode == "why_probe" or body.why_level > 0:
+        if mode == "why_probe" or body.why_level > 0:
             imm_tr = ""
             if body.immediate_causes:
                 for c in body.immediate_causes:
@@ -1215,7 +1244,7 @@ async def hitl_dynamic_questions(
                     ).strip().upper():
                         imm_tr = str(c.get("cause_tr") or "")
                         break
-            payload = next_why_probe_questions(
+            return next_why_probe_questions(
                 how_happened=body.how_happened or "",
                 root_cause_initial=body.root_cause_initial or "",
                 answered_ids=body.answered_ids or [],
@@ -1230,16 +1259,19 @@ async def hitl_dynamic_questions(
                 tenant_id=tenant_id,
                 incident_id=incident_id,
             )
-        else:
-            payload = next_hitl_questions(
-                body.how_happened or "",
-                body.root_cause_initial or "",
-                body.answered_ids or [],
-                body.immediate_causes,
-                bs,
-                known_fields=body.known_fields or [],
-                output_language=output_language,
-            )
+        return next_hitl_questions(
+            body.how_happened or "",
+            body.root_cause_initial or "",
+            body.answered_ids or [],
+            body.immediate_causes,
+            bs,
+            known_fields=body.known_fields or [],
+            output_language=output_language,
+        )
+
+    async def _compute_and_cache() -> dict:
+        # Blocking üretimi event loop dışında çalıştır (head-of-line blocking önlenir).
+        payload = await asyncio.to_thread(_compute_payload)
         hybrid_set(
             tenant_id,
             "hitl_questions",
@@ -1247,7 +1279,32 @@ async def hitl_dynamic_questions(
             payload,
             _hitl_cache_ttl_seconds(),
         )
+        return payload
+
+    task = asyncio.ensure_future(_compute_and_cache())
+    # Timeout sonrası görev arka planda sürerse istisnası "never retrieved"
+    # uyarısı vermesin diye sessizce tüket (cache zaten en iyi çaba).
+    task.add_done_callback(lambda t: t.cancelled() or t.exception())
+    try:
+        # shield: timeout'ta görev iptal edilmez; arka planda tamamlanıp cache'i
+        # ısıtır, böylece kullanıcının tekrar denemesi anında 200 döner.
+        payload = await asyncio.wait_for(
+            asyncio.shield(task), timeout=_hitl_question_budget_seconds()
+        )
         return {"success": True, "data": payload, "cached": False, "cache_layer": "miss"}
+    except asyncio.TimeoutError:
+        # Üretim hâlâ sürüyor — 504 yerine retriable sinyal dön. İstemci kısa
+        # bir bekleme sonrası tekrar dener ve sıcak cache'e düşer.
+        return JSONResponse(
+            status_code=202,
+            content={
+                "success": False,
+                "retriable": True,
+                "data": None,
+                "cache_layer": "pending",
+                "detail": "HITL soruları hazırlanıyor, lütfen birkaç saniye sonra tekrar deneyin.",
+            },
+        )
     except Exception as exc:  # noqa: BLE001
         traceback.print_exc()
         raise HTTPException(
