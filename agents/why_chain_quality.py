@@ -20,21 +20,40 @@ _RE_BARSSEL_PREFIX = re.compile(
 _SOLUTION_MARKERS = (
     "verilmeli",
     "yapılmalı",
+    "yapılmalıydı",
     "sağlanmalı",
     "uygulanmalı",
     "önlenmeli",
     "alınmalı",
     "düzeltilmeli",
     "gerekir",
+    "gerekli kılınmalıydı",
+    "zorunlu tutulmalıydı",
     "önerilir",
     "should be",
     "must be",
     "needs to be",
     "shall be",
 )
+_RE_SOLUTION_PHRASES = re.compile(
+    r"\b("
+    r"yapılmalıydı|yapılması\s+gerekirdi|gerekli\s+kılınmalıydı|zorunlu\s+tutulmalıydı|"
+    r"sağlanmalıydı|uygulanmalıydı|alınmalıydı|önlenmeli(dir)?|düzeltilmeli(dir)?"
+    r")\b",
+    re.IGNORECASE,
+)
+_RE_RISK_HAZOP_THEME = re.compile(
+    r"\b(hazop|lopa|pha|bowtie|bow\s*tie|iş\s*izni|ptw|"
+    r"risk\s*değerlendirme|risk\s*analiz|risk\s*kontrol|jha|jsa)\b",
+    re.IGNORECASE,
+)
+SNAP_ROOT_JACCARD_MIN = 0.12
+D4_D5_RISK_CRITIC_JACCARD = 0.42
 _SOLUTION_REWRITES = (
     (re.compile(r"\b(eğitim|talimat|prosedür|kkd|izin)\s+verilmelidir\b", re.I), r"\1 verilmemişti"),
     (re.compile(r"\b(eğitim|talimat|prosedür|kkd|izin)\s+verilmeli(dir)?\b", re.I), r"\1 verilmemişti"),
+    (re.compile(r"\b(yapılmalıydı|yapılması\s+gerekirdi)\b", re.I), "yapılmamıştı"),
+    (re.compile(r"\b(gerekli\s+kılınmalıydı|zorunlu\s+tutulmalıydı)\b", re.I), "tanımlanmamıştı"),
     (re.compile(r"\b(yapılmalı|uygulanmalı|sağlanmalı|alınmalı)(dır|dir)?\b", re.I), "yapılmamıştı"),
     (re.compile(r"\b(önlenmeli|düzeltilmeli)(dir)?\b", re.I), "önlenmemişti"),
 )
@@ -44,8 +63,16 @@ def word_count(text: str) -> int:
     return len(re.findall(r"\S+", str(text or "")))
 
 
+def _hard_truncate_words(text: str, max_words: int) -> str:
+    """LLM yeniden denemesi olmadan kelime sınırında kes."""
+    words = re.findall(r"\S+", str(text or "").strip())
+    if len(words) <= max_words:
+        return " ".join(words)
+    return " ".join(words[:max_words]).rstrip(",;:")
+
+
 def enforce_short_why_question(question: str, *, max_words: int = WHY_QUESTION_MAX_WORDS) -> str:
-    """Tek cümle, en fazla max_words kelime."""
+    """Tek cümle, en fazla max_words kelime (uzun sorular retry olmadan kırpılır)."""
     q = re.sub(r"\s+", " ", str(question or "").strip())
     if not q:
         return q
@@ -55,13 +82,22 @@ def enforce_short_why_question(question: str, *, max_words: int = WHY_QUESTION_M
         q = parts[0].strip()
     if not q.endswith("?"):
         q = q.rstrip(".") + "?"
-    words = q.replace("?", "").split()
-    if len(words) > max_words:
-        q = " ".join(words[:max_words]).rstrip(",;:") + "?"
+    body = q.replace("?", "").strip()
+    if word_count(body) > max_words:
+        body = _hard_truncate_words(body, max_words)
+        q = body + "?"
     if not q.startswith(("Neden", "neden", "Why", "why")):
         q = "Neden " + q.lstrip("?").strip()
         if not q.endswith("?"):
             q += "?"
+    # Son güvence: önek eklendikten sonra da sert kes
+    prefix_match = re.match(r"^(Neden|neden|Why|why)\s+", q)
+    prefix = prefix_match.group(0) if prefix_match else ""
+    rest = q[len(prefix) :].rstrip("?").strip()
+    if word_count(prefix + rest) > max_words:
+        budget = max(1, max_words - word_count(prefix))
+        rest = _hard_truncate_words(rest, budget)
+        q = f"{prefix}{rest}?"
     return q
 
 
@@ -127,7 +163,41 @@ def question_repeats_answer(answer: str, question: str, *, threshold: float = 0.
 
 def is_solution_language(text: str) -> bool:
     low = (text or "").lower()
-    return any(m in low for m in _SOLUTION_MARKERS)
+    return any(m in low for m in _SOLUTION_MARKERS) or bool(_RE_SOLUTION_PHRASES.search(low))
+
+
+def _d_subgroup(code: str) -> str:
+    key = extract_taxonomy_code(code) or (code or "").strip().upper()
+    m = re.match(r"^(D\d+)", key)
+    return m.group(1) if m else ""
+
+
+def is_d4_d5_risk_hazop_branch_pair(code_a: str, code_b: str, text_a: str, text_b: str) -> bool:
+    """D4.x ile D5.x dallarında ortak HAZOP/risk teması (yanlış birleştirmeyi önlemek için)."""
+    ga, gb = _d_subgroup(code_a), _d_subgroup(code_b)
+    if not ga or not gb or ga == gb:
+        return False
+    if {ga, gb} != {"D4", "D5"}:
+        return False
+    return bool(_RE_RISK_HAZOP_THEME.search(text_a or "")) and bool(
+        _RE_RISK_HAZOP_THEME.search(text_b or "")
+    )
+
+
+def effective_critic_jaccard_threshold(
+    code_a: str,
+    code_b: str,
+    text_a: str,
+    text_b: str,
+    base_threshold: float,
+) -> float:
+    """
+    D4.x + D5.x HAZOP/risk temalı dallar için daha yüksek eşik (tamamlayıcı açılar korunur).
+    Diğer çiftlerde base_threshold (varsayılan 0.25) uygulanır.
+    """
+    if is_d4_d5_risk_hazop_branch_pair(code_a, code_b, text_a, text_b):
+        return max(base_threshold, D4_D5_RISK_CRITIC_JACCARD)
+    return base_threshold
 
 
 def demote_solution_to_cause(text: str) -> str:
@@ -208,14 +278,28 @@ def derive_root_cause_from_why5(
         if snap_fn
         else None
     )
-    base = snapped or {
-        "code": code,
-        "standard_title_tr": title,
-        "cause_tr": title or raw_answer[:120],
-        "category_type": "ORGANİZASYONEL" if (code or "").startswith("D") else "KİŞİSEL",
-        "explanation_tr": raw_answer,
-        "confidence": 0.75,
-    }
+    if snapped:
+        snap_label = str(
+            snapped.get("cause_tr") or snapped.get("standard_title_tr") or ""
+        ).strip()
+        overlap_text = " ".join(
+            x for x in (raw_answer, str(why5.get("question_tr") or "")) if x
+        )
+        if snap_label and token_jaccard(overlap_text, snap_label) < SNAP_ROOT_JACCARD_MIN:
+            snapped = None
+    if snapped:
+        base = dict(snapped)
+    else:
+        direct_title = single_mechanism_text(raw_answer, max_len=120) or raw_answer[:120].strip()
+        base = {
+            "code": code,
+            "standard_title_tr": direct_title,
+            "cause_tr": direct_title or title,
+            "category_type": "ORGANİZASYONEL" if (code or "").startswith("D") else "KİŞİSEL",
+            "explanation_tr": raw_answer,
+            "confidence": 0.75,
+            "snap_rejected": bool(snap_fn),
+        }
     try:
         from agents.barsel_taxonomy import enrich_root_cause_from_taxonomy
     except ImportError:

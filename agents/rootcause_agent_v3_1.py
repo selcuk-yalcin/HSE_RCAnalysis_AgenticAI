@@ -177,6 +177,7 @@ try:
         pick_non_forbidden_code,
         question_repeats_answer,
         resolve_why_taxonomy_code,
+        effective_critic_jaccard_threshold,
         score_chain_quality,
         single_mechanism_text,
         word_count,
@@ -189,6 +190,7 @@ except ImportError:
         build_why1_question,
         demote_solution_to_cause,
         derive_root_cause_from_why5,
+        effective_critic_jaccard_threshold,
         enforce_short_why_question,
         format_barsel_why_answer,
         is_solution_language,
@@ -1241,7 +1243,7 @@ class RootCauseAgentV3_1:
         use_rag: bool = False,
         enable_diversity_check: bool = True,
         enable_branch_critic: bool = True,
-        critic_jaccard_threshold: float = 0.35,
+        critic_jaccard_threshold: float = 0.25,
         critic_max_regenerations: int = 3,
         *,
         use_chain_of_thought: bool = True,
@@ -1557,16 +1559,24 @@ class RootCauseAgentV3_1:
                 if code and prev_code and code == prev_code:
                     redundant = True
                     break
-                if title and _token_jaccard_similarity(title, str(prev_r.get("cause_tr") or "")) >= threshold:
-                    redundant = True
-                    break
+                prev_title = str(prev_r.get("cause_tr") or "").strip()
                 fp_a = " ".join(
                     w.get("answer_tr", "") for w in (branch.get("why_chain") or [])
                 )
                 fp_b = " ".join(
                     w.get("answer_tr", "") for w in (prev_b.get("why_chain") or [])
                 )
-                if _token_jaccard_similarity(fp_a, fp_b) >= threshold + 0.05:
+                eff = effective_critic_jaccard_threshold(
+                    code,
+                    prev_code,
+                    fp_a or title,
+                    fp_b or prev_title,
+                    threshold,
+                )
+                if title and _token_jaccard_similarity(title, prev_title) >= eff:
+                    redundant = True
+                    break
+                if _token_jaccard_similarity(fp_a, fp_b) >= eff:
                     redundant = True
                     break
             if not redundant:

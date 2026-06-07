@@ -399,8 +399,13 @@ def enrich_root_cause_from_taxonomy(
     out = dict(root)
     leaf = root_cause_leaf_title_for_code(code)
     out["code"] = code
-    out["standard_title_tr"] = leaf
-    out["cause_tr"] = leaf
+    if root.get("snap_rejected"):
+        direct = str(root.get("cause_tr") or root.get("standard_title_tr") or "").strip()
+        out["standard_title_tr"] = direct or leaf
+        out["cause_tr"] = direct or leaf
+    else:
+        out["standard_title_tr"] = leaf
+        out["cause_tr"] = leaf
     out["critical_factor_title"] = critical_factor_title_for_code(code)
     out["category_type"] = _category_type_label(code)
     narrative = str(root.get("explanation_tr") or root.get("cause_tr") or "").strip()

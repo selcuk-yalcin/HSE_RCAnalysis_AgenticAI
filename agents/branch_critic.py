@@ -265,17 +265,30 @@ class BranchCriticAgent:
                     root_i.get("cause_tr", ""), root_j.get("cause_tr", "")
                 )
                 fp_sim = self._jaccard(fp_i, fp_j)
+                try:
+                    from agents.why_chain_quality import effective_critic_jaccard_threshold
+                except ImportError:
+                    from .why_chain_quality import effective_critic_jaccard_threshold
+
+                eff_threshold = effective_critic_jaccard_threshold(
+                    str(root_i.get("code") or ""),
+                    str(root_j.get("code") or ""),
+                    fp_i,
+                    fp_j,
+                    self.jaccard_threshold,
+                )
 
                 deterministic_dup = (
                     same_code
-                    or root_sim >= self.jaccard_threshold
-                    or fp_sim >= self.jaccard_threshold
+                    or root_sim >= eff_threshold
+                    or fp_sim >= eff_threshold
                 )
 
                 info = {
                     "same_code": bool(same_code),
                     "root_jaccard": round(root_sim, 3),
                     "fingerprint_jaccard": round(fp_sim, 3),
+                    "effective_jaccard_threshold": round(eff_threshold, 3),
                     "deterministic_duplicate": bool(deterministic_dup),
                 }
                 if deterministic_dup:

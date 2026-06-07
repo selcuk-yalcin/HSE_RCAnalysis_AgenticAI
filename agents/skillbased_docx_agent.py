@@ -80,6 +80,86 @@ except ImportError:
 strip_hse_codes = sanitize_report_text
 
 
+def _default_barsel_code_system(lang_code: str = "tr") -> List[Dict[str, str]]:
+    """BARSEL/HSG245 3.2 kod tablosu: A=Davranış, B=Koşullar, C=Kişisel, D=Organizasyonel."""
+    if (lang_code or "tr").lower().startswith("en"):
+        return [
+            {
+                "code": "A",
+                "category": "Behavior",
+                "description": "Observable actions: procedure violations, PPE use, unsafe acts",
+            },
+            {
+                "code": "B",
+                "category": "Conditions",
+                "description": "Equipment, environment, energy sources, and physical workplace conditions",
+            },
+            {
+                "code": "C",
+                "category": "Personal",
+                "description": "Individual capacity, competence, skill, and performance factors",
+            },
+            {
+                "code": "D",
+                "category": "Organizational",
+                "description": "Management systems, procedures, training, supervision, and oversight gaps",
+            },
+        ]
+    return [
+        {
+            "code": "A",
+            "category": "Davranış",
+            "description": "Gözlemlenebilir eylemler: prosedür ihlali, KKD kullanımı, güvensiz davranış",
+        },
+        {
+            "code": "B",
+            "category": "Koşullar",
+            "description": "Ekipman, ortam, enerji kaynağı ve fiziksel iş yeri koşulları",
+        },
+        {
+            "code": "C",
+            "category": "Kişisel",
+            "description": "Bireysel kapasite, yeterlilik, beceri ve performans faktörleri",
+        },
+        {
+            "code": "D",
+            "category": "Organizasyonel",
+            "description": "Yönetim sistemleri, prosedür, eğitim, gözetim ve denetim eksiklikleri",
+        },
+    ]
+
+
+def _normalize_analysis_method(method: Optional[Dict]) -> Dict:
+    """3.2 kod tablosunu resmi A/B/C/D etiketleriyle hizala."""
+    m = dict(method or {})
+    lang = get_report_lang()
+    canonical = {row["code"]: row for row in _default_barsel_code_system(lang)}
+    rows = m.get("code_system") or []
+    if not rows:
+        m["code_system"] = list(canonical.values())
+        return m
+    fixed: List[Dict[str, str]] = []
+    seen: set[str] = set()
+    for row in rows:
+        letter = str(row.get("code") or "").strip().upper()[:1]
+        if letter not in canonical or letter in seen:
+            continue
+        seen.add(letter)
+        base = canonical[letter]
+        fixed.append(
+            {
+                "code": letter,
+                "category": base["category"],
+                "description": str(row.get("description") or base["description"]).strip(),
+            }
+        )
+    for letter in ("A", "B", "C", "D"):
+        if letter not in seen:
+            fixed.append(canonical[letter])
+    m["code_system"] = sorted(fixed, key=lambda r: r.get("code", ""))
+    return m
+
+
 def _resolve_openrouter_chat_completions_url() -> str:
     """OPENROUTER_BASE_URL veya tam URL; çift /v1 ve yanlış path hatalarını azaltır."""
     explicit = (os.getenv("OPENROUTER_CHAT_COMPLETIONS_URL") or "").strip()
@@ -246,10 +326,10 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
     "methodology_description": "Kök neden analizi yöntemi ve bu olayda nasıl uygulandı - 2 paragraf",
     "five_why_explanation": "5-Why tekniği nasıl uygulandı - 2 paragraf",
     "code_system": [
-      {"code": "A", "category": "İnsan Faktörü", "description": "Bilgi eksikliği, beceri yetersizliği, dikkatsizlik, yorgunluk gibi bireysel faktörler"},
-      {"code": "B", "category": "Organizasyonel Faktör", "description": "Prosedür eksikliği, iletişim bozukluğu, yönetim kararları, politika yetersizlikleri"},
-      {"code": "C", "category": "İş/Görev Faktörü", "description": "Ekipman arızası, tasarım hatası, fiziksel yük, ergonomi sorunları"},
-      {"code": "D", "category": "Çevresel Faktör", "description": "Hava koşulları, aydınlatma, gürültü, sıcaklık, alan düzeni"}
+      {"code": "A", "category": "Davranış", "description": "Gözlemlenebilir eylemler: prosedür ihlali, KKD kullanımı, güvensiz davranış"},
+      {"code": "B", "category": "Koşullar", "description": "Ekipman, ortam, enerji kaynağı ve fiziksel iş yeri koşulları"},
+      {"code": "C", "category": "Kişisel", "description": "Bireysel kapasite, yeterlilik, beceri ve performans faktörleri"},
+      {"code": "D", "category": "Organizasyonel", "description": "Yönetim sistemleri, prosedür, eğitim, gözetim ve denetim eksiklikleri"}
     ],
     "team_members": [
       {"name": "HSE Uzmanı", "role": "Baş Araştırmacı", "date": "..."},
@@ -651,6 +731,7 @@ def _build_incident_details(doc, details: dict):
 
 
 def _build_analysis_method(doc, method: dict):
+    method = _normalize_analysis_method(method)
     _add_section_header(doc, "3", _L("section_analysis_method"))
     _add_subsection_header(doc, f"3.1 {_L('subsection_five_why')}")
     _add_paragraph(doc, method.get("five_why_explanation", ""), space_after=8)
@@ -1495,7 +1576,7 @@ class SkillBasedDocxAgent:
             },
             "analysis_method": {
                 "five_why_explanation": "HSG245 tabanlı 5-Why yaklaşımı ile doğrudan ve kök nedenler analiz edilmiştir.",
-                "code_system": [],
+                "code_system": _default_barsel_code_system(get_report_lang()),
                 "team_members": [],
             },
             "branches": branches,
@@ -3317,6 +3398,7 @@ class SkillBasedDocxAgent:
 
     def _html_analysis_method(self, method: Dict) -> str:
         """Analiz yöntemi HTML."""
+        method = _normalize_analysis_method(method)
         html = f"""
         <div class="section" id="analysis-method">
             <div class="section-header">3. {_L('section_analysis_method')}</div>
