@@ -14,15 +14,15 @@ import re
 GROUP_TITLE_TR: dict[str, str] = {
     "C1": "Fiziksel Kapasite ve Sağlık",
     "C2": "Bilişsel ve Zihinsel Yeterlilik / Yetenek",
-    "C3": "BECERİ DÜZEYİ, YETKİNLİK, YETERLİLİK VE DAVRANIŞSAL ŞARTLANMA",
+    "C3": "Beceri düzeyi, yetkinlik, yeterlilik ve davranışsal şartlanma",
     "D1": "Liderlik, gözetim ve güvenlik kültürü",
     "D2": "İletişim ve Bilgi Yönetimi",
     "D3": "Eğitim, yetkinlik ve işgücü yönetimi",
-    "D4": "RİSK VE İŞ KONTROL SİSTEMLERİ",
+    "D4": "Risk ve iş kontrol sistemleri",
     "D5": "Mühendislik / Tasarım ve Teknik Sistemler",
     "D6": "Bakım, varlık bütünlüğü ve güvenilirlik",
     "D7": "Yüklenici ve Tedarik Zinciri Yönetimi",
-    "D8": "SATIN ALMA, MALZEME TAŞIMA VE MALZEME KONTROLÜ",
+    "D8": "Satın alma, malzeme taşıma ve malzeme kontrolü",
     "D9": "Standartlar / Pratikler / Prosedürler (SPP)",
     "D10": "Acil durum hazırlığı",
 }
@@ -42,13 +42,13 @@ CODE_TITLE_TR: dict[str, str] = {
     "C2.4": "Yetersiz Muhakeme veya Karar Verme Yeteneği",
     "C2.5": "Performansı Etkileyen Duygusal Durum",
     "C2.6": "Göreve Özgü Zihinsel Modellerin Eksikliği – Düşük Öğrenme Yeteneği",
-    "C3.1": "GEREKLİ BECERİ VEYA YETERLİLİĞİN DEĞERLENDİRİLMESİ YETERSİZ",
-    "C3.2": "YETERSİZ BECERİ UYGULAMASI",
-    "C3.3": "BECERİ KOÇLUĞU YAPILMAMIŞ VEYA GERİ BİLDİRİM EKSİKLİĞİ",
-    "C3.4": "BECERİNİN NADİREN UYGULANMASI VEYA KÖRELMESİ",
-    "C3.5": "HATALI DAVRANIŞIN ÖDÜLLENDİRİLMESİ VEYA DÜZELTİLMEMESİ",
-    "C3.6": "DOĞRU DAVRANIŞIN ÖDÜLLENDİRİLMEMESİ",
-    "C3.7": "GÖREV DEĞİŞİKLİĞİ VEYA ROTASYONA BAĞLI YETKİNLİK KAYBI",
+    "C3.1": "Gerekli beceri veya yeterliliğin değerlendirilmesi yetersiz",
+    "C3.2": "Yetersiz beceri uygulaması",
+    "C3.3": "Beceri koçluğu yapılmamış veya geri bildirim eksikliği",
+    "C3.4": "Becerinin nadiren uygulanması veya körelmesi",
+    "C3.5": "Hatalı davranışın ödüllendirilmesi veya düzeltilmemesi",
+    "C3.6": "Doğru davranışın ödüllendirilmemesi",
+    "C3.7": "Görev değişikliği veya rotasyona bağlı yetkinlik kaybı",
     # D — Organizasyonel faktörler
     "D1.1": "Güvenliğe yönelik zayıf liderlik taahhüdü",
     "D1.2": "Yetersiz gözetim veya denetim",
@@ -143,7 +143,32 @@ def group_title_tr_for_code(code: str) -> str:
     Yaprak kod (D4.3) veya grup kodu (D4) kabul eder.
     """
     gid = _group_id_from_code(code)
-    return GROUP_TITLE_TR.get(gid, "")
+    raw = GROUP_TITLE_TR.get(gid, "")
+    return normalize_display_title(raw) if raw else ""
+
+
+def normalize_display_title(title: str) -> str:
+    """Rapor/HITL görünümü: tamamen BÜYÜK HARF başlıkları okunabilir forma çevirir."""
+    t = (title or "").strip()
+    if not t:
+        return t
+    alpha = [c for c in t if c.isalpha()]
+    if len(alpha) < 4:
+        return t
+    upper_ratio = sum(1 for c in alpha if c.isupper()) / len(alpha)
+    if upper_ratio < 0.72:
+        return t
+    words = re.split(r"(\s+|/)", t)
+    out: list[str] = []
+    for w in words:
+        if not w or not w.strip():
+            out.append(w)
+            continue
+        if w.isupper() and len(w) > 1:
+            out.append(w.capitalize())
+        else:
+            out.append(w)
+    return "".join(out)
 
 
 def title_tr_for_code(code: str, fallback_en: str = "") -> str:
@@ -164,5 +189,5 @@ def title_tr_for_code(code: str, fallback_en: str = "") -> str:
     if barsel_taxonomy_enabled():
         official = official_title_tr_for_code(key)
         if official:
-            return official
-    return (fallback_en or "").strip()
+            return normalize_display_title(official)
+    return normalize_display_title((fallback_en or "").strip())

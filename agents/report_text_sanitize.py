@@ -211,7 +211,7 @@ def strip_hsg_labels(text: str) -> str:
 
 
 _RE_ROOT_CAUSE_LABEL_PREFIX = re.compile(
-    r"^(?:KÖK\s*NEDEN|Kök\s*Neden|ROOT\s*CAUSE)\s*(?:\d+\s*)?[:\-–]\s*",
+    r"^(?:KÖK\s*NEDEN|Kök\s*Neden|ROOT\s*CAUSE)\s*(?:\d+\s*)?[:\-–]?\s*",
     re.IGNORECASE,
 )
 

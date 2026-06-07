@@ -89,11 +89,11 @@ def test_critical_factor_group_titles_from_section_trail():
     from agents.barsel_taxonomy import critical_factor_title_for_code
     from agents.taxonomy_title_tr_map import group_title_tr_for_code, title_tr_for_code
 
-    assert critical_factor_title_for_code("D8.4") == "SATIN ALMA, MALZEME TAŞIMA VE MALZEME KONTROLÜ"
+    assert critical_factor_title_for_code("D8.4") == "Satın alma, malzeme taşıma ve malzeme kontrolü"
     assert critical_factor_title_for_code("D9.1") == "Standartlar / Pratikler / Prosedürler (SPP)"
     assert critical_factor_title_for_code("D5.2") == "Mühendislik / Tasarım ve Teknik Sistemler"
     assert critical_factor_title_for_code("D2.1") == "İletişim ve Bilgi Yönetimi"
-    assert critical_factor_title_for_code("D4.3") == "RİSK VE İŞ KONTROL SİSTEMLERİ"
+    assert critical_factor_title_for_code("D4.3") == "Risk ve iş kontrol sistemleri"
     assert group_title_tr_for_code("C1") == "Fiziksel Kapasite ve Sağlık"
     assert group_title_tr_for_code("D3.2") == "Eğitim, yetkinlik ve işgücü yönetimi"
     assert "Değişim Yönetimi (MoC)" not in title_tr_for_code("D4.3")
@@ -123,6 +123,12 @@ def test_resolve_root_code_from_why_chain():
     assert "Mühendislik / Tasarım" in branches[0]["branch_title"]
 
 
+def test_c32_title_case_not_all_caps():
+    from agents.barsel_taxonomy import root_cause_leaf_title_for_code
+
+    assert root_cause_leaf_title_for_code("C3.2") == "Yetersiz beceri uygulaması"
+
+
 def test_d14_official_title_uses_full_phrase_not_short_label():
     from agents.barsel_taxonomy import root_cause_leaf_title_for_code
 
@@ -135,8 +141,12 @@ def test_strip_root_cause_label_prefix():
     from agents.report_text_sanitize import strip_root_cause_label_prefix
 
     assert (
-        strip_root_cause_label_prefix("Kök Neden 1: YETERSİZ BECERİ UYGULAMASI", 1)
-        == "YETERSİZ BECERİ UYGULAMASI"
+        strip_root_cause_label_prefix("Kök Neden 1: Yetersiz beceri uygulaması", 1)
+        == "Yetersiz beceri uygulaması"
+    )
+    assert (
+        strip_root_cause_label_prefix("KÖK NEDEN 1: Kök Neden 1: Yetersiz beceri uygulaması", 1)
+        == "Yetersiz beceri uygulaması"
     )
     assert (
         strip_root_cause_label_prefix("KÖK NEDEN 2: Üretim baskısının güvenliğin önüne geçmesi", 2)

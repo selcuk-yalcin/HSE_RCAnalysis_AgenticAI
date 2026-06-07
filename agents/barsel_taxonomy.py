@@ -166,7 +166,11 @@ def official_title_tr_for_code(code: str) -> str:
     item = _BY_CODE.get(key)
     if not item:
         return ""
-    return normalize_taxonomy_title(item.title)
+    try:
+        from agents.taxonomy_title_tr_map import normalize_display_title
+    except ImportError:
+        from .taxonomy_title_tr_map import normalize_display_title
+    return normalize_display_title(normalize_taxonomy_title(item.title))
 
 
 def section_titles_tr_for_code(code: str) -> List[str]:
@@ -536,11 +540,11 @@ def why_level_target_bands(why_level: int) -> List[str]:
 
 
 def hitl_probe_min_relevance() -> float:
-    raw = (os.getenv("HITL_PROBE_MIN_RELEVANCE") or "0.06").strip()
+    raw = (os.getenv("HITL_PROBE_MIN_RELEVANCE") or "0.03").strip()
     try:
         return max(0.0, min(1.0, float(raw)))
     except ValueError:
-        return 0.06
+        return 0.03
 
 
 def hitl_rag_min_score() -> float:

@@ -1416,6 +1416,8 @@ def _apply_incident_probe_context(
     item: BarselTaxonomyItem | None,
     incident_context: str,
     output_language: str,
+    *,
+    force_keep: bool = False,
 ) -> dict[str, Any] | None:
     """Önce LLM ile olaya özelleştir, sonra relevance eşiğini uygula."""
     if not isinstance(row, dict):
@@ -1433,13 +1435,57 @@ def _apply_incident_probe_context(
         if tailored:
             out["probe_context"] = tailored
             ctx = tailored
-    if item:
+    if item and not force_keep:
         if ctx:
             if probe_context_relevance(ctx, item, incident_context) < hitl_probe_min_relevance():
                 return None
         elif item_relevance_score(item, incident_context) < hitl_probe_min_relevance():
             return None
     return out
+
+
+def _fallback_probe_row(
+    item: BarselTaxonomyItem,
+    why_level: int,
+    incident_context: str,
+    output_language: str,
+) -> dict[str, Any] | None:
+    """typical_problems boş veya relevance filtresi havuzu sıfırladığında en az bir soru üret."""
+    probe_ctx = ""
+    problems = pick_typical_problems_for_hitl(
+        item,
+        incident_context,
+        why_level,
+        max_problems=1,
+        min_relevance=0.0,
+    )
+    if problems:
+        probe_ctx = problems[0]
+    elif item.definition:
+        probe_ctx = re.split(r"[.!?]\s+", item.definition.strip(), maxsplit=1)[0].strip()[:220]
+    if not probe_ctx:
+        return None
+    q_tr = probe_question_for_type("typical_problem", "tr")
+    q_en = probe_question_for_type("typical_problem", "en")
+    row = {
+        "id": _stable_id("bx-fb", item.code, str(why_level), probe_ctx[:96]),
+        "source": "why_probe_barsel_taxonomy",
+        "code": item.code,
+        "cause_desc": item.title,
+        "hsg245": item.title,
+        "soru": q_tr,
+        "soru_en": q_en,
+        "probe_context": probe_ctx,
+        "yönler": {"probe_type": "typical_problem"},
+        "why_level": why_level,
+    }
+    return _apply_incident_probe_context(
+        row,
+        item,
+        incident_context,
+        output_language,
+        force_keep=True,
+    )
 
 
 def _llm_probe_from_typical_problems(
@@ -1704,6 +1750,7 @@ def build_why_probe_question_pool(
     seen_q_fp: set[str] = set()
     seen_q_tokens: list[set[str]] = []
     pool_cap = _hitl_max_pool_per_branch()
+    imm_upper = (immediate_code or "").strip().upper()
 
     for code in deep_codes:
         item = taxonomy_item_for_code(
@@ -1729,7 +1776,13 @@ def build_why_probe_question_pool(
                 continue
             if _should_skip_probe_row(row, seen_probe_keys):
                 continue
-            shaped = _apply_incident_probe_context(row, item, incident_ctx, output_language)
+            shaped = _apply_incident_probe_context(
+                row,
+                item,
+                incident_ctx,
+                output_language,
+                force_keep=(code == imm_upper),
+            )
             if not shaped:
                 continue
             soru = str(shaped.get("soru") or "").strip()
@@ -1749,6 +1802,7 @@ def build_why_probe_question_pool(
                 incident_ctx,
                 why_level,
                 max_problems=1,
+                min_relevance=0.0 if code == imm_upper else None,
             )
             llm_rows = _llm_probe_from_typical_problems(
                 code=item.code,
@@ -1763,7 +1817,13 @@ def build_why_probe_question_pool(
             for row in llm_rows:
                 if _should_skip_probe_row(row, seen_probe_keys):
                     continue
-                shaped = _apply_incident_probe_context(row, item, incident_ctx, output_language)
+                shaped = _apply_incident_probe_context(
+                    row,
+                    item,
+                    incident_ctx,
+                    output_language,
+                    force_keep=(code == imm_upper),
+                )
                 if not shaped:
                     continue
                 soru = str(shaped.get("soru") or "").strip()
@@ -1776,6 +1836,17 @@ def build_why_probe_question_pool(
 
         if len(pool) >= pool_cap:
             break
+
+    if not pool and imm_upper:
+        imm_item = taxonomy_item_for_code(
+            imm_upper,
+            barsel_by_code=barsel_by_code or None,
+            retriever=retriever,
+        )
+        if imm_item:
+            fb = _fallback_probe_row(imm_item, why_level, incident_ctx, output_language)
+            if fb:
+                pool.append(fb)
 
     return _filter_questions(pool[:pool_cap], known_fields=known_fields, incident_context=incident_ctx)
 

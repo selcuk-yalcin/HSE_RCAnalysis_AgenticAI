@@ -130,6 +130,44 @@ def test_build_why_probe_pool_one_relevant_problem_per_code(monkeypatch):
     assert any("kapasite" in r["probe_context"].lower() for r in prob_rows)
 
 
+def test_build_why_probe_pool_fallback_when_no_typical_problems(monkeypatch):
+    import agents.hitl_question_service as svc
+
+    bare = BarselTaxonomyItem(
+        code="A4.1",
+        title="Yetersiz beceri uygulaması",
+        definition=(
+            "Kazı tatbikatı sonrası saha davranış doğrulaması prosedürü eksikti veya uygulanmıyordu. "
+            "Çalışanlar teorik eğitim almış olsalar da uygulama fırsatı bulamamışlardır."
+        ),
+        typical_problems=[],
+        section_ids=["A", "A4"],
+    )
+    monkeypatch.setattr(svc, "_BARSEL_ITEMS", [bare])
+    monkeypatch.setattr(svc, "_BARSEL_BY_CODE", {bare.code: bare})
+    monkeypatch.setattr(svc, "_hitl_llm_probe_enabled", lambda: False)
+    monkeypatch.setattr(svc, "_hitl_llm_probe_context_enabled", lambda: False)
+    monkeypatch.setattr(
+        "agents.hitl_question_service.codes_for_why_level",
+        lambda *_a, **_k: [bare.code],
+    )
+    monkeypatch.setattr(
+        svc,
+        "_hitl_taxonomy_index",
+        lambda *_a, **_k: ([bare], {bare.code: bare}),
+    )
+
+    pool = build_why_probe_question_pool(
+        how_happened="kazı tatbikatı sonrası saha davranış doğrulaması yapılmadı",
+        root_cause_initial="",
+        immediate_code=bare.code,
+        why_level=1,
+        output_language="tr",
+    )
+    assert len(pool) >= 1
+    assert pool[0].get("code") == bare.code
+
+
 def test_next_why_probe_stops_at_branch_limit(monkeypatch):
     import agents.hitl_question_service as svc
 

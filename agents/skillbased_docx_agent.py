@@ -1359,9 +1359,11 @@ class SkillBasedDocxAgent:
                 or extract_taxonomy_code(str(root_enriched.get("code") or root_code or ""))
             )
             cf_title = critical_factor_title_for_code(root_code)
-            root_title = root_cause_leaf_title_for_code(root_code) or str(
-                root_enriched.get("standard_title_tr") or ""
-            ).strip()
+            root_title = strip_root_cause_label_prefix(
+                root_cause_leaf_title_for_code(root_code)
+                or str(root_enriched.get("standard_title_tr") or "").strip(),
+                branch_number=idx,
+            )
             root_section = ""
             root_detail = sanitize_report_text(
                 str(root_enriched.get("explanation_tr") or root_enriched.get("explanation") or root_title)
@@ -1416,9 +1418,11 @@ class SkillBasedDocxAgent:
                     str(rc_enriched.get("code") or rc_code or "")
                 )
                 cf_title = critical_factor_title_for_code(rc_code)
-                title = root_cause_leaf_title_for_code(rc_code) or str(
-                    rc_enriched.get("standard_title_tr") or ""
-                ).strip()
+                title = strip_root_cause_label_prefix(
+                    root_cause_leaf_title_for_code(rc_code)
+                    or str(rc_enriched.get("standard_title_tr") or "").strip(),
+                    branch_number=idx,
+                )
                 detail = strip_hse_codes(
                     str(rc_enriched.get("explanation_tr") or rc_enriched.get("explanation") or title)
                 )
