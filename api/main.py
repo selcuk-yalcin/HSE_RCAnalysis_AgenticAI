@@ -439,6 +439,9 @@ def _sync_incident_from_pipeline_result(result_payload: dict):
 
     part3 = result_payload.get("part3")
     part4 = result_payload.get("part4")
+    job_id = str(result_payload.get("last_pipeline_job_id") or "").strip()
+    if job_id:
+        incident["last_pipeline_job_id"] = job_id
     if part3:
         incident["part3"] = part3
         incident["status"] = "investigated"
@@ -696,6 +699,49 @@ class LibrarySaveHtmlRequest(BaseModel):
     decision_tree_html: str = ""
 
 
+def _recover_incident_part3_from_pipeline(
+    tenant_id: str,
+    incident_id: str,
+    incident: dict,
+) -> dict:
+    """Part3 Redis'e yazılmadan rapor istenirse Celery sonucundan veya Redis'ten kurtar."""
+    if isinstance(incident.get("part3"), dict) and incident.get("part3"):
+        return incident
+
+    job_id = str(incident.get("last_pipeline_job_id") or "").strip()
+    if job_id and celery_app is not None:
+        try:
+            async_result = AsyncResult(job_id, app=celery_app)
+            if async_result.successful():
+                payload = async_result.result if isinstance(async_result.result, dict) else {}
+                part3 = payload.get("part3")
+                part4 = payload.get("part4")
+                if isinstance(part3, dict) and part3:
+                    incident = dict(incident)
+                    incident["part3"] = part3
+                    if isinstance(part4, dict) and part4:
+                        incident["part4"] = part4
+                        incident["status"] = "completed"
+                    else:
+                        incident["status"] = "investigated"
+                    _save_incident_record(tenant_id, incident_id, incident)
+                    return incident
+        except Exception:  # noqa: BLE001
+            pass
+
+    try:
+        from shared.incident_persistence import load_incident_from_redis
+
+        remote = load_incident_from_redis(tenant_id, incident_id)
+        if isinstance(remote, dict) and isinstance(remote.get("part3"), dict) and remote.get("part3"):
+            merged = {**incident, **remote}
+            _incidents(tenant_id)[incident_id] = merged
+            return merged
+    except Exception:  # noqa: BLE001
+        pass
+    return incident
+
+
 def _validate_artifact_paths(artifacts: dict) -> bool:
     if not isinstance(artifacts, dict):
         return False
@@ -760,20 +806,25 @@ def _generate_report_artifacts(
         }
 
     # Bazı akışlarda job "completed" görünse de incident kaydına part3 yazımı gecikebiliyor.
-    # Kısa bir retry penceresi tanı.
+    # Retry + Celery/Redis kurtarma penceresi.
     has_part3 = False
-    for _ in range(10):
+    for _ in range(20):
+        incident = _recover_incident_part3_from_pipeline(tenant_id, incident_id, incident)
         has_part3 = isinstance(incident.get("part3"), dict) and bool(incident.get("part3"))
         cached_artifacts = incident.get("report_artifacts") or {}
         if has_part3 or _validate_artifact_paths(cached_artifacts):
             break
-        time.sleep(0.8)
+        time.sleep(1.0)
         incident = _require_incident_record(tenant_id, incident_id)
     has_part4 = isinstance(incident.get("part4"), dict) and bool(incident.get("part4"))
     if not has_part3:
         raise HTTPException(
             status_code=400,
-            detail="Investigation (Part 3) is not completed yet",
+            detail=(
+                "Kök neden analizi (Part 3) henüz kayda yazılmadı. "
+                "Analiz tamamlandıysa birkaç saniye bekleyip tekrar deneyin veya "
+                "«Rapor ve karar ağacını buluta kaydet» ile HTML'i önce senkronize edin."
+            ),
         )
     if not has_part4:
         if actionplan_agent is None:
@@ -1320,6 +1371,8 @@ async def start_pipeline_job(
             tenant_id=tenant_id,
             owner_user_id=owner_user_id,
         )
+        incident["last_pipeline_job_id"] = task.id
+        _save_incident_record(tenant_id, incident_id, incident)
 
         return {
             "success": True,
@@ -1353,6 +1406,8 @@ async def start_pipeline_job(
         "result": None,
         "error": None,
     }
+    incident["last_pipeline_job_id"] = job_id
+    _save_incident_record(tenant_id, incident_id, incident)
     asyncio.create_task(_run_pipeline_job(job_id, incident_id, tenant_id, payload, owner_user_id))
 
     return {

@@ -224,6 +224,10 @@ Sertifikalar → OCR         → sertifika_durumu{}
   - while root cause and report stages run, users see streaming progress in chat
     (`activity_lines` from worker + summary blocks for immediate/root causes and actions).
   - HITL phase disables free-text chat input; answers only via question panel.
+- **Planned (P1.22):** after A/B immediate-cause probes, a **root-cause candidate** HITL phase
+  asks C/D `typical_problems` yes/no probes (Mongo BARSEL); **No** excludes codes from 5-Why
+  root selection; **Yes** affirms `typical_problems` in final root narrative — reduces generic
+  D4.1 risk-assessment clustering. See [`roadmap.md`](roadmap.md) § P1.22.
 
 ## Smart Hybrid RCA (Planned — P1.14)
 

@@ -58,6 +58,34 @@ ROOTCAUSE_COST_PROFILE=balanced
 
 ### HITL (P0.2 kalan)
 - ⏳ HITL log persist (training)
+- ⏳ **HITL kök neden aday netleştirme (C/D `typical_problems`)** — aşağıda P1.22
+
+---
+
+## P1.22 HITL — kök neden çeşitlendirme (C/D probe)
+
+**Sorun:** 5-Why sonunda kök nedenler sık sık **D4.x (risk değerlendirmesi / iş planlama)** bandına toplanıyor. Mevcut HITL yalnızca **A/B doğrudan neden** probe’u yapıyor (`why_level=1`, `codes_for_why_level` band değiştirmiyor); C/D `typical_problems` kök neden seçimine bağlanmıyor (`affirmed_typical_problems` yalnızca level-5 + Evet).
+
+**Hedef:** HITL’e A/B probe’larından sonra (veya dal başına ek faz) **kök neden aday netleştirme** eklemek; rapor çeşitliliğini artırmak, jenerik D4.1 tuzağını azaltmak.
+
+| Adım | Durum | İş |
+|------|--------|-----|
+| **RC1** | ⏳ | `codes_for_why_level` / yeni `codes_for_root_probe`: olay metnine göre Mongo RAG ile **2–4 C/D aday kodu** (relevance eşiği; olayla alakasız kodları eleme) |
+| **RC2** | ⏳ | Her aday için `typical_problems` → mevcut probe şablonu (`probe_question_for_type`, `probe_context`); boşsa `definition` ilk cümle fallback |
+| **RC3** | ⏳ | HITL cevap semantiği: **Evet** → `affirmed_typical_problems` + dal bağlamı; **Hayır/Bilinmiyor** → `forbidden_root_codes` / RAG exclusion (dal ve global) |
+| **RC4** | ⏳ | `rootcause_agent_v3_1`: forbidden + affirmed sinyallerini 5-Why (Why-4/5) ve `derive_root_cause_from_why5` zincirine bağla; level-5-only kısıtını kaldır |
+| **RC5** | ⏳ | Frontend (`ChatInterface.jsx`): `why_probe` fazı — A/B immediate probe sonrası **root_probe** modu; cap (`MAX_ROOT_PROBE_ANSWERS`); Türkçe UI etiketleri |
+| **RC6** | ⏳ | Testler: depo/yaya–forklift senaryosunda D4.1 tekrarı azalır; D4.9/D5/D1 gibi spesifik kodlar mümkün; Hayır → kod dışlanır |
+| **RC7** | ⏳ | `ROOTCAUSE_COST_PROFILE=balanced` ile uyum: rule-based probe öncelikli; LLM probe context opsiyonel (`HITL_LLM_PROBE_CONTEXT`) |
+
+**Kabul kriterleri:**
+- Aynı olayda 3+ dal sonrası kök neden başlıklarında **aynı D4.1/D4.2 teması** baskın olmamalı (branch critic + forbidden ile).
+- Kullanıcı D8.6 tipik problemine **Hayır** derse, o kod ilgili dalda kök neden olarak seçilmemeli.
+- Mevcut A/B immediate HITL akışı bozulmamalı; root probe ek faz olarak çalışmalı.
+
+**Kod dokunuşu (planlı):** `agents/hitl_question_service.py`, `agents/barsel_taxonomy.py`, `agents/rootcause_agent_v3_1.py`, `admin_pan/Admin/src/rca-frontend/components/ChatInterface.jsx`, `api/main.py`, `tests/test_mongo_why_flow.py` (+ yeni root-probe testleri).
+
+**Env (değişiklik yok — mevcut):** `HITL_USE_BARSEL=1`, `TAXONOMY_COLLECTION=taxonomy_barsel`, `HITL_PROBE_MIN_RELEVANCE=0.03`
 
 ### Ürün
 - ⏳ Dal kurulum ekranı (P1.12) — kullanıcı onayı → pipeline

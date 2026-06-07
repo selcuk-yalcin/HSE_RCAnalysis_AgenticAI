@@ -163,6 +163,7 @@ def run_pipeline_task(
         ),
     )
 
+    job_id = str(getattr(self.request, "id", "") or "")
     result = {
         "tenant_id": tenant_id,
         "incident_id": incident_id,
@@ -170,10 +171,26 @@ def run_pipeline_task(
         "part3": part3_data,
         "part4": part4_data,
         "actionplan_meta": actionplan_meta,
+        "last_pipeline_job_id": job_id,
         "stage": "completed",
         "progress": 100,
         "message": "Pipeline tamamlandi",
     }
+    try:
+        from shared.incident_persistence import merge_incident_fields
+
+        merge_incident_fields(
+            tenant_id,
+            incident_id,
+            {
+                "part3": part3_data,
+                "part4": part4_data,
+                "status": "completed",
+                "last_pipeline_job_id": job_id,
+            },
+        )
+    except Exception:  # noqa: BLE001
+        pass
     try:
         from shared import token_account
 
