@@ -409,6 +409,34 @@ def _default_part2_data() -> dict:
     }
 
 
+def _build_part1_fast(incident: "IncidentCreate") -> dict:
+    """Map form fields to Part 1 without LLM (interactive HITL fast path)."""
+    ref_no = f"INC-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    description = (incident.description or "").strip()
+    injury = (incident.injury_description or "").strip()
+    what = description
+    if injury and injury not in what:
+        what = f"{what}\n{injury}".strip() if what else injury
+    event_cat = (incident.event_category or "").strip()
+    incident_type = event_cat or "Accident"
+    return {
+        "ref_no": ref_no,
+        "reported_by": incident.reported_by or "",
+        "date_time": incident.date_time or datetime.now().strftime("%d.%m.%y %I:%M%p"),
+        "incident_type": incident_type,
+        "brief_details": {
+            "what": what[:2000],
+            "where": incident.forwarded_to or "",
+            "when": incident.date_time or "",
+            "who": incident.reported_by or "",
+            "emergency_measures": "",
+        },
+        "forwarded_to": incident.forwarded_to or "",
+        "forwarded_date_time": "",
+        "part1_source": "form_snapshot",
+    }
+
+
 def _build_part2_from_form_assessment(assessment: "AssessmentData") -> dict:
     """Map form assessment fields to Part 2 without LLM (interactive HITL fast path)."""
     harm = (assessment.actual_harm or "").strip()
@@ -1132,6 +1160,38 @@ async def root():
             "/api/v1/health",
         ]
     }
+
+@app.post("/api/v1/incidents/create/fast", response_model=IncidentResponse)
+async def create_incident_fast(tenant_id: TenantId, incident: IncidentCreate):
+    """
+    Part 1 from manual form only (no LLM). Used by interactive HITL so the UI
+    is not blocked by Overview Agent OpenRouter calls before the chat tab opens.
+    """
+    try:
+        part1_data = _build_part1_fast(incident)
+        incident_id = part1_data["ref_no"]
+        incident_record = {
+            "id": incident_id,
+            "tenant_id": tenant_id,
+            "part1": part1_data,
+            "part2": None,
+            "part3": None,
+            "part4": None,
+            "created_at": datetime.now().isoformat(),
+            "status": "created",
+        }
+        _save_incident_record(tenant_id, incident_id, incident_record)
+        return IncidentResponse(
+            success=True,
+            data={"incident_id": incident_id, "part1": part1_data},
+            message="Incident created (fast path)",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error creating incident (fast): {str(e)}",
+        ) from e
+
 
 @app.post("/api/v1/incidents/create", response_model=IncidentResponse)
 async def create_incident(tenant_id: TenantId, incident: IncidentCreate):
