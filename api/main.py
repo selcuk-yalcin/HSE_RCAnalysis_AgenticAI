@@ -669,6 +669,20 @@ class AssessmentData(BaseModel):
     actual_harm: str
     riddor_reportable: str
 
+
+class InteractiveBootstrapRequest(BaseModel):
+    """Tek çağrıda Part 1 + Part 2 (LLM yok) — etkileşimli HITL form gönderimi."""
+    reported_by: str
+    description: str
+    injury_description: str = ""
+    forwarded_to: str = ""
+    date_time: str = None
+    event_category: str = ""
+    event_type: str = ""
+    actual_harm: str = ""
+    riddor_reportable: str = ""
+
+
 class InvestigationData(BaseModel):
     incident_id: str = ""  # Optional - can be inferred from URL path
     how_happened: str  # Main detailed investigation field (REQUIRED)
@@ -1180,7 +1194,9 @@ async def create_incident_fast(tenant_id: TenantId, incident: IncidentCreate):
             "created_at": datetime.now().isoformat(),
             "status": "created",
         }
-        _save_incident_record(tenant_id, incident_id, incident_record)
+        await asyncio.to_thread(
+            _save_incident_record, tenant_id, incident_id, incident_record
+        )
         return IncidentResponse(
             success=True,
             data={"incident_id": incident_id, "part1": part1_data},
@@ -1190,6 +1206,61 @@ async def create_incident_fast(tenant_id: TenantId, incident: IncidentCreate):
         raise HTTPException(
             status_code=500,
             detail=f"Error creating incident (fast): {str(e)}",
+        ) from e
+
+
+@app.post("/api/v1/incidents/bootstrap/interactive", response_model=IncidentResponse)
+async def bootstrap_interactive_session(
+    tenant_id: TenantId, body: InteractiveBootstrapRequest
+):
+    """
+    Part 1 + Part 2 in one request (no LLM). Cuts gateway round-trips and avoids
+    504 when Railway cold-starts between create and assessment calls.
+    """
+    try:
+        incident = IncidentCreate(
+            reported_by=body.reported_by,
+            description=body.description,
+            injury_description=body.injury_description,
+            forwarded_to=body.forwarded_to,
+            date_time=body.date_time,
+            event_category=body.event_category,
+        )
+        part1_data = _build_part1_fast(incident)
+        incident_id = part1_data["ref_no"]
+        assessment = AssessmentData(
+            incident_id=incident_id,
+            event_type=body.event_type or body.event_category or "Accident",
+            actual_harm=body.actual_harm or "",
+            riddor_reportable=body.riddor_reportable or "",
+        )
+        part2_data = _build_part2_from_form_assessment(assessment)
+        incident_record = {
+            "id": incident_id,
+            "tenant_id": tenant_id,
+            "part1": part1_data,
+            "part2": part2_data,
+            "part3": None,
+            "part4": None,
+            "created_at": datetime.now().isoformat(),
+            "status": "assessed",
+        }
+        await asyncio.to_thread(
+            _save_incident_record, tenant_id, incident_id, incident_record
+        )
+        return IncidentResponse(
+            success=True,
+            data={
+                "incident_id": incident_id,
+                "part1": part1_data,
+                "part2": part2_data,
+            },
+            message="Interactive session bootstrapped (fast path)",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error bootstrapping interactive session: {str(e)}",
         ) from e
 
 
@@ -1436,7 +1507,7 @@ async def add_assessment_from_form(tenant_id: TenantId, incident_id: str, assess
         part2_data = _build_part2_from_form_assessment(assessment)
         incident["part2"] = part2_data
         incident["status"] = "assessed"
-        _save_incident_record(tenant_id, incident_id, incident)
+        await asyncio.to_thread(_save_incident_record, tenant_id, incident_id, incident)
         return {"success": True, "data": part2_data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -59,7 +59,9 @@ def test_probe_answer_affirms_fit():
 
 def test_build_interim_why1_question():
     q = build_interim_why_question(1, "B2.1", cause_tr="Korkuluk montajı tamamlanmamıştı")
-    assert q.startswith("Neden")
+    # P1.24: soru kendi soru kelimesini içerir ("hangi alt mekanizmayla"); başa
+    # ikinci bir "Neden" eklenmez (düşük cümle önlenir).
+    assert "hangi alt mekanizma" in q.lower() or q.startswith("Neden")
     assert "?" in q
 
 

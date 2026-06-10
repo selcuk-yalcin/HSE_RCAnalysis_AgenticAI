@@ -90,7 +90,12 @@ def enforce_short_why_question(question: str, *, max_words: int = WHY_QUESTION_M
     if word_count(body) > max_words:
         body = _hard_truncate_words(body, max_words)
         q = body + "?"
-    if not q.startswith(("Neden", "neden", "Why", "why")):
+    # P1.24: Soru zaten kendi soru kelimesini içeriyorsa ("hangi alt mekanizmayla ...?")
+    # başa ikinci bir "Neden" ekleme — "Neden X hangi ... gerçekleşti?" düşük cümle olur.
+    has_interrogative = bool(
+        re.search(r"\b(hangi|nasıl|niçin|neden|why|how|what)\b", q.lower())
+    )
+    if not q.startswith(("Neden", "neden", "Why", "why")) and not has_interrogative:
         q = "Neden " + q.lstrip("?").strip()
         if not q.endswith("?"):
             q += "?"
@@ -136,6 +141,51 @@ def build_why1_question(immediate_cause: Dict) -> str:
     if cause.lower().startswith("neden"):
         return enforce_short_why_question(cause)
     return enforce_short_why_question(f"{cause} hangi alt mekanizmayla gerçekleşti?")
+
+
+_EVENT_TAIL_RE = re.compile(
+    r"\s*(meydana\s+gel\w*|gerçekleş\w*|yaşan\w*|oluş\w*|olmuştur|oldu)[.!?]?\s*$",
+    re.IGNORECASE,
+)
+
+
+def build_event_why1_question(incident_text: str, *, max_words: int = 18) -> str:
+    """
+    P1.24: Why-1 olayın KENDİSİNE sorulur ("Neden <olay> meydana geldi?").
+
+    Cevabı deterministik olarak tespit edilen doğrudan neden (immediate cause) olur;
+    böylece zincir klasik 5-Why örneklerindeki gibi bir seviye aşağı kayar
+    (problem → ilk neden = doğrudan neden → alt mekanizmalar → kök neden).
+    """
+    text = str(incident_text or "")
+    sentence = ""
+    for line in text.splitlines():
+        ln = line.strip()
+        if not ln or ln.startswith("["):
+            continue
+        candidate = re.split(r"(?<=[.!?])\s+", ln)[0].strip()
+        if len(candidate) >= 20:
+            sentence = candidate
+            break
+        if not sentence:
+            sentence = candidate
+    sentence = _EVENT_TAIL_RE.sub("", sentence).strip().rstrip(".!?,;:")
+    if not sentence:
+        return "Neden bu olay meydana geldi?"
+    words = sentence.split()
+    if len(words) > max_words:
+        sentence = " ".join(words[:max_words])
+    return f"Neden {sentence} meydana geldi?"
+
+
+def immediate_cause_sentence(cause_text: str) -> str:
+    """Doğrudan neden ifadesini düşük (yarım) cümle olmaktan çıkarıp tam cümle yapar."""
+    t = re.sub(r"\s+", " ", str(cause_text or "").strip())
+    if not t:
+        return ""
+    if t[-1] in ".!?":
+        return t
+    return f"{t.rstrip(' ,;:')}, olayın doğrudan nedenidir."
 
 
 def _token_set(text: str) -> set:

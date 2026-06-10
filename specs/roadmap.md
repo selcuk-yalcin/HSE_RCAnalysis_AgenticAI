@@ -33,7 +33,7 @@ Kod: `agents/rca_cost_profile.py`, `agents/rootcause_agent_v3_1.py`, `tasks/pipe
 |------|--------|-----|
 | **R2** | ⏳ | Parser QA: 156 kod, keywords/typical_problems doluluk |
 | **R6b** | ✅ | HITL tam BARSEL: disambiguation, taxonomy_gap, why-probe code-specific (`HITL_USE_BARSEL=1`) |
-| **R9** | ⏳ | BARSEL sentetik dataset (iyi/kötü) |
+| **R9** | ✅ (v1) | BARSEL/küratörlü sektör dataset (iyi/kötü) — `build_curated_sector_dataset.py`, 30 örnek train/dev/test |
 | **R10** | ⏳ | MIPROv2 + A/B + promote |
 | **OPS-E4/E5** | ⏳ | Railway explicit env doğrulama |
 | **OPS-E7–E10** | ⏳ | verify one-off, HF_TOKEN, TZ, yerel ST venv |
@@ -119,6 +119,37 @@ _try_snap_to_taxonomy() → cause_tr'yi W5'ten koparıp BARSEL başlığıyla ez
 **Kod dokunuşu (planlı):** `agents/barsel_taxonomy.py`, `agents/why_chain_quality.py`, `agents/rootcause_agent_v3_1.py`, `agents/branch_critic.py`, `agents/skillbased_docx_agent.py`, `shared/` (yeni audit store), `tests/test_why_chain_quality.py` (+ yeni snap/dedupe testleri).
 
 **Sıra:** G2 → G1 → G3 → G5 → G4 (opsiyonel).
+
+## P1.24 5-Why zincir kayması — Why-1 = olay sorusu, cevabı doğrudan neden ✅
+
+**Sorun:** Raporda Why-1 sorusu doğrudan nedeni içine gömüyor ("X hangi alt mekanizmayla gerçekleşti?") ve cevabı W1'de doğrudan kök neden seviyesine zıplıyordu ("bakım stratejisi yok"). Ayrıca 4.1 bölümünde doğrudan neden düşük (yarım) cümle olarak basılıyordu. Klasik 5-Why örneklerindeki gibi zincir bir seviye aşağı kaymalı: problem → ilk neden = doğrudan neden → alt mekanizmalar → kök neden.
+
+| İş | Durum | Detay |
+|----|--------|-------|
+| Zincir kayması | ✅ | `WhyChainModule.forward`: **W1 deterministik** — soru `build_event_why1_question(incident_summary)` ("Neden <olay> meydana geldi?"), cevap `immediate_cause_sentence(cause_tr)` + A/B kodu. **W2 = eski W1** (alt mekanizma şablonu); W3-W5 LLM. Circularity guard W2'ye taşındı; HITL probe seviye L → zincir W(L+1); kök affirm probe'ları seviye 4+5'ten toplanır |
+| Düşük cümle düzeltmesi | ✅ | `skillbased_docx_agent._direct_cause_sentence()`: 4.1'deki doğrudan neden fragmanı tam cümleye çevrilir ("Bu dalın doğrudan nedeni, X olarak belirlenmiştir.") — DOCX + HTML her iki builder sitesi |
+| C bandı çeşitliliği | ✅ | Kök seviye (W4+) taksonomi prompt'una band seçimi nudge'ı: kanıt kişisel yetkinlik/beceri/yorgunluk/karar verme gösteriyorsa **C bandı** seçilir; her dal D'ye bağlanmaz |
+
+**Kabul kriterleri:**
+- W1 satırı: soru olaya, cevap tespit edilen doğrudan neden (tam cümle + A/B kodu).
+- 4.1 "Başlangıç Durumu ve Doğrudan Neden" bölümünde yarım cümle kalmamalı.
+- Çok dallı analizlerde kök nedenler yalnızca D bandında toplanmamalı; kanıt varsa C bandı kodlar seçilebilmeli.
+
+**Kod dokunuşu:** `agents/why_chain_quality.py` (`build_event_why1_question`, `immediate_cause_sentence`), `agents/rootcause_agent_v3_1.py` (forward zinciri), `agents/skillbased_docx_agent.py` (`_direct_cause_sentence`), `tests/test_why_chain_quality.py`.
+
+## P1.25 Etkileşimli form 504 — bootstrap + retry ✅
+
+**Sorun:** Bazı kullanıcılar etkileşimli form gönderiminde `HTTP 504` alıyor (Railway cold-start, iki ayrı gateway çağrısı, Redis blokajı).
+
+| İş | Durum | Detay |
+|----|--------|-------|
+| Tek bootstrap endpoint | ✅ | `POST /api/v1/incidents/bootstrap/interactive` — Part 1+2 tek çağrı (LLM yok) |
+| Gateway retry | ✅ | `fetchGatewayWithRetry` — 502/503/504 için 4 deneme, 3.5s aralık |
+| Cold-start prewarm | ✅ | Form sekmesi açılınca `checkHealth()` arka planda |
+| Redis fast-fail | ✅ | `socket_connect_timeout=2`, `socket_timeout=2` |
+| Async persist | ✅ | Fast path kayıtları `asyncio.to_thread` ile Redis'e yazılır |
+
+**Kabul:** Etkileşimli analiz formu gönderimi çoğu cold-start senaryosunda 504 vermeden chat sekmesine geçmeli.
 
 ### Ürün
 - ⏳ Dal kurulum ekranı (P1.12) — kullanıcı onayı → pipeline

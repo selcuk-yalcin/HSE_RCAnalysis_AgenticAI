@@ -33,7 +33,12 @@ def get_redis_client():
     if redis is None:
         return None
     try:
-        _redis_client = redis.from_url(redis_url(), decode_responses=True)
+        _redis_client = redis.from_url(
+            redis_url(),
+            decode_responses=True,
+            socket_connect_timeout=2,
+            socket_timeout=2,
+        )
         return _redis_client
     except Exception:  # noqa: BLE001
         return None

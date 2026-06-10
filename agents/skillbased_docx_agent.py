@@ -80,6 +80,19 @@ except ImportError:
 strip_hse_codes = sanitize_report_text
 
 
+def _direct_cause_sentence(text: str, lang_code: str = "tr") -> str:
+    """Doğrudan neden ifadesini düşük (yarım) cümle olarak basmak yerine tam cümleye çevirir."""
+    t = re.sub(r"\s+", " ", str(text or "").strip())
+    if not t:
+        return ""
+    if t[-1] in ".!?":
+        return t
+    t = t.rstrip(" ,;:")
+    if (lang_code or "tr").lower().startswith("en"):
+        return f"The direct cause of this branch was identified as: {t}."
+    return f"Bu dalın doğrudan nedeni, {t} olarak belirlenmiştir."
+
+
 def _default_barsel_code_system(lang_code: str = "tr") -> List[Dict[str, str]]:
     """BARSEL/HSG245 3.2 kod tablosu: A=Davranış, B=Koşullar, C=Kişisel, D=Organizasyonel."""
     if (lang_code or "tr").lower().startswith("en"):
@@ -1457,7 +1470,10 @@ class SkillBasedDocxAgent:
                     "branch_number": br.get("branch_number", idx),
                     "branch_title": branch_title,
                     "initial_condition": strip_hse_codes(str(immediate.get("evidence_tr") or incident_summary[:500])),
-                    "direct_cause": strip_hse_codes(str(immediate.get("cause_tr") or immediate.get("cause") or "")),
+                    "direct_cause": _direct_cause_sentence(
+                        strip_hse_codes(str(immediate.get("cause_tr") or immediate.get("cause") or "")),
+                        lang_code,
+                    ),
                     "why_chain": why_chain,
                     "root_cause_title": strip_hse_codes(root_title),
                     "root_cause_section": strip_hse_codes(root_section),
@@ -1526,7 +1542,7 @@ class SkillBasedDocxAgent:
                         "branch_number": idx,
                         "branch_title": branch_title,
                         "initial_condition": strip_hse_codes(incident_summary[:500]),
-                        "direct_cause": title,
+                        "direct_cause": _direct_cause_sentence(title, lang_code),
                         "why_chain": [],
                         "root_cause_title": title,
                         "root_cause_section": root_section,

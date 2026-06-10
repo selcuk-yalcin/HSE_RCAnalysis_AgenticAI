@@ -5,12 +5,14 @@ from agents.why_chain_quality import (
     SNAP_ROOT_JACCARD_MIN,
     answer_repeats_previous,
     branch_diversity_angle,
+    build_event_why1_question,
     build_why1_question,
     demote_solution_to_cause,
     derive_root_cause_from_why5,
     effective_critic_jaccard_threshold,
     enforce_short_why_question,
     format_barsel_why_answer,
+    immediate_cause_sentence,
     is_solution_language,
     pick_non_forbidden_code,
     single_mechanism_text,
@@ -38,6 +40,46 @@ def test_build_why1_asks_sub_mechanism_not_circular():
     q = build_why1_question({"cause_tr": "keskin talaşa doğrudan temas"})
     assert word_count(q) <= 20
     assert "alt mekanizma" in q.lower()
+
+
+def test_build_event_why1_question_targets_event():
+    # P1.24: Why-1 olayın kendisine sorulur; cevabı doğrudan neden olacaktır.
+    incident = (
+        "Üretim hattındaki bir ekipmanda kontaktörün yapışık kalması sonucu "
+        "ısı yükselmesi ve dumanlama meydana gelmiştir. Rezistanslarda yanık yoktur."
+    )
+    q = build_event_why1_question(incident)
+    assert q.startswith("Neden ")
+    assert q.endswith("meydana geldi?")
+    # Olay cümlesinin sonundaki "meydana gelmiştir" kuyruğu çiftlenmemeli.
+    assert "gelmiştir" not in q
+
+
+def test_build_event_why1_question_skips_instruction_blocks():
+    incident = (
+        "[Instruction: produce analysis text in English where applicable]\n"
+        "Konveyör bandında yatak arızası nedeniyle duruş yaşanmıştır."
+    )
+    q = build_event_why1_question(incident)
+    assert "Instruction" not in q
+    assert q.startswith("Neden ")
+
+
+def test_build_event_why1_question_empty_fallback():
+    assert build_event_why1_question("") == "Neden bu olay meydana geldi?"
+
+
+def test_immediate_cause_sentence_completes_fragment():
+    # Düşük (yarım) cümle tam cümleye çevrilmeli.
+    frag = "Kontaktörün zamanla eskimesi nedeniyle yapışık kalması"
+    out = immediate_cause_sentence(frag)
+    assert out.endswith("olayın doğrudan nedenidir.")
+    assert out.startswith("Kontaktörün")
+
+
+def test_immediate_cause_sentence_keeps_full_sentence():
+    full = "Kontaktör yapışık kalmıştır."
+    assert immediate_cause_sentence(full) == full
 
 
 def test_format_barsel_why_answer_includes_code_and_title():

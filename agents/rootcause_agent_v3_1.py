@@ -168,11 +168,13 @@ try:
         WHY_QUESTION_MAX_WORDS,
         answer_repeats_previous,
         branch_diversity_angle,
+        build_event_why1_question,
         build_why1_question,
         demote_solution_to_cause,
         derive_root_cause_from_why5,
         enforce_short_why_question,
         format_barsel_why_answer,
+        immediate_cause_sentence,
         is_solution_language,
         pick_non_forbidden_code,
         question_repeats_answer,
@@ -187,12 +189,14 @@ except ImportError:
         WHY_QUESTION_MAX_WORDS,
         answer_repeats_previous,
         branch_diversity_angle,
+        build_event_why1_question,
         build_why1_question,
         demote_solution_to_cause,
         derive_root_cause_from_why5,
         effective_critic_jaccard_threshold,
         enforce_short_why_question,
         format_barsel_why_answer,
+        immediate_cause_sentence,
         is_solution_language,
         pick_non_forbidden_code,
         question_repeats_answer,
@@ -972,6 +976,35 @@ class WhyChain(dspy.Module):
 
         for level in range(1, 6):
             if level == 1:
+                # P1.24: Zincir kayması — Why-1 olayın kendisine sorulur ve cevabı
+                # deterministik olarak tespit edilen doğrudan nedendir (klasik 5-Why
+                # örneklerindeki gibi: problem → ilk neden = doğrudan neden).
+                question_raw = build_event_why1_question(incident_summary)
+                answer_raw = immediate_cause_sentence(
+                    str(
+                        immediate_cause.get("cause_tr")
+                        or immediate_cause.get("standard_title_tr")
+                        or ""
+                    )
+                )
+                imm_code = str(immediate_cause.get("code") or "").strip().upper()
+                step_payload = {
+                    "level": level,
+                    "question_tr": strip_hse_codes(question_raw),
+                    "answer_tr": format_barsel_why_answer(imm_code, strip_hse_codes(answer_raw)),
+                    "code": imm_code,
+                }
+                try:
+                    step_data = _validate_model_dict(WhyStepModel, step_payload)
+                except ValidationError:
+                    step_data = step_payload
+                chain.append(step_data)
+                all_answers_in_chain.append(answer_raw)
+                current_answer_raw = answer_raw
+                previous_question_raw = question_raw
+                continue
+            if level == 2:
+                # Eski Why-1: doğrudan nedenin alt mekanizması (şablonla, circularity'siz).
                 question_raw = build_why1_question(immediate_cause)
             else:
                 previous_for_question = (
@@ -1015,13 +1048,24 @@ class WhyChain(dspy.Module):
                         "\n\nTERCİH EDİLEN KÖK KODLAR (olaya uygunluğu kullanıcı tarafından onaylandı, "
                         "uygunsa bunları seç): " + ", ".join(allowed)
                     )
+            # P1.24: Kök neden bandı çeşitliliği — her dal D'ye saplanmasın.
+            if level >= 4:
+                taxonomy += (
+                    "\n\nBAND SEÇİMİ: Her dalı D (organizasyonel) bandına bağlama. "
+                    "Kanıt kişisel yetkinlik, beceri uygulaması, yorgunluk, muhakeme/karar verme "
+                    "veya davranışsal şartlanma gösteriyorsa C bandından kod seç."
+                )
 
+            # P1.24 zincir kayması: HITL probe cevapları eski seviyelemeye göre toplanır
+            # (probe seviye L → yeni zincirde Why-(L+1)).
+            probe_level = level - 1
             incident_ctx = incident_summary
-            probe_ctx = self._probe_context_for_level(level, probe_answers_by_level)
-            if level == 1:
+            probe_ctx = self._probe_context_for_level(probe_level, probe_answers_by_level)
+            if level == 2:
                 incident_ctx = (
-                    "Why-1: TEK birincil zararlı mekanizma (çalışırken müdahale, temas, sıkışma vb.). "
-                    "Birden fazla neden listeleme. Geçmiş olgu dili.\n\n" + incident_summary
+                    "Why-2: Doğrudan nedeni doğuran TEK alt mekanizma (çalışırken müdahale, temas, "
+                    "sıkışma, aşınma vb.). Birden fazla neden listeleme; doğrudan nedeni tekrar etme. "
+                    "Geçmiş olgu dili.\n\n" + incident_summary
                 )
             else:
                 incident_ctx = (
@@ -1034,7 +1078,7 @@ class WhyChain(dspy.Module):
 
             answer_raw = ""
             definition_code = ""
-            for prow in (probe_answers_by_level or {}).get(level) or []:
+            for prow in (probe_answers_by_level or {}).get(probe_level) or []:
                 ans_text = str(
                     (prow or {}).get("answer")
                     or (prow or {}).get("label")
@@ -1083,9 +1127,9 @@ class WhyChain(dspy.Module):
                     taxonomy_codes=taxonomy,
                 )
                 answer_raw = demote_solution_to_cause((answer_result.answer or "").strip())
-                # P1.23-G1: W1 circularity guard — cevap doğrudan nedeni neredeyse aynen
-                # tekrar ediyorsa (Jaccard > 0.55) tek bir retry ile alt mekanizma iste.
-                if level == 1 and answer_raw:
+                # P1.23-G1 (P1.24 ile Why-2'ye kaydı): alt mekanizma cevabı doğrudan nedeni
+                # neredeyse aynen tekrar ediyorsa (Jaccard > 0.55) tek bir retry yap.
+                if level == 2 and answer_raw:
                     try:
                         from agents.why_chain_quality import token_jaccard
                     except ImportError:
@@ -1163,7 +1207,11 @@ class WhyChain(dspy.Module):
         )
         conf = _safe_float(getattr(validation, "confidence", None), default=0.8)
         affirmed_probs: List[str] = []
-        for prow in (probe_answers_by_level or {}).get(5) or []:
+        # P1.24 zincir kayması: kök seviye Why-5 ← probe seviye 4 (5 de geriye dönük desteklenir).
+        root_probe_rows = list((probe_answers_by_level or {}).get(4) or []) + list(
+            (probe_answers_by_level or {}).get(5) or []
+        )
+        for prow in root_probe_rows:
             ans_text = str(
                 (prow or {}).get("answer")
                 or (prow or {}).get("label")
