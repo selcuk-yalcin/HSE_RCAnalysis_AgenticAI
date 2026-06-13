@@ -5,6 +5,7 @@ from agents.why_chain_quality import (
     SNAP_ROOT_JACCARD_MIN,
     answer_repeats_previous,
     branch_diversity_angle,
+    build_direct_cause_why2_question,
     build_event_why1_question,
     build_why1_question,
     demote_solution_to_cause,
@@ -27,19 +28,29 @@ def test_enforce_short_why_question_max_words():
     assert short.endswith("?")
 
 
+def test_build_direct_cause_why2_classic_question():
+    q = build_direct_cause_why2_question({"cause_tr": "keskin talaşa doğrudan temas"})
+    assert word_count(q) <= 20
+    assert q.startswith("Neden ")
+    assert "?" in q
+    assert "alt mekanizma" not in q.lower()
+
+
+def test_build_why1_delegates_to_direct_cause_why2():
+    imm = {"cause_tr": "Tekerlek frenleri devre dışıydı"}
+    assert build_why1_question(imm) == build_direct_cause_why2_question(imm)
+
+
 def test_build_why1_single_mechanism():
-    q = build_why1_question(
+    q = build_direct_cause_why2_question(
         {"cause_tr": "Makine çalışırken müdahale edildi; prosedür ihlali ve eğitim eksikliği"}
     )
     assert word_count(q) <= 20
-    assert "prosedür" not in q.lower() or "müdahale" in q.lower()
+    assert q.startswith("Neden ")
 
 
-def test_build_why1_asks_sub_mechanism_not_circular():
-    # P1.23-G1: Soru doğrudan nedeni "neden oldu" diye değil alt mekanizma olarak sormalı.
-    q = build_why1_question({"cause_tr": "keskin talaşa doğrudan temas"})
-    assert word_count(q) <= 20
-    assert "alt mekanizma" in q.lower()
+def test_build_direct_cause_why2_empty_fallback():
+    assert build_direct_cause_why2_question({}) == "Neden bu doğrudan neden meydana geldi?"
 
 
 def test_build_event_why1_question_targets_event():
@@ -70,11 +81,16 @@ def test_build_event_why1_question_empty_fallback():
 
 
 def test_immediate_cause_sentence_completes_fragment():
-    # Düşük (yarım) cümle tam cümleye çevrilmeli.
     frag = "Kontaktörün zamanla eskimesi nedeniyle yapışık kalması"
     out = immediate_cause_sentence(frag)
-    assert out.endswith("olayın doğrudan nedenidir.")
+    assert out.endswith(".")
+    assert "olayın doğrudan nedenidir" not in out.lower()
     assert out.startswith("Kontaktörün")
+
+
+def test_immediate_cause_sentence_strips_meta_label():
+    labeled = "Tekerlek frenleri devre dışıydı, olayın doğrudan nedenidir."
+    assert immediate_cause_sentence(labeled) == "Tekerlek frenleri devre dışıydı."
 
 
 def test_immediate_cause_sentence_keeps_full_sentence():

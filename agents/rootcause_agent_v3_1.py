@@ -168,6 +168,7 @@ try:
         WHY_QUESTION_MAX_WORDS,
         answer_repeats_previous,
         branch_diversity_angle,
+        build_direct_cause_why2_question,
         build_event_why1_question,
         build_why1_question,
         demote_solution_to_cause,
@@ -189,6 +190,7 @@ except ImportError:
         WHY_QUESTION_MAX_WORDS,
         answer_repeats_previous,
         branch_diversity_angle,
+        build_direct_cause_why2_question,
         build_event_why1_question,
         build_why1_question,
         demote_solution_to_cause,
@@ -988,10 +990,11 @@ class WhyChain(dspy.Module):
                     )
                 )
                 imm_code = str(immediate_cause.get("code") or "").strip().upper()
+                answer_display = strip_hse_codes(demote_solution_to_cause(answer_raw))
                 step_payload = {
                     "level": level,
                     "question_tr": strip_hse_codes(question_raw),
-                    "answer_tr": format_barsel_why_answer(imm_code, strip_hse_codes(answer_raw)),
+                    "answer_tr": answer_display,
                     "code": imm_code,
                 }
                 try:
@@ -1004,8 +1007,8 @@ class WhyChain(dspy.Module):
                 previous_question_raw = question_raw
                 continue
             if level == 2:
-                # Eski Why-1: doğrudan nedenin alt mekanizması (şablonla, circularity'siz).
-                question_raw = build_why1_question(immediate_cause)
+                # Klasik 5-Why Why-2: doğrudan nedene neden sorulur.
+                question_raw = build_direct_cause_why2_question(immediate_cause)
             else:
                 previous_for_question = (
                     f"Önceki soru: {previous_question_raw}\n"
@@ -1063,9 +1066,9 @@ class WhyChain(dspy.Module):
             probe_ctx = self._probe_context_for_level(probe_level, probe_answers_by_level)
             if level == 2:
                 incident_ctx = (
-                    "Why-2: Doğrudan nedeni doğuran TEK alt mekanizma (çalışırken müdahale, temas, "
-                    "sıkışma, aşınma vb.). Birden fazla neden listeleme; doğrudan nedeni tekrar etme. "
-                    "Geçmiş olgu dili.\n\n" + incident_summary
+                    "Why-2: Klasik 5-Why — doğrudan neden (A/B) NEDEN oluştu? "
+                    "Tek bir alt neden; doğrudan nedeni aynen tekrar etme. Geçmiş olgu dili.\n\n"
+                    + incident_summary
                 )
             else:
                 incident_ctx = (
@@ -1127,8 +1130,7 @@ class WhyChain(dspy.Module):
                     taxonomy_codes=taxonomy,
                 )
                 answer_raw = demote_solution_to_cause((answer_result.answer or "").strip())
-                # P1.23-G1 (P1.24 ile Why-2'ye kaydı): alt mekanizma cevabı doğrudan nedeni
-                # neredeyse aynen tekrar ediyorsa (Jaccard > 0.55) tek bir retry yap.
+                # Why-2 cevabı doğrudan nedeni neredeyse aynen tekrar ediyorsa tek retry.
                 if level == 2 and answer_raw:
                     try:
                         from agents.why_chain_quality import token_jaccard
@@ -1146,7 +1148,7 @@ class WhyChain(dspy.Module):
                             incident_context=(
                                 incident_ctx
                                 + "\n\nUYARI: Yukarıdaki doğrudan nedeni TEKRARLAMA; "
-                                "onu doğuran bir ALT mekanizmayı veya öncülü açıkla."
+                                "onu doğuran bir öncül veya alt nedeni açıkla."
                             ),
                             taxonomy_codes=taxonomy,
                         )

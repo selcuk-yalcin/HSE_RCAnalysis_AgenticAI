@@ -476,7 +476,7 @@ KURALLAR:
 - Sınıflandırma / HSG kodları (ör. D4.1, C3.1, H-1.5, K-01), parantez içi kodlar veya "Birincil Kod:" gibi etiketler narrative metinlerde, kök neden açıklamalarında ve why_chain soru-cevaplarında YAZILMAYACAK. JSON şemasındaki code alanlarını boş string bırak veya kullanma.
 - executive_summary: where_happened ve who_affected alanlarını her zaman boş string "" bırak; yer ve kişi bilgisini yalnızca what_happened içinde anlat.
 - Olay özeti yalnızca cover.incident_summary_short içinde olmalı (2-3 cümle). incident_details.event_table içine "Özet" veya uzun anlatım EKLEME.
-- why_chain: NEDEN 1, doğrudan nedeni tek cümleyle sor (ör. doğrudan neden "keskin talaşa temas" ise soru "Neden keskin talaş yüzeyine doğrudan temas oluştu?" gibi); olay özetini baştan sona tekrarlayan uzun soru yazma. NEDEN 2–5: Bir önceki yanıtın ana noktasını konu alan kısa "Neden ...?" zinciri kur.
+- why_chain: Klasik 5-Why — NEDEN 1 olay sorusu (olay metninden), cevap doğrudan neden; NEDEN 2 doğrudan nedene "Neden ...?" sorusu; NEDEN 3–5 bir önceki cevabın alt nedeni. Olay özetini baştan sona tekrarlayan uzun soru yazma.
 - Kök neden ve açıklama metinlerinde markdown kullanma: ** veya __ ile kalın vurgu yazma; düz Türkçe paragraf veya "1. Başlık:" gibi numaralı madde kullan.
 - SADECE JSON döndür, başka hiçbir şey yazma
 """
@@ -816,10 +816,7 @@ def _build_branches(doc, branches: list):
         run.font.size = Pt(11)
         run.font.color.rgb = COLOR["white"]
         doc.add_paragraph()
-        _add_subsection_header(doc, f"{3+bn}.1 {_L('subsection_branch_start')}")
-        _add_paragraph(doc, strip_hse_codes(str(branch.get("initial_condition", "") or "")), space_after=6)
-        _add_paragraph(doc, strip_hse_codes(str(branch.get("direct_cause", "") or "")), bold=True, space_after=8)
-        _add_subsection_header(doc, f"{3+bn}.2 {_L('subsection_why_table')}")
+        _add_subsection_header(doc, f"{3+bn}.1 {_L('subsection_why_table')}")
         why_chain = branch.get("why_chain", [])
         if why_chain:
             table = doc.add_table(rows=len(why_chain) + 1, cols=2)
@@ -848,7 +845,7 @@ def _build_branches(doc, branches: list):
                     run.font.size = Pt(9)
                     run.bold = (j == 0)
         doc.add_paragraph()
-        _add_subsection_header(doc, f"{3+bn}.3 {_L('subsection_root_cause')}")
+        _add_subsection_header(doc, f"{3+bn}.2 {_L('subsection_root_cause')}")
         rc_label = strip_root_cause_label_prefix(
             str(branch.get("root_cause_title", "") or ""),
             branch_number=bn,
@@ -858,7 +855,7 @@ def _build_branches(doc, branches: list):
         _add_colored_box(doc, rc_title, rc_content, color)
         org_factors = branch.get("organizational_factors", [])
         if org_factors:
-            _add_subsection_header(doc, f"{3+bn}.4 {_L('subsection_org_factors')}")
+            _add_subsection_header(doc, f"{3+bn}.3 {_L('subsection_org_factors')}")
             _add_bullet_list(doc, [strip_hse_codes(str(x)) for x in org_factors])
         _add_page_break(doc)
 
@@ -3487,11 +3484,7 @@ class SkillBasedDocxAgent:
             <div class="subsection">
             <div class="section-header">{3+bn}. {branch.get('branch_title', f"{_L('branch_critical_factor')} {bn}")}</div>
             
-            <div class="subsection-header">{3+bn}.1 {_L('subsection_branch_start')}</div>
-            <div class="paragraph" contenteditable="true">{strip_hse_codes(str(branch.get('initial_condition', '') or ''))}</div>
-            <div class="paragraph" contenteditable="true" style="font-weight: bold;">{strip_hse_codes(str(branch.get('direct_cause', '') or ''))}</div>
-            
-            <div class="subsection-header">{3+bn}.2 {_L('subsection_why_chain')}</div>
+            <div class="subsection-header">{3+bn}.1 {_L('subsection_why_chain')}</div>
             <div class="why-chain">
 """
             
@@ -3530,7 +3523,7 @@ class SkillBasedDocxAgent:
             html += f"""
             </div>
             
-            <div class="subsection-header">{3+bn}.3 {_L('subsection_root_cause')}</div>
+            <div class="subsection-header">{3+bn}.2 {_L('subsection_root_cause')}</div>
             <div class="colored-box box-{color}">
                 <div class="box-header" contenteditable="true">{_L('root_cause_prefix')} {bn}: {root_cause_title}</div>
                 <div class="box-content" contenteditable="true">{format_report_html_rich(str(branch.get('root_cause_detail', '') or ''))}</div>
@@ -3539,7 +3532,7 @@ class SkillBasedDocxAgent:
             
             if branch.get("organizational_factors"):
                 html += f"""
-            <div class="subsection-header">{3+bn}.4 {_L('subsection_org_factors')}</div>
+            <div class="subsection-header">{3+bn}.3 {_L('subsection_org_factors')}</div>
             <ul class="bullet-list">
 """
                 for factor in branch.get("organizational_factors", []):

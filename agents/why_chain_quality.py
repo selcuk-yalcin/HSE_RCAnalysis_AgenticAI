@@ -120,27 +120,39 @@ def single_mechanism_text(text: str, *, max_len: int = 160) -> str:
     return s
 
 
-def build_why1_question(immediate_cause: Dict) -> str:
-    """
-    Birincil zararlı mekanizmaya tek odaklı Why-1.
-
-    P1.23-G1: Soru doğrudan nedeni TEKRAR ettirmek yerine onun bir ALT mekanizmasını
-    sorar; böylece zincir baştan circularity'e düşmez ("X neden oldu?" → cevap yine X).
-    """
+def _direct_cause_phrase(immediate_cause: Dict) -> str:
     cause = (
         str(immediate_cause.get("cause_tr") or immediate_cause.get("standard_title_tr") or "")
         .strip()
     )
-    cause = cause.split(";")[0].split(" — ")[0].strip()
-    if _RE_MULTI_CLAUSE.search(cause) and "," in cause:
-        cause = cause.split(",")[0].strip()
-    cause = re.sub(r"^(çünkü|neden)\s+", "", cause, flags=re.IGNORECASE).strip()
+    cause = single_mechanism_text(cause)
+    cause = re.sub(r",?\s*olayın doğrudan nedenidir\.?\s*$", "", cause, flags=re.IGNORECASE).strip()
+    return cause.rstrip(".?!").strip()
+
+
+def build_direct_cause_why2_question(immediate_cause: Dict) -> str:
+    """
+    Klasik 5-Why Why-2: doğrudan nedene (A/B) neden sorulur.
+
+    Why-1 olay + cevap = doğrudan neden; Why-2 bu cevabın alt nedenini açar.
+    """
+    cause = _direct_cause_phrase(immediate_cause)
     if not cause:
-        return "Birincil zararlı mekanizma hangi alt nedenle gerçekleşti?"
-    cause = cause.rstrip(".?!").strip()
+        return "Neden bu doğrudan neden meydana geldi?"
     if cause.lower().startswith("neden"):
-        return enforce_short_why_question(cause)
-    return enforce_short_why_question(f"{cause} hangi alt mekanizmayla gerçekleşti?")
+        q = cause if cause.endswith("?") else f"{cause}?"
+        return enforce_short_why_question(q)
+    if re.search(
+        r"\b(yd[ıi]|d[üu]|mış|miş|mamış|memiş|değildi|degildi|arı|eri|dır|dir|tur|tür)\b",
+        cause.lower(),
+    ):
+        return enforce_short_why_question(f"Neden {cause}?")
+    return enforce_short_why_question(f"Neden {cause} oluştu?")
+
+
+def build_why1_question(immediate_cause: Dict) -> str:
+    """Geriye dönük uyumluluk: klasik Why-2 sorusu."""
+    return build_direct_cause_why2_question(immediate_cause)
 
 
 _EVENT_TAIL_RE = re.compile(
@@ -179,13 +191,14 @@ def build_event_why1_question(incident_text: str, *, max_words: int = 18) -> str
 
 
 def immediate_cause_sentence(cause_text: str) -> str:
-    """Doğrudan neden ifadesini düşük (yarım) cümle olmaktan çıkarıp tam cümle yapar."""
+    """Why-1 cevabı: doğrudan neden ifadesi (klasik 5-Why, meta etiket yok)."""
     t = re.sub(r"\s+", " ", str(cause_text or "").strip())
+    t = re.sub(r",?\s*olayın doğrudan nedenidir\.?\s*$", "", t, flags=re.IGNORECASE).strip()
     if not t:
         return ""
-    if t[-1] in ".!?":
-        return t
-    return f"{t.rstrip(' ,;:')}, olayın doğrudan nedenidir."
+    if t[-1] not in ".!?":
+        t = f"{t.rstrip(' ,;:')}."
+    return t
 
 
 def _token_set(text: str) -> set:

@@ -1359,15 +1359,15 @@ def build_interim_why_question(
     """HITL panelinde gösterilecek Why-N sorusu."""
     if why_level <= 1:
         try:
-            from agents.why_chain_quality import build_why1_question
+            from agents.why_chain_quality import build_direct_cause_why2_question
         except ImportError:
-            from .why_chain_quality import build_why1_question
+            from .why_chain_quality import build_direct_cause_why2_question
 
         imm = {
             "code": (immediate_code or "").strip().upper(),
             "cause_tr": (cause_tr or "").strip() or (immediate_code or ""),
         }
-        return build_why1_question(imm)
+        return build_direct_cause_why2_question(imm)
     if (current_why_question or "").strip():
         return str(current_why_question).strip()
     prev = (previous_why_answer or "").strip()

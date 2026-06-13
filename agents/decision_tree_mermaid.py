@@ -1,5 +1,7 @@
 """5-Why Decision Tree Generator — dikey (TD) tam sayfa okunabilir çıktı."""
 
+from __future__ import annotations
+
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 import re
@@ -10,12 +12,14 @@ try:
         sanitize_report_text,
         taxonomy_display_title,
     )
+    from .why_chain_quality import build_event_why1_question
 except ImportError:
     from agents.report_text_sanitize import (
         full_incident_narrative_for_tree,
         sanitize_report_text,
         taxonomy_display_title,
     )
+    from agents.why_chain_quality import build_event_why1_question
 
 
 class DecisionTreeGenerator:
@@ -262,8 +266,7 @@ class DecisionTreeGenerator:
         return "çalışan"
 
     def _build_first_why_question(self, incident_summary: str) -> str:
-        subject = self._extract_subject_for_injury_question(incident_summary)
-        return f"Neden {subject} yaralandı?"
+        return build_event_why1_question(incident_summary)
 
     def _clean_root_explanation(self, text: Any) -> str:
         s = sanitize_report_text(str(text or "")).strip()
