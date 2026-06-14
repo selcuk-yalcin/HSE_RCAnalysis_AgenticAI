@@ -120,82 +120,22 @@ _try_snap_to_taxonomy() → cause_tr'yi W5'ten koparıp BARSEL başlığıyla ez
 
 **Sıra:** G2 → G1 → G3 → G5 → G4 (opsiyonel).
 
-## P1.24 5-Why zincir kayması — Why-1 = olay sorusu (ilk iterasyon) ✅ → P1.26 ile güncellendi
+## P1.24 5-Why zincir kayması — Why-1 = olay sorusu, cevabı doğrudan neden ✅
 
-**Tarihçe:** İlk kaydırma (P1.24): W1 olay sorusu + doğrudan neden cevabı; W2 alt mekanizma şablonu; 4.1'de başlangıç+doğrudan neden paragrafı.
-
-**Güncel durum (commit `98940ca`):** Klasik 5-Why'e geçildi — bkz. **P1.26**. P1.24 satırlarındaki W2 alt-mekanizma ve 4.1 tekrarı kaldırıldı; rapor LLM kilidi (P1.26) hâlâ eksik.
+**Sorun:** Raporda Why-1 sorusu doğrudan nedeni içine gömüyor ("X hangi alt mekanizmayla gerçekleşti?") ve cevabı W1'de doğrudan kök neden seviyesine zıplıyordu ("bakım stratejisi yok"). Ayrıca 4.1 bölümünde doğrudan neden düşük (yarım) cümle olarak basılıyordu. Klasik 5-Why örneklerindeki gibi zincir bir seviye aşağı kaymalı: problem → ilk neden = doğrudan neden → alt mekanizmalar → kök neden.
 
 | İş | Durum | Detay |
 |----|--------|-------|
-| W1 deterministik (agent) | ✅ | `WhyChain.forward` level 1: `build_event_why1_question` + `immediate_cause_sentence(cause_tr)` |
-| W2 klasik soru (agent) | ✅ | `build_direct_cause_why2_question` — "Neden [doğrudan neden]?" |
-| 4.1 tekrar bölümü | ✅ kaldırıldı | `_build_branches` / `_html_branches`: yalnızca 5-Why tablosu |
-| Rapor why_chain kilidi | ✅ P1.26 | Merge sonrası agent zinciri pinlenir |
-
-**Kod dokunuşu (agent):** `agents/why_chain_quality.py`, `agents/rootcause_agent_v3_1.py`, `tests/test_why_chain_quality.py`, `agents/decision_tree_mermaid.py`.
-
----
-
-## P1.26 Klasik 5-Why + rapor zincir kilidi ✅
-
-**Hedef yapı (tüm dallarda):**
-
-```
-NEDEN 1 — Olay sorusu (ortak, olay metninden) → Cevap: A/B doğrudan neden (kısa, meta etiket yok)
-NEDEN 2 — "Neden [doğrudan neden]?" → LLM alt neden
-NEDEN 3–5 — Önceki cevaba why → NEDEN 5 / kök neden kutusu: C/D kök neden
-```
-
-**Gözlem (INC-20260613-181437):** Agent doğru `immediate_cause` + `why_chain` üretse bile `_generate_content_with_claude` → `_merge_with_fallback_content` LLM'in dolu `branches[].why_chain` çıktısını koruyor; NEDEN 1 dal bazlı/uzun, bazı dallar 4 adımda kalıyor.
-
-### Kod haritası — kim ne üretiyor / kim yazıyor
-
-| Aşama | Dosya | Sınıf / fonksiyon | Çıktı |
-|-------|--------|-------------------|--------|
-| **1. Doğrudan neden (A/B)** | `agents/rootcause_agent_v3_1.py` | `ImmediateCauseFinder.forward` | `causes[]`: `{code, cause_tr, evidence_tr, category_type}` |
-| BARSEL hizalama | `agents/barsel_taxonomy.py` | `snap_immediate_cause_to_barsel` | Resmi A/B kod + başlık |
-| Dedupe / limit | `agents/rootcause_agent_v3_1.py` | `_dedupe_similar_immediate_causes`, `_effective_branch_limit` | Dal sayısı (2–5) |
-| **2. 5-Why zinciri** | `agents/rootcause_agent_v3_1.py` | `WhyChain.forward` | `whys[]` (5 adım) |
-| W1 soru | `agents/why_chain_quality.py` | `build_event_why1_question` | Olaydan "Neden … meydana geldi?" |
-| W1 cevap | `agents/why_chain_quality.py` | `immediate_cause_sentence` | `immediate_cause.cause_tr` (kısa) |
-| W2 soru | `agents/why_chain_quality.py` | `build_direct_cause_why2_question` | "Neden [doğrudan neden]?" |
-| W3–5 | `agents/rootcause_agent_v3_1.py` | `WhyChain` → `why_question` / `why_answer` (DSPy) | LLM soru-cevap |
-| **3. Kök neden (C/D)** | `agents/why_chain_quality.py` | `derive_root_cause_from_why5` | `{code, cause_tr, explanation_tr, …}` |
-| BARSEL snap | `agents/barsel_taxonomy.py` | `snap_to_barsel_taxonomy`, `enrich_root_cause_from_taxonomy` | Kök kod + açıklama |
-| Validator | `agents/rootcause_agent_v3_1.py` | `RootCauseValidator` (DSPy) | C/D band doğrulama |
-| **4. Dal paketi** | `agents/rootcause_agent_v3_1.py` | `RootCauseAgentV3_1.analyze_root_causes` | `part3_rca.analysis_branches[]` → `{immediate_cause, why_chain, root_cause}` |
-| Dal eleştirisi | `agents/branch_critic.py` | `BranchCritic.review` | Tekrarlayan kök/dal → regenerate |
-| Pipeline | `agents/orchestrator.py`, `tasks/pipeline_tasks.py` | `analyze_root_causes` çağrısı | `investigation_data.part3_rca` |
-| **5. Rapor ham → JSON** | `agents/skillbased_docx_agent.py` | `_build_deterministic_fallback_content` | Agent `why_chain` + `root_cause` kopyası (pinned) |
-| **6. Rapor LLM** | `agents/skillbased_docx_agent.py` | `_generate_content_with_claude` | Tüm rapor JSON (executive summary, dallar, …) |
-| Merge | `agents/skillbased_docx_agent.py` | `_merge_with_fallback_content` | LLM dolu alanları korur |
-| Pin | `agents/report_why_chain.py` | `pin_agent_why_chains_to_report` | Merge sonrası agent why_chain zorla yazılır |
-| Başlık düzeltme | `agents/skillbased_docx_agent.py` | `_enforce_taxonomy_titles` | Dal/kök BARSEL başlıkları (zinciri değiştirmez) |
-| **7. HTML/DOCX yazma** | `agents/skillbased_docx_agent.py` | `_build_branches`, `_html_branches` | 5-Why tablosu + kök neden kutusu |
-| Kök neden bölümü | `agents/skillbased_docx_agent.py` | `_html_root_causes`, `_ensure_root_causes_from_branches` | Bölüm 6 nihai kök nedenler |
-| Decision tree | `agents/decision_tree_mermaid.py` | `DecisionTreeGenerator` | `part3_rca` dallarından ağaç (W1: `build_event_why1_question`) |
-
-### Yapılacaklar (P1.26)
-
-| Görev | Durum | İş |
-|-------|--------|-----|
-| **R1** | ✅ | Merge sonrası `branches[].why_chain` → **agent/fallback'ten zorla pin** (`pin_agent_why_chains_to_report`) |
-| **R2** | ✅ | `build_shared_event_question` — tüm dallarda aynı NEDEN 1 olay sorusu |
-| **R3** | ✅ | `CONTENT_SYSTEM_PROMPT` şeması: NEDEN 1 = olay; "why_chain'i yeniden yazma" kuralı |
-| **R4** | ✅ | Render öncesi `len(why_chain)==5` doğrulama / uyarı (`validate_report_why_chains`) |
-| **R5** | ✅ | Agent W1/W2 klasik shift (`98940ca`); 4.1 tekrar kaldırıldı |
-
-**Deploy:** Billing entegrasyonu gibi pin + 1M token kotası için **API + Celery worker** yeniden deploy gerekir.
+| Zincir kayması | ✅ | `WhyChainModule.forward`: **W1 deterministik** — soru `build_event_why1_question(incident_summary)` ("Neden <olay> meydana geldi?"), cevap `immediate_cause_sentence(cause_tr)` + A/B kodu. **W2 = eski W1** (alt mekanizma şablonu); W3-W5 LLM. Circularity guard W2'ye taşındı; HITL probe seviye L → zincir W(L+1); kök affirm probe'ları seviye 4+5'ten toplanır |
+| Düşük cümle düzeltmesi | ✅ | `skillbased_docx_agent._direct_cause_sentence()`: 4.1'deki doğrudan neden fragmanı tam cümleye çevrilir ("Bu dalın doğrudan nedeni, X olarak belirlenmiştir.") — DOCX + HTML her iki builder sitesi |
+| C bandı çeşitliliği | ✅ | Kök seviye (W4+) taksonomi prompt'una band seçimi nudge'ı: kanıt kişisel yetkinlik/beceri/yorgunluk/karar verme gösteriyorsa **C bandı** seçilir; her dal D'ye bağlanmaz |
 
 **Kabul kriterleri:**
-- Raporda her dal: ortak NEDEN 1 olay sorusu + kısa A/B cevap + 5 satır.
-- `part3_rca.analysis_branches[].why_chain` ile HTML tablosu birebir örtüşmeli (LLM override yok).
-- Kök neden kutusu `derive_root_cause_from_why5` + `enrich_root_cause_from_taxonomy` çıktısıyla uyumlu.
+- W1 satırı: soru olaya, cevap tespit edilen doğrudan neden (tam cümle + A/B kodu).
+- 4.1 "Başlangıç Durumu ve Doğrudan Neden" bölümünde yarım cümle kalmamalı.
+- Çok dallı analizlerde kök nedenler yalnızca D bandında toplanmamalı; kanıt varsa C bandı kodlar seçilebilmeli.
 
-**Kod dokunuşu:** `agents/report_why_chain.py` (pin), `agents/skillbased_docx_agent.py` (wire + prompt), `agents/why_chain_quality.py` (shared event Q), `tests/test_report_why_chain.py`, `tests/test_why_chain_quality.py`.
-
-**Sıra:** R1 → R2 → R3 → R4.
+**Kod dokunuşu:** `agents/why_chain_quality.py` (`build_event_why1_question`, `immediate_cause_sentence`), `agents/rootcause_agent_v3_1.py` (forward zinciri), `agents/skillbased_docx_agent.py` (`_direct_cause_sentence`), `tests/test_why_chain_quality.py`.
 
 ## P1.25 Etkileşimli form 504 — bootstrap + retry ✅
 

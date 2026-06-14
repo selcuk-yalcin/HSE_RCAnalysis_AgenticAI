@@ -359,11 +359,11 @@ Sadece JSON formatında çıktı ver. Başka hiçbir şey yazma.
       "initial_condition": "Bu faktörün başlangıç koşulu - 1 paragraf",
       "direct_cause": "Doğrudan nedenin kısa açıklaması",
       "why_chain": [
-        {"number": 1, "question": "(sistem doldurur — boş bırak)", "answer": "", "code": "", "category": ""},
-        {"number": 2, "question": "", "answer": "", "code": "", "category": ""},
-        {"number": 3, "question": "", "answer": "", "code": "", "category": ""},
-        {"number": 4, "question": "", "answer": "", "code": "", "category": ""},
-        {"number": 5, "question": "", "answer": "", "code": "", "category": ""}
+        {"number": 1, "question": "Neden [doğrudan neden kısa ifade]?", "answer": "Kısa olgu + gerekirse kısa açıklama", "code": "", "category": ""},
+        {"number": 2, "question": "Bir önceki yanıtın özünü soran kısa Neden?", "answer": "...", "code": "", "category": ""},
+        {"number": 3, "question": "...", "answer": "...", "code": "", "category": ""},
+        {"number": 4, "question": "...", "answer": "...", "code": "", "category": ""},
+        {"number": 5, "question": "...", "answer": "...", "code": "", "category": ""}
       ],
       "root_cause_title": "Kök Neden 1 başlığı",
       "root_cause_detail": "Kök nedenin çok detaylı açıklaması - 3-4 cümle",
@@ -476,7 +476,7 @@ KURALLAR:
 - Sınıflandırma / HSG kodları (ör. D4.1, C3.1, H-1.5, K-01), parantez içi kodlar veya "Birincil Kod:" gibi etiketler narrative metinlerde, kök neden açıklamalarında ve why_chain soru-cevaplarında YAZILMAYACAK. JSON şemasındaki code alanlarını boş string bırak veya kullanma.
 - executive_summary: where_happened ve who_affected alanlarını her zaman boş string "" bırak; yer ve kişi bilgisini yalnızca what_happened içinde anlat.
 - Olay özeti yalnızca cover.incident_summary_short içinde olmalı (2-3 cümle). incident_details.event_table içine "Özet" veya uzun anlatım EKLEME.
-- why_chain: BU ALANI YENİDEN YAZMA — boş bırak veya atla; sistem agent part3_rca.analysis_branches verisinden deterministik doldurur. NEDEN 1 = ortak olay sorusu + A/B doğrudan neden cevabı; NEDEN 2–5 agent zinciri.
+- why_chain: Klasik 5-Why — NEDEN 1 olay sorusu (olay metninden), cevap doğrudan neden; NEDEN 2 doğrudan nedene "Neden ...?" sorusu; NEDEN 3–5 bir önceki cevabın alt nedeni. Olay özetini baştan sona tekrarlayan uzun soru yazma.
 - Kök neden ve açıklama metinlerinde markdown kullanma: ** veya __ ile kalın vurgu yazma; düz Türkçe paragraf veya "1. Başlık:" gibi numaralı madde kullan.
 - SADECE JSON döndür, başka hiçbir şey yazma
 """
@@ -1378,14 +1378,6 @@ class SkillBasedDocxAgent:
             )
         return out
 
-    def _pin_agent_why_chains(self, content: Dict, raw_data: Dict) -> Dict:
-        """P1.26 R1: Merge sonrası why_chain'i agent part3_rca verisine sabitle."""
-        try:
-            from agents.report_why_chain import pin_agent_why_chains_to_report
-        except ImportError:
-            from .report_why_chain import pin_agent_why_chains_to_report
-        return pin_agent_why_chains_to_report(content, raw_data)
-
     def _build_deterministic_fallback_content(self, raw_data: Dict, lang: Optional[Dict] = None) -> Dict:
         """LLM başarısız olsa bile boş olmayan rapor iskeleti üret."""
         lang = lang or {"code": "tr"}
@@ -1421,24 +1413,16 @@ class SkillBasedDocxAgent:
         branches_raw = part3.get("analysis_branches") or part3.get("branches") or []
         branches: List[Dict[str, Any]] = []
         root_causes: List[Dict[str, Any]] = []
-        shared_event_q = ""
-        try:
-            from agents.report_why_chain import build_shared_event_question
-
-            shared_event_q = build_shared_event_question(incident_summary)
-        except ImportError:
-            from .report_why_chain import build_shared_event_question
-
-            shared_event_q = build_shared_event_question(incident_summary)
 
         for idx, br in enumerate(branches_raw[:8], start=1):
             immediate = br.get("immediate_cause", {}) if isinstance(br.get("immediate_cause", {}), dict) else {}
             root = br.get("root_cause", {}) if isinstance(br.get("root_cause", {}), dict) else {}
-            try:
-                from agents.report_why_chain import build_pinned_why_chain
-            except ImportError:
-                from .report_why_chain import build_pinned_why_chain
-            why_chain, _ = build_pinned_why_chain(br, shared_event_q)
+            why_chain_raw = br.get("why_chain") or br.get("questions_and_answers") or []
+            why_chain: List[Dict[str, Any]] = []
+            for w_i, w in enumerate(why_chain_raw[:5], start=1):
+                q = strip_hse_codes(str(w.get("question_tr") or w.get("question") or ""))
+                a = strip_hse_codes(str(w.get("answer_tr") or w.get("answer") or ""))
+                why_chain.append({"number": w.get("level", w_i), "question": q, "answer": a})
 
             root_code = str(root.get("code") or "").strip().upper()
             try:
@@ -1771,8 +1755,7 @@ class SkillBasedDocxAgent:
         parsed = _request_and_parse(base_payload, "attempt-1")
         if parsed:
             merged = self._merge_with_fallback_content(parsed, deterministic_fallback)
-            pinned = self._pin_agent_why_chains(merged, raw_data)
-            return self._enforce_taxonomy_titles(pinned, raw_data)
+            return self._enforce_taxonomy_titles(merged, raw_data)
 
         # 2) Parse/format bozuksa, daha katı prompt ve düşük temperature ile bir kez yeniden dene
         retry_payload = copy.deepcopy(base_payload)
@@ -1791,12 +1774,10 @@ class SkillBasedDocxAgent:
         parsed_retry = _request_and_parse(retry_payload, "attempt-2")
         if parsed_retry:
             merged = self._merge_with_fallback_content(parsed_retry, deterministic_fallback)
-            pinned = self._pin_agent_why_chains(merged, raw_data)
-            return self._enforce_taxonomy_titles(pinned, raw_data)
+            return self._enforce_taxonomy_titles(merged, raw_data)
 
         print("  ⚠️  Tüm denemeler başarısız, deterministic fallback rapora düşülüyor (boş rapor engellendi).")
-        pinned = self._pin_agent_why_chains(deterministic_fallback, raw_data)
-        return self._enforce_taxonomy_titles(pinned, raw_data)
+        return self._enforce_taxonomy_titles(deterministic_fallback, raw_data)
 
     def _parse_json_response(self, text: str) -> Optional[Dict]:
         last_error: Optional[Exception] = None
