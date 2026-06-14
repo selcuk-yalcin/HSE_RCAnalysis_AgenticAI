@@ -208,6 +208,17 @@ Return ONLY valid JSON.
                         "anthropic-version": "2023-06-01"  # Prompt caching desteği
                     }
                 )
+                try:
+                    from shared.usage_context import try_record_openai_completion
+
+                    try_record_openai_completion(
+                        response,
+                        reason="actionplan",
+                        model=OPENROUTER_DEFAULT_CHAT_MODEL,
+                        operation_label="Aksiyon planı üretimi",
+                    )
+                except Exception:  # noqa: BLE001
+                    pass
 
                 result_text = (response.choices[0].message.content or "").strip()
                 result, parse_info = self._parse_action_plan_response(result_text)

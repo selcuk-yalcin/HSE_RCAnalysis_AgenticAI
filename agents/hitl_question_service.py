@@ -1432,6 +1432,17 @@ Görev: Şablonu bu olaya özgü, somut ve kısa TEK bir koşul cümlesine çevi
             temperature=0.15,
             max_tokens=180,
         )
+        try:
+            from shared.usage_context import try_record_openai_completion
+
+            try_record_openai_completion(
+                resp,
+                reason="hitl_question",
+                model=model,
+                operation_label="HITL probe cümle özelleştirme",
+            )
+        except Exception:  # noqa: BLE001
+            pass
         out = (resp.choices[0].message.content or "").strip()
         out = re.sub(r"^[\"'`]+|[\"'`]+$", "", out)
         if len(out) >= 18:
@@ -1594,6 +1605,17 @@ Kurallar:
             temperature=0.15,
             max_tokens=500,
         )
+        try:
+            from shared.usage_context import try_record_openai_completion
+
+            try_record_openai_completion(
+                resp,
+                reason="hitl_question",
+                model=model,
+                operation_label="HITL typical_problem probe",
+            )
+        except Exception:  # noqa: BLE001
+            pass
         content = (resp.choices[0].message.content or "").strip()
         items = _extract_json_array(content)
         out: list[dict[str, Any]] = []
@@ -1686,6 +1708,17 @@ Kurallar:
                     temperature=0.2,
                     max_tokens=1200,
                 )
+                try:
+                    from shared.usage_context import try_record_openai_completion
+
+                    try_record_openai_completion(
+                        resp,
+                        reason="hitl_question",
+                        model=model,
+                        operation_label="HITL immediate cause identify",
+                    )
+                except Exception:  # noqa: BLE001
+                    pass
                 content = (resp.choices[0].message.content or "").strip()
                 for row in _extract_json_array(content)[:max_causes]:
                     if isinstance(row, dict) and row.get("code"):

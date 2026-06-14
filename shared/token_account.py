@@ -175,6 +175,23 @@ def _new_account_doc(tenant_id: str, owner_user_id: str) -> dict[str, Any]:
     }
 
 
+def _sync_plan_limit_to_account(doc: dict[str, Any]) -> dict[str, Any]:
+    """Plan kotası yükseldiyse period_limit + kalan bakiyeyi güncelle."""
+    for name in ("TOKEN_PERIOD_LIMIT", "TOKEN_DEFAULT_LIMIT"):
+        if (os.getenv(name) or "").strip():
+            return doc
+    tier = normalize_plan_tier(doc.get("plan_tier") or os.getenv("TOKEN_DEFAULT_PLAN_TIER") or "starter")
+    new_limit = max(1000, int(monthly_token_budget_for_plan(tier)))
+    old_limit = int(doc.get("period_limit") or new_limit)
+    if new_limit <= old_limit:
+        return doc
+    updated = dict(doc)
+    updated["period_limit"] = new_limit
+    updated["balance"] = int(updated.get("balance") or 0) + (new_limit - old_limit)
+    updated["updated_at"] = _utc_now_iso()
+    return updated
+
+
 def ensure_account(tenant_id: str, owner_user_id: str) -> dict[str, Any]:
     tenant_id = (tenant_id or "default").strip()[:128]
     owner_user_id = (owner_user_id or "anonymous").strip()[:256]
@@ -182,6 +199,19 @@ def ensure_account(tenant_id: str, owner_user_id: str) -> dict[str, Any]:
         col = _get_accounts_col()
         doc = col.find_one({"tenant_id": tenant_id, "owner_user_id": owner_user_id})
         if doc:
+            synced = _sync_plan_limit_to_account(doc)
+            if synced is not doc:
+                col.update_one(
+                    {"tenant_id": tenant_id, "owner_user_id": owner_user_id},
+                    {
+                        "$set": {
+                            "period_limit": synced["period_limit"],
+                            "balance": synced["balance"],
+                            "updated_at": synced["updated_at"],
+                        }
+                    },
+                )
+                doc = synced
             return _public_account(doc)
         fresh = _new_account_doc(tenant_id, owner_user_id)
         try:
@@ -194,6 +224,8 @@ def ensure_account(tenant_id: str, owner_user_id: str) -> dict[str, Any]:
     key = _account_key(tenant_id, owner_user_id)
     if key not in _mem_accounts:
         _mem_accounts[key] = _new_account_doc(tenant_id, owner_user_id)
+    else:
+        _mem_accounts[key] = _sync_plan_limit_to_account(_mem_accounts[key])
     return _public_account(_mem_accounts[key])
 
 

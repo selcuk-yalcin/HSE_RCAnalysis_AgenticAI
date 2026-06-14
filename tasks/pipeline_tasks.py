@@ -72,6 +72,44 @@ def run_pipeline_task(
 ) -> Dict[str, Any]:
     from agents.actionplan_agent import ActionPlanAgent
     from agents.rootcause_agent_v2 import RootCauseAgentV2
+    from shared.usage_context import bind_usage_context, clear_usage_context
+
+    job_id = str(getattr(self.request, "id", "") or "")
+    bind_usage_context(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        module="deepwhy",
+        incident_id=incident_id,
+        job_id=job_id,
+    )
+    try:
+        return _run_pipeline_body(
+            self,
+            incident_id=incident_id,
+            part1_data=part1_data,
+            part2_data=part2_data,
+            investigation_payload=investigation_payload,
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            job_id=job_id,
+        )
+    finally:
+        clear_usage_context()
+
+
+def _run_pipeline_body(
+    task,
+    *,
+    incident_id: str,
+    part1_data: Dict[str, Any],
+    part2_data: Dict[str, Any],
+    investigation_payload: Dict[str, Any],
+    tenant_id: str,
+    owner_user_id: str,
+    job_id: str,
+) -> Dict[str, Any]:
+    from agents.actionplan_agent import ActionPlanAgent
+    from agents.rootcause_agent_v2 import RootCauseAgentV2
 
     try:
         from agents.rootcause_agent_v3_1 import RootCauseAgentV3_1
@@ -87,7 +125,7 @@ def run_pipeline_task(
 
     from shared.pipeline_progress import celery_progress_reporter
 
-    progress = celery_progress_reporter(self, incident_id, tenant_id)
+    progress = celery_progress_reporter(task, incident_id, tenant_id)
     progress.emit(
         "Kök neden analizi başlatıldı",
         stage="investigate",
@@ -175,7 +213,6 @@ def run_pipeline_task(
         ),
     )
 
-    job_id = str(getattr(self.request, "id", "") or "")
     result = {
         "tenant_id": tenant_id,
         "incident_id": incident_id,
@@ -203,22 +240,4 @@ def run_pipeline_task(
         )
     except Exception:  # noqa: BLE001
         pass
-    try:
-        from shared import token_account
-
-        job_id = str(getattr(self.request, "id", "") or "")
-        token_account.debit_tokens(
-            tenant_id,
-            owner_user_id,
-            amount=token_account.estimate_cost("pipeline"),
-            reason="pipeline",
-            module="deepwhy",
-            incident_id=incident_id,
-            job_id=job_id,
-            operation_label=f"Kök neden pipeline ({incident_id})",
-            idempotency_key=f"pipeline:{tenant_id}:{job_id}" if job_id else "",
-        )
-    except Exception:  # noqa: BLE001
-        pass
     return result
-

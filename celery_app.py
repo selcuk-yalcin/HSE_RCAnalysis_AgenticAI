@@ -37,6 +37,14 @@ celery_app = Celery(
     include=["tasks.pipeline_tasks", "tasks.report_delivery_tasks"],
 )
 
+try:
+    from shared.litellm_billing import install_litellm_billing_callback
+
+    if install_litellm_billing_callback():
+        print("✅ LiteLLM billing callback registered (worker)")
+except Exception as _billing_exc:  # noqa: BLE001
+    print(f"⚠️  LiteLLM billing callback skipped: {_billing_exc}")
+
 celery_app.conf.update(
     task_serializer="json",
     accept_content=["json"],

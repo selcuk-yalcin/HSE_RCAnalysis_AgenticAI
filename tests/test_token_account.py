@@ -64,6 +64,27 @@ def test_users_isolated():
     assert acc_b["balance"] == 5000
 
 
+def test_plan_limit_upgrade_syncs_balance():
+    os.environ.pop("TOKEN_PERIOD_LIMIT", None)
+    os.environ.pop("TOKEN_DEFAULT_LIMIT", None)
+    token_account._mem_accounts["t1|user_up"] = {
+        "tenant_id": "t1",
+        "owner_user_id": "user_up",
+        "balance": 180_000,
+        "reserved": 0,
+        "period_limit": 220_000,
+        "lifetime_used": 40_000,
+        "plan_tier": "starter",
+        "period_reset_at": "",
+        "created_at": "",
+        "updated_at": "",
+    }
+    acc = token_account.ensure_account("t1", "user_up")
+    assert acc["period_limit"] == 1_000_000
+    assert acc["balance"] == 180_000 + (1_000_000 - 220_000)
+    assert acc["available"] == acc["balance"]
+
+
 def test_usage_summary_and_recent():
     token_account.debit_tokens(
         "t1",

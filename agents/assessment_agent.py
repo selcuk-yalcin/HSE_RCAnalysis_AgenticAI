@@ -154,6 +154,17 @@ Return ONLY the event type name."""
                     "anthropic-version": "2023-06-01"  # Prompt caching
                 }
             )
+            try:
+                from shared.usage_context import try_record_openai_completion
+
+                try_record_openai_completion(
+                    response,
+                    reason="assessment",
+                    model=OPENROUTER_DEFAULT_CHAT_MODEL,
+                    operation_label="Olay tipi sınıflandırma",
+                )
+            except Exception:  # noqa: BLE001
+                pass
             
             event_type = response.choices[0].message.content.strip()
             event_type = event_type.replace('"', '').replace("'", "").strip()
@@ -199,6 +210,17 @@ Return ONLY the severity level."""
                     "anthropic-version": "2023-06-01"  # Prompt caching
                 }
             )
+            try:
+                from shared.usage_context import try_record_openai_completion
+
+                try_record_openai_completion(
+                    response,
+                    reason="assessment",
+                    model=OPENROUTER_DEFAULT_CHAT_MODEL,
+                    operation_label="Şiddet değerlendirme",
+                )
+            except Exception:  # noqa: BLE001
+                pass
             
             severity = response.choices[0].message.content.strip()
             severity = severity.replace('"', '').replace("'", "").strip()
@@ -246,6 +268,17 @@ Return ONLY JSON."""
                     "anthropic-version": "2023-06-01"  # Prompt caching
                 }
             )
+            try:
+                from shared.usage_context import try_record_openai_completion
+
+                try_record_openai_completion(
+                    response,
+                    reason="assessment",
+                    model=OPENROUTER_DEFAULT_CHAT_MODEL,
+                    operation_label="RIDDOR değerlendirme",
+                )
+            except Exception:  # noqa: BLE001
+                pass
             
             result = response.choices[0].message.content.strip()
             
@@ -323,6 +356,17 @@ Return ONLY valid JSON."""
                 "anthropic-version": "2023-06-01"  # Prompt caching
             }
         )
+        try:
+            from shared.usage_context import try_record_openai_completion
+
+            try_record_openai_completion(
+                response,
+                reason="assessment",
+                model=OPENROUTER_DEFAULT_CHAT_MODEL,
+                operation_label="İnceleme seviyesi belirleme",
+            )
+        except Exception:  # noqa: BLE001
+            pass
         
         result = response.choices[0].message.content.strip()
         

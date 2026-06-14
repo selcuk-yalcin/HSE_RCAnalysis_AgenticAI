@@ -59,6 +59,7 @@ from shared import saved_reports_store
 from shared import report_deliveries
 from shared import token_account
 from shared.usage_context import bind_usage_context, clear_usage_context
+from shared.litellm_billing import install_litellm_billing_callback
 from shared.hybrid_cache import hybrid_get, hybrid_set
 from shared.oracle_memory import merge_oracle_into_investigation, upsert_context, list_recent
 from shared.ops_celery import celery_inspect_snapshot
@@ -138,33 +139,6 @@ def _enforce_token_cost(tenant_id: str, owner_user_id: str, reason: str) -> None
     ok, msg = token_account.check_sufficient(tenant_id, owner_user_id, cost)
     if not ok:
         _raise_insufficient_tokens(msg)
-
-
-def _debit_token_estimate(
-    tenant_id: str,
-    owner_user_id: str,
-    reason: str,
-    *,
-    module: str = "deepwhy",
-    incident_id: str = "",
-    job_id: str = "",
-    operation_label: str = "",
-    idempotency_key: str = "",
-) -> None:
-    try:
-        token_account.debit_tokens(
-            tenant_id,
-            owner_user_id,
-            amount=token_account.estimate_cost(reason),
-            reason=reason,
-            module=module,
-            incident_id=incident_id,
-            job_id=job_id,
-            operation_label=operation_label or reason,
-            idempotency_key=idempotency_key,
-        )
-    except Exception as exc:  # noqa: BLE001
-        print(f"⚠️  Token debit skipped ({reason}): {exc}")
 
 
 def _hitl_cache_ttl_seconds() -> int:
@@ -290,7 +264,10 @@ async def startup_event():
     except Exception as texc:
         print(f"⚠️  Token accounts init: {texc}")
 
-    # HITL cold-start ısıtma: ilk soru isteğinin Mongo retriever + embedding
+    if install_litellm_billing_callback():
+        print("✅ LiteLLM billing callback registered (API)")
+
+    # HITL cold-start ısıtma:
     # model yükleme gecikmesini (gateway 504 kaynağı) ödememesi için arka planda.
     async def _warm_hitl() -> None:
         try:
@@ -1069,6 +1046,26 @@ async def _run_pipeline_job(
     payload: dict,
     owner_user_id: str = "anonymous",
 ):
+    bind_usage_context(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        module="deepwhy",
+        incident_id=incident_id,
+        job_id=job_id,
+    )
+    try:
+        await _run_pipeline_job_body(job_id, incident_id, tenant_id, payload, owner_user_id)
+    finally:
+        clear_usage_context()
+
+
+async def _run_pipeline_job_body(
+    job_id: str,
+    incident_id: str,
+    tenant_id: str,
+    payload: dict,
+    owner_user_id: str = "anonymous",
+):
     try:
         _set_job_state(
             tenant_id,
@@ -1126,15 +1123,6 @@ async def _run_pipeline_job(
             },
             finished_at=_utc_now_iso(),
             error=None,
-        )
-        _debit_token_estimate(
-            tenant_id,
-            owner_user_id,
-            "pipeline",
-            incident_id=incident_id,
-            job_id=job_id,
-            operation_label=f"Kök neden pipeline ({incident_id})",
-            idempotency_key=f"pipeline:{tenant_id}:{job_id}",
         )
     except HTTPException as he:
         _set_job_state(
@@ -1344,6 +1332,7 @@ async def hitl_dynamic_questions(
         tenant_id=tenant_id,
         owner_user_id=owner_user_id,
         module="hitl",
+        incident_id=incident_id,
     )
     mode = (body.mode or "").lower()
 
@@ -1465,29 +1454,29 @@ async def add_assessment(
     try:
         _enforce_token_cost(tenant_id, owner_user_id, "assessment")
         incident = _require_incident_record(tenant_id, incident_id)
-        
-        # Process with Assessment Agent
-        part2_data = assessment_agent.assess_incident(
-            incident["part1"],
-            {
-                "event_type": assessment.event_type,
-                "actual_harm": assessment.actual_harm,
-                "riddor_reportable": assessment.riddor_reportable
-            }
+
+        bind_usage_context(
+            tenant_id=tenant_id,
+            owner_user_id=owner_user_id,
+            module="assessment",
+            incident_id=incident_id,
         )
+        try:
+            part2_data = assessment_agent.assess_incident(
+                incident["part1"],
+                {
+                    "event_type": assessment.event_type,
+                    "actual_harm": assessment.actual_harm,
+                    "riddor_reportable": assessment.riddor_reportable
+                }
+            )
+        finally:
+            clear_usage_context()
         
         # Update database
         incident["part2"] = part2_data
         incident["status"] = "assessed"
         _save_incident_record(tenant_id, incident_id, incident)
-        _debit_token_estimate(
-            tenant_id,
-            owner_user_id,
-            "assessment",
-            incident_id=incident_id,
-            operation_label=f"Değerlendirme ({incident_id})",
-            idempotency_key=f"assessment:{tenant_id}:{incident_id}",
-        )
         return {
             "success": True,
             "data": part2_data
@@ -1527,19 +1516,16 @@ async def investigate_incident(
     _enforce_token_cost(tenant_id, owner_user_id, "investigate")
     inv_dict = merge_oracle_into_investigation(tenant_id, investigation.model_dump())
     investigation = InvestigationData(**inv_dict)
-    bind_usage_context(tenant_id=tenant_id, owner_user_id=owner_user_id, module="deepwhy")
+    bind_usage_context(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        module="deepwhy",
+        incident_id=incident_id,
+    )
     try:
         result = await _investigate_core(tenant_id, incident_id, investigation)
     finally:
         clear_usage_context()
-    _debit_token_estimate(
-        tenant_id,
-        owner_user_id,
-        "investigate",
-        incident_id=incident_id,
-        operation_label=f"Kök neden analizi ({incident_id})",
-        idempotency_key=f"investigate:{tenant_id}:{incident_id}",
-    )
     return result
 
 
@@ -1690,15 +1676,16 @@ async def generate_action_plan(tenant_id: TenantId, owner_user_id: OwnerUserId, 
     Part 4: Generate action plan with ActionPlan Agent
     """
     _enforce_token_cost(tenant_id, owner_user_id, "actionplan")
-    result = await _actionplan_core(tenant_id, incident_id)
-    _debit_token_estimate(
-        tenant_id,
-        owner_user_id,
-        "actionplan",
+    bind_usage_context(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        module="deepwhy",
         incident_id=incident_id,
-        operation_label=f"Aksiyon planı ({incident_id})",
-        idempotency_key=f"actionplan:{tenant_id}:{incident_id}",
     )
+    try:
+        result = await _actionplan_core(tenant_id, incident_id)
+    finally:
+        clear_usage_context()
     return result
 
 @app.get("/api/v1/incidents/{incident_id}")
@@ -1924,20 +1911,21 @@ async def generate_pdf_report(
     """
     incident_id = request.incident_id
     _enforce_token_cost(tenant_id, owner_user_id, "report_docx")
-    artifacts = _generate_report_artifacts(
-        tenant_id,
-        incident_id,
-        layout_override=request.report_layout,
-        force_regenerate=request.force_regenerate,
-    )
-    _debit_token_estimate(
-        tenant_id,
-        owner_user_id,
-        "report_docx",
+    bind_usage_context(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        module="report",
         incident_id=incident_id,
-        operation_label=f"Word rapor ({incident_id})",
-        idempotency_key=f"report_docx:{tenant_id}:{incident_id}",
     )
+    try:
+        artifacts = _generate_report_artifacts(
+            tenant_id,
+            incident_id,
+            layout_override=request.report_layout,
+            force_regenerate=request.force_regenerate,
+        )
+    finally:
+        clear_usage_context()
     filepath = artifacts["docx_path"]
     return FileResponse(
         filepath,
@@ -1961,20 +1949,21 @@ async def generate_html_report(
     """
     incident_id = request.incident_id
     _enforce_token_cost(tenant_id, owner_user_id, "report_html")
-    artifacts = _generate_report_artifacts(
-        tenant_id,
-        incident_id,
-        layout_override=request.report_layout,
-        force_regenerate=request.force_regenerate,
-    )
-    _debit_token_estimate(
-        tenant_id,
-        owner_user_id,
-        "report_html",
+    bind_usage_context(
+        tenant_id=tenant_id,
+        owner_user_id=owner_user_id,
+        module="report",
         incident_id=incident_id,
-        operation_label=f"HTML rapor ({incident_id})",
-        idempotency_key=f"report_html:{tenant_id}:{incident_id}",
     )
+    try:
+        artifacts = _generate_report_artifacts(
+            tenant_id,
+            incident_id,
+            layout_override=request.report_layout,
+            force_regenerate=request.force_regenerate,
+        )
+    finally:
+        clear_usage_context()
     await _enqueue_report_delivery_email(
         tenant_id=tenant_id,
         owner_user_id=owner_user_id,

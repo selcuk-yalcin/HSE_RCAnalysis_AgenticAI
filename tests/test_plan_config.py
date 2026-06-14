@@ -19,7 +19,7 @@ def test_normalize_plan_tier_aliases():
 
 
 def test_monthly_token_budget_mapping():
-    assert monthly_token_budget_for_plan("starter") == 220_000
+    assert monthly_token_budget_for_plan("starter") == 1_000_000
     assert monthly_token_budget_for_plan("pro") == 900_000
     pro = get_plan("pro")
     assert pro["monthly_report_quota"] == 50
