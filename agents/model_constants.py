@@ -27,7 +27,7 @@ import contextvars
 import os
 from contextlib import contextmanager
 
-_HAIKU_MODEL = "anthropic/claude-haiku-4.5"
+_HAIKU_MODEL = "anthropic/claude-sonnet-5"
 _FLASH_MODEL = "google/gemini-2.5-flash"
 
 _DEFAULT_ANALYSIS_MODEL = _HAIKU_MODEL
