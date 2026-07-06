@@ -1,10 +1,9 @@
-"""V3.2 trainset W1 birim testleri (DSPy/LLM çağrısı yok)."""
+"""V3.2 olay-zarar W1 birim testleri (DSPy/LLM çağrısı yok)."""
 
 import importlib.util
 import sys
 from pathlib import Path
 
-# Paket __init__ lazy; kalite modülünü doğrudan yükle
 _quality_path = (
     Path(__file__).resolve().parent.parent
     / "agents"
@@ -19,14 +18,21 @@ sys.modules[_spec.name] = _mod
 assert _spec.loader is not None
 _spec.loader.exec_module(_mod)
 
+build_incident_harm_why1_question_heuristic = _mod.build_incident_harm_why1_question_heuristic
 build_trainset_why1_question_heuristic = _mod.build_trainset_why1_question_heuristic
 immediate_cause_ab_answer = _mod.immediate_cause_ab_answer
-
 
 KIMYA_INCIDENT = (
     "Solvent transfer hattında flanş bağlantısından küçük sızıntı tespit edildi; "
     "operatör bölgede KKD olmadan kısa süre kaldı ve baş dönmesi şikayetiyle "
     "sağlık birimine yönlendirildi."
+)
+
+GARCIA_INCIDENT = (
+    "29.06.2026 tarihinde EAK (Eğik Askılı Köprü) bölgesinde, VSL firması tarafından "
+    "Batı Pilon bölgesinde segment strand halat montaj faaliyeti yürütülmekteydi. "
+    "Montaj sırasında vinç zincir kancasının mandalı açıldı ve Garcia isimli personel "
+    "3,8 metre yükseklikten düşerek ağır yaralandı."
 )
 
 
@@ -35,6 +41,19 @@ def test_trainset_why1_question_kimya_heuristic():
     assert q.startswith("Neden ")
     assert "?" in q
     assert "solvent" in q.lower() or "maruz" in q.lower() or "kimyasal" in q.lower()
+    assert "montaj" not in q.lower()
+
+
+def test_garcia_fall_why1_not_activity():
+    """V3.1 hatası: montaj cümlesi yerine yaralanma sorusu."""
+    q = build_incident_harm_why1_question_heuristic(GARCIA_INCIDENT)
+    assert q.startswith("Neden ")
+    assert "Garcia" in q
+    assert "düş" in q.lower() or "yaraland" in q.lower()
+    assert "3.8" in q or "3,8" in q
+    assert "montaj" not in q.lower()
+    assert "strand halat" not in q.lower()
+    assert "meydana geldi" not in q.lower()
 
 
 def test_immediate_cause_ab_answer_prefers_evidence():
@@ -61,9 +80,25 @@ def test_immediate_cause_ab_answer_falls_back_to_cause_tr():
     assert code == "A1.2"
 
 
-def test_v3_2_status_inactive():
+def test_ptw_branch_ab_answer():
+    ans, code = immediate_cause_ab_answer(
+        {
+            "code": "A3.1",
+            "cause_tr": "Deforme kanca kullanımı",
+            "evidence_tr": (
+                "Vinç zincir kancasının mandalı açıldı; kancada 4-10 mm deformasyon "
+                "tespit edilmiş olmasına rağmen ekipman servis dışı bırakılmamıştı."
+            ),
+        }
+    )
+    assert "kanca" in ans.lower() or "mandal" in ans.lower()
+    assert code == "A3.1"
+
+
+def test_v3_2_status_active_by_default():
     try:
         from agents.v3_2 import check_v3_2_status
+        from agents.root_cause_factory import resolve_root_cause_agent_version
     except Exception as exc:  # noqa: BLE001 — dspy sandbox
         import pytest
 
@@ -71,4 +106,6 @@ def test_v3_2_status_inactive():
 
     st = check_v3_2_status()
     assert st["version"] == "3.2"
-    assert st["active_in_production"] is False
+    if resolve_root_cause_agent_version() == "3.2":
+        assert st["active_in_production"] is True
+    assert "v31_bug" in st

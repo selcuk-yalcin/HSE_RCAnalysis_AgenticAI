@@ -1,10 +1,10 @@
 """
-V3.2 WhyChain — trainset W1 + LLM W2–W5 (C/D kök).
+V3.2 WhyChain — olay-zarar W1 + A/B cevap + W2–W5 → C/D.
 
-V3.1 farkları:
-  - W1 soru: olaydan trainset tarzı (tüm dallarda ortak cache)
-  - W1 cevap: A/B BARSEL / immediate_cause (deterministik)
-  - W2–W5: bir önceki cevaba LLM zinciri (W2'de doğrudan-neden şablonu yok)
+Akış (her kritik faktör / dal):
+  NEDEN 1 — Ortak olay sorusu (tüm dallarda aynı) → cevap: dalın A/B mekanizması
+  NEDEN 2 — W1 cevabına neden (doğrudan neden alt mekanizma)
+  NEDEN 3–5 — LLM zincir, branch_angle ile C/D kök nedene
 """
 
 from __future__ import annotations
@@ -24,6 +24,7 @@ try:
     )
     from agents.why_chain_quality import (
         answer_repeats_previous,
+        build_direct_cause_why2_question,
         demote_solution_to_cause,
         derive_root_cause_from_why5,
         enforce_short_why_question,
@@ -46,6 +47,7 @@ except ImportError:
     )
     from ..why_chain_quality import (
         answer_repeats_previous,
+        build_direct_cause_why2_question,
         demote_solution_to_cause,
         derive_root_cause_from_why5,
         enforce_short_why_question,
@@ -70,22 +72,26 @@ except ImportError:
 
 
 class IncidentWhy1Question(dspy.Signature):
-    """Olay özetinden trainset tarzı ilk Why sorusu."""
+    """Olay özetinden zarar/yaralanma merkezli ilk Why sorusu."""
 
     incident_summary = dspy.InputField(desc="Olay özeti")
     question = dspy.OutputField(
         desc=(
             "Tek Türkçe cümle, 'Neden ...?' ile bitmeli, en fazla 15 kelime. "
-            "Olayın birincil zararlı sonucu, maruziyeti veya güvenlik sapmasını sor; "
-            "tüm olay paragrafını tekrarlama. "
-            "Örnek: 'Neden operatör solvent buharına maruz kaldı?'"
+            "Olayın zararlı sonucunu sor (yaralanma, düşme, maruziyet). "
+            "Montaj/faaliyet/operasyon cümlesi SORMA. "
+            "Örnek: 'Neden Garcia 3,8 metre yükseklikten düşerek ağır yaralandı?' "
+            "YANLIŞ: 'Neden segment strand halat montaj meydana geldi?'"
         )
     )
 
 
 class WhyChainV32(WhyChain):
     """
-    V3.2 5-Why zinciri — hse_dspy_trainset.json akışı.
+    V3.2 5-Why — olay merceği + A/B → C/D.
+
+    W1 sorusu tüm dallarda paylaşılır (shared_why1_question_cache).
+    W1 cevabı dal başına immediate_cause / BARSEL A-B.
     """
 
     def __init__(
@@ -104,6 +110,9 @@ class WhyChainV32(WhyChain):
 
     def reset_shared_why1_cache(self) -> None:
         self.shared_why1_question_cache = None
+
+    def get_shared_why1_question(self) -> Optional[str]:
+        return self.shared_why1_question_cache
 
     def _resolve_why1_question(
         self,
@@ -180,29 +189,33 @@ class WhyChainV32(WhyChain):
                 previous_question_raw = question_raw
                 continue
 
-            # W2–W5: trainset — bir önceki cevabın alt nedeni (LLM soru)
-            previous_for_question = (
-                f"Önceki soru: {previous_question_raw}\n"
-                f"Önceki cevap: {current_answer_raw}\n\n"
-                f"{_why1_question_seed(incident_summary, immediate_cause)}"
-            )
-            if branch_angle:
-                previous_for_question += f"\n\nDAL ODAĞI: {branch_angle}"
-            level_label = f"Why-{level} — alt neden (max {WHY_QUESTION_MAX_WORDS} kelime)"
-            question_result = self.why_question(
-                incident_summary=incident_summary,
-                previous_answer=previous_for_question,
-                chain_level=level_label,
-            )
-            question_raw = enforce_short_why_question((question_result.question or "").strip())
-            if question_repeats_answer(current_answer_raw, question_raw):
+            if level == 2:
+                # W2: A/B cevabına (W1 mekanizması) neden — V3.1 klasik adım
+                imm_for_w2 = {**immediate_cause, "cause_tr": current_answer_raw}
+                question_raw = build_direct_cause_why2_question(imm_for_w2)
+            else:
+                previous_for_question = (
+                    f"Önceki soru: {previous_question_raw}\n"
+                    f"Önceki cevap: {current_answer_raw}\n\n"
+                    f"{_why1_question_seed(incident_summary, immediate_cause)}"
+                )
+                if branch_angle:
+                    previous_for_question += f"\n\nDAL ODAĞI: {branch_angle}"
+                level_label = f"Why-{level} — alt neden (max {WHY_QUESTION_MAX_WORDS} kelime)"
                 question_result = self.why_question(
                     incident_summary=incident_summary,
-                    previous_answer=previous_for_question
-                    + "\n\nUYARI: Önceki cevabı TEKRARLAMA; bir alt organizasyonel/teknik nedeni sor.",
+                    previous_answer=previous_for_question,
                     chain_level=level_label,
                 )
                 question_raw = enforce_short_why_question((question_result.question or "").strip())
+                if question_repeats_answer(current_answer_raw, question_raw):
+                    question_result = self.why_question(
+                        incident_summary=incident_summary,
+                        previous_answer=previous_for_question
+                        + "\n\nUYARI: Önceki cevabı TEKRARLAMA; bir alt organizasyonel/teknik nedeni sor.",
+                        chain_level=level_label,
+                    )
+                    question_raw = enforce_short_why_question((question_result.question or "").strip())
 
             question_display = strip_hse_codes(question_raw)
 
@@ -395,4 +408,5 @@ class WhyChainV32(WhyChain):
             "whys": chain,
             "root_cause": root_cause_data,
             "chain_quality": score_chain_quality(chain),
+            "shared_why1_question": self.shared_why1_question_cache,
         }

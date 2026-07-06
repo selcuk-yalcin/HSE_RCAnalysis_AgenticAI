@@ -1,10 +1,16 @@
 """
-Root Cause Agent V3.2 — trainset tarzı 5-Why (olay W1 + A/B cevap).
+Root Cause Agent V3.2 — olay-zarar merkezli 5-Why (A/B → C/D).
 
-STATUS: INACTIVE — production hâlâ V3.1 kullanır.
-Aktivasyon: orchestrator / api/main değişikliği gerekir (bilinçli opt-in).
+STATUS: ACTIVE (varsayılan production — ROOTCAUSE_AGENT_VERSION=3.2)
 
-V3.1'e sadık kalır; yalnızca WhyChain ve W1 semantiği değişir.
+V3.1 hatası:
+  build_event_why1_question → "Neden … montaj meydana geldi?" (faaliyet cümlesi)
+
+V3.2 akış (her kritik faktör):
+  W1 — Ortak olay sorusu: "Neden Garcia … düşerek ağır yaralandı?"
+  W1 cevap — Dal A/B mekanizması (BARSEL + evidence_tr)
+  W2 — W1 cevabına neden
+  W3–W5 — C/D kök neden
 """
 
 from __future__ import annotations
@@ -40,11 +46,12 @@ class _WhyChainV32CallWrapper:
 
 class RootCauseAgentV3_2(RootCauseAgentV3_1):
     """
-    V3.2: hse_dspy_trainset.json akışı.
+    V3.2: olay-zarar merkezli 5-Why.
 
-    - W1 soru: olaydan trainset tarzı (tüm dallarda ortak)
-    - W1 cevap: A/B immediate_cause + BARSEL Mongo
-    - W2–W5: bir önceki cevaba LLM → C/D kök neden
+    - W1 soru: tüm dallarda ortak (yaralanma/maruziyet merceği)
+    - W1 cevap: dal başına A/B immediate_cause + BARSEL
+    - W2: A/B cevabına neden
+    - W3–W5: LLM → C/D kök neden
     """
 
     VERSION = "3.2"
@@ -78,8 +85,7 @@ class RootCauseAgentV3_2(RootCauseAgentV3_1):
         self._why_chain_v32 = inner
         self.why_chain = _WhyChainV32CallWrapper(inner, self)
         print(
-            "✅ Root Cause Agent V3.2 hazır (INACTIVE — trainset W1 akışı, "
-            "orchestrator bağlı değil)"
+            "✅ Root Cause Agent V3.2 hazır (olay-zarar W1 + A/B→C/D)"
         )
 
     def _analyze_root_causes_impl(
@@ -90,7 +96,7 @@ class RootCauseAgentV3_2(RootCauseAgentV3_1):
         synthesize_meta_root: bool = True,
     ) -> Dict:
         self._progress(
-            "BÖLÜM 3: Hiyerarşik kök neden analizi (V3.2 — trainset W1)",
+            "BÖLÜM 3: Hiyerarşik kök neden analizi (V3.2 — olay W1 + A/B→C/D)",
             stage="investigate",
             progress=12,
         )
@@ -103,8 +109,14 @@ class RootCauseAgentV3_2(RootCauseAgentV3_1):
             synthesize_meta_root,
         )
         if isinstance(result, dict):
+            shared_q = None
+            inner = getattr(self.why_chain, "inner", None)
+            if inner is not None:
+                shared_q = getattr(inner, "shared_why1_question_cache", None)
+            if shared_q:
+                result["shared_why1_question"] = shared_q
             result["analysis_method"] = (
-                "BARSEL Hierarchical 5-Why (DSPy V3.2 — trainset olay W1 + A/B cevap)"
+                "BARSEL Hierarchical 5-Why (DSPy V3.2 — olay W1 + A/B cevap → C/D kök)"
             )
             result["agent_version"] = self.VERSION
         return result
@@ -130,16 +142,21 @@ def check_v3_2_status() -> Dict:
         from ..rootcause_agent_v3_1 import RAG_AVAILABLE, check_v3_1_status
 
     base = check_v3_1_status()
+    from agents.root_cause_factory import resolve_root_cause_agent_version
+
+    active = resolve_root_cause_agent_version() == "3.2"
     return {
         **base,
         "version": "3.2",
-        "status": "INACTIVE (parallel implementation — opt-in only)",
-        "active_in_production": False,
+        "status": "ACTIVE (production default)" if active else "available (ROOTCAUSE_AGENT_VERSION≠3.2)",
+        "active_in_production": active,
         "parent_agent": "RootCauseAgentV3_1",
         "why_chain_class": "WhyChainV32",
-        "w1_question_style": "trainset — olaydan maruziyet/sonuç sorusu (ortak tüm dallarda)",
+        "w1_question_style": "olay-zarar merceği — tüm dallarda ortak (ör. Garcia düşme yaralanması)",
         "w1_answer_source": "A/B immediate_cause + BARSEL Mongo (evidence_tr öncelikli)",
-        "w2_w5_style": "LLM zincir → C/D kök neden",
+        "w2_style": "W1 A/B cevabına neden (build_direct_cause_why2_question)",
+        "w3_w5_style": "LLM zincir → C/D kök neden",
+        "v31_bug": "build_event_why1_question faaliyet cümlesi üretir (montaj/meydana geldi)",
         "report_agent": "SkillBasedDocxAgentV32",
         "report_pin": "report_why_chain_v3_2.pin_agent_why_chains_to_report_v32",
         "decision_tree": "DecisionTreeGeneratorV32",

@@ -31,8 +31,8 @@ CONTENT_SYSTEM_PROMPT_V32 = CONTENT_SYSTEM_PROMPT.replace(
     "NEDEN 2 doğrudan nedene \"Neden ...?\" sorusu; NEDEN 3–5 bir önceki cevabın alt nedeni. "
     "Olay özetini baştan sona tekrarlayan uzun soru yazma.",
     "- why_chain: BU ALANI YENİDEN YAZMA — boş bırak; sistem V3.2 agent part3_rca verisinden doldurur. "
-    "NEDEN 1 = trainset tarzı olay/maruziyet sorusu (ortak) + A/B cevap (evidence_tr); "
-    "NEDEN 2–5 agent zinciri.",
+    "NEDEN 1 = olay-zarar sorusu (ortak, örn. Garcia düşme yaralanması) + A/B cevap (evidence_tr); "
+    "NEDEN 2 A/B mekanizmasına neden; NEDEN 3–5 agent zinciri → C/D kök.",
 ).replace(
     '{"number": 1, "question": "Neden [doğrudan neden kısa ifade]?", "answer": "Kısa olgu + gerekirse kısa açıklama", "code": "", "category": ""}',
     '{"number": 1, "question": "(sistem doldurur — trainset W1)", "answer": "", "code": "", "category": ""}',

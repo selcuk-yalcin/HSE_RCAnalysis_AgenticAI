@@ -1,6 +1,6 @@
-# V3.2 — Trainset 5-Why paketi (INACTIVE)
+# V3.2 — olay-zarar 5-Why paketi (ACTIVE — production varsayılan)
 
-Parallel stack; **production = V3.1**. Orijinal dosyalara dokunulmaz.
+Parallel stack; **production varsayılan = V3.2** (`ROOTCAUSE_AGENT_VERSION=3.2`).
 
 ## Neden tüm `rootcause_agent_v3_1.py` burada değil?
 
@@ -19,12 +19,33 @@ Parallel stack; **production = V3.1**. Orijinal dosyalara dokunulmaz.
 
 2329 satırın kopyalanması bakım riski yaratır; V3.2 **composition** ile V3.1'i genişletir.
 
-## Trainset akış (`good_tr_kimya_sizinti`)
+## V3.1 hatası (V3.2 ile düzeltildi)
+
+`build_event_why1_question` ilk cümleden faaliyet sorusu üretir:
 
 ```
-NEDEN 1 — Olaydan trainset sorusu (ortak) → A/B cevap (evidence_tr / BARSEL)
-NEDEN 2–5 — LLM zincir → C/D kök
+YANLIŞ: Neden … segment strand halat montaj meydana geldi?
+DOĞRU:  Neden Garcia 3,8 metre yükseklikten düşerek ağır yaralandı?
 ```
+
+## Trainset akış
+
+```
+NEDEN 1 — Ortak olay-zarar sorusu → cevap: dal A/B (BARSEL)
+NEDEN 2   — W1 A/B cevabına neden
+NEDEN 3–5 — LLM → C/D kök
+```
+
+## Aktivasyon
+
+Varsayılan (kod + Railway):
+
+```env
+ROOTCAUSE_AGENT_VERSION=3.2
+OPENROUTER_DSPY_MODEL=anthropic/claude-haiku-4.5
+```
+
+V3.1'e dönmek için: `ROOTCAUSE_AGENT_VERSION=3.1`
 
 ## Dosya listesi
 

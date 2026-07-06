@@ -1,23 +1,27 @@
 """
 OpenRouter model seçimi (agents geneli).
 
+Tek kaynak: bu dosya. Ortam değişkenleri yalnızca override içindir.
+
 Sabit ayrım (üretim varsayılanı):
-- Analiz (DSPy, kök neden, overview, değerlendirme, eylem planı, HITL, chat):
+- Analiz (HITL, overview, assessment, aksiyon planı, chat):
   `anthropic/claude-haiku-4.5`
-- Yalnızca rapor yazımı (DOCX/HTML: SkillBasedDocxAgent):
+- RCA / DSPy (V3.2 varsayılan kök neden motoru — RootCauseAgentV3_2 → V3.1 DSPy LM):
+  `anthropic/claude-haiku-4.5` (OPENROUTER_DSPY_MODEL ile override)
+- Rapor (DOCX/HTML — SkillBasedDocxAgentV32 / SkillBasedDocxAgent):
   `google/gemini-2.5-flash`
 
-Formdaki quality/economy seçimi analiz modelini değiştirmez (ikisi de Haiku);
-yalnızca ileride farklı analiz profilleri eklenirse kullanılabilir.
+RCA motoru (agents/v3_2): ROOTCAUSE_AGENT_VERSION=3.2 (varsayılan).
+Model seçimi yine resolve_openrouter_dspy_model() üzerinden — v3_2 ayrı model tanımlamaz.
 
 Ortam önceliği (HITL, overview, assessment, chat):
 - Hepsini test için tek model: OPENROUTER_TEST_MODEL=...
-- Genel analiz override: OPENROUTER_DEFAULT_MODEL (genelde Haiku bırakın)
-- OPENROUTER_MODEL_PRESET (dikkat: preset analiz yolunu etkiler)
+- Genel analiz override: OPENROUTER_DEFAULT_MODEL
+- OPENROUTER_MODEL_PRESET
 
-RCA / DSPy (yalnızca kök neden):
-- OPENROUTER_DSPY_MODEL (ör. anthropic/claude-sonnet-5)
-- OPENROUTER_TEST_MODEL tüm hattı tek modele çeker (DSPy dahil)
+RCA / DSPy (V3.2 + V3.1):
+- OPENROUTER_DSPY_MODEL
+- OPENROUTER_TEST_MODEL (tüm hattı tek modele çeker)
 
 Rapor:
 - OPENROUTER_DOCX_MODEL veya varsayılan Flash
@@ -33,8 +37,10 @@ from contextlib import contextmanager
 
 _HAIKU_MODEL = "anthropic/claude-haiku-4.5"
 _FLASH_MODEL = "google/gemini-2.5-flash"
+_SONNET_MODEL = "anthropic/claude-sonnet-5"
 
 _DEFAULT_ANALYSIS_MODEL = _HAIKU_MODEL
+_DEFAULT_DSPY_MODEL = _HAIKU_MODEL
 _DEFAULT_REPORT_MODEL = _FLASH_MODEL
 
 _MODEL_PRESETS = {
@@ -44,9 +50,9 @@ _MODEL_PRESETS = {
     "sonnet": "anthropic/claude-sonnet-4.5",
     "claude_sonnet": "anthropic/claude-sonnet-4.5",
     "claude-sonnet-4.5": "anthropic/claude-sonnet-4.5",
-    "sonnet5": "anthropic/claude-sonnet-5",
-    "claude_sonnet_5": "anthropic/claude-sonnet-5",
-    "claude-sonnet-5": "anthropic/claude-sonnet-5",
+    "sonnet5": _SONNET_MODEL,
+    "claude_sonnet_5": _SONNET_MODEL,
+    "claude-sonnet-5": _SONNET_MODEL,
     "haiku": _HAIKU_MODEL,
     "claude_haiku": _HAIKU_MODEL,
     "claude-haiku-4.5": _HAIKU_MODEL,
@@ -112,14 +118,14 @@ def _resolve_analysis_model() -> str:
 
 
 def _resolve_dspy_model() -> str:
-    """RCA / DSPy kök neden — OPENROUTER_DSPY_MODEL diğer analizden ayrı."""
+    """RCA / DSPy (V3.2 + V3.1) — OPENROUTER_DSPY_MODEL veya varsayılan Haiku."""
     test = _env("OPENROUTER_TEST_MODEL")
     if test:
         return test
     explicit = _env("OPENROUTER_DSPY_MODEL")
     if explicit:
         return explicit
-    return _resolve_from_preset_or_default()
+    return _DEFAULT_DSPY_MODEL
 
 
 def resolve_openrouter_chat_model() -> str:
@@ -137,4 +143,24 @@ def resolve_openrouter_dspy_model() -> str:
 
 def resolve_openrouter_docx_model() -> str:
     """Rapor (DOCX/HTML): TEST > OPENROUTER_DOCX_MODEL > Flash."""
-    return _env("OPENROUTER_TEST_MODEL") or _env("OPENROUTER_DOCX_MODEL") or OPENROUTER_DOCX_DEFAULT_MODEL
+    return _env("OPENROUTER_TEST_MODEL") or _env("OPENROUTER_DOCX_MODEL") or _DEFAULT_REPORT_MODEL
+
+
+def resolve_models_for_health() -> dict:
+    """Health / debug — aktif model slug'ları (V3.2 RCA dahil)."""
+    try:
+        from agents.root_cause_factory import resolve_root_cause_agent_version
+        rca_version = resolve_root_cause_agent_version()
+    except Exception:  # noqa: BLE001
+        rca_version = "unknown"
+    return {
+        "rca_agent_version": rca_version,
+        "chat": resolve_openrouter_chat_model(),
+        "dspy_rca": resolve_openrouter_dspy_model(),
+        "docx_report": resolve_openrouter_docx_model(),
+        "defaults": {
+            "analysis": _DEFAULT_ANALYSIS_MODEL,
+            "dspy": _DEFAULT_DSPY_MODEL,
+            "report": _DEFAULT_REPORT_MODEL,
+        },
+    }

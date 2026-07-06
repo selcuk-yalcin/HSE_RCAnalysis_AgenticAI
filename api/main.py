@@ -32,6 +32,7 @@ from agents.assessment_agent import AssessmentAgent
 from agents.rootcause_agent_v2 import RootCauseAgentV2
 from agents.actionplan_agent import ActionPlanAgent
 from agents.skillbased_docx_agent import SkillBasedDocxAgent
+from agents.root_cause_factory import init_root_cause_agent, init_report_agent
 from agents.hitl_question_service import (
     next_hitl_questions,
     next_immediate_causes_identify,
@@ -39,11 +40,7 @@ from agents.hitl_question_service import (
     next_why_probe_questions,
     warm_hitl_resources,
 )
-from agents.model_constants import (
-    resolve_openrouter_chat_model,
-    resolve_openrouter_dspy_model,
-    resolve_openrouter_docx_model,
-)
+from agents.model_constants import resolve_models_for_health
 from shared.tenant_store import (
     get_tenant_store,
     total_incidents_across_tenants,
@@ -96,8 +93,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "https://inferaworld-admin.vercel.app",
-        "https://*.vercel.app"
     ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -163,37 +160,7 @@ def _hitl_question_budget_seconds() -> float:
 
 
 def _init_root_cause_agent(use_rag: bool) -> Tuple[object, str]:
-    """
-    Önce RootCauseAgentV3_1 (DSPy); import veya __init__ başarısızsa RootCauseAgentV2.
-    ROOTCAUSE_ENGINE=v2|legacy ile doğrudan V2 zorlanabilir.
-    """
-    force_v2 = os.getenv("ROOTCAUSE_ENGINE", "").strip().lower() in (
-        "v2",
-        "2",
-        "legacy",
-    )
-    if force_v2:
-        agent = RootCauseAgentV2(use_rag=use_rag)
-        return agent, "v2 (ROOTCAUSE_ENGINE forced)"
-
-    if _RootCauseV3_1 is None:
-        err = repr(_v3_1_import_error) if _v3_1_import_error else "unknown"
-        print(f"⚠️  V3.1 import edilemedi, V2 kullanılıyor: {err}")
-        agent = RootCauseAgentV2(use_rag=use_rag)
-        return agent, f"v2 (v3.1 import failed: {err})"
-
-    try:
-        from agents.rca_cost_profile import get_rca_cost_profile, root_cause_agent_kwargs
-
-        kwargs = root_cause_agent_kwargs(use_rag)
-        agent = _RootCauseV3_1(**kwargs)
-        prof = get_rca_cost_profile()
-        return agent, f"v3.1 ({prof.name})"
-    except Exception as e:
-        print(f"⚠️  V3.1 başlatılamadı, V2 kullanılıyor: {e}")
-        traceback.print_exc()
-        agent = RootCauseAgentV2(use_rag=use_rag)
-        return agent, f"v2 (fallback after v3.1 init error: {e})"
+    return init_root_cause_agent(use_rag)
 
 
 @app.on_event("startup")
@@ -232,10 +199,8 @@ async def startup_event():
         actionplan_agent = ActionPlanAgent()
         print("✅ Action Plan Agent initialized")
         
-        # Primary report generator: SkillBasedDocxAgent (DOCX + HTML + decision tree).
-        # ClaudeSkillPDFAgent may exist in codebase but is not primary in API flow.
-        pdf_agent = SkillBasedDocxAgent()
-        print("✅ Report Agent initialized (SkillBasedDocxAgent)")
+        pdf_agent, report_agent_info = init_report_agent()
+        print(f"✅ Report Agent initialized ({report_agent_info})")
         
         print("🎉 All agents ready!")
         print(f"🔑 Using API Key: {api_key[:20]}...{api_key[-10:]}")
@@ -933,8 +898,8 @@ def _generate_report_artifacts(
             # Ensure API always tries SkillBasedDocxAgent as safe fallback.
             if isinstance(active_report_agent, SkillBasedDocxAgent):
                 raise
-            print("⚠️  Primary report agent failed. Falling back to SkillBasedDocxAgent.")
-            active_report_agent = SkillBasedDocxAgent()
+            print("⚠️  Primary report agent failed. Falling back to report factory.")
+            active_report_agent, _ = init_report_agent()
             docx_generated = _call_generate_report(active_report_agent, report_payload, preferred_language)
 
         docx_path = Path(docx_generated).resolve()
@@ -1778,11 +1743,7 @@ async def health_check():
         "status": "healthy" if all_agents_ready else "degraded",
         "agents": agents_status,
         "rootcause_engine": rootcause_engine_info,
-        "models": {
-            "chat_default": resolve_openrouter_chat_model(),
-            "dspy": resolve_openrouter_dspy_model(),
-            "docx": resolve_openrouter_docx_model(),
-        },
+        "models": resolve_models_for_health(),
         "cache": {
             "hitl_cache_ttl_seconds": _hitl_cache_ttl_seconds(),
             "hybrid": {"redis_ping_ms": redis_ms, "redis_ok": redis_ok, "mongo_ping_ms": mongo_ms, "mongo_ok": mongo_ok},
