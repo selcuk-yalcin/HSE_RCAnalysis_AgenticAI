@@ -14,6 +14,8 @@ STATUS:  ACTIVE (Production'da kullanılıyor - Fallback: V2)
 ENTEGRASYON NOTU:
 ────────────────
 - DSPy module-based architecture
+- RCA modeli: OPENROUTER_DSPY_MODEL (varsayılan Haiku; örn. anthropic/claude-sonnet-5)
+- Tüm DSPy çağrıları (ImmediateCauseFinder, WhyChain, BranchCritic) aynı LM'i kullanır
 - Backward compatible ile V2.5 veri yapıları
 - Orchestrator'da try-except ile fallback (V2'ye düşer)
 - DSPy yoksa otomatik V2 kullanılır
@@ -1768,14 +1770,16 @@ class RootCauseAgentV3_1:
         return 3
     
     def _reconfigure_dspy_lm(self, initial: bool = False) -> None:
-        """Resolve OpenRouter DSPy LM from env + optional request tier; dspy.configure(lm=...)."""
+        """OPENROUTER_DSPY_MODEL → dspy.LM (OpenRouter) → dspy.configure(lm=...)."""
         api_key = _resolve_openrouter_api_key()
         _api_base = _normalize_openrouter_api_base()
         os.environ["OPENROUTER_API_KEY"] = api_key
         os.environ["OPENAI_API_KEY"] = api_key
         os.environ["OPENROUTER_API_BASE"] = _api_base
 
+        rca_model_slug = resolve_openrouter_dspy_model().strip()
         dspy_model = _openrouter_litellm_model()
+        self._rca_model_slug = rca_model_slug
         if not initial and self._configured_litellm_model_id == dspy_model:
             return
 
@@ -1790,7 +1794,8 @@ class RootCauseAgentV3_1:
             else "🔁 DSPy LM reconfigured (analysis tier/context):"
         )
         print(
-            f"{label} model={dspy_model}, api_base={_api_base}, key={_mask_secret(api_key)}"
+            f"{label} model={rca_model_slug} (litellm={dspy_model}), "
+            f"api_base={_api_base}, key={_mask_secret(api_key)}"
         )
 
         dspy_lm = dspy.LM(
@@ -1813,7 +1818,7 @@ class RootCauseAgentV3_1:
     ) -> Dict:
         """
         Ana analiz — V2.5 ile uyumlu output format.
-        Form / API: investigation_data.analysis_model_preset in (quality | economy).
+        RCA modeli: OPENROUTER_DSPY_MODEL (analysis_model_preset modeli değiştirmez).
         progress_reporter: shared.pipeline_progress.PipelineProgressReporter (opsiyonel).
         """
         preset = ""
@@ -1867,6 +1872,10 @@ class RootCauseAgentV3_1:
             stage="investigate",
             progress=12,
         )
+        rca_model = (
+            getattr(self, "_rca_model_slug", None) or resolve_openrouter_dspy_model()
+        ).strip()
+        self._progress(f"RCA modeli: {rca_model}", progress=13)
         
         # Olay özeti hazırla
         incident_summary = self._prepare_incident_summary(
@@ -1913,6 +1922,7 @@ class RootCauseAgentV3_1:
             "analysis_branches": [],
             "final_root_causes": [],
             "analysis_method": "BARSEL Hierarchical 5-Why (DSPy V3.1)",
+            "rca_model": rca_model,
             "chain_quality_scores": []
         }
         
