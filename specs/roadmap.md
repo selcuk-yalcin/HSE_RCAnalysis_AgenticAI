@@ -137,6 +137,62 @@ _try_snap_to_taxonomy() → cause_tr'yi W5'ten koparıp BARSEL başlığıyla ez
 
 **Kod dokunuşu:** `agents/why_chain_quality.py` (`build_event_why1_question`, `immediate_cause_sentence`), `agents/rootcause_agent_v3_1.py` (forward zinciri), `agents/skillbased_docx_agent.py` (`_direct_cause_sentence`), `tests/test_why_chain_quality.py`.
 
+---
+
+## P1.28 V3.2 — trainset tarzı 5-Why (paralel agent, inactive) ⏳
+
+**Bağlam:** V3.1 W1 = `"Neden {olay} meydana geldi?"` + kısa A/B cevap. Trainset (`hse_dspy_trainset.json`, örn. `good_tr_kimya_sizinti`) W1 = olaydan **maruziyet/sonuç sorusu** (`"Neden operatör solvent buharına maruz kaldı?"`) + A/B band cevabı (`evidence_tr` / BARSEL). V3.1 ile trainset hizası tam değil.
+
+**Kod (inactive — production V3.1):** `agents/v3_2/` — `RootCauseAgentV3_2`, `WhyChainV32`, `why_chain_quality_v3_2.py`. Orchestrator / API **bağlı değil**.
+
+**Hedef akış (V3.2):**
+
+```
+NEDEN 1 — Olaydan trainset soru (tüm dallarda ortak) → cevap A/B + BARSEL Mongo
+NEDEN 2–5 — LLM zincir (bir önceki cevap) → C/D kök neden
+```
+
+| Adım | Durum | İş |
+|------|--------|-----|
+| **V32-1** | ✅ | Paralel paket `agents/v3_2/` (V3.1'e dokunmadan) |
+| **V32-1b** | ✅ | Tam stack: `why_chain_v3_2`, `report_why_chain_v3_2`, `skillbased_docx_agent_v3_2`, `decision_tree_v3_2`, `pipeline_v3_2`, `v31_bridge.py` |
+| **V32-2** | ✅ | Birim testler — `tests/test_rootcause_agent_v3_2.py`, `tests/test_report_why_chain_v3_2.py` |
+| **V32-3** | ⏳ | **Tam test ortamı:** proje venv + `dspy-ai` kurulu iken `pytest tests/test_rootcause_agent_v3_2.py -v` (skip kalkmalı) |
+| **V32-4** | ⏳ | E2E: `good_tr_kimya_sizinti` olayı ile V3.1 vs V3.2 `analyze_root_causes` çıktı karşılaştırması |
+| **V32-5** | ⏳ | `hse_dspy_trainset.json` W1 şemasını V3.2 ile hizala (MIPRO / R10) |
+| **V32-6** | ⏳ | Opt-in aktivasyon: `ROOTCAUSE_AGENT_VERSION=3.2` + orchestrator factory |
+| **V32-7** | ⏳ | Rapor pin (P1.26) ile birlikte HTML 5-Why tablosu doğrulama |
+
+### Test durumu ve “sandbox / skip” ne demek?
+
+CI veya Cursor **sandbox** ortamında `pytest` çalıştırıldığında:
+
+| Sonuç | Anlam |
+|--------|--------|
+| **3 passed** | DSPy/LLM **gerektirmeyen** testler geçti: W1 soru heuristic (`build_trainset_why1_question_heuristic`), A/B cevap (`immediate_cause_ab_answer`). |
+| **1 skipped** | `test_v3_2_status_inactive` — `RootCauseAgentV3_2` import ederken `dspy` + `rootcause_agent_v3_1` zinciri yüklenir; sandbox’ta `dspy.Signature` vb. eksik/bozuk olunca test **atlanır** (`pytest.skip`), hata sayılmaz. |
+| **Sandbox** | Agent’in kod çalıştırdığı **izole kısıtlı ortam** (ağ/sandbox venv). Production worker veya yerel tam venv ile aynı değildir. |
+
+**Yerel doğrulama (denenecek):**
+
+```bash
+# Proje venv aktif, requirements kurulu
+pytest tests/test_rootcause_agent_v3_2.py -v
+python -c "from agents.v3_2 import check_v3_2_status; import json; print(json.dumps(check_v3_2_status(), indent=2, ensure_ascii=False))"
+# E2E (OpenRouter + Mongo gerekir):
+# from agents.v3_2 import create_v3_2_agent
+# agent = create_v3_2_agent(use_rag=True)
+# agent.analyze_root_causes(part1, part2, investigation_data)
+```
+
+**Kabul (promote öncesi):**
+- Kimya örneğinde W1 sorusu trainset’e yakın; W1 cevabı A/B + `evidence_tr`; 5 satır; kök C/D trainset bandına uygun.
+- V3.1 production davranışı değişmeden kalır (opt-in).
+
+**Kod dokunuşu:** `agents/v3_2/` (tam paket), `tests/test_rootcause_agent_v3_2.py`, `tests/test_report_why_chain_v3_2.py`, `agents/synetic_data_preperation/hse_dspy_trainset.json` (hizalama).
+
+---
+
 ## P1.25 Etkileşimli form 504 — bootstrap + retry ✅
 
 **Sorun:** Bazı kullanıcılar etkileşimli form gönderiminde `HTTP 504` alıyor (Railway cold-start, iki ayrı gateway çağrısı, Redis blokajı).
