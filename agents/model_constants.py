@@ -10,10 +10,14 @@ Sabit ayrım (üretim varsayılanı):
 Formdaki quality/economy seçimi analiz modelini değiştirmez (ikisi de Haiku);
 yalnızca ileride farklı analiz profilleri eklenirse kullanılabilir.
 
-Ortam önceliği (analiz):
+Ortam önceliği (HITL, overview, assessment, chat):
 - Hepsini test için tek model: OPENROUTER_TEST_MODEL=...
-- Analiz özel override: OPENROUTER_DSPY_MODEL, OPENROUTER_DEFAULT_MODEL (genelde Haiku bırakın)
+- Genel analiz override: OPENROUTER_DEFAULT_MODEL (genelde Haiku bırakın)
 - OPENROUTER_MODEL_PRESET (dikkat: preset analiz yolunu etkiler)
+
+RCA / DSPy (yalnızca kök neden):
+- OPENROUTER_DSPY_MODEL (ör. anthropic/claude-sonnet-5)
+- OPENROUTER_TEST_MODEL tüm hattı tek modele çeker (DSPy dahil)
 
 Rapor:
 - OPENROUTER_DOCX_MODEL veya varsayılan Flash
@@ -40,6 +44,9 @@ _MODEL_PRESETS = {
     "sonnet": "anthropic/claude-sonnet-4.5",
     "claude_sonnet": "anthropic/claude-sonnet-4.5",
     "claude-sonnet-4.5": "anthropic/claude-sonnet-4.5",
+    "sonnet5": "anthropic/claude-sonnet-5",
+    "claude_sonnet_5": "anthropic/claude-sonnet-5",
+    "claude-sonnet-5": "anthropic/claude-sonnet-5",
     "haiku": _HAIKU_MODEL,
     "claude_haiku": _HAIKU_MODEL,
     "claude-haiku-4.5": _HAIKU_MODEL,
@@ -82,14 +89,7 @@ def analysis_tier_context(tier: str):
         _request_analysis_tier.reset(token)
 
 
-def _resolve_analysis_model() -> str:
-    """Tüm RCA/HITL/overview/aksiyon planı — varsayılan Haiku."""
-    test = _env("OPENROUTER_TEST_MODEL")
-    if test:
-        return test
-    explicit = _env("OPENROUTER_DSPY_MODEL") or _env("OPENROUTER_DEFAULT_MODEL")
-    if explicit:
-        return explicit
+def _resolve_from_preset_or_default() -> str:
     preset = (_env("OPENROUTER_MODEL_PRESET") or "").strip().lower()
     if preset and preset in _MODEL_PRESETS:
         # Preset flash ise bile analizde Haiku kullan (flash yalnızca rapor)
@@ -98,6 +98,28 @@ def _resolve_analysis_model() -> str:
             return _HAIKU_MODEL
         return slug
     return _HAIKU_MODEL
+
+
+def _resolve_analysis_model() -> str:
+    """HITL, overview, assessment, aksiyon planı — varsayılan Haiku."""
+    test = _env("OPENROUTER_TEST_MODEL")
+    if test:
+        return test
+    explicit = _env("OPENROUTER_DEFAULT_MODEL")
+    if explicit:
+        return explicit
+    return _resolve_from_preset_or_default()
+
+
+def _resolve_dspy_model() -> str:
+    """RCA / DSPy kök neden — OPENROUTER_DSPY_MODEL diğer analizden ayrı."""
+    test = _env("OPENROUTER_TEST_MODEL")
+    if test:
+        return test
+    explicit = _env("OPENROUTER_DSPY_MODEL")
+    if explicit:
+        return explicit
+    return _resolve_from_preset_or_default()
 
 
 def resolve_openrouter_chat_model() -> str:
@@ -109,8 +131,8 @@ OPENROUTER_DOCX_DEFAULT_MODEL = (_env("OPENROUTER_DOCX_DEFAULT_MODEL") or "").st
 
 
 def resolve_openrouter_dspy_model() -> str:
-    """DSPy kök neden — analiz yolu (Haiku)."""
-    return _resolve_analysis_model()
+    """DSPy kök neden — OPENROUTER_DSPY_MODEL veya varsayılan Haiku."""
+    return _resolve_dspy_model()
 
 
 def resolve_openrouter_docx_model() -> str:
