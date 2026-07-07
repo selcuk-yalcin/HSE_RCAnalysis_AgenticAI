@@ -154,7 +154,7 @@ def check_v3_2_status() -> Dict:
         "why_chain_class": "WhyChainV32",
         "w1_question_style": "olay-zarar merceği — tüm dallarda ortak (ör. Garcia düşme yaralanması)",
         "w1_answer_source": "A/B immediate_cause + BARSEL Mongo (evidence_tr öncelikli)",
-        "w2_style": "W1 A/B cevabına neden (build_direct_cause_why2_question)",
+        "w2_style": "W1 A/B cevabına neden (build_why2_from_ab_answer + dal odağı)",
         "w3_w5_style": "LLM zincir → C/D kök neden",
         "v31_bug": "build_event_why1_question faaliyet cümlesi üretir (montaj/meydana geldi)",
         "report_agent": "SkillBasedDocxAgentV32",

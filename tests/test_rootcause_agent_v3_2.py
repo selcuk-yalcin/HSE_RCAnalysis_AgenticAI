@@ -28,6 +28,35 @@ KIMYA_INCIDENT = (
     "sağlık birimine yönlendirildi."
 )
 
+HASAN_INCIDENT = (
+    "İskele montaj işçisi Hasan Yıldız (32) yaklaşık 6 metre yükseklikteki iskeleden "
+    "düşerek zemine çakıldı. Emniyet kemeri takılmamıştı."
+)
+
+V31_BAD_WHY1 = (
+    "Neden İskele montaj işçisi Hasan Yıldız (32) yaklaşık 6 metre yükseklikteki "
+    "iskeleden düşerek zemine çakıldı meydana geldi?"
+)
+
+
+def test_hasan_fall_why1():
+    q = build_incident_harm_why1_question_heuristic(HASAN_INCIDENT)
+    assert "Hasan" in q
+    assert "6" in q
+    assert "düş" in q.lower() or "yaraland" in q.lower()
+    assert "meydana geldi" not in q.lower()
+    assert "montaj" not in q.lower() or q.lower().index("neden") < q.lower().find("montaj")
+
+
+def test_rejects_v31_meydana_geldi_pattern():
+    from agents.v3_2.why_chain_quality_v3_2 import is_invalid_why1_question
+
+    assert is_invalid_why1_question(V31_BAD_WHY1) is True
+    assert is_invalid_why1_question(
+        "Neden Hasan Yıldız 6 metre yükseklikten düşerek ağır yaralandı?"
+    ) is False
+
+
 GARCIA_INCIDENT = (
     "29.06.2026 tarihinde EAK (Eğik Askılı Köprü) bölgesinde, VSL firması tarafından "
     "Batı Pilon bölgesinde segment strand halat montaj faaliyeti yürütülmekteydi. "

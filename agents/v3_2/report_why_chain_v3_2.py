@@ -20,11 +20,19 @@ try:
     from agents.v3_2.why_chain_quality_v3_2 import (
         build_trainset_why1_question_heuristic,
         immediate_cause_ab_answer,
+        is_invalid_why1_question,
+        is_valid_why_question,
+        repair_why_question,
+        validate_chain_step,
     )
 except ImportError:
     from .why_chain_quality_v3_2 import (
         build_trainset_why1_question_heuristic,
         immediate_cause_ab_answer,
+        is_invalid_why1_question,
+        is_valid_why_question,
+        repair_why_question,
+        validate_chain_step,
     )
 
 
@@ -32,10 +40,27 @@ def build_shared_trainset_why1_question(
     incident_text: str,
     *,
     cached: str | None = None,
+    raw_data: Dict[str, Any] | None = None,
 ) -> str:
-    """Tüm dallarda ortak NEDEN 1 (trainset tarzı)."""
-    if cached:
+    """Tüm dallarda ortak NEDEN 1 — önce agent cache, sonra heuristic."""
+    if cached and not is_invalid_why1_question(cached):
         return cached
+
+    part3 = (raw_data or {}).get("part3_rca") if isinstance(raw_data, dict) else {}
+    if isinstance(part3, dict):
+        agent_q = str(part3.get("shared_why1_question") or "").strip()
+        if agent_q and not is_invalid_why1_question(agent_q):
+            return agent_q
+        for br in part3.get("analysis_branches") or []:
+            if not isinstance(br, dict):
+                continue
+            for step in br.get("why_chain") or br.get("whys") or []:
+                if not isinstance(step, dict) or int(step.get("level") or 0) != 1:
+                    continue
+                q = str(step.get("question_tr") or step.get("question") or "").strip()
+                if q and not is_invalid_why1_question(q):
+                    return q
+
     return build_trainset_why1_question_heuristic(incident_text)
 
 
@@ -113,13 +138,18 @@ def build_pinned_why_chain_v32(
     for level in range(2, 6):
         step = by_level.get(level)
         if step:
-            q = strip_hse_codes(str(step.get("question_tr") or step.get("question") or ""))
+            q = repair_why_question(
+                strip_hse_codes(str(step.get("question_tr") or step.get("question") or ""))
+            )
             a = strip_hse_codes(
                 strip_barsel_answer_prefix(str(step.get("answer_tr") or step.get("answer") or ""))
             )
         else:
             q, a = "", ""
             warnings.append(f"dal {branch_no}: NEDEN {level} agent zincirinde eksik")
+        prev_a = chain[-1]["answer"] if chain else ""
+        for issue in validate_chain_step(level, q, a, prev_a, ""):
+            warnings.append(f"dal {branch_no}: NEDEN {level} — {issue}")
         chain.append({"number": level, "question": q, "answer": a})
 
     if len(chain) != 5:
@@ -142,8 +172,11 @@ def validate_report_why_chains_v32(branches: List[Dict[str, Any]]) -> List[str]:
             issues.append(f"dal {bn}: NEDEN 1 cevabı (A/B) boş")
         for w in wc:
             n = int(w.get("number") or 0)
-            if n >= 2 and not str(w.get("question") or "").strip():
+            q = str(w.get("question") or "").strip()
+            if n >= 2 and not q:
                 issues.append(f"dal {bn}: NEDEN {n} sorusu boş")
+            elif n >= 2 and not is_valid_why_question(q, level=n):
+                issues.append(f"dal {bn}: NEDEN {n} geçersiz soru formatı")
     if len(branches) > 1:
         first_q = []
         for br in branches:
@@ -167,7 +200,12 @@ def pin_agent_why_chains_to_report_v32(
         return content
 
     incident_summary = _incident_summary_from_raw(raw_data)
-    shared_q = build_shared_trainset_why1_question(incident_summary)
+    part3 = raw_data.get("part3_rca") if isinstance(raw_data.get("part3_rca"), dict) else {}
+    shared_q = build_shared_trainset_why1_question(
+        incident_summary,
+        cached=str(part3.get("shared_why1_question") or "").strip() or None,
+        raw_data=raw_data,
+    )
     out = copy.deepcopy(content)
     report_branches: List[Dict[str, Any]] = list(out.get("branches") or [])
     all_warnings: List[str] = []

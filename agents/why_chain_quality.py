@@ -221,6 +221,32 @@ def answer_repeats_previous(previous: str, new_answer: str, *, threshold: float 
     return token_jaccard(previous, new_answer) >= threshold
 
 
+def validate_causal_link(
+    prev_answer: str,
+    question: str,
+    *,
+    min_shared: int = 1,
+) -> bool:
+    """Soru bir önceki cevapla nedensellik bağı taşıyor mu?"""
+    prev_tokens = {
+        t
+        for t in re.findall(r"[a-zçğıöşü]{5,}", (prev_answer or "").lower())
+    }
+    q_tokens = {
+        t
+        for t in re.findall(r"[a-zçğıöşü]{5,}", (question or "").lower())
+    }
+    stop = {
+        "neden", "olarak", "için", "şekilde", "sonucu", "nedeni", "hangi",
+        "olayda", "personel", "kazazede", "çalışan",
+    }
+    prev_tokens -= stop
+    q_tokens -= stop
+    if not prev_tokens or not q_tokens:
+        return True
+    return len(prev_tokens & q_tokens) >= min_shared
+
+
 def question_repeats_answer(answer: str, question: str, *, threshold: float = 0.55) -> bool:
     """Why-2+ sorusu bir önceki cevabı yeniden anlatıyor mu?"""
     q = (question or "").lower()

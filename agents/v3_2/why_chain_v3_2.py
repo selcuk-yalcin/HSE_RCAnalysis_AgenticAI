@@ -34,8 +34,11 @@ try:
         question_repeats_answer,
         resolve_why_taxonomy_code,
         score_chain_quality,
-        strip_hse_codes,
     )
+    try:
+        from agents.report_text_sanitize import strip_hse_codes
+    except ImportError:
+        from ..report_text_sanitize import strip_hse_codes
 except ImportError:
     from ..rootcause_agent_v3_1 import (
         WHY_QUESTION_MAX_WORDS,
@@ -57,12 +60,23 @@ except ImportError:
         question_repeats_answer,
         resolve_why_taxonomy_code,
         score_chain_quality,
-        strip_hse_codes,
     )
+    try:
+        from ..report_text_sanitize import strip_hse_codes
+    except ImportError:
+        def strip_hse_codes(t: str) -> str:
+            return str(t or "")
 
 from .why_chain_quality_v3_2 import (
     build_trainset_why1_question,
+    build_why2_from_ab_answer,
     immediate_cause_ab_answer,
+    is_valid_why_question,
+    repair_why_question,
+    resolve_branch_focus,
+    score_chain_quality_v32,
+    topic_drift_violation,
+    validate_chain_step,
 )
 
 try:
@@ -155,6 +169,10 @@ class WhyChainV32(WhyChain):
         ]
         affirmed_probe_texts = [t for t in (affirmed_probe_texts or []) if str(t).strip()]
         taxonomy_cd_blob = (taxonomy_c or "") + "\n" + (taxonomy_d or "")
+        branch_focus_id, branch_focus_prompt = resolve_branch_focus(immediate_cause)
+        effective_angle = branch_focus_prompt
+        if branch_angle and branch_angle not in branch_focus_prompt:
+            effective_angle = f"{branch_focus_prompt}\n{branch_angle}"
 
         chain: List[Dict] = []
         current_answer_raw = immediate_cause.get("cause_tr", "")
@@ -190,34 +208,60 @@ class WhyChainV32(WhyChain):
                 continue
 
             if level == 2:
-                # W2: A/B cevabına (W1 mekanizması) neden — V3.1 klasik adım
-                imm_for_w2 = {**immediate_cause, "cause_tr": current_answer_raw}
-                question_raw = build_direct_cause_why2_question(imm_for_w2)
+                question_raw = build_why2_from_ab_answer(
+                    current_answer_raw,
+                    branch_focus_id,
+                )
             else:
                 previous_for_question = (
                     f"Önceki soru: {previous_question_raw}\n"
                     f"Önceki cevap: {current_answer_raw}\n\n"
-                    f"{_why1_question_seed(incident_summary, immediate_cause)}"
+                    f"{_why1_question_seed(incident_summary, immediate_cause)}\n\n"
+                    f"{effective_angle}\n\n"
+                    "KURAL: Soru mutlaka 'Neden …?' ile başlasın ve bir önceki cevabın "
+                    "ALT nedenini sorsun. Beyan cümlesi veya konu listesi yazma. "
+                    "Dal odağı dışına kayma."
                 )
-                if branch_angle:
-                    previous_for_question += f"\n\nDAL ODAĞI: {branch_angle}"
                 level_label = f"Why-{level} — alt neden (max {WHY_QUESTION_MAX_WORDS} kelime)"
-                question_result = self.why_question(
-                    incident_summary=incident_summary,
-                    previous_answer=previous_for_question,
-                    chain_level=level_label,
-                )
-                question_raw = enforce_short_why_question((question_result.question or "").strip())
-                if question_repeats_answer(current_answer_raw, question_raw):
+                question_raw = ""
+                for q_attempt in range(3):
                     question_result = self.why_question(
                         incident_summary=incident_summary,
-                        previous_answer=previous_for_question
-                        + "\n\nUYARI: Önceki cevabı TEKRARLAMA; bir alt organizasyonel/teknik nedeni sor.",
+                        previous_answer=previous_for_question,
                         chain_level=level_label,
                     )
-                    question_raw = enforce_short_why_question((question_result.question or "").strip())
+                    candidate = repair_why_question(
+                        (question_result.question or "").strip()
+                    )
+                    if question_repeats_answer(current_answer_raw, candidate):
+                        previous_for_question += (
+                            "\n\nUYARI: Önceki cevabı TEKRARLAMA; bir alt organizasyonel/teknik nedeni sor."
+                        )
+                        continue
+                    drift = topic_drift_violation(
+                        candidate, branch_focus_id, level=level
+                    )
+                    if drift:
+                        previous_for_question += f"\n\nUYARI: {drift} — dal odağında kal."
+                        continue
+                    if is_valid_why_question(
+                        candidate, current_answer_raw, level=level
+                    ):
+                        question_raw = candidate
+                        break
+                    previous_for_question += (
+                        "\n\nUYARI: Geçerli 'Neden …?' sorusu üret; önceki cevaba bağlı kal."
+                    )
+                if not question_raw:
+                    question_result = self.why_question(
+                        incident_summary=incident_summary,
+                        previous_answer=previous_for_question,
+                        chain_level=level_label,
+                    )
+                    question_raw = repair_why_question(
+                        (question_result.question or "").strip()
+                    )
 
-            question_display = strip_hse_codes(question_raw)
 
             taxonomy = taxonomy_c if level >= 3 else ""
             if level >= 4:
@@ -248,7 +292,7 @@ class WhyChainV32(WhyChain):
             )
             probe_ctx = self._probe_context_for_level(probe_level, probe_answers_by_level)
             if branch_angle and level >= 3:
-                incident_ctx += f"\n\nDAL ODAĞI: {branch_angle}"
+                incident_ctx += f"\n\n{effective_angle}"
             if probe_ctx:
                 incident_ctx += "\n\n" + probe_ctx
 
@@ -331,10 +375,43 @@ class WhyChainV32(WhyChain):
                     if diverse_check:
                         answer_raw = demote_solution_to_cause(diverse_check)
 
+            step_issues = validate_chain_step(
+                level,
+                question_raw,
+                answer_raw,
+                chain[-1]["answer_tr"] if chain else "",
+                branch_focus_id,
+            )
+            if step_issues and level >= 2 and answer_result is not None:
+                for issue in step_issues[:1]:
+                    retry_ctx = incident_ctx + f"\n\nUYARI: {issue} — farklı alt neden yaz."
+                    retry_result = self.why_answer(
+                        question=question_raw,
+                        incident_context=retry_ctx,
+                        taxonomy_codes=taxonomy,
+                    )
+                    retry_raw = demote_solution_to_cause(
+                        (retry_result.answer or "").strip()
+                    )
+                    if retry_raw and not answer_repeats_previous(
+                        chain[-1]["answer_tr"], retry_raw, threshold=0.72
+                    ):
+                        answer_raw = retry_raw
+                        if retry_result is not None:
+                            llm_code = str(
+                                getattr(retry_result, "hsg245_code", "") or ""
+                            )
+                            code = pick_non_forbidden_code(
+                                llm_code,
+                                answer_raw,
+                                taxonomy_cd_blob,
+                                forbidden_root_codes if level >= 5 else [],
+                            )
+
             answer_display = format_barsel_why_answer(code, strip_hse_codes(answer_raw))
             step_payload = {
                 "level": level,
-                "question_tr": question_display,
+                "question_tr": strip_hse_codes(question_raw),
                 "answer_tr": answer_display,
                 "code": code,
             }
@@ -407,6 +484,7 @@ class WhyChainV32(WhyChain):
         return {
             "whys": chain,
             "root_cause": root_cause_data,
-            "chain_quality": score_chain_quality(chain),
+            "chain_quality": score_chain_quality_v32(chain, branch_focus_id),
             "shared_why1_question": self.shared_why1_question_cache,
+            "branch_focus": branch_focus_id,
         }
